@@ -58,6 +58,9 @@ EFrame Tools/项目初始化向导
 窗口支持：
 
 - 一键执行冷启动
+- 初始化 Addressables 设置
+- 创建默认 `App Local Group`
+- 将 `Assets/App/Res` 下已有资源注册为 Addressables，并按相对路径去掉扩展名生成地址
 - 创建或刷新 `Assets/Scenes/StartUp.unity`
 - 自动创建 `Boot + Main Camera`
 - 设置 `ProcedureComponent` 与 `EFrameComponent` 引用

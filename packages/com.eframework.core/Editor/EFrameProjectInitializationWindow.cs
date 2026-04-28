@@ -50,6 +50,8 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 EditorGUILayout.LabelField("Project", ProjectRootPath);
                 EditorGUILayout.LabelField("Framework Root", TryGetFrameworkRoot(out var frameworkRoot, out var rootError) ? frameworkRoot : rootError);
                 EditorGUILayout.LabelField("AI Sync Available", IsAiSyncAvailable(out _, out _) ? "Yes" : "No");
+                EditorGUILayout.LabelField("Addressables Ready", EFrameAddressablesBootstrapUtility.AreAddressablesInitialized() ? "Yes" : "No");
+                EditorGUILayout.LabelField("App Res Group Ready", EFrameAddressablesBootstrapUtility.IsAppResAddressablesReady() ? "Yes" : "No");
             }
 
             EditorGUILayout.Space();
@@ -75,6 +77,16 @@ namespace EFrameWork.Editor.ProjectBootstrap
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 EditorGUILayout.LabelField("Scene", EditorStyles.boldLabel);
+
+                if (GUILayout.Button("Initialize Addressables"))
+                {
+                    EnsureAddressablesInitialized();
+                }
+
+                if (GUILayout.Button("Setup App Res Addressables Group"))
+                {
+                    EnsureAppResAddressablesGroup();
+                }
 
                 if (GUILayout.Button("Create Or Refresh StartUp Scene"))
                 {
@@ -153,6 +165,16 @@ namespace EFrameWork.Editor.ProjectBootstrap
             else
             {
                 SetStatus("Framework root was not detected as a local repo. Running scene initialization only.", false);
+            }
+
+            if (!EnsureAddressablesInitialized())
+            {
+                return;
+            }
+
+            if (!EnsureAppResAddressablesGroup())
+            {
+                return;
             }
 
             CreateOrRefreshStartUpScene();
@@ -254,6 +276,20 @@ namespace EFrameWork.Editor.ProjectBootstrap
             Selection.activeObject = asset;
             EditorGUIUtility.PingObject(asset);
             SetStatus($"Opened guide at {StartUpGuidePath}.", false);
+        }
+
+        private bool EnsureAddressablesInitialized()
+        {
+            var success = EFrameAddressablesBootstrapUtility.EnsureAddressablesInitialized(out var message);
+            SetStatus(message, !success);
+            return success;
+        }
+
+        private bool EnsureAppResAddressablesGroup()
+        {
+            var success = EFrameAddressablesBootstrapUtility.EnsureAppResAddressablesGroup(out var message);
+            SetStatus(message, !success);
+            return success;
         }
 
         private bool RunToolScript(string scriptName, string arguments)
@@ -390,7 +426,9 @@ namespace EFrameWork.Editor.ProjectBootstrap
         {
             var startUpSceneExists = File.Exists(Path.Combine(ProjectRootPath, StartUpScenePath));
             var aiManifestExists = File.Exists(Path.Combine(ProjectRootPath, ".github", "eframe-ai.manifest.json"));
-            return !startUpSceneExists || !aiManifestExists;
+            var addressablesReady = EFrameAddressablesBootstrapUtility.AreAddressablesInitialized();
+            var appResGroupReady = EFrameAddressablesBootstrapUtility.IsAppResAddressablesReady();
+            return !startUpSceneExists || !aiManifestExists || !addressablesReady || !appResGroupReady;
         }
 
         [InitializeOnLoadMethod]

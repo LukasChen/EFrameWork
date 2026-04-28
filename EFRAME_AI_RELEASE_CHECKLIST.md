@@ -41,7 +41,8 @@
 6. `Initialize-EFrameBootstrapCode.ps1` 能在一个临时项目目录中生成最小启动代码和场景说明。
 7. `Initialize-EFrameColdStart.ps1` 能在一个临时空目录中完成冷启动。
 8. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
-9. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
+9. 初始化窗口能创建 `App Local Group`，并将 `Assets/App/Res` 资源注册进 Addressables。
+10. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
 
 ## 3. 业务项目升级流程
 
