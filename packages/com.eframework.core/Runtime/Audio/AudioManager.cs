@@ -67,13 +67,13 @@ namespace EFrameWork.Runtime.Audio
         public void Dispose()
         {
             // 停止所有音乐动画
-            foreach (var audioSource in m_musicAudioSourceCache)
+            foreach (var audioSource in m_musicAudioSourceCache ?? Enumerable.Empty<AudioSource>())
             {
                 audioSource.DOKill();
             }
 
             // 清理音频池
-            foreach (var audioSource in m_audioSourcePool)
+            foreach (var audioSource in m_audioSourcePool ?? Enumerable.Empty<AudioSource>())
             {
                 if (audioSource != null)
                 {
@@ -90,8 +90,22 @@ namespace EFrameWork.Runtime.Audio
         private void InitAudioCache()
         {
             m_audioMixer = Resources.Load<AudioMixer>("EFrameAudioMixerSettings");
-            m_musicGroup = m_audioMixer.FindMatchingGroups(K_musicGroup)[0];
-            m_sfxGroup = m_audioMixer.FindMatchingGroups(K_sfxGroup)[0];
+            if (m_audioMixer == null)
+            {
+                Debug.LogWarning("EFrameAudioMixerSettings was not found under Assets/Resources. Audio will initialize without mixer routing. Run EFrame Tools/项目初始化向导 or EFrame Tools/Audio Setup to create it.");
+            }
+            else
+            {
+                var musicGroups = m_audioMixer.FindMatchingGroups(K_musicGroup);
+                var sfxGroups = m_audioMixer.FindMatchingGroups(K_sfxGroup);
+                m_musicGroup = musicGroups.Length > 0 ? musicGroups[0] : null;
+                m_sfxGroup = sfxGroups.Length > 0 ? sfxGroups[0] : null;
+
+                if (m_musicGroup == null || m_sfxGroup == null)
+                {
+                    Debug.LogWarning("EFrameAudioMixerSettings is missing MUSIC or SFX groups. Audio will initialize without complete mixer routing.");
+                }
+            }
 
             if (m_audioSourceHolder.GetComponent<AudioListener>() == null)
                 m_audioSourceHolder.AddComponent<AudioListener>();
@@ -101,7 +115,8 @@ namespace EFrameWork.Runtime.Audio
             for (int i = 0; i < 2; i++)
             {
                 AudioSource musicAudioSource = m_audioSourceHolder.AddComponent<AudioSource>();
-                musicAudioSource.outputAudioMixerGroup = m_musicGroup;
+                if (m_musicGroup != null)
+                    musicAudioSource.outputAudioMixerGroup = m_musicGroup;
                 m_musicAudioSourceCache.Enqueue(musicAudioSource);
             }
             m_currentMusicSource = m_musicAudioSourceCache.ElementAt(0);
@@ -114,7 +129,8 @@ namespace EFrameWork.Runtime.Audio
             for (int i = 0; i < K_initialAudioSourceCount; i++)
             {
                 AudioSource audioSource = m_audioSourceHolder.AddComponent<AudioSource>();
-                audioSource.outputAudioMixerGroup = m_sfxGroup;
+                if (m_sfxGroup != null)
+                    audioSource.outputAudioMixerGroup = m_sfxGroup;
                 m_audioSourcePool.Add(audioSource);
             }
         }
@@ -230,7 +246,8 @@ namespace EFrameWork.Runtime.Audio
             if (m_audioSourcePool.Count < K_maxAudioSourceCount)
             {
                 AudioSource newSource = m_audioSourceHolder.AddComponent<AudioSource>();
-                newSource.outputAudioMixerGroup = m_sfxGroup;
+                if (m_sfxGroup != null)
+                    newSource.outputAudioMixerGroup = m_sfxGroup;
                 m_audioSourcePool.Add(newSource);
                 return newSource;
             }

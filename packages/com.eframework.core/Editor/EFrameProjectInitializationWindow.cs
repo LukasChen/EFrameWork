@@ -52,6 +52,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 EditorGUILayout.LabelField("AI Sync Available", IsAiSyncAvailable(out _, out _) ? "Yes" : "No");
                 EditorGUILayout.LabelField("Addressables Ready", EFrameAddressablesBootstrapUtility.AreAddressablesInitialized() ? "Yes" : "No");
                 EditorGUILayout.LabelField("App Res Group Ready", EFrameAddressablesBootstrapUtility.IsAppResAddressablesReady() ? "Yes" : "No");
+                EditorGUILayout.LabelField("Audio Ready", EFrameAudioBootstrapUtility.IsAudioSetupReady() ? "Yes" : "No");
             }
 
             EditorGUILayout.Space();
@@ -86,6 +87,11 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 if (GUILayout.Button("Setup App Res Addressables Group"))
                 {
                     EnsureAppResAddressablesGroup();
+                }
+
+                if (GUILayout.Button("Initialize Audio"))
+                {
+                    EnsureAudioSetup();
                 }
 
                 if (GUILayout.Button("Create Or Refresh StartUp Scene"))
@@ -173,6 +179,11 @@ namespace EFrameWork.Editor.ProjectBootstrap
             }
 
             if (!EnsureAppResAddressablesGroup())
+            {
+                return;
+            }
+
+            if (!EnsureAudioSetup())
             {
                 return;
             }
@@ -288,6 +299,13 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private bool EnsureAppResAddressablesGroup()
         {
             var success = EFrameAddressablesBootstrapUtility.EnsureAppResAddressablesGroup(out var message);
+            SetStatus(message, !success);
+            return success;
+        }
+
+        private bool EnsureAudioSetup()
+        {
+            var success = EFrameAudioBootstrapUtility.EnsureAudioSetup(out var message);
             SetStatus(message, !success);
             return success;
         }
@@ -428,7 +446,8 @@ namespace EFrameWork.Editor.ProjectBootstrap
             var aiManifestExists = File.Exists(Path.Combine(ProjectRootPath, ".github", "eframe-ai.manifest.json"));
             var addressablesReady = EFrameAddressablesBootstrapUtility.AreAddressablesInitialized();
             var appResGroupReady = EFrameAddressablesBootstrapUtility.IsAppResAddressablesReady();
-            return !startUpSceneExists || !aiManifestExists || !addressablesReady || !appResGroupReady;
+            var audioReady = EFrameAudioBootstrapUtility.IsAudioSetupReady();
+            return !startUpSceneExists || !aiManifestExists || !addressablesReady || !appResGroupReady || !audioReady;
         }
 
         [InitializeOnLoadMethod]
