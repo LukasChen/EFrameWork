@@ -1,0 +1,28 @@
+﻿{
+  "name": "com.eframework.core",
+  "displayName": "EFrameWork Core",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Reusable Unity game framework extracted from CozyBloom.",
+  "keywords": [
+    "unity",
+    "framework",
+    "eframework",
+    "game-framework"
+  ],
+  "author": {
+    "name": "Ethan Hubin"
+  },
+  "dependencies": {
+    "com.unity.addressables": "2.9.1",
+    "com.unity.ugui": "2.0.0",
+    "com.unity.inputsystem": "1.19.0"
+  },
+  "samples": [
+    {
+      "displayName": "EFrameWork Samples",
+      "description": "Sample assets extracted with the initial EFrameWork package.",
+      "path": "Samples~"
+    }
+  ]
+}

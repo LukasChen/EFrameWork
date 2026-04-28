@@ -1,0 +1,1118 @@
+using UnityEngine;
+using UnityEditor;
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
+using EFrameWork.Runtime.UI;
+using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Text;
+
+namespace EFrameWork.Editor
+{
+    [CustomEditor(typeof(QUIBinding))]
+    public class UIAutoBindingEditor : UnityEditor.Editor
+    {
+        public const string ClassPath = "Assets/Scripts/Generated/UI";
+        private QUIBinding m_target;
+        private Vector2 m_scrollPosition;
+        private Vector2 m_treeScrollPosition;
+        private Vector2 m_componentScrollPosition;
+
+        // 树状节点相关
+        private List<RectTransform> m_rectTransformNodes = new List<RectTransform>();
+        private Dictionary<RectTransform, bool> m_nodeExpandedState = new Dictionary<RectTransform, bool>();
+        private RectTransform m_selectedNode = null;
+        private List<Component> m_selectedNodeComponents = new List<Component>();
+
+        // ViewConfig 相关
+        private bool m_viewConfigFoldout = true;
+        private SerializedProperty m_viewConfigProperty;
+
+        private void OnEnable()
+        {
+            m_target = (QUIBinding)target;
+            m_viewConfigProperty = serializedObject.FindProperty("m_viewConfig");
+            RefreshRectTransformNodes();
+        }
+
+
+        public override void OnInspectorGUI()
+        {
+            serializedObject.Update();
+            DrawViewConfigSection();
+            EditorGUILayout.Space(5);
+            DrawControlButtons();
+            DrawBindingsList();
+            DrawAvailableComponents();
+
+            if (GUI.changed)
+            {
+                EditorUtility.SetDirty(m_target);
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        private void DrawViewConfigSection()
+        {
+            // 检查目标对象是否可以持久化（避免 DontSaveInEditor 断言错误）
+            bool isDontSave = (m_target.hideFlags & HideFlags.DontSaveInEditor) != 0 ||
+                              (m_target.gameObject != null && (m_target.gameObject.hideFlags & HideFlags.DontSaveInEditor) != 0);
+
+            if (!EditorUtility.IsPersistent(serializedObject.targetObject) && isDontSave)
+            {
+                EditorGUILayout.HelpBox("View 配置在非持久化对象上不可编辑", MessageType.Info);
+                return;
+            }
+
+            EditorGUILayout.BeginVertical("box");
+
+            m_viewConfigFoldout = EditorGUILayout.Foldout(m_viewConfigFoldout, "⚙️ View 配置", true, EditorStyles.foldoutHeader);
+
+            if (m_viewConfigFoldout && m_viewConfigProperty != null)
+            {
+                EditorGUI.indentLevel++;
+
+                // DefaultLayer
+                var layerProp = m_viewConfigProperty.FindPropertyRelative("DefaultLayer");
+                if (layerProp != null)
+                    EditorGUILayout.PropertyField(layerProp, new GUIContent("默认层级", "View 打开时的默认 UI 层级"));
+
+                // IsViewRoot
+                var isViewRoot = m_viewConfigProperty.FindPropertyRelative("IsViewRoot");
+                if (isViewRoot != null)
+                    EditorGUILayout.PropertyField(isViewRoot, new GUIContent("是否界面根节点", "方便该界面上的按钮获取到所属界面"));
+
+                // UsingCache
+                var cacheProp = m_viewConfigProperty.FindPropertyRelative("UsingCache");
+                if (cacheProp != null)
+                    EditorGUILayout.PropertyField(cacheProp, new GUIContent("使用缓存", "开启后关闭时隐藏而非销毁，可重复使用"));
+
+                // AnimationRootName - 使用下拉菜单
+                var animRootProp = m_viewConfigProperty.FindPropertyRelative("AnimationRootName");
+                if (animRootProp != null)
+                    DrawAnimationRootPopup(animRootProp);
+
+                // AnimationDuration
+                var durationProp = m_viewConfigProperty.FindPropertyRelative("AnimationDuration");
+                if (durationProp != null)
+                {
+                    EditorGUILayout.PropertyField(durationProp, new GUIContent("动画时长", "开关动画的持续时间（秒）"));
+
+                    // 确保动画时长在合理范围内
+                    if (durationProp.floatValue < 0)
+                        durationProp.floatValue = 0;
+                    if (durationProp.floatValue > 2f)
+                        durationProp.floatValue = 2f;
+                }
+
+                EditorGUI.indentLevel--;
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void DrawAnimationRootPopup(SerializedProperty animRootProp)
+        {
+            // 收集1-2级子节点
+            var nodeOptions = new List<string> { "(无动画)" };
+            var nodePaths = new List<string> { "" };
+
+            CollectChildNodes(m_target.transform, "", 0, 2, nodeOptions, nodePaths);
+
+            // 查找当前选中的索引
+            int currentIndex = 0;
+            string currentValue = animRootProp.stringValue;
+            if (!string.IsNullOrEmpty(currentValue))
+            {
+                int foundIndex = nodePaths.IndexOf(currentValue);
+                if (foundIndex >= 0)
+                {
+                    currentIndex = foundIndex;
+                }
+                else
+                {
+                    // 当前值不在列表中，添加为无效项
+                    nodeOptions.Add($"⚠ {currentValue} (未找到)");
+                    nodePaths.Add(currentValue);
+                    currentIndex = nodeOptions.Count - 1;
+                }
+            }
+
+            // 绘制下拉菜单
+            EditorGUI.BeginChangeCheck();
+            int newIndex = EditorGUILayout.Popup(
+                new GUIContent("动画根节点", "用于播放开关动画的子节点，留空则不播放动画"),
+                currentIndex,
+                nodeOptions.ToArray()
+            );
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                animRootProp.stringValue = nodePaths[newIndex];
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        private void CollectChildNodes(Transform parent, string pathPrefix, int currentDepth, int maxDepth, List<string> options, List<string> paths)
+        {
+            if (currentDepth >= maxDepth) return;
+
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i);
+                string childPath = string.IsNullOrEmpty(pathPrefix) ? child.name : $"{pathPrefix}/{child.name}";
+
+                // 添加节点显示名称（带层级缩进）
+                string indent = currentDepth > 0 ? "    " : "";
+                string displayName = $"{indent}{child.name}";
+                options.Add(displayName);
+                paths.Add(childPath);
+
+                // 递归收集下一级
+                CollectChildNodes(child, childPath, currentDepth + 1, maxDepth, options, paths);
+            }
+        }
+
+        private void DrawControlButtons()
+        {
+            EditorGUILayout.BeginHorizontal();
+
+            // 刷新按钮（小图标）
+            if (GUILayout.Button(new GUIContent("🔄", "刷新节点树"), GUILayout.Width(28), GUILayout.Height(25)))
+            {
+                RefreshRectTransformNodes();
+            }
+
+            // 生成访问类按钮（绿色突出）
+            GUI.enabled = m_target.BindingItems.Count > 0;
+            Color originalColor = GUI.backgroundColor;
+            GUI.backgroundColor = new Color(0.4f, 0.8f, 0.4f);
+            if (GUILayout.Button("Generate Class", GUILayout.Height(25)))
+            {
+                GenerateAccessClass();
+            }
+            GUI.backgroundColor = originalColor;
+            GUI.enabled = true;
+
+            // 清空绑定按钮
+            if (GUILayout.Button("Clear All", GUILayout.Width(70), GUILayout.Height(25)))
+            {
+                if (EditorUtility.DisplayDialog("清空确认", "确定要清空所有绑定吗？", "确定", "取消"))
+                {
+                    m_target.ClearAllBindings();
+                    SaveCurrentData();
+                }
+            }
+
+            // 验证绑定按钮
+            if (GUILayout.Button("Validate", GUILayout.Width(60), GUILayout.Height(25)))
+            {
+                m_target.ValidateBindings();
+                Debug.Log("绑定验证完成");
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void RefreshRectTransformNodes()
+        {
+            m_rectTransformNodes.Clear();
+            m_nodeExpandedState.Clear();
+
+            // 收集所有RectTransform节点
+            CollectRectTransformsRecursively(m_target.GetComponent<RectTransform>(), m_rectTransformNodes);
+
+            // 初始化展开状态 - 默认展开前2级节点
+            var rootTransform = m_target.GetComponent<RectTransform>();
+            foreach (var rect in m_rectTransformNodes)
+            {
+                // 计算节点深度
+                int depth = GetNodeDepthFromRoot(rect, rootTransform);
+                // 展开前2级（深度0和1的节点）
+                m_nodeExpandedState[rect] = depth <= 1;
+            }
+        }
+
+        private void CollectRectTransformsRecursively(RectTransform current, List<RectTransform> results)
+        {
+            if (current == null) return;
+
+            results.Add(current);
+            for (int i = 0; i < current.childCount; i++)
+            {
+                var child = current.GetChild(i) as RectTransform;
+                if (child != null)
+                {
+                    CollectRectTransformsRecursively(child, results);
+                }
+            }
+        }
+
+        private void RefreshSelectedNodeComponents()
+        {
+            m_selectedNodeComponents.Clear();
+
+            if (m_selectedNode == null) return;
+
+            // 获取所有组件，包括RectTransform
+            var allComponents = m_selectedNode.GetComponents<Component>();
+
+            foreach (var component in allComponents)
+            {
+                if (component == null) continue;
+
+                // 排除Transform（因为RectTransform已经包含了Transform功能）
+                // 排除当前的QUIBinding组件
+                if (component is Transform && !(component is RectTransform)) continue;
+                if (component == m_target) continue;
+
+                m_selectedNodeComponents.Add(component);
+            }
+        }
+
+        private void DrawBindingsList()
+        {
+            if (m_target.BindingItems.Count == 0)
+            {
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.HelpBox("暂无绑定项\n在下方选择节点和组件来添加绑定", MessageType.Info);
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space(10);
+                return;
+            }
+
+            // 绑定列表标题和操作区
+            EditorGUILayout.BeginVertical("box");
+
+            // 标题行 - 显示数量和快速操作
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField($"🔗 绑定列表 ({m_target.BindingItems.Count})", EditorStyles.boldLabel);
+
+            GUILayout.FlexibleSpace();
+
+            // 清空所有绑定按钮
+            GUI.backgroundColor = Color.red;
+            if (GUILayout.Button("🗑️", GUILayout.Width(30), GUILayout.Height(20)))
+            {
+                if (EditorUtility.DisplayDialog("清空确认", "确定要清空所有绑定吗？", "确定", "取消"))
+                {
+                    m_target.ClearAllBindings();
+                    SaveCurrentData();
+                }
+            }
+            GUI.backgroundColor = Color.white;
+
+            EditorGUILayout.EndHorizontal();
+
+            // 绑定项列表
+            m_scrollPosition = EditorGUILayout.BeginScrollView(m_scrollPosition, GUILayout.Height(180));
+
+            for (int i = 0; i < m_target.BindingItems.Count; i++)
+            {
+                var item = m_target.BindingItems[i];
+                DrawBindingItem(item, i);
+
+                // 添加分隔线（除了最后一项）
+                if (i < m_target.BindingItems.Count - 1)
+                {
+                    EditorGUILayout.Space(2);
+                    var rect = EditorGUILayout.GetControlRect(false, 1);
+                    EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 0.3f));
+                    EditorGUILayout.Space(2);
+                }
+            }
+
+            EditorGUILayout.EndScrollView();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space(10);
+        }
+
+        private void DrawBindingItem(ComponentBindingItem item, int index)
+        {
+            EditorGUILayout.BeginHorizontal(GUILayout.Height(40));
+
+            // 序号显示
+            EditorGUILayout.BeginVertical(GUILayout.Width(25));
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.LabelField($"{index + 1:00}", EditorStyles.miniLabel, GUILayout.Width(20));
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndVertical();
+
+            // 主要内容区域
+            EditorGUILayout.BeginVertical();
+
+            // 绑定名称编辑 - 增强样式
+            EditorGUI.BeginChangeCheck();
+            var newBindingName = EditorGUILayout.TextField(item.BindingName, EditorStyles.textField);
+            if (EditorGUI.EndChangeCheck())
+            {
+                item.BindingName = newBindingName;
+            }
+
+            // 组件信息 - 增加GameObject名称
+            var componentInfo = $"{GetComponentIcon(item.Component)} {item.ComponentTypeName}";
+            if (item.Component != null && item.Component.gameObject != null)
+            {
+                componentInfo += $" (来自: {item.Component.gameObject.name})";
+            }
+            EditorGUILayout.LabelField(componentInfo, EditorStyles.miniLabel);
+
+            EditorGUILayout.EndVertical();
+
+            // 操作按钮组
+            EditorGUILayout.BeginHorizontal(GUILayout.Width(60));
+
+            // 跳转到GameObject按钮
+            if (GUILayout.Button("📍", GUILayout.Width(25), GUILayout.Height(20)))
+            {
+                if (item.Component != null && item.Component.gameObject != null)
+                {
+                    Selection.activeGameObject = item.Component.gameObject;
+                    EditorGUIUtility.PingObject(item.Component.gameObject);
+                }
+            }
+
+            // 删除按钮 - 增大尺寸
+            GUI.backgroundColor = Color.red;
+            if (GUILayout.Button("×", GUILayout.Width(30), GUILayout.Height(20)))
+            {
+                m_target.BindingItems.RemoveAt(index);
+                SaveCurrentData();
+            }
+            GUI.backgroundColor = Color.white;
+
+            EditorGUILayout.EndHorizontal(); EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawAvailableComponents()
+        {
+            // 上半部分：节点树
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField("🌲 RectTransform Nodes", EditorStyles.boldLabel);
+
+            m_treeScrollPosition = EditorGUILayout.BeginScrollView(m_treeScrollPosition, GUILayout.Height(300));
+            DrawNodeTree();
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
+            // 下半部分：选中节点的组件
+            EditorGUILayout.BeginVertical("box");
+            if (m_selectedNode != null)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"🔧 Components on: {m_selectedNode.name}", EditorStyles.boldLabel);
+
+                // 添加手动跳转到节点的按钮
+                if (GUILayout.Button("📍", GUILayout.Width(25), GUILayout.Height(18)))
+                {
+                    Selection.activeGameObject = m_selectedNode.gameObject;
+                    EditorGUIUtility.PingObject(m_selectedNode.gameObject);
+                }
+
+
+
+                EditorGUILayout.EndHorizontal();
+
+                m_componentScrollPosition = EditorGUILayout.BeginScrollView(m_componentScrollPosition, GUILayout.Height(100));
+                DrawNodeComponents();
+                EditorGUILayout.EndScrollView();
+            }
+            else
+            {
+                EditorGUILayout.LabelField("🔧 Node Components", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox("请先选择一个节点来查看其组件", MessageType.Info);
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void DrawNodeTree()
+        {
+            if (m_rectTransformNodes.Count == 0)
+            {
+                EditorGUILayout.HelpBox("未找到RectTransform节点", MessageType.Warning);
+                return;
+            }
+
+            // 只从根节点开始绘制，避免重复显示
+            var rootNode = m_target.GetComponent<RectTransform>();
+            if (rootNode != null)
+            {
+                DrawTreeNode(rootNode, 0);
+            }
+        }
+
+        private void DrawTreeNode(RectTransform node, int depth)
+        {
+            if (node == null) return;
+
+            EditorGUILayout.BeginHorizontal();
+
+            // 缩进 - 使用更清晰的缩进量
+            GUILayout.Space(depth * 15);
+
+            // 展开/折叠按钮（如果有子节点）
+            bool hasChildren = HasRectTransformChildren(node);
+            if (hasChildren)
+            {
+                bool isExpanded = m_nodeExpandedState.GetValueOrDefault(node, false);
+                string foldoutSymbol = isExpanded ? "▼" : "▶";
+
+                if (GUILayout.Button(foldoutSymbol, GUILayout.Width(18), GUILayout.Height(18)))
+                {
+                    m_nodeExpandedState[node] = !isExpanded;
+                }
+            }
+            else
+            {
+                // 叶节点显示不同的图标
+                GUILayout.Label("•", GUILayout.Width(18));
+            }
+
+            // 层级线条（可选 - 增强视觉效果）
+            string levelPrefix = "";
+            if (depth > 0)
+            {
+                levelPrefix = new string('│', depth - 1) + "├─ ";
+            }
+
+            // 节点选择按钮
+            Color originalColor = GUI.backgroundColor;
+            if (m_selectedNode == node)
+            {
+                GUI.backgroundColor = Color.green;
+            }
+
+            string nodeName = string.IsNullOrEmpty(node.name) ? "<unnamed>" : node.name;
+            string displayName = $"{levelPrefix}📦 {nodeName}";
+
+            // 创建左对齐的按钮样式
+            GUIStyle leftAlignedButton = new GUIStyle(GUI.skin.button);
+            leftAlignedButton.alignment = TextAnchor.MiddleLeft;
+
+            if (GUILayout.Button(displayName, leftAlignedButton, GUILayout.ExpandWidth(true)))
+            {
+                // 如果点击的是已选中的节点，执行展开/折叠操作
+                if (m_selectedNode == node && hasChildren)
+                {
+                    m_nodeExpandedState[node] = !m_nodeExpandedState.GetValueOrDefault(node, false);
+                }
+                else
+                {
+                    // 否则选中该节点
+                    SelectNode(node);
+                }
+            }
+
+            GUI.backgroundColor = originalColor;
+
+            EditorGUILayout.EndHorizontal();
+
+            // 递归绘制子节点（只有在展开时才绘制）
+            if (hasChildren && m_nodeExpandedState.GetValueOrDefault(node, false))
+            {
+                for (int i = 0; i < node.childCount; i++)
+                {
+                    var child = node.GetChild(i) as RectTransform;
+                    if (child != null)
+                    {
+                        DrawTreeNode(child, depth + 1);
+                    }
+                }
+            }
+        }
+
+        private void DrawNodeComponents()
+        {
+            if (m_selectedNodeComponents.Count == 0)
+            {
+                EditorGUILayout.HelpBox("该节点上没有可绑定的组件", MessageType.Info);
+                return;
+            }
+
+            // 网格布局显示组件按钮 - 使用自适应宽度避免横向滚动
+            int buttonsPerRow = 2; // 减少每行按钮数量，避免宽度问题
+            int currentInRow = 0;
+
+            EditorGUILayout.BeginHorizontal();
+
+            foreach (var component in m_selectedNodeComponents)
+            {
+                if (component == null) continue;
+
+                // 换行处理
+                if (currentInRow >= buttonsPerRow)
+                {
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    currentInRow = 0;
+                }
+
+                // 检查是否已经被绑定
+                bool isAlreadyBound = IsComponentAlreadyBound(component);
+
+                // 设置按钮颜色
+                Color originalColor = GUI.backgroundColor;
+                if (isAlreadyBound)
+                {
+                    GUI.backgroundColor = Color.green; // 绿色表示已绑定
+                }
+                else
+                {
+                    GUI.backgroundColor = Color.white; // 白色表示未绑定
+                }
+
+                // 组件图标和名称
+                string componentIcon = GetComponentIcon(component);
+                string buttonText = $"{componentIcon} {component.GetType().Name}";
+
+                // 添加已绑定的标识
+                if (isAlreadyBound)
+                {
+                    buttonText += " ✓";
+                }
+
+                // 组件绑定/取消绑定按钮 - 使用ExpandWidth自适应宽度
+                if (GUILayout.Button(buttonText, GUILayout.ExpandWidth(true), GUILayout.Height(25)))
+                {
+                    if (isAlreadyBound)
+                    {
+                        RemoveBindingForComponent(component); // 取消绑定
+                    }
+                    else
+                    {
+                        AddBinding(m_selectedNode.gameObject, component); // 添加绑定
+                    }
+                }
+
+                GUI.backgroundColor = originalColor;
+                currentInRow++;
+            }
+
+            // 填充剩余空间
+            if (currentInRow > 0)
+            {
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+
+        private bool IsComponentAlreadyBound(Component component)
+        {
+            return m_target.BindingItems.Any(item => item.Component == component);
+        }
+
+        private void RemoveBindingForComponent(Component component)
+        {
+            var bindingItem = m_target.BindingItems.FirstOrDefault(item => item.Component == component);
+            if (bindingItem != null)
+            {
+                m_target.RemoveBinding(bindingItem.BindingName);
+                Debug.Log($"取消绑定: {bindingItem.BindingName} -> {component.GetType().Name}");
+            }
+        }
+
+        private void SelectNode(RectTransform node)
+        {
+            m_selectedNode = node;
+            RefreshSelectedNodeComponents();
+
+            // 不再自动切换Selection，避免编辑器窗口跳转
+            // Selection.activeGameObject = node.gameObject;
+        }
+
+        private int GetNodeDepth(RectTransform node)
+        {
+            int depth = 0;
+            Transform parent = node.parent;
+            Transform rootTransform = m_target.transform;
+
+            while (parent != null && parent != rootTransform)
+            {
+                depth++;
+                parent = parent.parent;
+            }
+
+            return depth;
+        }
+
+        private int GetNodeDepthFromRoot(RectTransform node, RectTransform rootTransform)
+        {
+            if (node == rootTransform) return 0;
+
+            int depth = 0;
+            Transform parent = node.parent;
+
+            while (parent != null && parent != rootTransform)
+            {
+                depth++;
+                parent = parent.parent;
+            }
+
+            // 如果找到了rootTransform，再加1（因为node是rootTransform的子级）
+            if (parent == rootTransform)
+            {
+                depth++;
+            }
+
+            return depth;
+        }
+
+        private bool HasRectTransformChildren(RectTransform node)
+        {
+            for (int i = 0; i < node.childCount; i++)
+            {
+                if (node.GetChild(i) is RectTransform)
+                    return true;
+            }
+            return false;
+        }
+
+        private string GetComponentIcon(Component component)
+        {
+            switch (component)
+            {
+                case RectTransform _: return "📐";
+                case Button _: return "🔘";
+                case Image _: return "🖼️";
+                case Text _: return "📝";
+                case TextMeshProUGUI _: return "✏️";
+                case Slider _: return "🎚️";
+                case Toggle _: return "☑️";
+                case InputField _: return "📝";
+                case ScrollRect _: return "📜";
+                case Canvas _: return "🖼️";
+                case CanvasGroup _: return "👥";
+                default: return "⚙️";
+            }
+        }
+
+        private void AddBinding(GameObject gameObject, Component component)
+        {
+            var objName = gameObject.name;
+            var typeName = component.GetType().Name;
+            if (typeName == "TextMeshProUGUI")
+            {
+                typeName = "Text";
+            }
+
+            string bindingName = $"{objName}_{typeName}";
+
+            if (typeName.IndexOf("Text") != -1 && (objName.IndexOf("Text") != -1 || objName.IndexOf("Label") != -1) || objName.IndexOf("Title") != -1)
+            {
+                bindingName = $"{objName}";
+            }
+
+            if (typeName.IndexOf("Button") != -1 && objName.IndexOf("Button") != -1)
+            {
+                bindingName = $"{objName}";
+            }
+
+            if (typeName.IndexOf("Image") != -1 && (objName.IndexOf("Image") != -1 || objName.IndexOf("Icon") != -1 || objName.IndexOf("Img") != -1 || objName.IndexOf("Bg") != -1 || objName.IndexOf("Background") != -1 || objName.IndexOf("Bg") != -1))
+            {
+                bindingName = $"{objName}";
+            }
+
+            if (typeName.IndexOf("Slider") != -1 && objName.IndexOf("Slider") != -1)
+            {
+                bindingName = $"{objName}";
+            }
+
+            if (typeName.IndexOf("Toggle") != -1 && objName.IndexOf("Toggle") != -1)
+            {
+                bindingName = $"{objName}";
+            }
+
+            if (typeName.IndexOf("RectTransform") != -1)
+            {
+                bindingName = $"{objName}";
+            }
+
+            // 确保绑定名称唯一
+            int counter = 1;
+            string originalName = bindingName;
+            while (m_target.HasBinding(bindingName))
+            {
+                bindingName = $"{originalName}_{counter}";
+                counter++;
+            }
+
+            m_target.AddBinding(bindingName, component, gameObject.name);
+            Debug.Log($"添加绑定: {bindingName} -> {component.GetType().Name}");
+        }
+
+        /// <summary>
+        /// 保存当前编辑器数据
+        /// </summary>
+        private void SaveCurrentData()
+        {
+            // 确保序列化对象是最新的
+            serializedObject.ApplyModifiedProperties();
+
+            // 标记目标对象已修改
+            EditorUtility.SetDirty(m_target);
+
+            // 如果目标对象是预制体，也标记预制体已修改
+            if (PrefabUtility.IsPartOfPrefabInstance(m_target))
+            {
+                PrefabUtility.RecordPrefabInstancePropertyModifications(m_target);
+            }
+
+            // 保存当前场景
+            if (!Application.isPlaying)
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(m_target.gameObject.scene);
+            }
+
+            // 强制保存资源
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"已自动保存 QUIBinding 数据: {m_target.gameObject.name} ({m_target.BindingItems.Count} 个绑定项)");
+        }
+
+
+
+        private void GenerateAccessClass()
+        {
+            var bindingItems = m_target.BindingItems;
+            if (bindingItems.Count == 0)
+            {
+                EditorUtility.DisplayDialog("生成失败", "没有绑定项！请先添加组件绑定。", "确定");
+                return;
+            }
+
+            // 自动保存当前数据
+            SaveCurrentData();
+
+            string code = GenerateAccessClassCode();
+
+            if (!Directory.Exists(ClassPath))
+            {
+                Directory.CreateDirectory(ClassPath);
+            }
+
+            string filePath = Path.Combine(ClassPath, $"{m_target.AccessClassName}.cs");
+
+            // 保存文件（不刷新AssetDatabase避免焦点跳转）
+            File.WriteAllText(filePath, code, Encoding.UTF8);
+
+            // 使用异步导入，避免立即刷新导致的焦点跳转
+            AssetDatabase.ImportAsset(filePath, ImportAssetOptions.DontDownloadFromCacheServer);
+
+            Debug.Log($"访问类已生成: {filePath}");
+            EditorUtility.DisplayDialog("生成成功", $"独立访问类已生成到: {filePath}\n\n包含 {bindingItems.Count} 个组件的直接引用。", "确定");
+        }
+
+        private string GenerateAccessClassCode()
+        {
+            var bindingItems = m_target.BindingItems;
+            var sb = new StringBuilder();
+
+            // 添加文件头注释
+            sb.AppendLine("// 自动生成的独立访问类，请勿手动修改");
+            sb.AppendLine($"// 生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            sb.AppendLine($"// 组件数量: {bindingItems.Count}");
+            sb.AppendLine($"// 源QUIBinding: {m_target.gameObject.name}");
+            sb.AppendLine();
+
+            // 添加using语句
+            var usings = new HashSet<string>
+            {
+                "UnityEngine",
+                "UnityEngine.UI",
+                "TMPro",
+                "System.Linq",
+                "EFrameWork.Runtime.UI"
+            };
+
+            // 根据组件类型添加额外的using
+            foreach (var item in bindingItems)
+            {
+                if (item.Component != null)
+                {
+                    var type = item.Component.GetType();
+                    if (!string.IsNullOrEmpty(type.Namespace))
+                    {
+                        usings.Add(type.Namespace);
+                    }
+                }
+            }
+
+            foreach (var usingNamespace in usings.OrderBy(x => x))
+            {
+                sb.AppendLine($"using {usingNamespace};");
+            }
+
+            sb.AppendLine();
+            sb.AppendLine($"namespace {m_target.AccessClassNamespace}");
+            sb.AppendLine("{");
+            sb.AppendLine($"    /// <summary>");
+            sb.AppendLine($"    /// {m_target.gameObject.name} 的独立组件访问类");
+            sb.AppendLine($"    /// 继承自 BindingViewBase，提供标准的UI绑定功能");
+            sb.AppendLine($"    /// </summary>");
+            sb.AppendLine($"    public class {m_target.AccessClassName} : BindingViewBase");
+            sb.AppendLine("    {");
+
+
+
+            // 生成构造函数和静态工厂方法
+            sb.AppendLine("        #region Constructors & Factory Methods");
+            sb.AppendLine();
+
+            // 1. 带参构造函数 (QUIBinding)
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 构造函数，自动初始化所有组件引用");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public " + m_target.AccessClassName + "(QUIBinding binding) : base(binding)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            InitializeFromBinding();");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 2. 资源路径构造函数
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从资源路径构造函数，自动加载并初始化");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public " + m_target.AccessClassName + "(string assetPath) : base(assetPath)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            InitializeFromBinding();");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 3. 资源路径构造函数（带UI层级）
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从资源路径构造函数，自动加载、初始化并打开到指定UI层级");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public " + m_target.AccessClassName + "(string assetPath, UILayer layer) : base(assetPath, layer)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            InitializeFromBinding();");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 4. 无参构造函数（支持延迟初始化）
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 无参构造函数，需要手动调用SetBinding进行初始化");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public " + m_target.AccessClassName + "() : base()");
+            sb.AppendLine("        {");
+            sb.AppendLine("            // 延迟初始化，等待SetBinding调用");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 5. 重写OnBindingSet方法
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 当Binding被设置时自动调用（支持延迟初始化）");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        protected override void OnBindingSet()");
+            sb.AppendLine("        {");
+            sb.AppendLine("            base.OnBindingSet();");
+            sb.AppendLine("            InitializeFromBinding();");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 6. 静态工厂方法 - Create(QUIBinding)
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 静态工厂方法，创建并初始化实例");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(QUIBinding binding)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (binding == null)");
+            sb.AppendLine("                throw new System.ArgumentNullException(nameof(binding));");
+            sb.AppendLine();
+            sb.AppendLine("            return new " + m_target.AccessClassName + "(binding);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 7. 静态工厂方法 - Create(string)
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从资源路径创建实例");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(string assetPath)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (string.IsNullOrEmpty(assetPath))");
+            sb.AppendLine("                throw new System.ArgumentNullException(nameof(assetPath));");
+            sb.AppendLine();
+            sb.AppendLine("            return new " + m_target.AccessClassName + "(assetPath);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 8. 静态工厂方法 - Create(string, UILayer)
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从资源路径创建实例并打开到指定UI层级");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(string assetPath, UILayer layer)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (string.IsNullOrEmpty(assetPath))");
+            sb.AppendLine("                throw new System.ArgumentNullException(nameof(assetPath));");
+            sb.AppendLine();
+            sb.AppendLine("            return new " + m_target.AccessClassName + "(assetPath, layer);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 9. 静态工厂方法 - CreateFromGameObject
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从GameObject查找QUIBinding并创建实例");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public static " + m_target.AccessClassName + " CreateFromGameObject(GameObject gameObject)");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (gameObject == null)");
+            sb.AppendLine("                throw new System.ArgumentNullException(nameof(gameObject));");
+            sb.AppendLine();
+            sb.AppendLine("            var binding = gameObject.GetComponent<QUIBinding>();");
+            sb.AppendLine("            if (binding == null)");
+            sb.AppendLine("                throw new System.InvalidOperationException($\"GameObject '{gameObject.name}' does not have a QUIBinding component.\");");
+            sb.AppendLine();
+            sb.AppendLine("            return Create(binding);");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+            sb.AppendLine("        #endregion");
+            sb.AppendLine();
+
+            // 生成字段声明
+            sb.AppendLine("        #region Component Fields");
+            sb.AppendLine();
+            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            {
+                if (item.Component == null) continue;
+                var typeName = item.ComponentTypeName;
+                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
+
+                sb.AppendLine($"        private {typeName} {fieldName};");
+            }
+            sb.AppendLine();
+            sb.AppendLine("        #endregion");
+            sb.AppendLine();
+
+            // 生成属性
+            sb.AppendLine("        #region Component Properties");
+            sb.AppendLine();
+            var componentGroups = bindingItems
+                .Where(item => item.Component != null)
+                .GroupBy(item => item.ComponentTypeName)
+                .OrderBy(g => g.Key);
+
+            foreach (var group in componentGroups)
+            {
+                sb.AppendLine($"        // {group.Key} Components");
+                foreach (var item in group.OrderBy(i => i.BindingName))
+                {
+                    var propertyName = SanitizePropertyName(item.BindingName);
+                    var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
+                    var typeName = item.ComponentTypeName;
+
+                    sb.AppendLine($"        /// <summary>");
+                    sb.AppendLine($"        /// {item.DisplayName} - {typeName}");
+                    sb.AppendLine($"        /// </summary>");
+                    sb.AppendLine($"        public {typeName} {propertyName} => {fieldName};");
+                    sb.AppendLine();
+                }
+            }
+            sb.AppendLine("        #endregion");
+            sb.AppendLine();
+
+            // 生成初始化方法
+            sb.AppendLine("        #region Initialization");
+            sb.AppendLine();
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 从QUIBinding初始化所有组件引用");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        private void InitializeFromBinding()");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (Binding == null)");
+            sb.AppendLine("            {");
+            sb.AppendLine("                UnityEngine.Debug.LogWarning($\"{GetType().Name}: Binding is null, component initialization skipped.\");");
+            sb.AppendLine("                return;");
+            sb.AppendLine("            }");
+            sb.AppendLine();
+
+            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            {
+                if (item.Component == null) continue;
+                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
+                var typeName = item.ComponentTypeName;
+
+                sb.AppendLine($"            {fieldName} = Binding.GetComponent<{typeName}>(\"{item.BindingName}\");");
+                sb.AppendLine($"            if ({fieldName} == null)");
+                sb.AppendLine($"                UnityEngine.Debug.LogWarning($\"Component '{item.BindingName}' of type {typeName} not found in binding.\");");
+            }
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 重写RefreshComponents方法
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 重新初始化所有组件引用（重写基类方法）");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public override void RefreshComponents()");
+            sb.AppendLine("        {");
+            sb.AppendLine("            base.RefreshComponents();");
+            sb.AppendLine("            InitializeFromBinding();");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 保持现有的ValidateReferences方法...
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 验证所有组件引用是否有效（重写基类方法）");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public override bool ValidateReferences()");
+            sb.AppendLine("        {");
+            sb.AppendLine("            if (!base.ValidateReferences()) return false;");
+            sb.AppendLine();
+            sb.AppendLine("            bool allValid = true;");
+            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            {
+                if (item.Component == null) continue;
+                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
+                sb.AppendLine($"            if ({fieldName} == null) {{ UnityEngine.Debug.LogError(\"Missing reference: {item.BindingName}\"); allValid = false; }}");
+            }
+            sb.AppendLine("            return allValid;");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+            sb.AppendLine("        #endregion");
+            sb.AppendLine();
+
+            sb.AppendLine("    }");
+            sb.AppendLine("}");
+
+            return sb.ToString();
+        }
+
+        private string SanitizeFieldName(string name)
+        {
+            return SanitizePropertyName(name).ToLowerInvariant();
+        }
+        private string SanitizePropertyName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return "Unknown";
+
+            // 移除无效字符并确保以字母开头
+            var sanitized = new StringBuilder();
+            bool firstChar = true;
+
+            foreach (char c in name)
+            {
+                if (char.IsLetter(c) || (!firstChar && char.IsDigit(c)) || c == '_')
+                {
+                    sanitized.Append(c);
+                    firstChar = false;
+                }
+                else if (!firstChar && (c == ' ' || c == '-'))
+                {
+                    sanitized.Append('_');
+                }
+            }
+
+            var result = sanitized.ToString();
+
+            // 确保不为空且以字母开头
+            if (string.IsNullOrEmpty(result) || !char.IsLetter(result[0]))
+                result = "Component_" + result;
+
+            return result;
+        }
+    }
+}

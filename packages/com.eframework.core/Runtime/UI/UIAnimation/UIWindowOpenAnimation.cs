@@ -1,0 +1,27 @@
+using DG.Tweening;
+using UnityEngine;
+
+namespace AssociaireSort.UI.UIAnimation
+{
+    public class UIWindowOpenAnimation : MonoBehaviour
+    {
+        [SerializeField] private float m_openDuration = 0.22f;
+        [SerializeField] private float m_easeOvershoot = 1.4f;
+        [SerializeField] private float m_startScale = 0.85f;
+
+        private void Start()
+        {
+            if (!this.gameObject.activeSelf) this.gameObject.SetActive(true);
+            this.transform.DOKill(true);
+            this.transform.localScale = Vector3.one * m_startScale; // 起始稍小
+            this.transform.DOScale(1f, m_openDuration)         // 放大到 1
+                .SetEase(Ease.OutBack, m_easeOvershoot)                 // 稍微弹一下
+                .SetUpdate(true);                            // 可选：不受 Time.timeScale 影响
+        }
+
+        private void OnDestroy()
+        {
+            this.transform.DOKill();
+        }
+    }
+}
