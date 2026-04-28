@@ -34,17 +34,23 @@ namespace EFrameWork.Runtime
 
         private void Awake()
         {
-            if (m_procedureComponent == null)
+            if (!TryEnsureProcedureComponent())
             {
-                m_procedureComponent = GetComponent<ProcedureComponent>();
-                if (m_procedureComponent == null)
-                {
-                    Debug.LogError("EFrameComponent requires a ProcedureComponent.");
-                    return;
-                }
+                Debug.LogError("EFrameComponent requires a ProcedureComponent.");
+                return;
             }
 
             StartCoroutine(FrameWorkInitialize());
+        }
+
+        private void Reset()
+        {
+            TryEnsureProcedureComponent();
+        }
+
+        private void OnValidate()
+        {
+            TryEnsureProcedureComponent();
         }
 
         private IEnumerator FrameWorkInitialize()
@@ -123,6 +129,17 @@ namespace EFrameWork.Runtime
 
             data.TotalPlayTime += totalSeconds;
             data.CurPlayTime = totalSeconds;
+        }
+
+        private bool TryEnsureProcedureComponent()
+        {
+            if (m_procedureComponent != null)
+            {
+                return true;
+            }
+
+            m_procedureComponent = GetComponent<ProcedureComponent>();
+            return m_procedureComponent != null;
         }
     }
 }

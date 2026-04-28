@@ -143,6 +143,11 @@ namespace UnityGameFramework.Editor
         {
             m_ProcedureTypeNames = GetProcedureTypeNames();
             ReadAvailableProcedureTypeNames();
+            if (m_CurrentAvailableProcedureTypeNames.Count == 0 && m_ProcedureTypeNames.Length > 0)
+            {
+                m_CurrentAvailableProcedureTypeNames = m_ProcedureTypeNames.ToList();
+            }
+
             int oldCount = m_CurrentAvailableProcedureTypeNames.Count;
             m_CurrentAvailableProcedureTypeNames = m_CurrentAvailableProcedureTypeNames.Where(x => m_ProcedureTypeNames.Contains(x)).ToList();
             if (m_CurrentAvailableProcedureTypeNames.Count != oldCount)
@@ -154,6 +159,8 @@ namespace UnityGameFramework.Editor
                 m_EntranceProcedureIndex = m_CurrentAvailableProcedureTypeNames.IndexOf(m_EntranceProcedureTypeName.stringValue);
                 if (m_EntranceProcedureIndex < 0) m_EntranceProcedureTypeName.stringValue = null;
             }
+
+            EnsureDefaultEntranceProcedureTypeName();
 
             serializedObject.ApplyModifiedProperties();
         }
@@ -186,6 +193,30 @@ namespace UnityGameFramework.Editor
                 m_EntranceProcedureIndex = m_CurrentAvailableProcedureTypeNames.IndexOf(m_EntranceProcedureTypeName.stringValue);
                 if (m_EntranceProcedureIndex < 0) m_EntranceProcedureTypeName.stringValue = null;
             }
+
+            EnsureDefaultEntranceProcedureTypeName();
+        }
+
+        private void EnsureDefaultEntranceProcedureTypeName()
+        {
+            if (m_CurrentAvailableProcedureTypeNames == null || m_CurrentAvailableProcedureTypeNames.Count == 0)
+            {
+                m_EntranceProcedureIndex = -1;
+                m_EntranceProcedureTypeName.stringValue = null;
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(m_EntranceProcedureTypeName.stringValue))
+            {
+                m_EntranceProcedureIndex = m_CurrentAvailableProcedureTypeNames.IndexOf(m_EntranceProcedureTypeName.stringValue);
+                if (m_EntranceProcedureIndex >= 0)
+                {
+                    return;
+                }
+            }
+
+            m_EntranceProcedureIndex = 0;
+            m_EntranceProcedureTypeName.stringValue = m_CurrentAvailableProcedureTypeNames[0];
         }
     }
 }

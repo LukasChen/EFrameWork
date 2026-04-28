@@ -10,6 +10,8 @@ using GameFramework.Fsm;
 using GameFramework.Procedure;
 using System;
 using System.Collections;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityGameFramework.Runtime
@@ -30,6 +32,8 @@ namespace UnityGameFramework.Runtime
 
         private ProcedureBase m_EntranceProcedure;
         private IProcedureManager m_ProcedureManager;
+
+        private bool HasAvailableProcedures => m_AvailableProcedureTypeNames != null && m_AvailableProcedureTypeNames.Length > 0;
 
         /// <summary>
         ///     获取当前流程。
@@ -70,6 +74,9 @@ namespace UnityGameFramework.Runtime
 
         private IEnumerator Start()
         {
+            EnsureDefaultAvailableProcedureTypeNames();
+            EnsureDefaultEntranceProcedureTypeName();
+
             ProcedureBase[] procedures = new ProcedureBase[m_AvailableProcedureTypeNames.Length];
             for (int i = 0; i < m_AvailableProcedureTypeNames.Length; i++)
             {
@@ -104,6 +111,55 @@ namespace UnityGameFramework.Runtime
             yield return new WaitForEndOfFrame();
 
             m_ProcedureManager.StartProcedure(m_EntranceProcedure.GetType());
+        }
+
+        private void Reset()
+        {
+            EnsureDefaultAvailableProcedureTypeNames();
+            EnsureDefaultEntranceProcedureTypeName();
+        }
+
+        private void OnValidate()
+        {
+            EnsureDefaultAvailableProcedureTypeNames();
+            EnsureDefaultEntranceProcedureTypeName();
+        }
+
+        private void EnsureDefaultAvailableProcedureTypeNames()
+        {
+            if (HasAvailableProcedures)
+            {
+                return;
+            }
+
+            m_AvailableProcedureTypeNames = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(GetLoadableTypes)
+                .Where(type => type.IsClass && !type.IsAbstract && typeof(ProcedureBase).IsAssignableFrom(type))
+                .Select(type => type.FullName)
+                .OrderBy(name => name)
+                .ToArray();
+        }
+
+        private void EnsureDefaultEntranceProcedureTypeName()
+        {
+            if (!string.IsNullOrEmpty(m_EntranceProcedureTypeName) || !HasAvailableProcedures)
+            {
+                return;
+            }
+
+            m_EntranceProcedureTypeName = m_AvailableProcedureTypeNames[0];
+        }
+
+        private static Type[] GetLoadableTypes(System.Reflection.Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException exception)
+            {
+                return exception.Types.Where(type => type != null).ToArray();
+            }
         }
 
 
