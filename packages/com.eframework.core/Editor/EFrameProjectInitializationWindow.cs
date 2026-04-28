@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using EFrameWork.Runtime;
 using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -353,7 +352,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             frameworkRoot = string.Empty;
             error = string.Empty;
 
-            var packageInfo = PackageInfo.FindForAssetPath($"Packages/{PackageName}");
+            var packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{PackageName}");
             if (packageInfo == null || string.IsNullOrEmpty(packageInfo.resolvedPath))
             {
                 error = "Could not resolve the EFrameWork package path.";
