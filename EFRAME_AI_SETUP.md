@@ -13,6 +13,7 @@
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
 - `tools/Initialize-EFrameBootstrapCode.ps1`：生成最小启动场景/Procedure 占位代码
+- `RESPATH_CONVENTION.md`：资源地址中心类与自动生成规则说明
 - `Packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`：Unity 编辑器初始化窗口
 
 ## 2. 新项目初始化方式
@@ -26,10 +27,11 @@
 它会一次性完成：
 
 - 创建推荐目录骨架
+- 目录骨架内容以 `UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 同步框架 AI 基础层到项目 `.github`
 - 安装项目侧更新脚本 `tools/Sync-EFrameAIFromFramework.ps1`
 - 生成项目 overlay 模板 `.github/instructions/project-local.instructions.md`
-- 生成最小启动代码骨架和 `Assets/Scenes/StartUp_SETUP.md`
+- 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
 
 如果你只想同步 AI，不想创建目录骨架，才单独执行 `Initialize-EFrameAI.ps1`。
 
@@ -44,8 +46,23 @@
 - `Assets/App/Runtime/Common/ResPath.cs`
 - `Assets/App/Runtime/Procedure/ProcedureLauncher.cs`
 - `Assets/App/Runtime/Procedure/ProcedureHome.cs`
+- `Assets/App/Runtime/UI/Views/HomeView.cs`
 - `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
+- `Assets/App/Res/Bootstrap/README.md`
+- `Assets/Modules/SampleModule/README.md`
+- `Assets/Modules/SampleModule/Runtime/**/*.cs` 示例模块脚本
 - `Assets/Scenes/StartUp_SETUP.md`
+
+默认范例流程为：`ProcedureLauncher -> ProcedureHome -> HomeUI`。HomeUI 会显示一个“模块测试”按钮，点击后切换到 `SampleModule` 的示例流程与示例界面。
+
+在 Unity 初始化窗口里执行 `Import Initial Templates`，会一次性从 EFrame package 导入所有内置初始范例模板，包括：
+
+- `Assets/App/Res/UI/Panels/HomeView.prefab`
+- `Assets/Modules/SampleModule/Res/UI/SampleModuleMainView.prefab`
+
+这两个 prefab 都带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它们。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这些 prefab。
+
+如果此时 Addressables 已经初始化，窗口会立即重跑目录分组同步并重新生成 `ResPath.Generated.cs`，这样刚复制出来的 UI prefab 会马上进入地址管理。
 
 ## 3. Unity 编辑器内初始化方式
 
@@ -57,14 +74,8 @@ EFrame Tools/项目初始化向导
 
 窗口支持：
 
-- 一键执行冷启动
-- 初始化 Addressables 设置
-- 创建默认 `App Local Group`
-- 将 `Assets/App/Res` 下已有资源注册为 Addressables，并按相对路径去掉扩展名生成地址
-- 创建或刷新 `Assets/Scenes/StartUp.unity`
-- 自动创建 `Boot + Main Camera`
-- 设置 `ProcedureComponent` 与 `EFrameComponent` 引用
-- 触发 AI 同步、项目 overlay、项目更新器和 bootstrap code 生成
+- `Full Initialize Project`：执行标准初始化链路，包括冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景与示例模板导入
+- `Import Initial Templates`：仅重新导入内置初始范例模板，例如 `HomeView.prefab` 与 `SampleModuleMainView.prefab`
 
 如果当前项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口仍然可以创建启动场景，但 AI 同步按钮会降级提示，需要手动在框架仓库根目录执行对应脚本。
 
@@ -164,3 +175,9 @@ EFrame Tools/项目初始化向导
 5. 最后再把这套 `.github` 同步到其他项目。
 
 更严格的发布与升级边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
+
+附：基础 Unity 目录结构规范见 [UNITY_DIRECTORY_STRUCTURE.md](UNITY_DIRECTORY_STRUCTURE.md)。
+
+资源地址中心与自动生成规范见 [RESPATH_CONVENTION.md](RESPATH_CONVENTION.md)。
+
+补充约定：实际 `.unity` 场景文件优先放在 `Assets/Scenes` 或 `Assets/Modules/<Name>/Scenes`；`Assets/App/Res/SceneAssets` 用于场景依赖资源，不直接放场景文件本体。

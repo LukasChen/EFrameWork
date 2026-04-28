@@ -1,0 +1,223 @@
+# EFrame Unity 目录结构规范
+
+这份文档定义 EFrame 推荐的 Unity 项目基础目录结构，用于统一运行时代码、资源、编辑器工具、启动场景和业务模块的落点。
+
+## 1. 目标
+
+- 降低新项目冷启动时的目录分歧。
+- 让 AI instruction、skills、初始化脚本和 Unity 代码生成同一套结构。
+- 明确哪些目录属于主应用，哪些目录属于独立玩法或生成产物。
+
+## 2. 基础目录
+
+```text
+Assets/
+|- App/
+|  |- Editor/
+|  |- Res/
+|  |  |- Bootstrap/
+|  |  |- Audios/
+|  |  |- Config/
+|  |  |- Fonts/
+|  |  |- FX/
+|  |  |- Materials/
+|  |  |- SceneAssets/
+|  |  |- Shaders/
+|  |  |- UI/
+|  |     |- Common/
+|  |     |- Panels/
+|  |     |- Popups/
+|  |     |- Widgets/
+|  |- Runtime/
+|     |- Common/
+|     |- Config/
+|     |- Data/
+|     |- Events/
+|     |- Generated/
+|     |- Procedure/
+|     |- Scene/
+|     |- Services/
+|     |- UI/
+|        |- Controllers/
+|        |- Views/
+|        |- Widgets/
+|- Modules/
+|- Scenes/
+|- Settings/
+```
+
+## 3. 主应用目录职责
+
+`Assets/App/Runtime`
+
+- 主应用运行时代码的统一入口。
+- 适合放 Procedure、UIController、服务层、事件定义、配置读取、路径中心类。
+
+`Assets/App/Res`
+
+- 主应用业务资源入口。
+- 适合放 UI 预制体、音频、配置资源、材质、特效、着色器、可复用场景资源。
+- Addressables 推荐从这里收集和注册主应用资源。
+- 不建议把 `.unity` 场景文件直接放进这里，避免与 `Assets/Scenes` 产生双重语义。
+
+`Assets/App/Res/Bootstrap`
+
+- 放启动期必须可用、且适合常驻的小体量资源。
+- 例如首屏加载页、框架启动期配置、首页前置共享资源。
+- 应保持克制，不要把普通业务模块资源塞进这里。
+
+`Assets/App/Editor`
+
+- 主应用专属编辑器工具。
+- 仅存放 Editor 代码、菜单、导入器、生成器、校验器，不放运行时代码。
+
+## 4. Runtime 细分约定
+
+`Assets/App/Runtime/Common`
+
+- 通用常量、`ResPath`、扩展方法、共享模型。
+- `ResPath.cs` 作为手写稳定入口层，提供动态路径辅助方法和少量别名。
+
+`Assets/App/Runtime/Config`
+
+- 配置读取入口、配置服务、配置适配层。
+
+`Assets/App/Runtime/Data`
+
+- 本地数据结构、存档表、数据仓库、状态快照模型。
+
+`Assets/App/Runtime/Events`
+
+- 强类型事件定义和与业务相关的事件桥接。
+
+`Assets/App/Runtime/Generated`
+
+- 固定生成代码目录。
+- 生成物不要散落到业务手写目录。
+- Addressables 自动生成的 `ResPath.Generated.cs` 建议放在 `Assets/App/Runtime/Generated/Res/`。
+
+`Assets/App/Runtime/Procedure`
+
+- `ProcedureXxx` 流程类。
+- 只负责状态切换、进入退出编排、生命周期清理。
+
+`Assets/App/Runtime/Scene`
+
+- 场景入口组件、场景根对象协调代码、场景过渡辅助逻辑。
+
+`Assets/App/Runtime/Services`
+
+- 网络、账号、引导、任务等服务层。
+- 服务负责长期存活的能力，不承担页面显示职责。
+
+`Assets/App/Runtime/UI/Controllers`
+
+- `XxxViewController`、弹窗控制器、UI 行为编排。
+
+`Assets/App/Runtime/UI/Views`
+
+- UI 视图脚本、绑定脚本、视图局部组件定义。
+
+`Assets/App/Runtime/UI/Widgets`
+
+- 可复用 UI 子组件逻辑，不单独承担主页面流程。
+
+## 5. Res 细分约定
+
+`Assets/App/Res/UI/Panels`
+
+- 主页面、常驻页面、首页、设置页等面板预制体。
+
+`Assets/App/Res/UI/Popups`
+
+- 模态弹窗、确认框、奖励弹层等短生命周期预制体。
+
+`Assets/App/Res/UI/Widgets`
+
+- 列表项、通用条目、小型复用预制体。
+
+`Assets/App/Res/UI/Common`
+
+- UI 通用图集、共享节点、过渡资源。
+
+`Assets/App/Res/SceneAssets`
+
+- 放场景依赖资源、场景配置、Lighting 相关资产、可复用场景内容片段。
+- 不放 `.unity` 场景文件本体，场景文件本身仍建议放在 `Assets/Scenes`。
+
+## 6. 场景与设置
+
+`Assets/Scenes`
+
+- 放项目实际场景文件，启动场景命名保持 `StartUp.unity`。
+- 启动场景只负责框架启动和流程切换，不承载常驻业务 UI。
+
+`Assets/Settings`
+
+- 放项目级 ScriptableObject 设置、Addressables 设置引用、全局配置资产。
+
+## 7. Modules 结构
+
+独立玩法、子系统、功能包或可拆分业务模块优先放到独立目录，不与主应用代码交叉堆放。
+
+推荐结构：
+
+```text
+Assets/Modules/<Name>/
+|- Editor/
+|- Res/
+|  |- UI/
+|  |- ...
+|- Runtime/
+|  |- Common/
+|  |- Procedure/
+|  |- UI/
+|  |- ...
+|- Scenes/
+```
+
+初始化时建议直接生成一个正式的 `Assets/Modules/SampleModule` 作为参考范例；后续新模块按同样结构直接创建，不再依赖 `_Template` 目录。
+
+约束：
+
+- Module 自己的代码和资源尽量闭包在自己的目录里。
+- 只有跨模块共享的内容才回收到 `Assets/App/...`。
+- 如果模块还不成熟，也不要先扔到临时目录，优先在 `Assets/Modules/<Name>` 内演进。
+- 如果业务项目确实是多玩法合集，可以在项目 overlay 中把 `Modules` 进一步细化为 `MiniGames`，但框架层默认保持抽象命名。
+
+## 8. Addressables 目录与分组建议
+
+为了支持按需加载，目录规划应至少体现“启动常驻内容”和“模块私有内容”的边界。
+
+推荐分组思路：
+
+- `Assets/App/Res/...` 对应主应用共享资源组，例如 `App-Shared`。
+- 启动必须资源优先放在 `Assets/App/Res/Bootstrap/...`，对应 `App-Bootstrap`。
+- `Assets/Modules/<Name>/Res/...` 对应模块私有资源组，例如 `Module-<Name>`。
+- 场景文件建议单独成组，主场景来自 `Assets/Scenes/...`，模块场景来自 `Assets/Modules/<Name>/Scenes/...`。
+
+目录规划原则：
+
+- 不要把“可能按需卸载的模块资源”和“常驻共享资源”长期混放。
+- 路径命名要稳定，便于 Addressables 地址和分组规则按目录推导。
+- 如果后续要做远程更新，优先让组边界与目录边界保持一致，避免一个目录同时落到多个组。
+
+ResPath 约束：
+
+- 业务代码优先使用 `ResPath.Generated.*` 常量访问 Addressables 地址。
+- 手写 `ResPath.cs` 负责稳定 API，不承担整表手工维护。
+- 详细规范见 `RESPATH_CONVENTION.md`。
+
+## 9. 禁止事项
+
+- 不要在 `Assets` 根下长期堆放零散脚本目录。
+- 不要把 Editor 代码混入 Runtime 目录。
+- 不要把 UI 预制体、音频、配置资源散写到多个随机目录。
+- 不要把生成代码写进手写业务目录。
+- 不要为一个普通页面单独新建 Module 目录。
+
+## 10. 迁移原则
+
+- 如果项目仍处于过渡结构，新增功能优先收敛到上述标准目录。
+- 旧目录可以逐步迁移，但新代码不要继续扩散旧结构。
+- 项目若确有特殊目录约束，应写在项目自己的 `project-*.instructions.md` 中，只记录差异。

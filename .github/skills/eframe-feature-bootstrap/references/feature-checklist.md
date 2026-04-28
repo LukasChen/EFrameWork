@@ -10,8 +10,9 @@
 
 - 运行时代码：`Assets/App/Runtime/...`
 - 主资源：`Assets/App/Res/...`
-- 子玩法：`Assets/MiniGames/<Name>/{Runtime,Res,Editor}`
+- 业务模块：`Assets/Modules/<Name>/{Runtime,Res,Editor,Scenes}`
 - 生成代码：`Generated` 或固定生成目录
+- 细分职责、场景目录和基础骨架以 `UNITY_DIRECTORY_STRUCTURE.md` 为准
 
 ## 3. 命名
 

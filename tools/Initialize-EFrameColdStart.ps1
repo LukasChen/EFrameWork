@@ -34,10 +34,12 @@ function New-RequiredDirectory {
 
 if (-not $SkipDirectoryScaffold) {
     $directories = @(
+        "Assets/App/Editor",
         "Assets/App/Runtime/Common",
         "Assets/App/Runtime/Config",
         "Assets/App/Runtime/Data",
         "Assets/App/Runtime/Events",
+        "Assets/App/Runtime/Generated",
         "Assets/App/Runtime/Procedure",
         "Assets/App/Runtime/Scene",
         "Assets/App/Runtime/Services",
@@ -45,17 +47,18 @@ if (-not $SkipDirectoryScaffold) {
         "Assets/App/Runtime/UI/Views",
         "Assets/App/Runtime/UI/Widgets",
         "Assets/App/Res/Audios",
+        "Assets/App/Res/Bootstrap",
         "Assets/App/Res/Config",
         "Assets/App/Res/Fonts",
         "Assets/App/Res/FX",
         "Assets/App/Res/Materials",
-        "Assets/App/Res/Scenes",
+        "Assets/App/Res/SceneAssets",
         "Assets/App/Res/Shaders",
         "Assets/App/Res/UI/Common",
         "Assets/App/Res/UI/Panels",
         "Assets/App/Res/UI/Popups",
         "Assets/App/Res/UI/Widgets",
-        "Assets/MiniGames",
+        "Assets/Modules",
         "Assets/Scenes",
         "Assets/Settings",
         "tools"

@@ -35,3 +35,15 @@ To install a project-side updater script:
 ```
 
 Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, and trigger AI/bootstrap initialization from a single window.
+
+## DOTween Dependency
+
+`com.eframework.core` uses DOTween directly in several runtime components. Consumer projects should install DOTween into the project `Assets` before using tween-enabled EFrameWork features.
+
+- Recommended: install DOTween as a normal project plugin under `Assets`
+- Then use `EFrame Tools/项目初始化向导` to create or open `Assets/Resources/DOTweenSettings.asset`
+- Do not rely on configuring DOTween through a package-local copy
+
+## TextMeshPro Dependency
+
+`com.eframework.core` also uses TextMeshPro directly and now expects the official Unity package dependency `com.unity.textmeshpro` instead of a framework-bundled copy.

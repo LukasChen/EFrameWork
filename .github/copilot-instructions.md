@@ -8,7 +8,9 @@
 - `Procedure` 只负责状态切换、进入退出编排和生命周期清理，不承担细碎业务逻辑。
 - UI 必须通过 `QUI` 与对应 `UIController` 管理，不在场景里手工堆顶层 Canvas 与 `EventSystem`。
 - 资源路径应该集中管理，优先使用 `ResPath` 或等价路径中心类，避免在业务代码中散写路径字符串。
-- 新增代码优先落到明确结构，例如 `Assets/App/Runtime`、`Assets/App/Res`、`Assets/MiniGames/*`，不要扩散临时目录。
+- 对 Addressables 动态加载，优先使用 `ResPath.Generated`、稳定入口 `ResPath` 或 `AssetReference`，不要在业务代码里直接写裸地址字符串。
+- 新增代码优先落到明确结构，例如 `Assets/App/Runtime`、`Assets/App/Res`、`Assets/Modules/*`，不要扩散临时目录。
+- 基础目录结构以 `UNITY_DIRECTORY_STRUCTURE.md` 为准；如果业务项目有差异，只在 `project-*` overlay 里补充差异，不复制整份规范。
 - 命名保持稳定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`、`StartUp.unity`、`Boot`、`Main Camera`。
 - 编辑 Unity 场景、预制体、`.asset` 文件时避免无关改动，尽量只修改任务直接相关内容。
 

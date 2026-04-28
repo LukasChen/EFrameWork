@@ -9,7 +9,7 @@ user-invocable: true
 
 ## When To Use
 
-- 新建业务页面、弹窗、玩法模块或 `Procedure`
+- 新建业务页面、弹窗、业务模块或 `Procedure`
 - 将演示代码或旧结构重构为正式结构
 - 给新项目建立 `View + Controller + Procedure + ResPath` 的最小骨架
 - 判断某个需求应该落在主流程、弹层还是独立玩法目录
@@ -22,9 +22,10 @@ user-invocable: true
 
 ## Structure
 
-1. 把运行时代码放入目标结构：`Assets/App/Runtime/...` 或 `Assets/MiniGames/<Name>/Runtime/...`。
-2. 把资源放入可映射目录：`Assets/App/Res/UI/...`、`Assets/App/Res/Scenes/...` 等。
+1. 把运行时代码放入目标结构：`Assets/App/Runtime/...` 或 `Assets/Modules/<Name>/Runtime/...`。
+2. 把资源放入可映射目录：`Assets/App/Res/UI/...`、`Assets/App/Res/SceneAssets/...`、`Assets/Modules/<Name>/Res/...` 等。
 3. 为资源路径建立集中入口，避免散写字符串。
+4. 具体目录职责和命名边界以仓库根的 `UNITY_DIRECTORY_STRUCTURE.md` 为准；项目特殊约束只写进 `project-*` overlay。
 
 ## UI
 

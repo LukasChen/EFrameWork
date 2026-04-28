@@ -6,7 +6,6 @@ namespace EFrameWork.Editor.ProjectBootstrap
 {
     internal sealed class EFrameAppResAddressablePostprocessor : AssetPostprocessor
     {
-        private static readonly HashSet<string> PendingAssetPaths = new();
         private static bool s_syncScheduled;
 
         private static void OnPostprocessAllAssets(
@@ -15,10 +14,15 @@ namespace EFrameWork.Editor.ProjectBootstrap
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
-            QueueAssetPaths(importedAssets);
-            QueueAssetPaths(movedAssets);
+            if (!ContainsManagedAssetChanges(importedAssets)
+                && !ContainsManagedAssetChanges(deletedAssets)
+                && !ContainsManagedAssetChanges(movedAssets)
+                && !ContainsManagedAssetChanges(movedFromAssetPaths))
+            {
+                return;
+            }
 
-            if (PendingAssetPaths.Count == 0 || s_syncScheduled)
+            if (s_syncScheduled)
             {
                 return;
             }
@@ -27,30 +31,26 @@ namespace EFrameWork.Editor.ProjectBootstrap
             EditorApplication.delayCall += FlushPendingAssets;
         }
 
-        private static void QueueAssetPaths(IEnumerable<string> assetPaths)
+        private static bool ContainsManagedAssetChanges(IEnumerable<string> assetPaths)
         {
             foreach (var assetPath in assetPaths)
             {
-                if (assetPath.StartsWith(EFrameAddressablesBootstrapUtility.AppResRootPath + "/", System.StringComparison.OrdinalIgnoreCase))
+                if (assetPath.StartsWith(EFrameAddressablesBootstrapUtility.AppResRootPath + "/", System.StringComparison.OrdinalIgnoreCase)
+                    || assetPath.StartsWith(EFrameAddressablesBootstrapUtility.ProjectScenesRootPath + "/", System.StringComparison.OrdinalIgnoreCase)
+                    || assetPath.StartsWith(EFrameAddressablesBootstrapUtility.ModulesRootPath + "/", System.StringComparison.OrdinalIgnoreCase))
                 {
-                    PendingAssetPaths.Add(assetPath);
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private static void FlushPendingAssets()
         {
             s_syncScheduled = false;
 
-            if (PendingAssetPaths.Count == 0)
-            {
-                return;
-            }
-
-            var assetPaths = new List<string>(PendingAssetPaths);
-            PendingAssetPaths.Clear();
-
-            EFrameAddressablesBootstrapUtility.SyncImportedAssets(assetPaths, out _);
+            EFrameAddressablesBootstrapUtility.SyncImportedAssets(null, out _);
         }
     }
 }
