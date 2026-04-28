@@ -26,6 +26,9 @@
 - `tools/Initialize-EFrameAI.ps1`
 - `tools/New-EFrameProjectAIOverlay.ps1`
 - `tools/Install-EFrameAIProjectUpdater.ps1`
+- `tools/Initialize-EFrameColdStart.ps1`
+- `tools/Initialize-EFrameBootstrapCode.ps1`
+- `packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`
 - `EFRAME_AI_SETUP.md`
 
 发布前必须确认：
@@ -35,7 +38,10 @@
 3. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `-Force` 都能正常运行。
 4. `Install-EFrameAIProjectUpdater.ps1` 能在一个临时项目目录中生成项目侧更新脚本。
 5. `New-EFrameProjectAIOverlay.ps1` 能正常生成 `project-local.instructions.md` 模板。
-6. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
+6. `Initialize-EFrameBootstrapCode.ps1` 能在一个临时项目目录中生成最小启动代码和场景说明。
+7. `Initialize-EFrameColdStart.ps1` 能在一个临时空目录中完成冷启动。
+8. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
+9. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
 
 ## 3. 业务项目升级流程
 

@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "updatedAt": "2026-04-28",
   "notes": "Bump this version whenever framework-managed .github instructions, skills, or sync tooling changes."
 }

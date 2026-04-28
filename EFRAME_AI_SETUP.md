@@ -11,8 +11,61 @@
 - `.github/skills/eframe-guideline-audit`：用于规范审查和回归检查
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
+- `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
+- `tools/Initialize-EFrameBootstrapCode.ps1`：生成最小启动场景/Procedure 占位代码
+- `Packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`：Unity 编辑器初始化窗口
 
 ## 2. 新项目初始化方式
+
+如果你要做一个“新项目一键冷启动”，优先使用：
+
+```powershell
+.\tools\Initialize-EFrameColdStart.ps1 -TargetRoot "D:\YourUnityProject" -Force
+```
+
+它会一次性完成：
+
+- 创建推荐目录骨架
+- 同步框架 AI 基础层到项目 `.github`
+- 安装项目侧更新脚本 `tools/Sync-EFrameAIFromFramework.ps1`
+- 生成项目 overlay 模板 `.github/instructions/project-local.instructions.md`
+- 生成最小启动代码骨架和 `Assets/Scenes/StartUp_SETUP.md`
+
+如果你只想同步 AI，不想创建目录骨架，才单独执行 `Initialize-EFrameAI.ps1`。
+
+如果你只想补最小启动代码骨架，可以单独执行：
+
+```powershell
+.\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject" -RootNamespace "YourGame"
+```
+
+它会生成：
+
+- `Assets/App/Runtime/Common/ResPath.cs`
+- `Assets/App/Runtime/Procedure/ProcedureLauncher.cs`
+- `Assets/App/Runtime/Procedure/ProcedureHome.cs`
+- `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
+- `Assets/Scenes/StartUp_SETUP.md`
+
+## 3. Unity 编辑器内初始化方式
+
+当项目通过本地 clone + `file:` path 方式引用 EFrameWork 包时，打开 Unity 后会自动弹出初始化窗口；也可以手动通过菜单打开：
+
+```text
+EFrame Tools/项目初始化向导
+```
+
+窗口支持：
+
+- 一键执行冷启动
+- 创建或刷新 `Assets/Scenes/StartUp.unity`
+- 自动创建 `Boot + Main Camera`
+- 设置 `ProcedureComponent` 与 `EFrameComponent` 引用
+- 触发 AI 同步、项目 overlay、项目更新器和 bootstrap code 生成
+
+如果当前项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口仍然可以创建启动场景，但 AI 同步按钮会降级提示，需要手动在框架仓库根目录执行对应脚本。
+
+## 4. 仅同步 AI 的方式
 
 当新项目已经引入这份框架仓库后，在框架仓库根目录执行：
 
@@ -28,7 +81,7 @@
 
 执行后，目标项目根目录会得到一套标准 `.github` 配置，VS Code / Copilot 就能按 EFrame 规范工作。
 
-## 3. 框架更新后的同步方式
+## 5. 框架更新后的同步方式
 
 当框架仓库有人提交了 AI 规则更新，其他项目在拉取框架最新代码后，应该执行两步：
 
@@ -46,7 +99,7 @@
 
 `-StatusOnly` 会比较框架仓库 `.github/eframe-ai.manifest.json` 和目标项目 `.github/eframe-ai.manifest.json` 的版本号。只要版本不同，就说明 instruction 或 skills 需要重新同步。
 
-## 4. 框架规则和项目规则如何同时生效
+## 6. 框架规则和项目规则如何同时生效
 
 真正生效的应该始终是项目根目录 `.github` 下那一套文件，而不是跨仓库引用。推荐分层如下：
 
@@ -79,7 +132,7 @@
 .\tools\Sync-EFrameAIFromFramework.ps1 -Force
 ```
 
-## 5. 推荐继承策略
+## 7. 推荐继承策略
 
 - 框架仓库中的 `.github` 视为标准源。
 - 新项目只在本项目确有差异时做增量扩展，不要直接改坏通用规则。
@@ -87,7 +140,7 @@
 - EFrame 托管的 instruction 和 skill 统一使用 `eframe-` 前缀；业务项目自己的 AI 规则请使用其他名称，脚本在 `-Force` 同步时会覆盖 `eframe-*` 项，但会保留项目自定义项。
 - 最稳定的落地方式是：框架仓库负责提供和安装同步器，业务项目仓库只负责执行 `Sync-EFrameAIFromFramework.ps1`。
 
-## 6. 何时更新指令层
+## 8. 何时更新指令层
 
 当下面任一内容变化时，应该同步更新 `.github`：
 
@@ -99,7 +152,7 @@
 
 只要上述内容导致 `.github/copilot-instructions.md`、`.github/instructions/` 或 `.github/skills/` 发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
 
-## 7. 推荐维护流程
+## 9. 推荐维护流程
 
 1. 先更新规范源文档。
 2. 再更新 `.github/copilot-instructions.md` 和对应 `.instructions.md` / `SKILL.md`。
