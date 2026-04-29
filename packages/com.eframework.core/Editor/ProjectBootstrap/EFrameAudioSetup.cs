@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using UnityEditor;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private void OnGUI()
         {
             GUILayout.Space(10);
-            GUILayout.Label("在Resources文件夹下创建一个AudioMixer资源,名字为EFrameAudioMixerSettings, 并新建一个 MUSIC 和 SFX ，以及 OVERLAP 三个组",
+            GUILayout.Label("在 Assets/Resources/Audio 下创建一个 AudioMixer 资源, 名字为 EFrameAudioMixerSettings, 并新建 MUSIC 和 SFX 组",
                 EditorStyles.wordWrappedLabel);
             GUILayout.Space(10);
 
@@ -34,7 +34,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             if (!EFrameAudioBootstrapUtility.IsAudioSetupReady())
             {
                 GUILayout.Toggle(false, "");
-                GUILayout.Label("EFrameAudioMixerSettings is not ready in Assets/Resources", m_redTextStyle);
+                GUILayout.Label("EFrameAudioMixerSettings is not ready in Assets/Resources/Audio", m_redTextStyle);
 
                 if (GUILayout.Button("Create EFrameAudioMixerSettings"))
                 {
@@ -50,7 +50,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             {
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Toggle(true, "");
-                GUILayout.Label("EFrameAudioMixerSettings found in Resources folder", m_greenTextStyle);
+                GUILayout.Label("EFrameAudioMixerSettings found in Assets/Resources/Audio", m_greenTextStyle);
                 GUILayout.FlexibleSpace();
                 EditorGUILayout.EndHorizontal();
 

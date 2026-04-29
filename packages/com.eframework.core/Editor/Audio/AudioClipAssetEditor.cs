@@ -76,6 +76,9 @@ namespace EFrameWork.Editor.Audio
         {
             if (m_audioSourceCache != null)
             {
+                var audioClipRef = audioClipAsset.GetClipReference();
+                if (audioClipRef == null || audioClipRef.editorAsset == null) return;
+
                 AudioSource audioSource = m_audioSourceCache.Peek();
 
                 if (audioSource.isPlaying && m_audioSourceCache.Count < AudioManager.K_maxAudioSourceCount)
@@ -89,7 +92,7 @@ namespace EFrameWork.Editor.Audio
                     m_audioSourceCache.Enqueue(m_audioSourceCache.Dequeue());
                 }
 
-                audioSource.clip = audioClipAsset.AudioClip.editorAsset;
+                audioSource.clip = audioClipRef.editorAsset;
                 audioSource.volume = audioClipAsset.Volume.RandomValue;
                 audioSource.pitch = audioClipAsset.Pitch.RandomValue;
                 audioSource.Play();

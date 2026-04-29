@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.Base.Attributes;
 using EFrameWork.Runtime.Event;
 using EFrameWork.Runtime.Vibration;
 using Lofelt.NiceVibrations;
@@ -19,7 +18,7 @@ namespace EFrameWork.Runtime.Audio
     {
         #region Constants
 
-        private const string k_configResourcePath = "Config/AudioEventConfig";
+        private const string k_configResourcePath = AudioResourcePaths.EventConfigResourcePath;
 
         #endregion
 
@@ -29,10 +28,11 @@ namespace EFrameWork.Runtime.Audio
         private Dictionary<string, AudioEventConfigItem> m_configDict;
         private Dictionary<string, float> m_lastPlayTimeByEvent;
         private Dictionary<string, int> m_sequentialIndexByEvent;
+        private Dictionary<string, FieldPathAccessor> m_fieldAccessorCache;
 
-        private AudioManager m_audioManager;
+        private IAudioService m_audioManager;
         private QVibration m_vibration;
-        private EFrameComponent m_component;
+        private CancellationTokenSource m_delayCancellationTokenSource;
 
         private bool m_isInitialized;
 
@@ -46,14 +46,15 @@ namespace EFrameWork.Runtime.Audio
 
         #region Initialization
 
-        public AudioEventManager(EFrameComponent component, AudioManager audioManager, QVibration vibration)
+        public AudioEventManager(EFrameComponent component, IAudioService audioManager, QVibration vibration)
         {
-            m_component = component;
             m_audioManager = audioManager;
             m_vibration = vibration;
             m_configDict = new Dictionary<string, AudioEventConfigItem>();
             m_lastPlayTimeByEvent = new Dictionary<string, float>();
             m_sequentialIndexByEvent = new Dictionary<string, int>();
+            m_fieldAccessorCache = new Dictionary<string, FieldPathAccessor>();
+            m_delayCancellationTokenSource = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -69,6 +70,7 @@ namespace EFrameWork.Runtime.Audio
 
             try
             {
+                EnsureDelayCancellationTokenSource();
                 await UniTask.CompletedTask;
                 m_configAsset = LoadConfigAsset();
 
@@ -102,6 +104,7 @@ namespace EFrameWork.Runtime.Audio
             }
 
             // 尝试同步加载
+            EnsureDelayCancellationTokenSource();
             m_configAsset = LoadConfigAsset();
 
             if (m_configAsset != null)
@@ -120,6 +123,7 @@ namespace EFrameWork.Runtime.Audio
         private void BuildConfigDictionary()
         {
             m_configDict.Clear();
+            m_fieldAccessorCache.Clear();
             if (m_configAsset == null) return;
 
             foreach (var item in m_configAsset.ConfigItems)
@@ -140,15 +144,28 @@ namespace EFrameWork.Runtime.Audio
         public void Dispose()
         {
             EventBus.OnAnyEvent -= OnAnyEventDispatched;
+            m_delayCancellationTokenSource?.Cancel();
+            m_delayCancellationTokenSource?.Dispose();
+            m_delayCancellationTokenSource = null;
             m_configDict.Clear();
             m_lastPlayTimeByEvent.Clear();
             m_sequentialIndexByEvent.Clear();
+            m_fieldAccessorCache.Clear();
             m_isInitialized = false;
         }
 
         #endregion
 
         #region Event Handling
+
+        private void EnsureDelayCancellationTokenSource()
+        {
+            if (m_delayCancellationTokenSource == null || m_delayCancellationTokenSource.IsCancellationRequested)
+            {
+                m_delayCancellationTokenSource?.Dispose();
+                m_delayCancellationTokenSource = new CancellationTokenSource();
+            }
+        }
 
         private void OnAnyEventDispatched(Type eventType, object eventData)
         {
@@ -196,7 +213,7 @@ namespace EFrameWork.Runtime.Audio
                     {
                         if (group.Delay > 0)
                         {
-                            PlayWithDelayAsync(group, clipEntry).Forget();
+                            PlayWithDelayAsync(group, clipEntry, m_delayCancellationTokenSource.Token).Forget();
                         }
                         else
                         {
@@ -292,37 +309,80 @@ namespace EFrameWork.Runtime.Audio
             if (obj == null || string.IsNullOrEmpty(fieldPath))
                 return obj;
 
+            Type rootType = obj.GetType();
+            string cacheKey = $"{rootType.FullName}|{fieldPath}";
+            if (!m_fieldAccessorCache.TryGetValue(cacheKey, out var accessor))
+            {
+                accessor = BuildFieldPathAccessor(rootType, fieldPath);
+                m_fieldAccessorCache[cacheKey] = accessor;
+            }
+
+            return accessor.GetValue(obj);
+        }
+
+        private FieldPathAccessor BuildFieldPathAccessor(Type rootType, string fieldPath)
+        {
             string[] parts = fieldPath.Split('.');
-            object current = obj;
+            Type currentType = rootType;
+            var members = new List<MemberInfo>(parts.Length);
 
             foreach (string part in parts)
             {
-                if (current == null) return null;
-
-                Type type = current.GetType();
-
-                // 尝试获取字段
-                var field = type.GetField(part, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var field = currentType.GetField(part, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (field != null)
                 {
-                    current = field.GetValue(current);
+                    members.Add(field);
+                    currentType = field.FieldType;
                     continue;
                 }
 
-                // 尝试获取属性
-                var property = type.GetProperty(part, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (property != null)
+                var property = currentType.GetProperty(part, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                if (property != null && property.GetIndexParameters().Length == 0)
                 {
-                    current = property.GetValue(current);
+                    members.Add(property);
+                    currentType = property.PropertyType;
                     continue;
                 }
 
-                // 找不到字段或属性
-                Debug.LogWarning($"[AudioEventManager] Field/Property '{part}' not found on type '{type.Name}'");
-                return null;
+                Debug.LogWarning($"[AudioEventManager] Field/Property '{part}' not found on type '{currentType.Name}'");
+                return FieldPathAccessor.Invalid;
             }
 
-            return current;
+            return new FieldPathAccessor(members);
+        }
+
+        private sealed class FieldPathAccessor
+        {
+            public static readonly FieldPathAccessor Invalid = new FieldPathAccessor(null);
+
+            private readonly List<MemberInfo> m_members;
+
+            public FieldPathAccessor(List<MemberInfo> members)
+            {
+                m_members = members;
+            }
+
+            public object GetValue(object root)
+            {
+                if (root == null || m_members == null) return null;
+
+                object current = root;
+                foreach (var member in m_members)
+                {
+                    if (current == null) return null;
+
+                    if (member is FieldInfo field)
+                    {
+                        current = field.GetValue(current);
+                    }
+                    else if (member is PropertyInfo property)
+                    {
+                        current = property.GetValue(current);
+                    }
+                }
+
+                return current;
+            }
         }
 
         private bool IsTypeMatch(object value, string typeName)
@@ -418,8 +478,7 @@ namespace EFrameWork.Runtime.Audio
                     m_sequentialIndexByEvent[groupKey] = (clipIndex + 1) % group.AudioClips.Count;
                     break;
 
-                case AudioPlayMode.WeightedCurve:
-                    // 简化处理，直接使用权重
+                case AudioPlayMode.WeightedRandom:
                     clipIndex = GetWeightedClipIndexFromList(group.AudioClips);
                     break;
             }
@@ -436,6 +495,9 @@ namespace EFrameWork.Runtime.Audio
             {
                 totalWeight += clip.Weight;
             }
+
+            if (totalWeight <= 0f)
+                return UnityEngine.Random.Range(0, clips.Count);
 
             float random = UnityEngine.Random.Range(0f, totalWeight);
             float cumulative = 0f;
@@ -466,9 +528,20 @@ namespace EFrameWork.Runtime.Audio
             }
         }
 
-        private async UniTask PlayWithDelayAsync(ConditionalAudioGroup group, AudioClipEntry clipEntry)
+        private async UniTask PlayWithDelayAsync(ConditionalAudioGroup group, AudioClipEntry clipEntry, CancellationToken cancellationToken)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(group.Delay));
+            try
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(group.Delay), cancellationToken: cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            if (cancellationToken.IsCancellationRequested || !m_isInitialized)
+                return;
+
             PlayAudioClip(group, clipEntry, group.MinInterval);
             ProcessVibrationFromGroup(group);
         }
@@ -494,7 +567,15 @@ namespace EFrameWork.Runtime.Audio
                     // SFX 播放，支持淡入淡出
                     if (group.FadeInDuration > 0 || group.FadeOutDuration > 0)
                     {
-                        PlaySfxWithFade(audioClip, group, volume, pitch);
+                        m_audioManager.PlaySfxWithFade(
+                            audioClip,
+                            volume,
+                            pitch,
+                            group.FadeInDuration,
+                            group.FadeInCurve,
+                            group.FadeOutDuration,
+                            group.FadeOutCurve,
+                            group.Loop);
                     }
                     else
                     {
@@ -508,79 +589,6 @@ namespace EFrameWork.Runtime.Audio
             }
         }
 
-        private void PlaySfxWithFade(AudioClip audioClip, ConditionalAudioGroup group, float targetVolume, float pitch)
-        {
-            // 使用协程处理淡入淡出
-            m_component.StartCoroutine(PlaySfxWithFadeCoroutine(audioClip, group, targetVolume, pitch));
-        }
-
-        private System.Collections.IEnumerator PlaySfxWithFadeCoroutine(
-            AudioClip audioClip,
-            ConditionalAudioGroup group,
-            float targetVolume,
-            float pitch)
-        {
-            // 创建临时 AudioSource 用于淡入淡出控制
-            var audioSource = m_component.gameObject.AddComponent<AudioSource>();
-            audioSource.clip = audioClip;
-            audioSource.pitch = pitch;
-            audioSource.loop = group.Loop;
-
-            float clipLength = audioClip.length;
-            float fadeInDuration = group.FadeInDuration;
-            float fadeOutDuration = group.FadeOutDuration;
-
-            // 淡入
-            if (fadeInDuration > 0)
-            {
-                audioSource.volume = 0;
-                audioSource.Play();
-
-                float elapsed = 0f;
-                while (elapsed < fadeInDuration)
-                {
-                    elapsed += Time.deltaTime;
-                    float t = Mathf.Clamp01(elapsed / fadeInDuration);
-                    float curveValue = group.FadeInCurve.Evaluate(t);
-                    audioSource.volume = curveValue * targetVolume;
-                    yield return null;
-                }
-                audioSource.volume = targetVolume;
-            }
-            else
-            {
-                audioSource.volume = targetVolume;
-                audioSource.Play();
-            }
-
-            // 等待播放（如果不循环）
-            if (!group.Loop)
-            {
-                float waitTime = clipLength - fadeInDuration - fadeOutDuration;
-                if (waitTime > 0)
-                {
-                    yield return new WaitForSeconds(waitTime);
-                }
-
-                // 淡出
-                if (fadeOutDuration > 0)
-                {
-                    float elapsed = 0f;
-                    float startVolume = audioSource.volume;
-                    while (elapsed < fadeOutDuration)
-                    {
-                        elapsed += Time.deltaTime;
-                        float t = Mathf.Clamp01(elapsed / fadeOutDuration);
-                        float curveValue = group.FadeOutCurve.Evaluate(t);
-                        audioSource.volume = curveValue * startVolume;
-                        yield return null;
-                    }
-                }
-
-                audioSource.Stop();
-                UnityEngine.Object.Destroy(audioSource);
-            }
-        }
 
         #endregion
 

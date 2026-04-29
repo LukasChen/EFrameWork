@@ -68,7 +68,7 @@ $directories = @(
     "Assets/App/Res/UI/Popups",
     "Assets/App/Res/UI/Widgets",
     "Assets/Modules",
-    "Assets/Resources/Config",
+    "Assets/Resources/Audio",
     "Assets/Scenes",
     "Assets/Settings",
     "tools"
@@ -125,7 +125,7 @@ function Write-ColdStartSummary {
     Write-ColdStartStatus -Name "Project updater" -State (Get-StateForPath "tools/Sync-EFrameAIFromFramework.ps1" $SkipProjectUpdater) -Detail "tools/Sync-EFrameAIFromFramework.ps1"
     Write-ColdStartStatus -Name "Project AI overlay" -State (Get-StateForPath ".github/instructions/project-local.instructions.md" $SkipProjectOverlay) -Detail ".github/instructions/project-local.instructions.md"
     Write-ColdStartStatus -Name "Bootstrap code" -State (Get-StateForPath "Assets/App/Runtime/Common/ResPath.cs" $SkipBootstrapCode) -Detail "ResPath, Procedure, Home UI, SampleModule, and StartUp_SETUP.md"
-    Write-ColdStartStatus -Name "Audio event config" -State (Get-StateForPath "Assets/Resources/Config/AudioEventConfig.asset" $false) -Detail "Resources config loaded by AudioEventManager"
+    Write-ColdStartStatus -Name "Audio event config" -State (Get-StateForPath "Assets/Resources/Audio/AudioEventConfig.asset" $false) -Detail "Resources config loaded by AudioEventManager"
 
     Write-Host ""
     Write-Host "Next steps:"
@@ -157,7 +157,7 @@ function Write-ColdStartSummary {
 }
 
 function New-AudioEventConfigAsset {
-    $relativeAssetPath = "Assets/Resources/Config/AudioEventConfig.asset"
+    $relativeAssetPath = "Assets/Resources/Audio/AudioEventConfig.asset"
     $assetPath = Join-Path $resolvedTargetRoot $relativeAssetPath
 
     if (Test-Path $assetPath) {

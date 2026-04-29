@@ -9,7 +9,7 @@ namespace EFrameWork.Editor.Audio
     /// </summary>
     public static class AudioEventConfigCreator
     {
-        private const string k_configAssetPath = "Assets/Resources/Config/AudioEventConfig.asset";
+        private const string k_configAssetPath = AudioResourcePaths.EventConfigAssetPath;
 
         public static void CreateAudioEventConfig()
         {

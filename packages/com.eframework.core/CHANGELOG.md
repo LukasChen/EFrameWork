@@ -4,6 +4,19 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-04-29
+
+### Added
+
+- Added an editor menu item at `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to initialize Addressables if needed, sync managed `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` entries, and regenerate `ResPath.Generated.cs` without running the full project initializer.
+- Added Audio service volume controls for master, music, and SFX output, music pause/resume, SFX stop-all, and mixer-exposed `MasterVolume`, `MusicVolume`, and `SfxVolume` template parameters.
+- Added centralized Audio Resources paths under `Assets/Resources/Audio` and unified `AudioClipAsset` so one asset can represent either a single clip or a random set of clips.
+
+### Fixed
+
+- Avoided invalid generated `ResPath` members when an Addressables path repeats the same segment name as its enclosing generated class, such as `Pets/Pet_1/Pet_1`.
+- Improved Audio event delayed-play cancellation, SFX fade cleanup through the shared pool, weighted-random zero-weight fallback, and AudioListener fallback creation.
+
 ## [0.2.1] - 2026-04-29
 
 ### Changed

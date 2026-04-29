@@ -21,7 +21,7 @@ namespace EFrameWork.Editor.Audio
         private const float LeftPanelWidth = 280f;
         private const float MinWindowWidth = 900f;
         private const float MinWindowHeight = 600f;
-        private const string ConfigAssetPath = "Assets/Resources/Config/AudioEventConfig.asset";
+        private const string ConfigAssetPath = AudioResourcePaths.EventConfigAssetPath;
 
         #endregion
 
@@ -47,6 +47,7 @@ namespace EFrameWork.Editor.Audio
 
         // Preview
         private AudioSource _previewAudioSource;
+        private Dictionary<string, int> _previewSequentialIndexByGroup = new Dictionary<string, int>();
 
         #endregion
 
@@ -1357,11 +1358,15 @@ namespace EFrameWork.Editor.Audio
                     break;
 
                 case AudioPlayMode.Sequential:
-                    clipIndex = groupToPreview.SequentialIndex % groupToPreview.AudioClips.Count;
-                    groupToPreview.SequentialIndex++;
+                    string groupKey = $"{configItem.EventTypeName}_{groupToPreview.GroupName}";
+                    if (!_previewSequentialIndexByGroup.TryGetValue(groupKey, out clipIndex))
+                    {
+                        clipIndex = 0;
+                    }
+                    _previewSequentialIndexByGroup[groupKey] = (clipIndex + 1) % groupToPreview.AudioClips.Count;
                     break;
 
-                case AudioPlayMode.WeightedCurve:
+                case AudioPlayMode.WeightedRandom:
                     clipIndex = GetWeightedClipIndexFromGroup(groupToPreview);
                     break;
             }
@@ -1388,6 +1393,9 @@ namespace EFrameWork.Editor.Audio
             {
                 totalWeight += clip.Weight;
             }
+
+            if (totalWeight <= 0f)
+                return UnityEngine.Random.Range(0, group.AudioClips.Count);
 
             float random = UnityEngine.Random.Range(0f, totalWeight);
             float cumulative = 0f;

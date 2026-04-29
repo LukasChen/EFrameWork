@@ -14,8 +14,10 @@ user-invocable: true
 3. Load runtime assets through `EFrame.Current.Assets.LoadAsync(...)` or `InstantiateAsync(...)`.
 4. Store and dispose returned handles according to the owner lifecycle: Procedure, controller, service, or spawned runtime object.
 5. Avoid `WaitForCompletion` and synchronous Addressables paths unless there is a documented reason.
-6. When editor tooling changes generated paths or Addressables grouping, update the corresponding bootstrap/generation workflow rather than patching business code around it.
-7. For UI resources, align prefab names, controller names, and generated binding namespaces with the UI contract.
+6. Keep framework-managed Audio Resources assets under `Assets/Resources/Audio` and route mixer/event-config paths through `AudioResourcePaths`.
+7. After adding, moving, or deleting managed resources, run `EFrame Tools/Addressables/Sync Groups And Generate ResPath` before updating runtime callers to new generated constants.
+8. When editor tooling changes generated paths or Addressables grouping, update the corresponding bootstrap/generation workflow rather than patching business code around it.
+9. For UI resources, align prefab names, controller names, and generated binding namespaces with the UI contract.
 
 ## Output Checks
 

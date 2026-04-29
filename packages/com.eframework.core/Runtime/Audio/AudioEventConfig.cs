@@ -21,9 +21,9 @@ namespace EFrameWork.Runtime.Audio
         Sequential,
 
         /// <summary>
-        /// 权重曲线控制 (基于曲线评估权重)
+        /// 加权随机播放
         /// </summary>
-        WeightedCurve
+        WeightedRandom
     }
 
     /// <summary>
@@ -198,11 +198,6 @@ namespace EFrameWork.Runtime.Audio
         /// </summary>
         public AudioPlayMode PlayMode = AudioPlayMode.Random;
 
-        /// <summary>
-        /// 权重曲线 (用于 WeightedCurve 模式)
-        /// </summary>
-        public AnimationCurve WeightCurve = AnimationCurve.Linear(0, 1, 1, 1);
-
         #endregion
 
         #region 播放参数
@@ -294,10 +289,6 @@ namespace EFrameWork.Runtime.Audio
         public float VibrationFrequency = 0.5f;
 
         #endregion
-
-        // 运行时状态
-        [NonSerialized]
-        public int SequentialIndex = 0;
     }
 
     #endregion
@@ -311,7 +302,7 @@ namespace EFrameWork.Runtime.Audio
         public AudioClip Clip;
 
         /// <summary>
-        /// 权重 (用于 WeightedCurve 模式)
+        /// 权重 (用于 WeightedRandom 模式)
         /// </summary>
         [Range(0f, 1f)]
         public float Weight = 1f;
@@ -338,9 +329,5 @@ namespace EFrameWork.Runtime.Audio
         /// 无条件的组 = 默认音效，始终播放
         /// </summary>
         public List<ConditionalAudioGroup> ConditionalGroups = new List<ConditionalAudioGroup>();
-
-        // 运行时状态：顺序播放索引 (已废弃，移至 ConditionalAudioGroup)
-        [NonSerialized]
-        public int SequentialIndex = 0;
     }
 }

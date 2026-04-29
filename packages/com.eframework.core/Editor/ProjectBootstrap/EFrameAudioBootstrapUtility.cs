@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.IO;
+using EFrameWork.Runtime.Audio;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -10,13 +11,18 @@ namespace EFrameWork.Editor.ProjectBootstrap
     {
         private const string MixerAssetName = "EFrameAudioMixerSettings";
         private const string SourceMixerAssetPath = "Packages/com.eframework.core/Editor/Settings/EFrameAudioMixerSettings.mixer";
-        private const string ResourcesFolderPath = "Assets/Resources";
-        private const string TargetMixerAssetPath = ResourcesFolderPath + "/EFrameAudioMixerSettings.mixer";
+        private const string ResourcesFolderPath = AudioResourcePaths.ResourcesAudioFolder;
+        private const string TargetMixerAssetPath = AudioResourcePaths.MixerSettingsAssetPath;
 
         internal static bool IsAudioSetupReady()
         {
             var mixer = LoadProjectMixer();
-            return mixer != null && HasGroup(mixer, "MUSIC") && HasGroup(mixer, "SFX");
+            return mixer != null &&
+                   HasGroup(mixer, "MUSIC") &&
+                   HasGroup(mixer, "SFX") &&
+                   HasVolumeControl(mixer, AudioManager.K_masterVolumeParam) &&
+                   HasVolumeControl(mixer, AudioManager.K_musicVolumeParam) &&
+                   HasVolumeControl(mixer, AudioManager.K_sfxVolumeParam);
         }
 
         internal static bool EnsureAudioSetup(out string message)
@@ -60,7 +66,15 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return false;
             }
 
-            message = "Initialized audio mixer under Assets/Resources/EFrameAudioMixerSettings.mixer.";
+            if (!HasVolumeControl(mixer, AudioManager.K_masterVolumeParam) ||
+                !HasVolumeControl(mixer, AudioManager.K_musicVolumeParam) ||
+                !HasVolumeControl(mixer, AudioManager.K_sfxVolumeParam))
+            {
+                message = "Audio mixer is missing exposed volume controls MasterVolume/MusicVolume/SfxVolume.";
+                return false;
+            }
+
+            message = $"Initialized audio mixer under {TargetMixerAssetPath}.";
             return true;
         }
 
@@ -72,6 +86,11 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private static bool HasGroup(AudioMixer mixer, string groupName)
         {
             return mixer != null && mixer.FindMatchingGroups(groupName).Length > 0;
+        }
+
+        private static bool HasVolumeControl(AudioMixer mixer, string parameterName)
+        {
+            return mixer != null && mixer.GetFloat(parameterName, out _);
         }
 
         private static void EnsureFolderExists(string assetPath)

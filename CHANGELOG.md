@@ -6,6 +6,22 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+### Changed
+
+- Updated AI release maintenance rules so future release handling includes creating a git commit and matching version tag.
+
+## [0.2.2] - 2026-04-29
+
+### Added
+
+- Added a framework editor menu item to sync managed Addressables groups and regenerate `ResPath.Generated.cs` without running the full project initializer.
+- Added unified Audio Resources paths under `Assets/Resources/Audio`, mixer volume controls, and a single `AudioClipAsset` configuration asset that supports one or more clips.
+
+### Fixed
+
+- Avoided invalid generated `ResPath` members when an Addressables path repeats the same segment name as its enclosing generated class.
+- Improved Audio event playback cleanup, weighted-random behavior, SFX fade pooling, delayed-event cancellation, and AudioListener fallback handling.
+
 ## [0.2.1] - 2026-04-29
 
 ### Changed

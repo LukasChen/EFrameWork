@@ -20,12 +20,20 @@ namespace EFrameWork.Runtime.Audio
         public const int K_maxAudioSourceCount = 30;
         public const int K_initialAudioSourceCount = 8;
         public const float K_defaultMinInterval = 0.05f;
+        public const string K_masterVolumeParam = "MasterVolume";
+        public const string K_musicVolumeParam = "MusicVolume";
+        public const string K_sfxVolumeParam = "SfxVolume";
 
         private AudioMixer m_audioMixer;
         private GameObject m_audioSourceHolder;
         private AudioMixerGroup m_musicGroup;
         private AudioMixerGroup m_sfxGroup;
+        private bool m_soundOn = true;
         private bool m_musicOn = true;
+        private float m_masterVolume = 1f;
+        private float m_musicVolume = 1f;
+        private float m_sfxVolume = 1f;
+        private bool m_useMixerVolumeControls;
 
         // Music: 独立的2个AudioSource用于crossfade
         private Queue<AudioSource> m_musicAudioSourceCache;
@@ -43,7 +51,18 @@ namespace EFrameWork.Runtime.Audio
             InitAudioCache();
         }
 
-        public bool SoundOn { get; set; }
+        public bool SoundOn
+        {
+            get => m_soundOn;
+            set
+            {
+                if (m_soundOn == value) return;
+                m_soundOn = value;
+                if (!m_soundOn && !m_useMixerVolumeControls)
+                    StopAllSfx();
+                ApplyMixerVolumes();
+            }
+        }
 
         public bool MusicOn
         {
@@ -52,15 +71,34 @@ namespace EFrameWork.Runtime.Audio
             {
                 if (m_musicOn == value) return;
                 m_musicOn = value;
-                if (m_musicOn) ResumeMusic();
-                else StopMusic();
+                ApplyMusicVolumeToSources();
+                ApplyMixerVolumes();
             }
+        }
+
+        public float MasterVolume
+        {
+            get => m_masterVolume;
+            set => SetMasterVolume(value);
+        }
+
+        public float MusicVolume
+        {
+            get => m_musicVolume;
+            set => SetMusicVolume(value);
+        }
+
+        public float SfxVolume
+        {
+            get => m_sfxVolume;
+            set => SetSfxVolume(value);
         }
 
         public void Initialize(bool musicOn = true, bool soundOn = true)
         {
-            SoundOn = soundOn;
+            m_soundOn = soundOn;
             m_musicOn = musicOn;
+            ApplyMixerVolumes();
             Debug.Log($"Initialize AudioManager musicOn {musicOn}, soundOn {soundOn}");
         }
 
@@ -77,6 +115,7 @@ namespace EFrameWork.Runtime.Audio
             {
                 if (audioSource != null)
                 {
+                    KillSfxTweens(audioSource);
                     audioSource.Stop();
                     Object.Destroy(audioSource);
                 }
@@ -89,10 +128,10 @@ namespace EFrameWork.Runtime.Audio
 
         private void InitAudioCache()
         {
-            m_audioMixer = Resources.Load<AudioMixer>("EFrameAudioMixerSettings");
+            m_audioMixer = Resources.Load<AudioMixer>(AudioResourcePaths.MixerSettingsResourcePath);
             if (m_audioMixer == null)
             {
-                Debug.LogWarning("EFrameAudioMixerSettings was not found under Assets/Resources. Audio will initialize without mixer routing. Run EFrame Tools/项目初始化向导 or EFrame Tools/Audio Setup to create it.");
+                Debug.LogWarning($"EFrameAudioMixerSettings was not found at Resources path '{AudioResourcePaths.MixerSettingsResourcePath}'. Audio will initialize without mixer routing. Run EFrame Tools/项目初始化向导 or EFrame Tools/Audio Setup to create it.");
             }
             else
             {
@@ -100,6 +139,7 @@ namespace EFrameWork.Runtime.Audio
                 var sfxGroups = m_audioMixer.FindMatchingGroups(K_sfxGroup);
                 m_musicGroup = musicGroups.Length > 0 ? musicGroups[0] : null;
                 m_sfxGroup = sfxGroups.Length > 0 ? sfxGroups[0] : null;
+                m_useMixerVolumeControls = HasMixerVolumeControls();
 
                 if (m_musicGroup == null || m_sfxGroup == null)
                 {
@@ -107,8 +147,7 @@ namespace EFrameWork.Runtime.Audio
                 }
             }
 
-            if (m_audioSourceHolder.GetComponent<AudioListener>() == null)
-                m_audioSourceHolder.AddComponent<AudioListener>();
+            EnsureAudioListener();
 
             // 初始化音乐AudioSource (2个用于crossfade)
             m_musicAudioSourceCache = new Queue<AudioSource>();
@@ -135,10 +174,83 @@ namespace EFrameWork.Runtime.Audio
             }
         }
 
+        public void SetMasterVolume(float volume)
+        {
+            m_masterVolume = Mathf.Clamp01(volume);
+            ApplyMusicVolumeToSources();
+            ApplyMixerVolumes();
+        }
+
+        public void SetMusicVolume(float volume)
+        {
+            m_musicVolume = Mathf.Clamp01(volume);
+            ApplyMusicVolumeToSources();
+            ApplyMixerVolumes();
+        }
+
+        public void SetSfxVolume(float volume)
+        {
+            m_sfxVolume = Mathf.Clamp01(volume);
+            ApplyMixerVolumes();
+        }
+
+        private float EffectiveMusicVolume => m_musicOn ? m_masterVolume * m_musicVolume : 0f;
+        private float EffectiveSfxVolume => m_soundOn ? m_masterVolume * m_sfxVolume : 0f;
+        private float EffectiveMusicSourceVolume => m_useMixerVolumeControls ? 1f : EffectiveMusicVolume;
+        private float EffectiveSfxSourceVolume => m_useMixerVolumeControls ? 1f : EffectiveSfxVolume;
+
+        private void ApplyMusicVolumeToSources()
+        {
+            if (m_musicAudioSourceCache == null) return;
+
+            foreach (var audioSource in m_musicAudioSourceCache)
+            {
+                if (audioSource == null) continue;
+                audioSource.volume = EffectiveMusicSourceVolume;
+            }
+        }
+
+        private void ApplyMixerVolumes()
+        {
+            if (m_audioMixer == null || !m_useMixerVolumeControls) return;
+
+            SetMixerVolume(K_masterVolumeParam, m_masterVolume);
+            SetMixerVolume(K_musicVolumeParam, m_musicOn ? m_musicVolume : 0f);
+            SetMixerVolume(K_sfxVolumeParam, m_soundOn ? m_sfxVolume : 0f);
+        }
+
+        private bool HasMixerVolumeControls()
+        {
+            if (m_audioMixer == null) return false;
+
+            return m_audioMixer.GetFloat(K_masterVolumeParam, out _) &&
+                   m_audioMixer.GetFloat(K_musicVolumeParam, out _) &&
+                   m_audioMixer.GetFloat(K_sfxVolumeParam, out _);
+        }
+
+        private void SetMixerVolume(string parameterName, float volume)
+        {
+            float clampedVolume = Mathf.Clamp01(volume);
+            float decibels = clampedVolume <= 0.0001f ? -80f : Mathf.Log10(clampedVolume) * 20f;
+            m_audioMixer.SetFloat(parameterName, decibels);
+        }
+
+        private void EnsureAudioListener()
+        {
+            foreach (var listener in Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
+            {
+                if (listener != null && listener.enabled && listener.gameObject.activeInHierarchy)
+                    return;
+            }
+
+            m_audioSourceHolder.AddComponent<AudioListener>();
+            Debug.LogWarning("[AudioManager] No active AudioListener found. Added a fallback listener to AudioSourceHolder.");
+        }
+
         #region SFX 播放接口
 
         /// <summary>
-        /// 播放音频资源 (自动识别资源类型: AudioClip / AudioClipAsset / AudioClipMultipleAsset)
+        /// Play an audio asset. Supported asset types: AudioClip and AudioClipAsset.
         /// </summary>
         public void PlayAudioAsset(string assetPath)
         {
@@ -149,8 +261,6 @@ namespace EFrameWork.Runtime.Audio
                 PlaySfx(clip);
             else if (audioAsset is AudioClipAsset audioClipAsset)
                 PlayAudioClipAsset(audioClipAsset);
-            else if (audioAsset is AudioClipMultipleAsset audioClipMultiple)
-                PlayAudioClipMultipleAsset(audioClipMultiple);
         }
 
         /// <summary>
@@ -159,20 +269,7 @@ namespace EFrameWork.Runtime.Audio
         public void PlayAudioClipAsset(AudioClipAsset audioClipAsset)
         {
             if (audioClipAsset == null) return;
-            AudioClip audioClip = audioClipAsset.LoadClipAsync();
-            if (audioClip == null) return;
-
-            PlaySfxInternal(audioClip, audioClipAsset.MinIntervalTime,
-                audioClipAsset.Volume.RandomValue, audioClipAsset.Pitch.RandomValue);
-        }
-
-        /// <summary>
-        /// 播放AudioClipMultipleAsset (随机选择一个clip播放)
-        /// </summary>
-        public void PlayAudioClipMultipleAsset(AudioClipMultipleAsset audioClipAsset)
-        {
-            if (audioClipAsset == null) return;
-            AudioClip audioClip = audioClipAsset.LoadClipAsync();
+            AudioClip audioClip = audioClipAsset.LoadClip();
             if (audioClip == null) return;
 
             PlaySfxInternal(audioClip, audioClipAsset.MinIntervalTime,
@@ -223,8 +320,9 @@ namespace EFrameWork.Runtime.Audio
             AudioSource audioSource = GetAvailableAudioSource();
             if (audioSource == null) return;
 
+            KillSfxTweens(audioSource);
             audioSource.clip = audioClip;
-            audioSource.volume = volume;
+            audioSource.volume = volume * EffectiveSfxSourceVolume;
             audioSource.pitch = pitch;
             audioSource.loop = false;
             audioSource.Play();
@@ -239,7 +337,10 @@ namespace EFrameWork.Runtime.Audio
             foreach (var source in m_audioSourcePool)
             {
                 if (!source.isPlaying)
+                {
+                    KillSfxTweens(source);
                     return source;
+                }
             }
 
             // 2. 池未满，创建新的
@@ -263,8 +364,26 @@ namespace EFrameWork.Runtime.Audio
                     oldest = source;
                 }
             }
+            KillSfxTweens(oldest);
             oldest.Stop();
             return oldest;
+        }
+
+        private static void KillSfxTweens(AudioSource audioSource)
+        {
+            if (audioSource == null) return;
+            audioSource.DOKill();
+        }
+
+        public void StopAllSfx()
+        {
+            foreach (var audioSource in m_audioSourcePool ?? Enumerable.Empty<AudioSource>())
+            {
+                if (audioSource == null) continue;
+
+                KillSfxTweens(audioSource);
+                audioSource.Stop();
+            }
         }
 
         #endregion
@@ -274,15 +393,30 @@ namespace EFrameWork.Runtime.Audio
         /// <summary>
         /// 恢复当前音乐播放
         /// </summary>
-        private void ResumeMusic()
+        public void PauseMusic()
         {
-            if (!m_musicOn) return;
+            if (m_musicAudioSourceCache == null) return;
+
+            foreach (AudioSource audioSource in m_musicAudioSourceCache)
+            {
+                if (audioSource != null && audioSource.isPlaying)
+                    audioSource.Pause();
+            }
+        }
+
+        public void ResumeMusic()
+        {
+            if (!m_musicOn) m_musicOn = true;
+            ApplyMixerVolumes();
+
             AudioSource musicAudioSource = m_currentMusicSource;
             if (musicAudioSource != null && musicAudioSource.clip != null)
             {
                 musicAudioSource.DOKill();
-                musicAudioSource.DOFade(1, K_fadeDuration).From(0);
-                musicAudioSource.Play();
+                musicAudioSource.volume = EffectiveMusicSourceVolume;
+                musicAudioSource.UnPause();
+                if (!musicAudioSource.isPlaying)
+                    musicAudioSource.Play();
             }
         }
 
@@ -341,11 +475,11 @@ namespace EFrameWork.Runtime.Audio
                 {
                     m_nextMusicSource.volume = 0;
                     m_nextMusicSource.Play();
-                    m_nextMusicSource.DOFade(1, fadeDuration);
+                    m_nextMusicSource.DOFade(EffectiveMusicSourceVolume, fadeDuration);
                 }
                 else
                 {
-                    m_nextMusicSource.volume = 1;
+                    m_nextMusicSource.volume = EffectiveMusicSourceVolume;
                     m_nextMusicSource.Play();
                 }
             }
@@ -359,14 +493,19 @@ namespace EFrameWork.Runtime.Audio
         /// <summary>
         /// 停止背景音乐
         /// </summary>
-        public void StopMusic()
+        public void StopMusic(bool fade = true)
         {
+            if (m_musicAudioSourceCache == null) return;
+
             foreach (AudioSource audioSource in m_musicAudioSourceCache)
             {
                 if (audioSource.clip != null && audioSource.isPlaying)
                 {
                     audioSource.DOKill();
-                    audioSource.DOFade(0, K_fadeDuration).OnComplete(audioSource.Stop);
+                    if (fade)
+                        audioSource.DOFade(0, K_fadeDuration).OnComplete(audioSource.Stop);
+                    else
+                        audioSource.Stop();
                 }
             }
         }
@@ -399,9 +538,11 @@ namespace EFrameWork.Runtime.Audio
         {
             if (!SoundOn || audioClip == null) return null;
 
+            float targetVolume = volume * EffectiveSfxSourceVolume;
             AudioSource audioSource = GetAvailableAudioSource();
             if (audioSource == null) return null;
 
+            KillSfxTweens(audioSource);
             audioSource.clip = audioClip;
             audioSource.pitch = pitch;
             audioSource.loop = loop;
@@ -415,14 +556,15 @@ namespace EFrameWork.Runtime.Audio
                 // 使用 DOTween 自定义曲线淡入
                 DOTween.To(
                     () => 0f,
-                    t => audioSource.volume = fadeInCurve.Evaluate(t) * volume,
+                    t => audioSource.volume = fadeInCurve.Evaluate(t) * targetVolume,
                     1f,
                     fadeInDuration
-                ).SetEase(Ease.Linear);
+                ).SetEase(Ease.Linear)
+                 .SetTarget(audioSource);
             }
             else
             {
-                audioSource.volume = volume;
+                audioSource.volume = targetVolume;
                 audioSource.Play();
             }
 
@@ -434,7 +576,7 @@ namespace EFrameWork.Runtime.Audio
                 {
                     DOVirtual.DelayedCall(fadeOutStartTime, () =>
                     {
-                        if (audioSource != null && audioSource.isPlaying)
+                        if (audioSource != null && audioSource.isPlaying && audioSource.clip == audioClip)
                         {
                             float startVolume = audioSource.volume;
                             DOTween.To(
@@ -443,9 +585,10 @@ namespace EFrameWork.Runtime.Audio
                                 1f,
                                 fadeOutDuration
                             ).SetEase(Ease.Linear)
+                             .SetTarget(audioSource)
                              .OnComplete(() => audioSource.Stop());
                         }
-                    });
+                    }).SetTarget(audioSource);
                 }
             }
 
@@ -459,6 +602,8 @@ namespace EFrameWork.Runtime.Audio
         {
             if (audioSource == null || !audioSource.isPlaying) return;
 
+            KillSfxTweens(audioSource);
+
             if (fadeOutDuration > 0)
             {
                 float startVolume = audioSource.volume;
@@ -470,11 +615,14 @@ namespace EFrameWork.Runtime.Audio
                         1f,
                         fadeOutDuration
                     ).SetEase(Ease.Linear)
+                     .SetTarget(audioSource)
                      .OnComplete(() => audioSource.Stop());
                 }
                 else
                 {
-                    audioSource.DOFade(0, fadeOutDuration).OnComplete(() => audioSource.Stop());
+                    audioSource.DOFade(0, fadeOutDuration)
+                        .SetTarget(audioSource)
+                        .OnComplete(() => audioSource.Stop());
                 }
             }
             else

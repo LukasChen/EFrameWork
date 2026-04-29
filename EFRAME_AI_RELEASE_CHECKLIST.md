@@ -72,6 +72,10 @@
 24. 新增 `eframe-*` skill 时，确认它是业务项目常用 workflow，而不是 maintainer-only 发布/同步流程。
 25. `eframe-feature-bootstrap` 应保持总控职责；UI、数据表、资源细节应委派给对应 specialized skill，避免重复规则。
 
+## Release Commit And Tag
+
+- Release handling must include git commit and tag: after checks pass, commit the release changes and create a version tag matching `packages/com.eframework.core/package.json`, such as `v0.2.2`. Do not stop at prepared-but-uncommitted release files unless the user explicitly asks for that.
+
 ## 3. 业务项目升级流程
 
 业务项目拉取新的框架版本后：

@@ -101,10 +101,10 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 && settings.FindGroup(AppScenesGroupName) != null;
         }
 
-            internal static bool IsGeneratedResPathReady()
-            {
-                return File.Exists(GetProjectAbsolutePath(GeneratedResPathFilePath));
-            }
+        internal static bool IsGeneratedResPathReady()
+        {
+            return File.Exists(GetProjectAbsolutePath(GeneratedResPathFilePath));
+        }
 
         internal static bool EnsureAddressablesInitialized(out string message)
         {
@@ -134,6 +134,30 @@ namespace EFrameWork.Editor.ProjectBootstrap
             EnsureFolderExists(ProjectScenesRootPath);
             EnsureFolderExists(ModulesRootPath);
             return SyncManagedAssets(out message);
+        }
+
+        internal static bool SyncProjectAddressablesAndGenerateResPath(out string message)
+        {
+            var messages = new List<string>();
+
+            if (!EnsureAddressablesInitialized(out var initializationMessage))
+            {
+                message = initializationMessage;
+                return false;
+            }
+
+            messages.Add(initializationMessage);
+
+            if (!EnsureProjectAddressablesGroups(out var syncMessage))
+            {
+                messages.Add(syncMessage);
+                message = string.Join(Environment.NewLine, messages);
+                return false;
+            }
+
+            messages.Add(syncMessage);
+            message = string.Join(Environment.NewLine, messages);
+            return true;
         }
 
         internal static bool SyncImportedAssets(IEnumerable<string> assetPaths, out string message)
@@ -521,27 +545,61 @@ namespace EFrameWork.Editor.ProjectBootstrap
             return node;
         }
 
-        private static void AppendNodeMembers(StringBuilder builder, ResPathNode node, int indentLevel)
+        private static void AppendNodeMembers(StringBuilder builder, ResPathNode node, int indentLevel, string enclosingTypeIdentifier = null)
         {
+            var usedMemberNames = new HashSet<string>(StringComparer.Ordinal);
+            var currentTypeIdentifier = enclosingTypeIdentifier ?? node.Identifier;
+            if (!string.IsNullOrEmpty(node.Address))
+            {
+                usedMemberNames.Add("Value");
+            }
+
             foreach (var child in node.Children.Values)
             {
                 var indent = new string(' ', indentLevel * 4);
                 if (child.Children.Count == 0)
                 {
-                    builder.AppendLine($"{indent}public const string {child.Identifier} = \"{EscapeStringLiteral(child.Address)}\";");
+                    var constIdentifier = MakeUniqueMemberIdentifier(child.Identifier, usedMemberNames, currentTypeIdentifier, "Value");
+                    builder.AppendLine($"{indent}public const string {constIdentifier} = \"{EscapeStringLiteral(child.Address)}\";");
                     continue;
                 }
 
-                builder.AppendLine($"{indent}public static class {child.Identifier}");
+                var classIdentifier = MakeUniqueMemberIdentifier(child.Identifier, usedMemberNames, currentTypeIdentifier, $"{child.Identifier}Node");
+                builder.AppendLine($"{indent}public static class {classIdentifier}");
                 builder.AppendLine($"{indent}{{");
                 if (!string.IsNullOrEmpty(child.Address))
                 {
                     builder.AppendLine($"{indent}    public const string Value = \"{EscapeStringLiteral(child.Address)}\";");
                 }
 
-                AppendNodeMembers(builder, child, indentLevel + 1);
+                AppendNodeMembers(builder, child, indentLevel + 1, classIdentifier);
                 builder.AppendLine($"{indent}}}");
             }
+        }
+
+        private static string MakeUniqueMemberIdentifier(string identifier, ISet<string> usedMemberNames, string enclosingTypeIdentifier, string conflictFallback)
+        {
+            var baseIdentifier = identifier;
+            if (string.Equals(baseIdentifier, enclosingTypeIdentifier, StringComparison.Ordinal))
+            {
+                baseIdentifier = string.IsNullOrEmpty(conflictFallback) ? $"{identifier}Item" : conflictFallback;
+            }
+
+            if (string.IsNullOrEmpty(baseIdentifier))
+            {
+                baseIdentifier = "Item";
+            }
+
+            var candidate = baseIdentifier;
+            var suffix = 2;
+            while (usedMemberNames.Contains(candidate) || string.Equals(candidate, enclosingTypeIdentifier, StringComparison.Ordinal))
+            {
+                candidate = $"{baseIdentifier}{suffix}";
+                suffix++;
+            }
+
+            usedMemberNames.Add(candidate);
+            return candidate;
         }
 
         private static string ResolveResPathNamespace()

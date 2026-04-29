@@ -101,6 +101,10 @@ EFrame Tools/项目初始化向导
 
 如果当前项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口仍然可以创建启动场景，但 AI 同步按钮会降级提示，需要手动在框架仓库根目录执行对应脚本。
 
+Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，`AudioEventConfig.asset` 由冷启动脚本生成，运行时通过 `AudioResourcePaths` 集中加载。
+
+资源迁移或新增完成后，可以通过菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 单独同步 Addressables 分组并重新生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。这个入口不会执行完整项目初始化，也不会刷新启动场景，适合业务项目升级、资源移动或模块整理后的日常同步。
+
 ## 4. 仅同步 AI 的方式
 
 当新项目已经引入这份框架仓库后，在框架仓库根目录执行：

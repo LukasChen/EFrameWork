@@ -30,6 +30,7 @@ user-invocable: true
 4. 需要详细审查时，优先扩展 maintainer skill 或 reference，而不是扩大每次都会触发的 instruction 上下文。
 5. 修改任何 framework-managed AI 文件后，递增 `.github/eframe-ai.manifest.json`，并更新 notes 说明真实意图。
 6. 运行 `tools/Test-EFrameAIRelease.ps1`，确认 managed instruction/skill 边界、manifest bump、frontmatter、instruction 长度预算和 release 检查通过。
+7. Release handling must include git commit and tag: after version, changelog, manifest, and release checks are ready, commit the release changes and create a version tag matching `packages/com.eframework.core/package.json`, such as `v0.2.2`. Only skip commit/tag when the user explicitly asks to prepare release files only.
 
 ## Instruction Quality Checks
 
