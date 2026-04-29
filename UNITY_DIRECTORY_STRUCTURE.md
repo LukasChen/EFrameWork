@@ -127,23 +127,155 @@ Assets/
 `Assets/App/Res/UI/Panels`
 
 - 主页面、常驻页面、首页、设置页等面板预制体。
+- 页面私有图片、动画、材质等资源可以跟随页面放在页面子目录中，不需要提升到 `Common`。
+- 推荐结构：
+
+```text
+Assets/App/Res/UI/Panels/<PanelName>/
+|- <PanelName>View.prefab
+|- Sprites/
+|- Animations/
+|- Materials/
+```
 
 `Assets/App/Res/UI/Popups`
 
 - 模态弹窗、确认框、奖励弹层等短生命周期预制体。
+- 弹窗私有图片、动画、材质等资源可以跟随弹窗放在弹窗子目录中。
+- 推荐结构：
+
+```text
+Assets/App/Res/UI/Popups/<PopupName>/
+|- <PopupName>Popup.prefab
+|- Sprites/
+|- Animations/
+|- Materials/
+```
 
 `Assets/App/Res/UI/Widgets`
 
 - 列表项、通用条目、小型复用预制体。
+- 仅被某个 Widget 使用的图片、动画、材质放在对应 Widget 子目录中。
+- 推荐结构：
+
+```text
+Assets/App/Res/UI/Widgets/<WidgetName>/
+|- <WidgetName>.prefab
+|- Sprites/
+|- Animations/
+|- Materials/
+```
 
 `Assets/App/Res/UI/Common`
 
 - UI 通用图集、共享节点、过渡资源。
+- 只放跨页面、跨弹窗或跨 Widget 复用的 UI 资源。
+- 推荐结构：
+
+```text
+Assets/App/Res/UI/Common/
+|- Sprites/
+|- Atlases/
+|- Fonts/
+|- Materials/
+|- Transitions/
+```
+
+UI 资源归属判断：
+
+- 只被一个页面使用：放 `Assets/App/Res/UI/Panels/<PanelName>/...`。
+- 只被一个弹窗使用：放 `Assets/App/Res/UI/Popups/<PopupName>/...`。
+- 只被一个复用组件使用：放 `Assets/App/Res/UI/Widgets/<WidgetName>/...`。
+- 被多个 UI 复用：放 `Assets/App/Res/UI/Common/...`。
+- UI 专用材质优先放 UI 目录内，不放到全局 `Assets/App/Res/Materials`。
 
 `Assets/App/Res/SceneAssets`
 
 - 放场景依赖资源、场景配置、Lighting 相关资产、可复用场景内容片段。
 - 不放 `.unity` 场景文件本体，场景文件本身仍建议放在 `Assets/Scenes`。
+- 推荐按场景或复用范围继续分层，避免 `SceneAssets` 变成混合资源池。
+- 推荐结构：
+
+```text
+Assets/App/Res/SceneAssets/<SceneName>/
+|- Prefabs/
+|- Sprites/
+|- Textures/
+|- Materials/
+|- Lighting/
+|- Config/
+
+Assets/App/Res/SceneAssets/Common/
+|- Prefabs/
+|- Textures/
+|- Materials/
+```
+
+场景资源归属判断：
+
+- `.unity` 场景文件本体：放 `Assets/Scenes/...`。
+- 某个场景专属图片、贴图、材质、灯光、配置：放 `Assets/App/Res/SceneAssets/<SceneName>/...`。
+- 多个场景复用的场景片段、贴图、材质：放 `Assets/App/Res/SceneAssets/Common/...`。
+- 多个系统都复用、且不依附具体场景的材质：放 `Assets/App/Res/Materials/...`。
+
+`Assets/App/Res/Materials`
+
+- 放跨 UI、跨场景或跨系统复用的通用材质。
+- 不放某个 UI 页面专用材质；这类资源应跟随 UI 页面、弹窗、Widget 或 `UI/Common`。
+- 不放某个场景专用材质；这类资源应放 `Assets/App/Res/SceneAssets/<SceneName>/Materials`。
+
+`Assets/App/Res/FX`
+
+- 放主应用共享特效资源，不承担所有业务特效的集中收纳职责。
+- 特效应按“业务拥有者”和“复用范围”归属：模块私有特效放模块内，跨模块共享特效才上移到这里。
+- 一个特效通常是 Prefab、Materials、Textures、Shaders、Animations、VFXGraph 或粒子配置的组合，应以特效 Prefab 为中心组织私有依赖。
+- 推荐结构：
+
+```text
+Assets/App/Res/FX/
+|- Common/
+|  |- Materials/
+|  |- Textures/
+|  |- Shaders/
+|  |- Animations/
+|  |- Prefabs/
+|- UI/
+|  |- Common/
+|  |- Reward/
+|  |- Transition/
+|- Scene/
+|  |- Common/
+|  |- <SceneName>/
+|- Gameplay/
+|  |- Common/
+|  |- Skill/
+|  |- Hit/
+|  |- Projectile/
+|  |- Buff/
+```
+
+单个特效推荐结构：
+
+```text
+Assets/App/Res/FX/Gameplay/Skill/Fireball/
+|- Fireball.prefab
+|- Materials/
+|- Textures/
+|- Shaders/
+|- Animations/
+```
+
+FX 资源归属判断：
+
+- 只服务某个具体特效的材质、贴图、Shader、动画：跟随这个特效目录。
+- 多个特效复用、但仍属于特效体系的资源：放 `Assets/App/Res/FX/Common/...`。
+- 跨模块共享的 UI 特效：放 `Assets/App/Res/FX/UI/...`。
+- 跨模块共享的场景表现特效：放 `Assets/App/Res/FX/Scene/...`。
+- 跨模块共享的技能、受击、投射物、Buff 等玩法特效：放 `Assets/App/Res/FX/Gameplay/...`。
+- 某个模块私有特效：放 `Assets/Modules/<ModuleName>/Res/FX/...`。
+- 真正跨 UI、场景、FX、系统复用的材质或 Shader：放 `Assets/App/Res/Materials` 或 `Assets/App/Res/Shaders`。
+- 只属于某个 UI 页面或弹窗的动效资源，如果不需要作为独立 FX 复用，可以跟随 UI 放 `Assets/App/Res/UI/.../Animations` 或 `Transitions`。
+- 只属于某个场景的环境表现资源，如果不需要作为独立 FX 复用，可以跟随场景放 `Assets/App/Res/SceneAssets/<SceneName>/FX`。
 
 ## 6. 场景与设置
 
@@ -167,6 +299,8 @@ Assets/Modules/<Name>/
 |- Editor/
 |- Res/
 |  |- UI/
+|  |- SceneAssets/
+|  |- FX/
 |  |- ...
 |- Runtime/
 |  |- Common/
@@ -184,6 +318,9 @@ Assets/Modules/<Name>/
 - 只有跨模块共享的内容才回收到 `Assets/App/...`。
 - 如果模块还不成熟，也不要先扔到临时目录，优先在 `Assets/Modules/<Name>` 内演进。
 - 如果业务项目确实是多玩法合集，可以在项目 overlay 中把 `Modules` 进一步细化为 `MiniGames`，但框架层默认保持抽象命名。
+- 模块内资源可复用主应用的细分规则，例如 `Res/UI/Panels`、`Res/UI/Common`、`Res/SceneAssets/<SceneName>`、`Res/FX/Gameplay`。
+- 模块私有图片、材质、特效不要提前放入 `Assets/App/Res`；确认跨模块共享后再上移。
+- 模块私有 FX 以 `Assets/Modules/<Name>/Res/FX` 为入口，并按照 UI、Scene、Gameplay、Common 等复用范围继续细分。
 
 ## 8. Addressables 目录与分组建议
 

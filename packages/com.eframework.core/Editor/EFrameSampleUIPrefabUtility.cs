@@ -9,8 +9,8 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private const string SourceHomeViewPrefabPath = "Packages/com.eframework.core/Editor/Templates/UI/HomeView.prefab";
         private const string SourceSampleModuleViewPrefabPath = "Packages/com.eframework.core/Editor/Templates/UI/SampleModuleMainView.prefab";
         private const string SourceModuleViewTemplatePrefabPath = "Packages/com.eframework.core/Editor/Templates/UI/ModuleMainViewTemplate.prefab";
-        private const string HomeViewPrefabPath = "Assets/App/Res/UI/Panels/HomeView.prefab";
-        private const string SampleModuleViewPrefabPath = "Assets/Modules/SampleModule/Res/UI/SampleModuleMainView.prefab";
+        private const string HomeViewPrefabPath = "Assets/App/Res/UI/Panels/Home/HomeView.prefab";
+        private const string SampleModuleViewPrefabPath = "Assets/Modules/SampleModule/Res/UI/Panels/SampleModuleMain/SampleModuleMainView.prefab";
 
         public static bool AreBootstrapSampleUIPrefabsReady()
         {
@@ -20,8 +20,8 @@ namespace EFrameWork.Editor.ProjectBootstrap
 
         public static bool EnsureBootstrapSampleUIPrefabs(out string message)
         {
-            EnsureFolderHierarchy("Assets/App/Res/UI/Panels");
-            EnsureFolderHierarchy("Assets/Modules/SampleModule/Res/UI");
+            EnsureFolderHierarchy("Assets/App/Res/UI/Panels/Home");
+            EnsureFolderHierarchy("Assets/Modules/SampleModule/Res/UI/Panels/SampleModuleMain");
 
             if (AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(SourceHomeViewPrefabPath) == null)
             {
@@ -93,7 +93,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return false;
             }
 
-            var targetFolder = $"Assets/Modules/{moduleName}/Res/UI";
+            var targetFolder = $"Assets/Modules/{moduleName}/Res/UI/Panels/{moduleName}Main";
             var targetPrefabPath = $"{targetFolder}/{moduleName}MainView.prefab";
             EnsureFolderHierarchy(targetFolder);
 

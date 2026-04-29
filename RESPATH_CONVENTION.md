@@ -35,12 +35,31 @@
 
 Addressables 地址由目录规则推导，约束如下：
 
-- `Assets/App/Res/...` 生成地址如 `UI/Panels/HomeView`
+- `Assets/App/Res/...` 生成地址如 `UI/Panels/Home/HomeView`
 - `Assets/App/Res/Bootstrap/...` 生成地址如 `Bootstrap/LoadingView`
 - `Assets/App/Res/SceneAssets/...` 生成地址如 `SceneAssets/MainLighting`
 - `Assets/Scenes/...` 生成地址如 `Scenes/StartUp`
-- `Assets/Modules/<Name>/Res/...` 生成地址如 `Modules/<Name>/Res/UI/MainView`
+- `Assets/Modules/<Name>/Res/...` 生成地址如 `Modules/<Name>/Res/UI/Panels/Main/MainView`
 - `Assets/Modules/<Name>/Scenes/...` 生成地址如 `Modules/<Name>/Scenes/Main`
+
+目录加细后，地址继续按资源相对路径生成，不额外折叠目录层级。例如：
+
+- `Assets/App/Res/UI/Panels/Home/HomeView.prefab` 生成 `UI/Panels/Home/HomeView`
+- `Assets/App/Res/UI/Panels/Home/Sprites/Banner.png` 生成 `UI/Panels/Home/Sprites/Banner`
+- `Assets/App/Res/UI/Common/Atlases/CommonUI.spriteatlas` 生成 `UI/Common/Atlases/CommonUI`
+- `Assets/App/Res/SceneAssets/BattleScene/Textures/Ground.png` 生成 `SceneAssets/BattleScene/Textures/Ground`
+- `Assets/App/Res/SceneAssets/Common/Materials/SharedGround.mat` 生成 `SceneAssets/Common/Materials/SharedGround`
+- `Assets/App/Res/FX/Gameplay/Skill/Fireball/Fireball.prefab` 生成 `FX/Gameplay/Skill/Fireball/Fireball`
+- `Assets/App/Res/FX/UI/Common/ButtonClick/ButtonClick.prefab` 生成 `FX/UI/Common/ButtonClick/ButtonClick`
+- `Assets/Modules/Shop/Res/UI/Panels/ShopMain/ShopMainView.prefab` 生成 `Modules/Shop/Res/UI/Panels/ShopMain/ShopMainView`
+- `Assets/Modules/Battle/Res/FX/Skill/Fireball/Fireball.prefab` 生成 `Modules/Battle/Res/FX/Skill/Fireball/Fireball`
+
+命名建议：
+
+- 资源目录和文件名使用稳定、可读的英文 PascalCase 或 UpperCamelCase。
+- 不要用 `New Folder`、`Temp`、`Test`、`Final2` 这类临时命名进入 Addressables 管理目录。
+- 不要为了整理美术源文件频繁移动已被代码引用的运行时资源；移动会改变生成地址。
+- 原始工程文件、PSD 源文件、参考图若不需要运行时加载，优先放在非 Addressables 扫描目录，或在项目中单独约定 `ArtSource` 类目录。
 
 ## 5. 代码风格
 
@@ -51,9 +70,14 @@ Addressables 地址由目录规则推导，约束如下：
 ## 6. 示例
 
 ```csharp
-var panelPath = ResPath.Generated.UI.Panels.HomeView;
+var panelPath = ResPath.Generated.UI.Panels.Home.HomeView;
+var homeBannerPath = ResPath.Generated.UI.Panels.Home.Sprites.Banner;
+var commonAtlasPath = ResPath.Generated.UI.Common.Atlases.CommonUI;
+var battleGroundPath = ResPath.Generated.SceneAssets.BattleScene.Textures.Ground;
+var sharedFireballFxPath = ResPath.Generated.FX.Gameplay.Skill.Fireball.Fireball;
+var moduleFireballFxPath = ResPath.Generated.Modules.Battle.Res.FX.Skill.Fireball.Fireball;
 var startupScenePath = ResPath.Generated.Scenes.StartUp;
-var shopMainView = ResPath.Generated.Modules.Shop.Res.UI.ShopMainView;
+var shopMainView = ResPath.Generated.Modules.Shop.Res.UI.Panels.ShopMain.ShopMainView;
 
 var dynamicPopup = ResPath.App.UI.Popup("RewardPopup");
 var moduleScene = ResPath.Modules.Scene("Shop", "ShopMain");

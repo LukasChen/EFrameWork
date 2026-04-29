@@ -57,8 +57,8 @@
 
 在 Unity 初始化窗口里执行 `Import Initial Templates`，会一次性从 EFrame package 导入所有内置初始范例模板，包括：
 
-- `Assets/App/Res/UI/Panels/HomeView.prefab`
-- `Assets/Modules/SampleModule/Res/UI/SampleModuleMainView.prefab`
+- `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
+- `Assets/Modules/SampleModule/Res/UI/Panels/SampleModuleMain/SampleModuleMainView.prefab`
 
 这两个 prefab 都带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它们。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这些 prefab。
 
