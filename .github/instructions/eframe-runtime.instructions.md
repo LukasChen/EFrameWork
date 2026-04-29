@@ -40,6 +40,8 @@ Project-local `project-*.instructions.md` overlays may add more specific busines
 - 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成，再访问 `EFrame.Current.UI`、`EFrame.Current.Audio`、`EFrame.Current.Data` 等框架服务。
 - `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 
+- Any runtime camera that should become the current scene render entry for the framework UI overlay must carry `EFrameSceneCamera`; do not add per-frame camera polling or hand-maintain the UI camera stack in gameplay code.
+
 ## Events And Data
 
 - 事件订阅优先使用 `EFrame.Current.Events.SubscribeScoped(...)` 并在 `OnLeave`、`OnDestroy` 或控制器释放时 `Dispose`，避免手写订阅/退订不成对。

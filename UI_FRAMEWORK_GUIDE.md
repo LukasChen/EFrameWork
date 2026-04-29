@@ -180,7 +180,21 @@ Required framework sorting layers should already be created by project bootstrap
 
 Do not create a separate top-level persistent Canvas outside `QUI` for normal framework UI.
 
-## 5. Basic View Example
+## 5. Scene Camera Contract
+
+Projects that use a separate scene camera and UI camera should mark every camera that can become the current scene render entry with `EFrameSceneCamera`.
+
+`QUI` listens to those marker components through `OnEnable`, `OnDisable`, and `OnDestroy`, and also refreshes once during initialization and scene changes. There is no per-frame camera polling. When an enabled marked camera is selected, `QUI` configures the persistent UI camera as a URP Overlay camera and appends it to the selected scene camera stack.
+
+Selection rules:
+
+- higher `EFrameSceneCamera.Priority` wins
+- if priority is equal, higher `Camera.depth` wins
+- if both are equal, the most recently registered camera wins
+
+Only cameras that should host the framework UI overlay should carry `EFrameSceneCamera`. Minimap, RenderTexture, screenshot, cutscene, and temporary effect cameras should leave the marker off unless they intentionally become the active scene render entry.
+
+## 6. Basic View Example
 
 Typical view class:
 
@@ -219,7 +233,7 @@ Notes:
 - cache references in `OnBindingSet()`
 - do not add your own public open/close lifecycle here
 
-## 6. Basic Controller Example
+## 7. Basic Controller Example
 
 Typical page controller:
 
@@ -274,7 +288,7 @@ Key point:
 - access the live instance through `TypedViewHandle.TypedView`
 - do not expect `controller.View`
 
-## 7. Showing And Hiding UI
+## 8. Showing And Hiding UI
 
 Show a page:
 
@@ -310,7 +324,7 @@ Lifecycle hooks are split by scope:
 - `OnViewClosed()` runs when each close starts, while bound components are still available
 - cache-enabled views close into `Closed`, so they do not call `OnViewDestroyed()` until the handle is force-destroyed or released
 
-## 8. Popup Example
+## 9. Popup Example
 
 `UIPopupController<TView, TResult>` keeps the same handle-based lifecycle and adds a result model.
 
@@ -352,7 +366,7 @@ if (result == ConfirmResult.Confirm)
 }
 ```
 
-## 9. Handle Access
+## 10. Handle Access
 
 When you need explicit lifecycle state:
 
@@ -389,7 +403,7 @@ Interpretation:
 - `Closed` means the cached instance can reopen without recreating the wrapper
 - `Released` means the runtime instance is gone and the controller must create a new handle later
 
-## 10. Navigation Stack
+## 11. Navigation Stack
 
 `QUI` navigation stack is now handle-first.
 
@@ -433,7 +447,7 @@ flowchart LR
     Caller -->|PopTo<T>()| QUI
 ```
 
-## 11. Transitions
+## 12. Transitions
 
 Default transitions are host-owned.
 
@@ -450,7 +464,7 @@ That means:
 - interrupted transitions complete their await path through tween completion/kill callbacks
 - stale async open/close completions are ignored by the handle if a newer operation has started
 
-## 12. What Business Code Should Avoid
+## 13. What Business Code Should Avoid
 
 Avoid these patterns:
 
@@ -461,7 +475,7 @@ Avoid these patterns:
 - assuming cached controller state is the same thing as cached binding state
 - writing raw Addressables UI paths repeatedly in business code
 
-## 13. Minimal End-To-End Example
+## 14. Minimal End-To-End Example
 
 ```csharp
 public sealed class LobbyProcedure : ProcedureBase

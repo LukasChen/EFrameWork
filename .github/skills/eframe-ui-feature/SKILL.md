@@ -24,4 +24,5 @@ user-invocable: true
 - Confirm `QUI` SortingLayer bootstrap exists before relying on UI ordering.
 - Confirm every event subscription, button listener, async handle, and controller-owned resource has a matching cleanup path at the right lifecycle scope.
 - Confirm generated or hand-written Views do not rely on `assetPath` constructors or a legacy controller `View` facade.
+- Confirm any camera intended to host the framework UI overlay uses `EFrameSceneCamera` instead of per-frame polling or scene-specific UI camera stack code.
 - For larger UI feature work, read [ui-checklist](./references/ui-checklist.md).

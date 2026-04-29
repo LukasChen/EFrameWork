@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.45",
-  "updatedAt": "2026-04-29",
-  "notes": "Internal sync marker for EFrameWork AI release rules updated to require release commits and version tags."
+  "version": "0.1.46",
+  "updatedAt": "2026-04-30",
+  "notes": "Synced runtime and UI guidance now documents the EFrameSceneCamera scene-camera contract for QUI camera stack binding."
 }

@@ -15,6 +15,8 @@ user-invocable: true
 
 ## Audit Flow
 
+- Check runtime cameras that should host the framework UI overlay use `EFrameSceneCamera` instead of per-frame polling or manual UI camera stack code.
+
 1. 找到启动链路入口，确认没有把业务逻辑塞回启动场景。
 2. 检查 `Procedure` 是否只做状态编排，进入退出是否对称清理。
 3. 检查 UI 是否经过 `QUI` 层级管理，控制器是否承担了正确职责。

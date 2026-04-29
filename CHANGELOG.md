@@ -6,6 +6,12 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-04-30
+
+### Added
+
+- Added the `EFrameSceneCamera` runtime convention so `QUI` can bind the persistent UI camera into URP camera stacks from scene-camera lifecycle events instead of per-frame polling.
+
 ### Changed
 
 - Updated AI release maintenance rules so future release handling includes creating a git commit and matching version tag.

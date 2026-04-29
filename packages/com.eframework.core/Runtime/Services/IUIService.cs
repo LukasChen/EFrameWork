@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime;
 using EFrameWork.Runtime.UI;
 using EFrameWork.Runtime.UI.Handles;
 using EFrameWork.Runtime.UI.Transitions;
@@ -37,6 +38,9 @@ namespace EFrameWork.Runtime.UI
         IUIViewHandle TopView { get; }
         int ViewStackCount { get; }
         void RemoveFromStack(BindingViewBase view);
+        void RegisterSceneCamera(EFrameSceneCamera sceneCamera);
+        void UnregisterSceneCamera(EFrameSceneCamera sceneCamera);
+        void RefreshSceneCameraBindings();
         void SetInteractive(bool isInteractive);
     }
 }

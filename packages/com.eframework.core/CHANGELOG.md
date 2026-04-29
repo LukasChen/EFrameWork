@@ -4,6 +4,12 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-04-30
+
+### Added
+
+- Added `EFrameSceneCamera` and QUI scene camera binding so marked runtime cameras automatically host the persistent UI camera as a URP Overlay stack camera without per-frame polling.
+
 ## [0.2.2] - 2026-04-29
 
 ### Added

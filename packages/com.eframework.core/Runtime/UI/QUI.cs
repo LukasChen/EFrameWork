@@ -59,6 +59,7 @@ namespace EFrameWork.Runtime.UI
         public int DesignWidth { get; private set; }
         public int DesignHeight { get; private set; }
         public bool EnableScreenFitDebugLog { get; private set; }
+        private UISceneCameraBinder m_sceneCameraBinder;
 
         #region 屏幕适配信息
 
@@ -314,6 +315,8 @@ namespace EFrameWork.Runtime.UI
             EnableScreenFitDebugLog = enableScreenFitDebugLog;
 
             ValidateSortingLayers();
+            m_sceneCameraBinder = new UISceneCameraBinder(UICamera);
+            m_sceneCameraBinder.Initialize();
 
             GameObject rootObject = new("UIRoot");
             Root = rootObject.AddComponent<RectTransform>();
@@ -600,6 +603,8 @@ namespace EFrameWork.Runtime.UI
             }
 
             m_uiLayerNodeTable?.Clear();
+            m_sceneCameraBinder?.Dispose();
+            m_sceneCameraBinder = null;
             Root = null;
             RootCanvas = null;
             UICamera = null;
@@ -698,6 +703,21 @@ namespace EFrameWork.Runtime.UI
         public void OpenBindingView(BindingViewBase bindingViewBase, UILayer uiLayerType = UI.UILayer.QuiPanel)
         {
             bindingViewBase.transform.SetParent(m_uiLayerNodeTable[uiLayerType], false);
+        }
+
+        public void RegisterSceneCamera(EFrameSceneCamera sceneCamera)
+        {
+            m_sceneCameraBinder?.Register(sceneCamera);
+        }
+
+        public void UnregisterSceneCamera(EFrameSceneCamera sceneCamera)
+        {
+            m_sceneCameraBinder?.Unregister(sceneCamera);
+        }
+
+        public void RefreshSceneCameraBindings()
+        {
+            m_sceneCameraBinder?.Refresh();
         }
         #endregion
     }
