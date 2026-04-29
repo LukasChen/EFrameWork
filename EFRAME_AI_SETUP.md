@@ -10,9 +10,13 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 
 - `.github/copilot-instructions.md`：始终生效的 EFrame 开发总规则
 - `.github/eframe-ai.manifest.json`：AI 配置版本清单，用于检测项目是否落后于框架规则
-- `.github/instructions/*.instructions.md`：按运行时代码、编辑器代码分层附加规则
+- `.github/instructions/eframe-*.instructions.md`：同步到业务项目的短规则，按运行时代码、编辑器代码分层
 - `.github/skills/eframe-feature-bootstrap`：用于新功能骨架搭建和重构收敛
 - `.github/skills/eframe-guideline-audit`：用于规范审查和回归检查
+- `.github/skills/eframe-ui-feature`：用于 UI 页面、弹窗、Controller、View prefab 和 binding 工作流
+- `.github/skills/eframe-data-table`：用于持久化数据表、dirty、迁移、保存/加载结果工作流
+- `.github/skills/eframe-resource-flow`：用于资源目录、Addressables、ResPath 和异步句柄释放工作流
+- `.github/instructions/maintainer-*` 与 `.github/skills/maintainer-*`：仅框架仓库维护用，不同步到业务项目
 - `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便项目内查看架构、接入和发布边界
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
@@ -144,6 +148,7 @@ EFrame Tools/项目初始化向导
 
 - 框架层：由框架仓库同步到项目 `.github/instructions/eframe-*.instructions.md`
 - 项目层：项目自己维护 `.github/instructions/project-*.instructions.md`
+- 工作流层：框架同步 `.github/skills/eframe-*`，项目可维护 `.github/skills/project-*` 作为本地补充
 
 这样两层会同时被 Copilot 读取，因为它们都位于当前项目工作区根目录下。
 
@@ -176,8 +181,9 @@ EFrame Tools/项目初始化向导
 - 框架仓库中的 `.github` 视为标准源。
 - 新项目只在本项目确有差异时做增量扩展，不要直接改坏通用规则。
 - 通用规范变化时，优先先改框架仓库，再用初始化脚本同步到业务项目。
-- EFrame 托管的 instruction 和 skill 统一使用 `eframe-` 前缀；业务项目自己的 AI 规则请使用其他名称，脚本在 `-Force` 同步时会覆盖 `eframe-*` 项，但会保留项目自定义项。
-- 如果框架仓库需要维护“只给框架维护者 AI 看”的规则，请使用 `maintainer-*` 命名；这类 instruction 不会被 `Initialize-EFrameAI.ps1` 同步到业务项目。
+- EFrame 托管并同步到业务项目的 instruction 和 skill 统一使用 `eframe-` 前缀；脚本在 `-Force` 同步时会覆盖 stale `eframe-*` 项。
+- 业务项目自己的 AI overlay 使用 `project-*` 前缀；同步脚本会保留项目自定义项。
+- 如果框架仓库需要维护“只给框架维护者 AI 看”的规则或工作流，请使用 `maintainer-*` 命名；这类 instruction 和 skill 不会被 `Initialize-EFrameAI.ps1` 同步到业务项目。
 - 最稳定的落地方式是：框架仓库负责提供和安装同步器，业务项目仓库只负责执行 `Sync-EFrameAIFromFramework.ps1`。
 
 ## 8. 何时更新指令层
@@ -194,6 +200,8 @@ EFrame Tools/项目初始化向导
 
 只要上述内容导致 `.github/copilot-instructions.md`、`.github/instructions/`、`.github/skills/`、AI 同步/冷启动工具或 AI setup/release 文档发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
 
+维护原则：instructions 只放短、稳定、始终需要生效的边界规则；多步骤生成、审查、发布和迁移流程放进 skills 或 skill references。同步到业务项目的流程放 `eframe-*` skill，框架仓库维护流程放 `maintainer-*` skill。
+
 ## 9. 推荐维护流程
 
 1. 先更新规范源文档。
@@ -209,7 +217,7 @@ EFrame Tools/项目初始化向导
 6. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
 7. 最后再把这套 `.github` 同步到其他项目。
 
-`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更，并检查框架仓库里是否误放了 `project-*` overlay。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
+`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更、manifest 版本是否真实递增、instruction/skill frontmatter 是否有效、synced instruction 是否过长、同步脚本是否误纳入 `maintainer-*`，并报告当前 `eframe-*` / `maintainer-*` instruction 和 skill 数量。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
 
 版本号建议：
 

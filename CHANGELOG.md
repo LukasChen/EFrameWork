@@ -6,6 +6,8 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-29
+
 ### Changed
 
 - Improved EFrame initialization diagnostics with explicit failure stages and safer partial-service cleanup.
@@ -40,8 +42,11 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 - Removed the legacy `UIControllerBase<TView>.View` facade and switched generated controller templates to explicit `TypedViewHandle` access.
 - Reduced `BindingViewBase` lifecycle entrypoints to internal-only APIs so `UIViewHandle` is now the sole runtime lifecycle surface for open/close flows.
 - Reorganized `eframe-runtime.instructions` into layer- and concern-based sections so the accumulated runtime/UI/persistence rules are easier to scan without changing the underlying guidance.
-- Split AI guidance by sync boundary: `eframe-runtime.instructions` now focuses on business-project runtime contract, while framework-only maintenance guidance is documented separately in a non-synced `maintainer-*` instruction.
+- Split AI guidance by sync boundary: `eframe-runtime.instructions` now focuses on business-project runtime contract, while framework-only maintenance guidance and workflows live under non-synced `maintainer-*` instructions/skills.
 - Applied the same sync-boundary split to `eframe-editor.instructions`, keeping business-project editor rules in the synced contract and moving framework-only generator/release maintenance guidance to the maintainer layer.
+- Clarified AI instruction-vs-skill ownership so short always-on rules stay in instructions, business-project workflows stay in synced `eframe-*` skills, and framework-only release/sync maintenance lives in `maintainer-*` skills.
+- Strengthened AI release checks with frontmatter validation, manifest version-increase validation, synced instruction length warnings, and maintainer sync-boundary checks.
+- Added focused business-project skills for EFrame UI features, persistent data tables, and resource/Addressables flows.
 - Returned event debug type queries as snapshots so external enumeration is not affected by later subscription changes.
 - Removed data storage sample/test classes from the runtime assembly surface.
 - Updated AI runtime instructions and skills to recommend async asset handles, the new UI cache semantics, scoped event cleanup, DataTable dirty automation, and versioned save migration.

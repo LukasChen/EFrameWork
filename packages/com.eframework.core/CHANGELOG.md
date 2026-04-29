@@ -4,6 +4,8 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-29
+
 ### Changed
 
 - Added initialization failure stages and safer cleanup for partially created services.
@@ -39,8 +41,11 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 - Removed the legacy `UIControllerBase<TView>.View` facade and updated generated controller templates to use `TypedViewHandle` explicitly.
 - Reduced `BindingViewBase` lifecycle entrypoints to internal-only APIs so runtime open/close flows now route through `UIViewHandle` only.
 - Reorganized the framework runtime instruction file into layer- and concern-based sections so UI, startup, resource, and persistence rules are easier to maintain.
-- Split AI guidance by sync boundary so synced `eframe-*` files stay business-project-facing while framework-only maintenance notes live in a separate non-synced instruction file.
+- Split AI guidance by sync boundary so synced `eframe-*` files stay business-project-facing while framework-only maintenance notes and workflows live under non-synced `maintainer-*` instructions/skills.
 - Applied the same sync-boundary cleanup to the editor instruction layer so only stable business-project editor rules remain in synced `eframe-editor.instructions`.
+- Clarified AI instruction-vs-skill ownership so business-project workflows remain in synced `eframe-*` skills while framework-only release and sync maintenance lives in `maintainer-*` skills.
+- Strengthened AI release checks with frontmatter validation, manifest version-increase validation, synced instruction length warnings, and maintainer sync-boundary checks.
+- Added focused business-project skills for EFrame UI features, persistent data tables, and resource/Addressables flows.
 - Returned event debug type queries as snapshots so external enumeration is not affected by later subscription changes.
 - Removed data storage sample/test classes from the runtime assembly surface.
 

@@ -7,7 +7,7 @@ In this repository, the AI layer is a first-class framework feature, not an opti
 ## Framework Layers
 
 - `packages/com.eframework.core/`: Unity runtime and editor package, including `EFrame`, `Procedure`, `QUI`, UI controllers, assets, audio, data, and bootstrap editor tooling.
-- `.github/`: framework-managed AI collaboration layer, including Copilot instructions, file instructions, skills, and the AI manifest.
+- `.github/`: framework-managed AI collaboration layer, including Copilot instructions, synced `eframe-*` instructions/skills, maintainer-only `maintainer-*` guidance, and the AI manifest.
 - `tools/`: project cold-start and AI sync toolchain for importing, updating, and extending the framework AI layer in business projects.
 
 See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
@@ -30,6 +30,8 @@ Use semantic versioning for EFrameWork releases. Before `1.0.0`, minor versions 
 Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.
 
 - Framework AI rules live under `.github/`
+- Synced business-project rules and workflows use the `eframe-*` prefix; framework-repository maintenance rules and workflows use `maintainer-*` and are not synced to projects.
+- High-value synced skills cover feature bootstrap, guideline audit, UI features, data tables, and resource flows.
 - Sync and installer scripts live under `tools/`
 - Setup and upgrade flow is documented in [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md)
 - AI release and manifest rules are documented in [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)

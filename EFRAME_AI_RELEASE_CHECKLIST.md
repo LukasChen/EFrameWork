@@ -6,13 +6,17 @@
 
 - `eframe-*`：框架托管文件专用前缀，只能由框架仓库维护。
 - `project-*`：业务项目本地 overlay 专用前缀，由项目仓库维护。
+- `maintainer-*`：框架仓库维护者专用前缀，不同步到业务项目。
 - 不要在业务项目里创建 `eframe-*` 的 instruction 或 skill。
 - 不要在框架仓库里创建 `project-*` 的 instruction 或 skill。
+- 不要把 release、manifest、同步脚本或迁移期维护流程塞进同步给业务项目的 `eframe-*` skill；这些属于 `maintainer-*`。
 
 适用范围：
 
 - `.github/instructions/eframe-*.instructions.md`
 - `.github/skills/eframe-*`
+- `.github/instructions/maintainer-*.instructions.md`
+- `.github/skills/maintainer-*`
 - `.github/instructions/project-*.instructions.md`
 - 业务项目自定义技能目录名也建议使用 `project-*` 前缀
 
@@ -22,7 +26,9 @@
 
 - `.github/copilot-instructions.md`
 - `.github/instructions/eframe-*.instructions.md`
+- `.github/instructions/maintainer-*.instructions.md`
 - `.github/skills/eframe-*`
+- `.github/skills/maintainer-*`
 - `tools/Initialize-EFrameAI.ps1`
 - `tools/Test-EFrameAIRelease.ps1`
 - `tools/New-EFrameProjectAIOverlay.ps1`
@@ -42,8 +48,8 @@
 2. 根目录 [CHANGELOG.md](CHANGELOG.md) 已记录本次仓库级变化；如果 package 代码有变化，`packages/com.eframework.core/CHANGELOG.md` 已同步记录。
 3. 如果 AI 规则、AI 文档、同步脚本或冷启动工具变化，`.github/eframe-ai.manifest.json` 的 `version` 已递增。
 4. 对外沟通时使用 EFrameWork 主版本号；manifest 只作为业务项目同步检测标记，不作为另一套产品版本发布。
-5. 新增或更新的 instruction / skills 命名符合 `eframe-*` 约定。
-6. `Test-EFrameAIRelease.ps1` 能通过，且会在 AI 影响文件变更但 manifest 未变更时报错。
+5. 新增或更新的 instruction / skills 命名符合边界：同步业务项目用 `eframe-*`，框架维护专用用 `maintainer-*`，业务 overlay 用 `project-*`。
+6. `Test-EFrameAIRelease.ps1` 能通过，且会在 AI 影响文件变更但 manifest 未变更、manifest 版本未递增、frontmatter 无效、synced instruction 过长或同步脚本误纳入 `maintainer-*` 时给出错误或警告。
 7. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `-Force` 都能正常运行。
 8. `Initialize-EFrameAI.ps1 -Force` 会同步 `.github`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`，且不会覆盖项目自定义的 `project-*` overlay。
 9. `Initialize-EFrameAI.ps1 -StatusOnly` 会报告框架托管项、项目 `project-*` overlay、根目录 AI 文档和陈旧 `eframe-*` 项。
@@ -59,6 +65,8 @@
 19. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
 20. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
 21. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
+22. Always-on 边界保留在 instructions；多步骤生成、审查、发布、迁移流程放在 skills 或 skill references。
+23. 新增 `eframe-*` skill 时，确认它是业务项目常用 workflow，而不是 maintainer-only 发布/同步流程。
 
 ## 3. 业务项目升级流程
 
@@ -75,3 +83,4 @@
 - 不要发布没有 bump manifest 版本的 AI 规则更新。
 - 不要在同步脚本里覆盖项目自定义的非 `eframe-*` 项。
 - 不要只重构框架代码或模板，却遗漏配套 AI instructions、skills、manifest、setup 文档和同步脚本检查。
+- 不要把 `maintainer-*` instruction 或 skill 加进 AI 同步白名单。

@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.33",
+  "version": "0.1.37",
   "updatedAt": "2026-04-29",
-  "notes": "Internal sync marker for EFrameWork AI rules updated with skill boundary cleanup: synced eframe skills stay project-facing, maintainer AI contract workflow is repository-only, and maintainer instructions now define skill prefix ownership."
+  "notes": "Internal sync marker for EFrameWork AI rules updated with focused synced skills for UI feature work, persistent data tables, and resource/Addressables flows."
 }
