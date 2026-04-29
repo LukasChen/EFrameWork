@@ -34,6 +34,14 @@ https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 - Keep TextMeshPro sourced from `com.unity.textmeshpro`
 - Do not add another framework-local TextMeshPro copy unless you are migrating legacy assets intentionally
 
+## JSON Dependency
+
+`com.eframework.core` uses Newtonsoft.Json in its data storage module. The package declares `com.unity.nuget.newtonsoft-json`, so Unity Package Manager installs the official Unity Newtonsoft.Json package automatically for consuming projects.
+
+- This package no longer redistributes the legacy JsonNet-Lite DLL
+- Keep Newtonsoft.Json sourced from `com.unity.nuget.newtonsoft-json`
+- Do not add a second JsonNet-Lite or Newtonsoft.Json DLL copy under `Assets`
+
 ## Source
 
 Initial extraction source:

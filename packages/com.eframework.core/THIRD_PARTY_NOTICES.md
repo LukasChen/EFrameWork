@@ -10,4 +10,5 @@ Bundled plugin folders include:
 - UGF
 - UniTask
 - Unity Ingame Debug Console
-- JsonNet-Lite
+
+Unity's official `com.unity.nuget.newtonsoft-json` package is consumed through Unity Package Manager and is not bundled in this package.

@@ -12,7 +12,8 @@
         "GUID:3de88c88fbbb8f944b9210d496af9762",
         "GUID:ab67fb10353d84448ac887a7367cbda8",
         "GUID:57a0b9bc628ab4740af4b6f1f0b2e134",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "Unity.Newtonsoft.Json"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -4,3 +4,4 @@
 
 - Initial UPM package extraction from CozyBloomUnity `Assets/EFrameWork`.
 - Preserved runtime, editor tooling, plugins, samples, and Unity `.meta` files.
+- Replaced the bundled JsonNet-Lite DLL with the official `com.unity.nuget.newtonsoft-json` package dependency.
