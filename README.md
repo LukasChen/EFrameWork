@@ -12,6 +12,17 @@ In this repository, the AI layer is a first-class framework feature, not an opti
 
 See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
 
+## Versioning
+
+The formal starting version for EFrameWork is `0.1.0`.
+
+- EFrameWork release version: `packages/com.eframework.core/package.json` is the canonical product version for Unity Package Manager consumers and for the framework as a whole.
+- EFrameWork release history: [CHANGELOG.md](CHANGELOG.md) records repository-level releases, including package code, AI collaboration rules, tools, and documentation changes.
+- Package release history: [packages/com.eframework.core/CHANGELOG.md](packages/com.eframework.core/CHANGELOG.md) records package-specific changes.
+- AI workspace manifest: `.github/eframe-ai.manifest.json` is an internal sync marker used by business projects to detect stale synced AI rules. It is not a separate product version.
+
+Use semantic versioning for EFrameWork releases. Before `1.0.0`, minor versions may still include breaking changes, but they must be clearly documented in the changelog. Treat Unity code, AI collaboration rules, bootstrap tools, and sync scripts as one release surface.
+
 ## AI Workspace Support
 
 Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.

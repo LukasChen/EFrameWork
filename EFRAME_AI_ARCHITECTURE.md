@@ -57,20 +57,29 @@ Any change in the following areas must include an AI layer impact check:
 
 If the change affects how Copilot should generate, refactor, or audit EFrame projects, update the relevant `.github` instruction or skill in the same change set.
 
-## 4. Versioning Contract
+## 4. Unified Versioning Contract
+
+EFrameWork should be maintained as one product surface, not as a Unity framework plus a second AI product. The AI collaboration layer, bootstrap tools, and sync scripts are part of the framework release contract.
+
+- EFrameWork release version: stored in `packages/com.eframework.core/package.json` and recorded in the root `CHANGELOG.md`.
+- AI workspace manifest version: stored in `.github/eframe-ai.manifest.json` only as a sync marker so business projects can detect stale framework-managed AI files.
+
+For the formal starting release, both values start at `0.1.0`. After that, think in terms of the EFrameWork release first. Bump the package version when publishing a framework/package release. Bump the manifest when the synced AI rules, AI docs, sync scripts, or cold-start tooling change, but do not describe it as a separate product version.
 
 Whenever `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, AI sync scripts, cold-start scripts, or AI setup docs change, bump `.github/eframe-ai.manifest.json`.
 
-The manifest version is the signal business projects use to detect whether their synced AI layer is stale.
+The manifest version is only the signal business projects use to detect whether their synced AI layer is stale.
 
 Recommended release sequence:
 
 1. Update the framework implementation or docs.
 2. Update matching instructions and skills.
-3. Bump `.github/eframe-ai.manifest.json`.
-4. Run `tools/Test-EFrameAIRelease.ps1`.
-5. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
-6. Verify cold-start or editor bootstrap paths affected by the change.
+3. Bump `packages/com.eframework.core/package.json` if this is a framework/package release.
+4. Update the root `CHANGELOG.md`; update `packages/com.eframework.core/CHANGELOG.md` if package code changed.
+5. Bump `.github/eframe-ai.manifest.json` if AI rules, AI docs, sync scripts, or cold-start tooling changed.
+6. Run `tools/Test-EFrameAIRelease.ps1`.
+7. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
+8. Verify cold-start or editor bootstrap paths affected by the change.
 
 ## 5. Naming Boundary
 

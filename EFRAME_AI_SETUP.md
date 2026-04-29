@@ -195,17 +195,26 @@ EFrame Tools/项目初始化向导
 
 1. 先更新规范源文档。
 2. 再更新 `.github/copilot-instructions.md` 和对应 `.instructions.md` / `SKILL.md`。
-3. 递增 `.github/eframe-ai.manifest.json` 的版本号。
-4. 执行发布检查脚本：
+3. 如果这是框架/包版本发布，更新 `packages/com.eframework.core/package.json` 的 `version`，并维护根目录 [CHANGELOG.md](CHANGELOG.md)。如果 package 代码有变化，也同步维护 `packages/com.eframework.core/CHANGELOG.md`。
+4. 如果 AI 规则、AI 文档、同步脚本或冷启动工具发生变化，递增 `.github/eframe-ai.manifest.json` 的版本号。
+5. 执行发布检查脚本：
 
 ```powershell
 .\tools\Test-EFrameAIRelease.ps1
 ```
 
-5. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
-6. 最后再把这套 `.github` 同步到其他项目。
+6. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
+7. 最后再把这套 `.github` 同步到其他项目。
 
 `Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更，并检查框架仓库里是否误放了 `project-*` overlay。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
+
+版本号建议：
+
+- `packages/com.eframework.core/package.json`：EFrameWork 对外发布版本，遵循 SemVer，是维护和沟通时的主版本号。
+- `.github/eframe-ai.manifest.json`：内部同步标记，只用于判断业务项目中的框架托管 AI 文件是否过期，不作为另一套产品版本理解。
+- `CHANGELOG.md`：仓库级发布记录，是阅读版本变化的入口；Unity 代码、AI 规则、工具链和文档都记录在同一个 EFrameWork 发布历史里。
+
+维护时不要把 AI 能力当成额外产品线。更合适的理解是：EFrameWork 的一个版本同时包含运行时代码、编辑器工具、AI 协作规则、冷启动模板和同步工具。manifest 只是让业务项目知道“本地同步到哪一版框架 AI 能力”。
 
 更严格的发布与升级边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
 

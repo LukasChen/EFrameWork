@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.20.0",
+  "version": "0.1.0",
   "updatedAt": "2026-04-29",
-  "notes": "AI collaboration layer is a first-class EFrameWork feature. Bootstrap ProcedureHome template now uses EFrame.Current.UI instead of the removed EFrame.UI shortcut. Bump this version whenever framework-managed .github instructions, skills, sync tooling, cold-start tooling, or AI setup/release docs change."
+  "notes": "Initial formal EFrame AI workspace baseline for EFrameWork 0.1.0. Bump this version whenever framework-managed .github instructions, skills, sync tooling, cold-start tooling, or AI setup/release docs change."
 }

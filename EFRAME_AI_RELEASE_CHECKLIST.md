@@ -38,23 +38,26 @@
 
 发布前必须确认：
 
-1. `.github/eframe-ai.manifest.json` 的 `version` 已递增。
-2. 新增或更新的 instruction / skills 命名符合 `eframe-*` 约定。
-3. `Test-EFrameAIRelease.ps1` 能通过，且会在 AI 影响文件变更但 manifest 未变更时报错。
-4. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `-Force` 都能正常运行。
-5. `Initialize-EFrameAI.ps1 -Force` 会同步 `.github`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`，且不会覆盖项目自定义的 `project-*` overlay。
-6. `Initialize-EFrameAI.ps1 -StatusOnly` 会报告框架托管项、项目 `project-*` overlay、根目录 AI 文档和陈旧 `eframe-*` 项。
-7. `Install-EFrameAIProjectUpdater.ps1` 能在一个临时项目目录中生成项目侧更新脚本。
-8. `New-EFrameProjectAIOverlay.ps1` 能正常生成 `project-local.instructions.md` 模板。
-9. `Initialize-EFrameBootstrapCode.ps1` 能在一个临时项目目录中生成最小启动代码和场景说明。
-10. `Initialize-EFrameColdStart.ps1` 能在一个临时空目录中完成冷启动，并输出包含目录、AI workspace、AI 文档、updater、overlay、bootstrap code 的 summary。
-11. 冷启动 summary 中没有意外 `WARN` 项；使用 `-Skip...` 参数时对应项显示为 `SKIP`。
-12. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
-13. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
-14. 初始化窗口或 Addressables 同步流程能生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
-15. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
-16. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
-17. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
+1. 如果这是框架/包发布，`packages/com.eframework.core/package.json` 的 `version` 已递增或确认保持当前版本。
+2. 根目录 [CHANGELOG.md](CHANGELOG.md) 已记录本次仓库级变化；如果 package 代码有变化，`packages/com.eframework.core/CHANGELOG.md` 已同步记录。
+3. 如果 AI 规则、AI 文档、同步脚本或冷启动工具变化，`.github/eframe-ai.manifest.json` 的 `version` 已递增。
+4. 对外沟通时使用 EFrameWork 主版本号；manifest 只作为业务项目同步检测标记，不作为另一套产品版本发布。
+5. 新增或更新的 instruction / skills 命名符合 `eframe-*` 约定。
+6. `Test-EFrameAIRelease.ps1` 能通过，且会在 AI 影响文件变更但 manifest 未变更时报错。
+7. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `-Force` 都能正常运行。
+8. `Initialize-EFrameAI.ps1 -Force` 会同步 `.github`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`，且不会覆盖项目自定义的 `project-*` overlay。
+9. `Initialize-EFrameAI.ps1 -StatusOnly` 会报告框架托管项、项目 `project-*` overlay、根目录 AI 文档和陈旧 `eframe-*` 项。
+10. `Install-EFrameAIProjectUpdater.ps1` 能在一个临时项目目录中生成项目侧更新脚本。
+11. `New-EFrameProjectAIOverlay.ps1` 能正常生成 `project-local.instructions.md` 模板。
+12. `Initialize-EFrameBootstrapCode.ps1` 能在一个临时项目目录中生成最小启动代码和场景说明。
+13. `Initialize-EFrameColdStart.ps1` 能在一个临时空目录中完成冷启动，并输出包含目录、AI workspace、AI 文档、updater、overlay、bootstrap code 的 summary。
+14. 冷启动 summary 中没有意外 `WARN` 项；使用 `-Skip...` 参数时对应项显示为 `SKIP`。
+15. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
+16. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
+17. 初始化窗口或 Addressables 同步流程能生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
+18. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
+19. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
+20. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
 
 ## 3. 业务项目升级流程
 
