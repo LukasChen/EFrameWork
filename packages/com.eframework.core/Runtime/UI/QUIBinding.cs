@@ -110,7 +110,7 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public string AccessClassNamespace
         {
-            get => string.IsNullOrEmpty(m_accessClassNamespace) ? "EFrameWork.UI.Generated" : m_accessClassNamespace;
+            get => string.IsNullOrEmpty(m_accessClassNamespace) ? "EFrameWork.Runtime.UI.Generated" : m_accessClassNamespace;
             set => m_accessClassNamespace = value;
         }
 
@@ -132,14 +132,6 @@ namespace EFrameWork.Runtime.UI
         {
             var item = m_bindingItems.Find(c => c.BindingName == bindingName && c.Component is T);
             return item?.Component as T;
-        }
-
-        /// <summary>
-        /// 根据绑定名称获取组件（兼容旧版本生成的访问类）
-        /// </summary>
-        public T GetBindingComponent<T>(string bindingName) where T : Component
-        {
-            return GetComponent<T>(bindingName);
         }
 
         /// <summary>

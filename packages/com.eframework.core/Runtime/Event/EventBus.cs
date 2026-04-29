@@ -24,6 +24,22 @@ namespace EFrameWork.Runtime.Event
     /// </remarks>
     public static class EventBus
     {
+        private sealed class EventSubscription : IDisposable
+        {
+            private Action m_unsubscribe;
+
+            public EventSubscription(Action unsubscribe)
+            {
+                m_unsubscribe = unsubscribe;
+            }
+
+            public void Dispose()
+            {
+                m_unsubscribe?.Invoke();
+                m_unsubscribe = null;
+            }
+        }
+
         #region 内部存储
 
         /// <summary>
@@ -62,6 +78,12 @@ namespace EFrameWork.Runtime.Event
             }
         }
 
+        public static IDisposable SubscribeScoped<T>(Action<T> handler) where T : struct, IEvent
+        {
+            Subscribe(handler);
+            return new EventSubscription(() => Unsubscribe(handler));
+        }
+
         /// <summary>
         /// 取消订阅事件
         /// </summary>
@@ -97,6 +119,7 @@ namespace EFrameWork.Runtime.Event
         public static void ClearAll()
         {
             s_handlers.Clear();
+            OnAnyEvent = null;
         }
 
         #endregion
@@ -194,6 +217,12 @@ namespace EFrameWork.Runtime.Event
             }
         }
 
+        public static IDisposable SubscribeRefScoped<T>(RefAction<T> handler) where T : struct, IEvent
+        {
+            SubscribeRef(handler);
+            return new EventSubscription(() => UnsubscribeRef(handler));
+        }
+
         /// <summary>
         /// 取消订阅事件（引用传递版本）
         /// </summary>
@@ -229,7 +258,7 @@ namespace EFrameWork.Runtime.Event
         /// </summary>
         public static IEnumerable<Type> GetRegisteredEventTypes()
         {
-            return s_handlers.Keys;
+            return new List<Type>(s_handlers.Keys);
         }
 
         #endregion

@@ -5,6 +5,7 @@ namespace EFrameWork.Runtime.Event
     public interface IEventService
     {
         void Subscribe<T>(Action<T> handler) where T : struct, IEvent;
+        IDisposable SubscribeScoped<T>(Action<T> handler) where T : struct, IEvent;
         void Unsubscribe<T>(Action<T> handler) where T : struct, IEvent;
         void Dispatch<T>(T evt) where T : struct, IEvent;
         void ClearAll();
@@ -15,6 +16,11 @@ namespace EFrameWork.Runtime.Event
         public void Subscribe<T>(Action<T> handler) where T : struct, IEvent
         {
             EventBus.Subscribe(handler);
+        }
+
+        public IDisposable SubscribeScoped<T>(Action<T> handler) where T : struct, IEvent
+        {
+            return EventBus.SubscribeScoped(handler);
         }
 
         public void Unsubscribe<T>(Action<T> handler) where T : struct, IEvent

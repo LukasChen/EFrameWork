@@ -15,6 +15,8 @@ Bundled plugin versions:
 
 ## Runtime Access Model
 
+For the current UI runtime structure and handle-based usage model, see [../../UI_FRAMEWORK_GUIDE.md](../../UI_FRAMEWORK_GUIDE.md).
+
 EFrameWork now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
 
 ```csharp
@@ -37,8 +39,6 @@ public sealed class HomeController : UIControllerBase<HomeView>
 }
 ```
 
-Legacy direct service statics such as `EFrame.UI`, `EFrame.Audio`, and `EFrame.DataManager` have been removed. Use `EFrame.Current.UI`, `EFrame.Current.Audio`, `EFrame.Current.Data`, or the injected `Context` property from framework base classes.
-
 ## Resource Lifetime
 
 New resource service APIs are asynchronous and return explicit handles:
@@ -58,7 +58,7 @@ var instance = await EFrame.Current.Assets.InstantiateAsync("Effects/CoinFly", p
 instance.Dispose();
 ```
 
-Older synchronous `AssetManager` helpers remain as transitional APIs for existing internals, but new code should prefer `EFrame.Current.Assets`.
+Use `EFrame.Current.Assets` as the runtime resource entry.
 
 ## Install
 
@@ -83,13 +83,13 @@ https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 
 - This package no longer redistributes the old framework-local TextMeshPro plugin copy
 - Keep TextMeshPro sourced from `com.unity.textmeshpro`
-- Do not add another framework-local TextMeshPro copy unless you are migrating legacy assets intentionally
+- Do not add another framework-local TextMeshPro copy
 
 ## JSON Dependency
 
 `com.eframework.core` uses Newtonsoft.Json in its data storage module. The package declares `com.unity.nuget.newtonsoft-json`, so Unity Package Manager installs the official Unity Newtonsoft.Json package automatically for consuming projects.
 
-- This package no longer redistributes the legacy JsonNet-Lite DLL
+- This package does not redistribute JsonNet-Lite
 - Keep Newtonsoft.Json sourced from `com.unity.nuget.newtonsoft-json`
 - Do not add a second JsonNet-Lite or Newtonsoft.Json DLL copy under `Assets`
 

@@ -53,11 +53,12 @@
 13. `Initialize-EFrameColdStart.ps1` 能在一个临时空目录中完成冷启动，并输出包含目录、AI workspace、AI 文档、updater、overlay、bootstrap code 的 summary。
 14. 冷启动 summary 中没有意外 `WARN` 项；使用 `-Skip...` 参数时对应项显示为 `SKIP`。
 15. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
-16. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
-17. 初始化窗口或 Addressables 同步流程能生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
-18. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
-19. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
-20. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
+16. 初始化窗口会自动补齐 `QUI` 依赖的 Unity SortingLayer；手动菜单修复入口仍可单独执行。
+17. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
+18. 初始化窗口或 Addressables 同步流程能生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
+19. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
+20. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
+21. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
 
 ## 3. 业务项目升级流程
 

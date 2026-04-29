@@ -1,4 +1,6 @@
 ﻿using EFrameWork.Runtime.Asset;
+using EFrameWork.Runtime.UI.Handles;
+using EFrameWork.Runtime.UI.Transitions;
 using EFrameWork.Runtime.Utils;
 using System;
 using System.Collections.Generic;
@@ -41,16 +43,20 @@ namespace EFrameWork.Runtime.UI
 
     public sealed class QUI : IUIService
     {
+        private readonly IUIViewTransition m_defaultTransition = new ScaleFadeViewTransition();
+
         public EventSystem EventSystem;
         private Dictionary<UILayer, RectTransform> m_uiLayerNodeTable;
         public RectTransform Root { get; private set; }
         public Canvas RootCanvas;
         public Camera UICamera { get; private set; }
+        public IUIViewTransition DefaultTransition => m_defaultTransition;
         public Rect ScreenFitRect { get; private set; }
         public float ScaleFactor { get; private set; }
         public float ScaleFitFactor { get; private set; }
         public int DesignWidth { get; private set; }
         public int DesignHeight { get; private set; }
+        public bool EnableScreenFitDebugLog { get; private set; }
 
         #region 屏幕适配信息
 
@@ -103,45 +109,44 @@ namespace EFrameWork.Runtime.UI
 
         #region View 缓存池
 
-        private Dictionary<string, Stack<BindingViewBase>> m_viewCache = new();
+        private const int DefaultMaxCachedViewsPerAsset = 8;
 
-        /// <summary>
-        /// 从缓存池获取 View，如果缓存中没有则返回 null
-        /// </summary>
-        /// <typeparam name="T">View 类型</typeparam>
-        /// <param name="assetPath">资源路径（作为缓存 key）</param>
-        /// <returns>缓存的 View 实例，或 null</returns>
-        public T GetViewFromCache<T>(string assetPath) where T : BindingViewBase
+        private Dictionary<string, Stack<QUIBinding>> m_viewCache = new();
+        public int MaxCachedViewsPerAsset { get; set; } = DefaultMaxCachedViewsPerAsset;
+
+        public QUIBinding TakeBindingFromCache(string assetPath)
         {
             if (m_viewCache.TryGetValue(assetPath, out var stack) && stack.Count > 0)
             {
-                var view = stack.Pop() as T;
-                if (view != null && !view.IsDisposed)
+                var binding = stack.Pop();
+                if (binding != null)
                 {
-                    view.gameObject.SetActive(true);
-                    return view;
+                    binding.gameObject.SetActive(true);
+                    return binding;
                 }
             }
+
             return null;
         }
 
-        /// <summary>
-        /// 回收 View 到缓存池
-        /// </summary>
-        /// <param name="assetPath">资源路径（作为缓存 key）</param>
-        /// <param name="view">要回收的 View</param>
-        public void RecycleViewToCache(string assetPath, BindingViewBase view)
+        public void RecycleBindingToCache(string assetPath, QUIBinding binding)
         {
-            if (view == null || view.IsDisposed) return;
+            if (binding == null) return;
 
             if (!m_viewCache.ContainsKey(assetPath))
             {
-                m_viewCache[assetPath] = new Stack<BindingViewBase>();
+                m_viewCache[assetPath] = new Stack<QUIBinding>();
             }
 
-            view.gameObject.SetActive(false);
-            view.transform.SetParent(null, false);
-            m_viewCache[assetPath].Push(view);
+            if (m_viewCache[assetPath].Count >= MaxCachedViewsPerAsset)
+            {
+                Object.Destroy(binding.gameObject);
+                return;
+            }
+
+            binding.gameObject.SetActive(false);
+            binding.transform.SetParent(null, false);
+            m_viewCache[assetPath].Push(binding);
         }
 
         /// <summary>
@@ -154,11 +159,11 @@ namespace EFrameWork.Runtime.UI
             {
                 foreach (var kvp in m_viewCache)
                 {
-                    foreach (var view in kvp.Value)
+                    foreach (var binding in kvp.Value)
                     {
-                        if (view != null && !view.IsDisposed)
+                        if (binding != null)
                         {
-                            Object.Destroy(view.gameObject);
+                            Object.Destroy(binding.gameObject);
                         }
                     }
                     kvp.Value.Clear();
@@ -167,11 +172,11 @@ namespace EFrameWork.Runtime.UI
             }
             else if (m_viewCache.TryGetValue(assetPath, out var stack))
             {
-                foreach (var view in stack)
+                foreach (var binding in stack)
                 {
-                    if (view != null && !view.IsDisposed)
+                    if (binding != null)
                     {
-                        Object.Destroy(view.gameObject);
+                        Object.Destroy(binding.gameObject);
                     }
                 }
                 stack.Clear();
@@ -183,19 +188,17 @@ namespace EFrameWork.Runtime.UI
 
         #region View 栈管理（可选）
 
-        private Stack<BindingViewBase> m_viewStack = new();
+        private Stack<IUIViewHandle> m_viewStack = new();
 
-        /// <summary>
-        /// 入栈打开 View（用于需要返回导航的场景）
-        /// </summary>
-        /// <param name="view">要打开的 View</param>
-        /// <param name="layer">UI 层级</param>
-        public void PushView(BindingViewBase view, UILayer layer)
+        public void PushView(IUIViewHandle viewHandle, UILayer layer)
         {
-            if (view == null) return;
+            if (viewHandle == null)
+            {
+                return;
+            }
 
-            m_viewStack.Push(view);
-            view.Open(layer);
+            m_viewStack.Push(viewHandle);
+            viewHandle.Open(layer);
         }
 
         /// <summary>
@@ -206,10 +209,10 @@ namespace EFrameWork.Runtime.UI
         {
             if (m_viewStack.Count > 0)
             {
-                var view = m_viewStack.Pop();
-                if (view != null && !view.IsDisposed)
+                var viewHandle = m_viewStack.Pop();
+                if (viewHandle != null && viewHandle.IsAlive)
                 {
-                    view.Close();
+                    viewHandle.Close();
                 }
                 return true;
             }
@@ -225,7 +228,7 @@ namespace EFrameWork.Runtime.UI
             while (m_viewStack.Count > 0)
             {
                 var top = m_viewStack.Peek();
-                if (top is T)
+                if (top?.View is T)
                 {
                     break;
                 }
@@ -245,9 +248,9 @@ namespace EFrameWork.Runtime.UI
         }
 
         /// <summary>
-        /// 获取栈顶 View
+        /// 获取栈顶 View Handle
         /// </summary>
-        public BindingViewBase TopView => m_viewStack.Count > 0 ? m_viewStack.Peek() : null;
+        public IUIViewHandle TopView => m_viewStack.Count > 0 ? m_viewStack.Peek() : null;
 
         /// <summary>
         /// 当前栈中 View 数量
@@ -262,15 +265,15 @@ namespace EFrameWork.Runtime.UI
             if (view == null || m_viewStack.Count == 0) return;
 
             // 如果是栈顶，直接 Pop
-            if (m_viewStack.Peek() == view)
+            if (m_viewStack.Peek()?.View == view)
             {
                 m_viewStack.Pop();
                 return;
             }
 
             // 否则需要重建栈（较少发生）
-            var tempList = new List<BindingViewBase>(m_viewStack);
-            tempList.Remove(view);
+            var tempList = new List<IUIViewHandle>(m_viewStack);
+            tempList.RemoveAll(item => item == null || item.View == view);
             m_viewStack.Clear();
             for (int i = tempList.Count - 1; i >= 0; i--)
             {
@@ -300,12 +303,15 @@ namespace EFrameWork.Runtime.UI
             return m_uiLayerNodeTable[uILayerType];
         }
 
-        public void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode = ScreenFitMode.FitHeight)
+        public void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode = ScreenFitMode.FitHeight, bool enableScreenFitDebugLog = false)
         {
             UICamera = uiCamera;
             DesignWidth = designWidth;
             DesignHeight = designHeight;
             FitMode = fitMode;
+            EnableScreenFitDebugLog = enableScreenFitDebugLog;
+
+            ValidateSortingLayers();
 
             GameObject rootObject = new("UIRoot");
             Root = rootObject.AddComponent<RectTransform>();
@@ -314,7 +320,7 @@ namespace EFrameWork.Runtime.UI
             rootObject.layer = (int)GameLayer.UI;
             RootCanvas = rootObject.AddComponent<Canvas>();
             EventSystem = rootObject.AddComponent<EventSystem>();
-            AddCompatibleInputModule(rootObject);
+            AddInputModule(rootObject);
 
             RootCanvas.renderMode = RenderMode.ScreenSpaceCamera;
             RootCanvas.worldCamera = UICamera;
@@ -330,7 +336,7 @@ namespace EFrameWork.Runtime.UI
             CreateUILayers();
         }
 
-        private static void AddCompatibleInputModule(GameObject rootObject)
+        private static void AddInputModule(GameObject rootObject)
         {
 #if ENABLE_INPUT_SYSTEM
             rootObject.AddComponent<InputSystemUIInputModule>();
@@ -347,7 +353,10 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         private void CalculateScreenFit()
         {
-            Debug.Log($"Screen: width={Screen.width}, height={Screen.height}, safeArea={Screen.safeArea}");
+            if (EnableScreenFitDebugLog)
+            {
+                Debug.Log($"Screen: width={Screen.width}, height={Screen.height}, safeArea={Screen.safeArea}");
+            }
 
             Rect safeArea = Screen.safeArea;
             SafeAreaRect = safeArea;
@@ -394,8 +403,44 @@ namespace EFrameWork.Runtime.UI
 
             ScaleFitFactor = ScreenFitRect.width / Screen.width;
 
-            Debug.Log($"FitMode: {FitMode}, ScreenFitRect: {ScreenFitRect}, ScaleFactor: {ScaleFactor}");
-            Debug.Log($"IsWideScreen: {IsWideScreen}, IsTallScreen: {IsTallScreen}, WidthDelta: {WidthDelta}, HeightDelta: {HeightDelta}");
+            if (EnableScreenFitDebugLog)
+            {
+                Debug.Log($"FitMode: {FitMode}, ScreenFitRect: {ScreenFitRect}, ScaleFactor: {ScaleFactor}");
+                Debug.Log($"IsWideScreen: {IsWideScreen}, IsTallScreen: {IsTallScreen}, WidthDelta: {WidthDelta}, HeightDelta: {HeightDelta}");
+            }
+        }
+
+        private static void ValidateSortingLayers()
+        {
+            var configuredLayers = SortingLayer.layers;
+            if (configuredLayers == null || configuredLayers.Length == 0)
+            {
+                Debug.LogWarning("QUI: No Unity Sorting Layers are configured. UI canvases will not use the expected EFrame UI layer order.");
+                return;
+            }
+
+            var configuredLayerNames = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var sortingLayer in configuredLayers)
+            {
+                if (!string.IsNullOrEmpty(sortingLayer.name))
+                {
+                    configuredLayerNames.Add(sortingLayer.name);
+                }
+            }
+
+            var missingLayers = new List<string>();
+            foreach (var layerName in Enum.GetNames(typeof(UILayer)))
+            {
+                if (!configuredLayerNames.Contains(layerName))
+                {
+                    missingLayers.Add(layerName);
+                }
+            }
+
+            if (missingLayers.Count > 0)
+            {
+                Debug.LogWarning($"QUI: Missing UI Sorting Layers: {string.Join(", ", missingLayers)}. Run 'EFrame Tools/自动创建 UI SortingLayer层级' or the project initialization flow to fix them.");
+            }
         }
 
         private void CreateUILayers()
@@ -548,6 +593,93 @@ namespace EFrameWork.Runtime.UI
         }
 
         #region UIBinding
+
+        public QUIBinding CreateBinding(string assetPath, UILayer? layer = null)
+        {
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                throw new ArgumentNullException(nameof(assetPath));
+            }
+
+            var cached = TakeBindingFromCache(assetPath);
+            if (cached != null)
+            {
+                return cached;
+            }
+
+            var parent = layer.HasValue ? UILayer(layer.Value) : null;
+            var go = parent != null ? AssetManager.Instantiate(assetPath, parent) : AssetManager.Instantiate(assetPath);
+
+            var context = EFrame.Current;
+            if (context == null)
+            {
+                Object.Destroy(go);
+                throw new InvalidOperationException($"QUI.CreateBinding requires EFrame.Initialize() to complete before creating UI views. AssetPath: {assetPath}");
+            }
+
+            context.InjectInto(go);
+            go.name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+
+            if (go.TryGetComponent<QUIBinding>(out var uiBinding))
+            {
+                return uiBinding;
+            }
+
+            Object.Destroy(go);
+            throw new ArgumentException($"The instantiated GameObject from path '{assetPath}' does not contain a QUIBinding component.");
+        }
+
+        public TView CreateView<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase
+        {
+            var binding = CreateBinding(assetPath, layer);
+
+            if (Activator.CreateInstance(typeof(TView)) is not TView view)
+            {
+                ReleaseBinding(assetPath, binding, false);
+                throw new InvalidOperationException($"Failed to create UI view instance for type {typeof(TView).FullName}.");
+            }
+
+            view.BindContext(EFrame.Current);
+            view.SetBinding(binding, assetPath);
+            return view;
+        }
+
+        public UIViewHandle<TView> CreateViewHandle<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase
+        {
+            var view = CreateView<TView>(assetPath, layer);
+            return new UIViewHandle<TView>(assetPath, view);
+        }
+
+        public void ReleaseBinding(string assetPath, QUIBinding binding, bool useCache)
+        {
+            if (binding == null)
+            {
+                return;
+            }
+
+            if (useCache && !string.IsNullOrEmpty(assetPath))
+            {
+                RecycleBindingToCache(assetPath, binding);
+                return;
+            }
+
+            Object.Destroy(binding.gameObject);
+        }
+
+        public UniTask PlayOpenTransitionAsync(BindingViewBase view)
+        {
+            return m_defaultTransition.PlayOpenAsync(view);
+        }
+
+        public UniTask PlayCloseTransitionAsync(BindingViewBase view)
+        {
+            return m_defaultTransition.PlayCloseAsync(view);
+        }
+
+        public void KillTransition(BindingViewBase view)
+        {
+            m_defaultTransition.Kill(view);
+        }
 
         public void OpenBindingView(BindingViewBase bindingViewBase, UILayer uiLayerType = UI.UILayer.QuiPanel)
         {

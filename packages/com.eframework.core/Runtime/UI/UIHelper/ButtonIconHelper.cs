@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace AssociaireSort.UI.Components
+namespace EFrameWork.Runtime.UI.UIHelper
 {
     /// <summary>
     /// 按钮图标辅助脚本，实现按下时图标下移的效果

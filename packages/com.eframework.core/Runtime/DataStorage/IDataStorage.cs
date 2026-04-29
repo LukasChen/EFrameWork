@@ -8,6 +8,10 @@ namespace EFrameWork.Runtime.DataStorage
 
         T Load<T>(string key, T defaultValue = default);
 
+        bool TryLoad<T>(string key, out T data);
+
+        bool TryLoad<T>(string key, out T data, out DataStorageLoadContext loadContext);
+
         void Delete(string key);
 
         bool HasKey(string key);

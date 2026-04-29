@@ -41,7 +41,7 @@ namespace EFrameWork.Runtime
         {
             if (component == null)
             {
-                LastInitializationResult = EFrameInitializationResult.Failure("EFrameComponent is null.");
+                LastInitializationResult = EFrameInitializationResult.Failure("EFrameComponent is null.", EFrameInitializationStage.Component);
                 yield break;
             }
 
@@ -59,6 +59,7 @@ namespace EFrameWork.Runtime
             var dataService = new DataManager(new JsonFileStorage());
             var eventService = new EventService();
             var uiService = new QUI();
+            EFrameContext context = null;
 
             DefaultFrameData defaultFrameData = null;
             AudioManager audioService = null;
@@ -68,8 +69,9 @@ namespace EFrameWork.Runtime
             yield return AssetManager.InitializeCoroutine();
             if (AssetManager.InitializeFailed)
             {
-                LastInitializationResult = EFrameInitializationResult.Failure("Addressables initialization failed.");
+                LastInitializationResult = EFrameInitializationResult.Failure("Addressables initialization failed.", EFrameInitializationStage.Assets);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
+                DisposeCreatedServices(audioEventService, audioService, uiService, assetService, dataService, coroutineService, eventService);
                 yield break;
             }
 
@@ -79,10 +81,9 @@ namespace EFrameWork.Runtime
             defaultFrameData = dataService.GetTable<DefaultFrameData>();
             if (defaultFrameData == null)
             {
-                LastInitializationResult = EFrameInitializationResult.Failure("DefaultFrameData registration failed.");
+                LastInitializationResult = EFrameInitializationResult.Failure("DefaultFrameData registration failed.", EFrameInitializationStage.Data);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
-                dataService.Dispose();
-                coroutineService.Dispose();
+                DisposeCreatedServices(audioEventService, audioService, uiService, assetService, dataService, coroutineService, eventService);
                 yield break;
             }
 
@@ -91,7 +92,7 @@ namespace EFrameWork.Runtime
             audioService.Initialize(defaultFrameData.MusicOn, defaultFrameData.SoundOn);
             audioEventService = new AudioEventManager(component, audioService, vibrationService);
 
-            var context = new EFrameContext(
+            context = new EFrameContext(
                 component,
                 assetService,
                 uiService,
@@ -106,7 +107,7 @@ namespace EFrameWork.Runtime
             component.BindContext(context);
 
             var designSize = component.ResolvedDesignSize;
-            uiService.Init(component.UICamera, designSize.x, designSize.y, component.ResolvedFitMode);
+            uiService.Init(component.UICamera, designSize.x, designSize.y, component.ResolvedFitMode, component.ResolvedEnableScreenFitDebugLog);
             audioEventService.Initialize();
 
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly);
@@ -115,6 +116,24 @@ namespace EFrameWork.Runtime
             LastInitializationResult = EFrameInitializationResult.Success();
             Debug.Log("[EFrame] Initialize completed.");
             yield return null;
+        }
+
+        private static void DisposeCreatedServices(
+            AudioEventManager audioEventService,
+            AudioManager audioService,
+            QUI uiService,
+            AssetManager assetService,
+            DataManager dataService,
+            CoroutineManager coroutineService,
+            EventService eventService)
+        {
+            audioEventService?.Dispose();
+            audioService?.Dispose();
+            uiService?.Dispose();
+            assetService?.Dispose();
+            dataService?.Dispose();
+            coroutineService?.Dispose();
+            eventService?.ClearAll();
         }
 
         public static void Update(float deltaTime, float unscaledDeltaTime)
@@ -136,6 +155,7 @@ namespace EFrameWork.Runtime
         public static void Dispose()
         {
             GameFrameworkEntry.Shutdown();
+            TaskQueue.Reset();
 
             Current?.Dispose();
             Current = null;

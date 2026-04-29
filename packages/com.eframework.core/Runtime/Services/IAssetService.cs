@@ -58,6 +58,8 @@ namespace EFrameWork.Runtime.Asset
         UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object;
         UniTask<InstanceHandle> InstantiateAsync(string assetId, Transform parent = null);
         UniTask<InstanceHandle> InstantiateAsync(AssetReferenceGameObject reference, Transform parent = null);
+        UniTask<bool> IsValidPathAsync(string assetId);
+        void ReleaseAllPools();
         void ReleaseUnusedAssets();
     }
 }

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using EFrameWork.Runtime;
+using EFrameWork.Runtime.UI.Handles;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -61,7 +62,6 @@ namespace EFrameWork.Runtime.UI
     /// UI 控制器基类
     /// - 管理 View 的生命周期
     /// - 支持单例模式（可选）
-    /// - 兼容直接 new View() 方式
     /// </summary>
     public abstract class UIControllerBase : IDisposable, IEFrameContextAware
     {
@@ -171,6 +171,21 @@ namespace EFrameWork.Runtime.UI
             if (context == null) return;
             Context = context;
             OnContextBound(context);
+        }
+
+        protected EFrameContext RequireContext()
+        {
+            if (Context == null)
+            {
+                BindContext(EFrame.Current);
+            }
+
+            if (Context == null)
+            {
+                throw new InvalidOperationException($"{GetType().Name} requires EFrame.Initialize() to complete before showing UI.");
+            }
+
+            return Context;
         }
 
         protected virtual void OnContextBound(EFrameContext context)
@@ -362,21 +377,28 @@ namespace EFrameWork.Runtime.UI
 
     /// <summary>
     /// 泛型 UI 控制器基类
-    /// - 自动管理 View 实例
-    /// - 提供 View 访问
+    /// - 自动管理 View Handle
+    /// - 提供 Handle 访问
     /// </summary>
     /// <typeparam name="TView">View 类型</typeparam>
     public abstract class UIControllerBase<TView> : UIControllerBase where TView : BindingViewBase
     {
+        private UIViewHandle<TView> m_viewHandle;
+
         /// <summary>
-        /// View 实例
+        /// 非泛型 View Handle
         /// </summary>
-        public TView View { get; private set; }
+        public IUIViewHandle ViewHandle => m_viewHandle;
+
+        /// <summary>
+        /// 泛型 View Handle
+        /// </summary>
+        public UIViewHandle<TView> TypedViewHandle => m_viewHandle;
 
         /// <summary>
         /// 是否正在显示
         /// </summary>
-        public override bool IsShowing => View != null && !View.IsDisposed && View.gameObject.activeSelf;
+        public override bool IsShowing => m_viewHandle != null && m_viewHandle.IsShowing;
 
         /// <summary>
         /// 资源路径（子类必须实现）
@@ -387,23 +409,10 @@ namespace EFrameWork.Runtime.UI
         /// 创建 View 实例（子类可重写自定义创建逻辑）
         /// </summary>
         /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
-        protected virtual TView CreateView(UILayer? layer = null)
+        protected virtual UIViewHandle<TView> CreateViewHandle(UILayer? layer = null)
         {
-            // 默认实现：通过反射创建（需要 View 有对应的构造函数）
-            // 如果未指定层级，使用单参数构造函数让 View 使用配置的默认层级
-            if (layer.HasValue)
-            {
-                var view = (TView)Activator.CreateInstance(typeof(TView), AssetPath, layer.Value);
-                view.BindContext(Context ?? EFrame.Current);
-                return view;
-            }
-            else
-            {
-                // 使用只有 assetPath 的构造函数，View 会使用配置的默认层级
-                var view = (TView)Activator.CreateInstance(typeof(TView), AssetPath);
-                view.BindContext(Context ?? EFrame.Current);
-                return view;
-            }
+            var context = RequireContext();
+            return context.UI.CreateViewHandle<TView>(AssetPath, layer);
         }
 
         /// <summary>
@@ -412,20 +421,17 @@ namespace EFrameWork.Runtime.UI
         /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
         public override void Show(UILayer? layer = null)
         {
-            if (View != null && !View.IsDisposed)
+            RequireContext();
+
+            if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
-                View.SetActive(true);
-                // 优先使用配置的层级
-                var targetLayer = layer ?? View.Config.DefaultLayer;
-                View.Open(targetLayer);
+                m_viewHandle.Open(layer);
             }
             else
             {
-                View = CreateView(layer);
+                m_viewHandle = CreateViewHandle(layer);
                 OnViewCreated();
-                // View 创建后从配置读取层级并打开
-                var targetLayer = layer ?? View.Config.DefaultLayer;
-                View.Open(targetLayer);
+                m_viewHandle.Open(layer);
             }
         }
 
@@ -435,20 +441,17 @@ namespace EFrameWork.Runtime.UI
         /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
         public override async UniTask ShowAsync(UILayer? layer = null)
         {
-            if (View != null && !View.IsDisposed)
+            RequireContext();
+
+            if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
-                View.SetActive(true);
-                // 优先使用配置的层级
-                var targetLayer = layer ?? View.Config.DefaultLayer;
-                await View.OpenAsync(targetLayer);
+                await m_viewHandle.OpenAsync(layer);
             }
             else
             {
-                View = CreateView(layer);
+                m_viewHandle = CreateViewHandle(layer);
                 OnViewCreated();
-                // View 创建后从配置读取层级
-                var targetLayer = layer ?? View.Config.DefaultLayer;
-                await View.OpenAsync(targetLayer);
+                await m_viewHandle.OpenAsync(layer);
             }
         }
 
@@ -457,13 +460,13 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public override void Hide()
         {
-            if (View != null && !View.IsDisposed)
+            if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
                 OnViewDestroyed();
-                View.Close();
-                if (!View.UsingCache)
+                m_viewHandle.Close();
+                if (m_viewHandle.IsReleased)
                 {
-                    View = null;
+                    m_viewHandle = null;
                 }
             }
             InvokeOnClosed();
@@ -474,13 +477,13 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public override async UniTask HideAsync()
         {
-            if (View != null && !View.IsDisposed)
+            if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
                 OnViewDestroyed();
-                await View.CloseAsync();
-                if (!View.UsingCache)
+                await m_viewHandle.CloseAsync();
+                if (m_viewHandle.IsReleased)
                 {
-                    View = null;
+                    m_viewHandle = null;
                 }
             }
             InvokeOnClosed();
@@ -502,11 +505,11 @@ namespace EFrameWork.Runtime.UI
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && View != null)
+            if (disposing && m_viewHandle != null)
             {
                 OnViewDestroyed();
-                View.CloseAndDestroy();
-                View = null;
+                m_viewHandle.CloseAndDestroy();
+                m_viewHandle = null;
             }
             base.Dispose(disposing);
         }

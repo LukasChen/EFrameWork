@@ -257,6 +257,18 @@ namespace EFrameWork.Runtime
             }
         }
 
+        public static void Reset()
+        {
+            Clear();
+            s_currentTask = null;
+            s_isRunning = false;
+            OnTaskEnqueued = null;
+            OnTaskStarted = null;
+            OnTaskCompleted = null;
+            OnQueueStarted = null;
+            OnQueueFinished = null;
+        }
+
         /// <summary>
         /// 获取队列状态信息（调试用）
         /// </summary>

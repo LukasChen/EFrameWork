@@ -21,11 +21,7 @@ namespace EFrameWork.Runtime.Utils
             }
 #endif
 
-#if ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetMouseButtonDown(0);
-#else
             return false;
-#endif
         }
 
         public static bool TryGetPrimaryPointerPosition(out Vector2 position)
@@ -48,13 +44,8 @@ namespace EFrameWork.Runtime.Utils
             }
 #endif
 
-#if ENABLE_LEGACY_INPUT_MANAGER
-            position = Input.mousePosition;
-            return true;
-#else
             position = default;
             return false;
-#endif
         }
     }
 }

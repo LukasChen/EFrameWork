@@ -27,8 +27,9 @@ When one part changes the expected project shape, the matching AI guidance must 
 
 - Provides the framework-managed AI collaboration layer.
 - `copilot-instructions.md` contains always-on EFrame rules.
-- `instructions/eframe-*.instructions.md` contains focused runtime and editor rules.
-- `skills/eframe-*` contains on-demand workflows for feature bootstrap and guideline audit.
+- `instructions/eframe-*.instructions.md` contains focused runtime and editor rules that are part of the synced business-project contract.
+- `skills/eframe-*` contains on-demand workflows that are also synced into business projects.
+- `instructions/maintainer-*.instructions.md` can be used for framework-repository-only guidance; these files are not part of the synced project contract because the sync scripts only manage `eframe-*` items.
 - `eframe-ai.manifest.json` declares the synced AI layer version.
 
 `tools/`
@@ -43,6 +44,7 @@ Business project `.github/`
 - Receives synced `eframe-*` files from the framework.
 - Owns `project-*` overlay files for local project rules.
 - Must not manually fork framework-managed `eframe-*` files.
+- Does not receive framework maintainer-only `maintainer-*` instructions.
 
 ## 3. Required Sync Rule
 
@@ -85,6 +87,7 @@ Recommended release sequence:
 
 - `eframe-*` is reserved for framework-managed instructions and skills.
 - `project-*` is reserved for business project overlays.
+- `maintainer-*` is reserved for framework-repository-only AI guidance and is not part of the sync surface.
 - Framework sync scripts may overwrite stale `eframe-*` files when `-Force` is used.
 - Framework sync scripts must preserve project-owned `project-*` files and other local customizations.
 

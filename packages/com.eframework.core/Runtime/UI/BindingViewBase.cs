@@ -1,6 +1,4 @@
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using EFrameWork.Runtime.Asset;
 using System;
 using UnityEngine;
 using EFrameWork.Runtime;
@@ -47,33 +45,12 @@ namespace EFrameWork.Runtime.UI
                 throw new ArgumentNullException(nameof(assetPath));
 
             m_assetPath = assetPath;
-
-            // 尝试从缓存获取
             BindContext(EFrame.Current);
             if (Context?.UI == null)
                 throw new InvalidOperationException($"BindingViewBase: EFrame.Current.UI is not initialized. AssetPath: {assetPath}");
-            var cached = Context.UI.GetViewFromCache<BindingViewBase>(assetPath);
-            if (cached != null)
-            {
-                Binding = cached.Binding;
-                ApplyConfig(Binding.Config);
-                return;
-            }
 
-            // 缓存中没有，实例化新的
-            var go = AssetManager.Instantiate(assetPath);
-            Context.InjectInto(go);
-            go.name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
-            if (go.TryGetComponent<QUIBinding>(out var uiBinding))
-            {
-                Binding = uiBinding;
-                ApplyConfig(Binding.Config);
-            }
-            else
-            {
-                GameObject.Destroy(go);
-                throw new ArgumentException($"The instantiated GameObject from path '{assetPath}' does not contain a QUIBinding component.");
-            }
+            Binding = Context.UI.CreateBinding(assetPath);
+            ApplyConfig(Binding.Config);
         }
 
         /// <summary>
@@ -94,31 +71,8 @@ namespace EFrameWork.Runtime.UI
             m_assetPath = assetPath;
             m_layer = layer;
 
-            // 尝试从缓存获取
-            var cached = Context.UI.GetViewFromCache<BindingViewBase>(assetPath);
-            if (cached != null)
-            {
-                Binding = cached.Binding;
-                ApplyConfig(Binding.Config, layer, useCache);
-                Open(m_layer);
-                return;
-            }
-
-            // 缓存中没有，实例化新的
-            var parent = Context.UI.UILayer(layer);
-            var go = AssetManager.Instantiate(assetPath, parent);
-            Context.InjectInto(go);
-            go.name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
-            if (go.TryGetComponent<QUIBinding>(out var uiBinding))
-            {
-                Binding = uiBinding;
-                ApplyConfig(Binding.Config, layer, useCache);
-            }
-            else
-            {
-                GameObject.Destroy(go);
-                throw new ArgumentException($"The instantiated GameObject from path '{assetPath}' does not contain a QUIBinding component.");
-            }
+            Binding = Context.UI.CreateBinding(assetPath, layer);
+            ApplyConfig(Binding.Config, layer, useCache);
         }
 
         /// <summary>
@@ -166,190 +120,117 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public ViewConfig Config => Binding == null ? ViewConfig.Default : Binding.Config;
 
+        internal UILayer CurrentLayer => m_layer;
+
         #endregion
 
         #region Open / Close
 
-        /// <summary>
-        /// 打开 View 到指定层级
-        /// </summary>
-        public virtual void Open(UILayer layer)
+        internal UILayer ResolveLayer(UILayer? layer = null)
+        {
+            return layer ?? m_layer;
+        }
+
+        internal void PrepareForOpen(UILayer? layer = null)
+        {
+            ThrowIfDisposed();
+            SetActive(true);
+            AttachToLayer(ResolveLayer(layer));
+            DispatchOpenEvent();
+        }
+
+        internal void AttachToLayer(UILayer layer)
         {
             ThrowIfDisposed();
             m_layer = layer;
+
             if (Binding != null)
             {
-                Context.UI.OpenBindingView(this, layer);
+                Context?.UI?.OpenBindingView(this, layer);
+            }
+        }
+
+        internal void DispatchOpenEvent()
+        {
+            if (Binding == null)
+            {
+                return;
             }
 
             EventBus.Dispatch(new UIOpenEvent() { UIName = Binding.gameObject.name });
         }
 
-        /// <summary>
-        /// 打开 View（使用预配置层级）
-        /// </summary>
-        public virtual void Open()
+        internal void DispatchCloseEvent()
         {
-            Open(m_layer);
-        }
-
-        /// <summary>
-        /// 关闭 View
-        /// - 如果使用缓存模式，回收到缓存池
-        /// - 否则销毁 GameObject
-        /// </summary>
-        public virtual void Close()
-        {
-            if (m_disposed) return;
-
-            // 从栈中移除（如果在栈中）
-            Context?.UI?.RemoveFromStack(this);
-            if (Binding != null)
+            if (Binding == null)
             {
-                EventBus.Dispatch(new UICloseEvent() { UIName = Binding.gameObject.name });
-
-                // Kill所有DOTween动画，防止销毁后动画仍在运行
-                var animRoot = Binding.GetAnimationRoot();
-                if (animRoot != null)
-                {
-                    animRoot.DOKill(true);
-                    var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-                    if (canvasGroup != null)
-                    {
-                        canvasGroup.DOKill(true);
-                    }
-                }
-
-                if (m_usingCache && !string.IsNullOrEmpty(m_assetPath))
-                {
-                    // 回收到缓存池
-                    Context.UI.RecycleViewToCache(m_assetPath, this);
-                }
-                else
-                {
-                    // 销毁
-                    GameObject.Destroy(Binding.gameObject);
-                    Binding = null;
-                    m_disposed = true;
-                }
+                return;
             }
 
+            EventBus.Dispatch(new UICloseEvent() { UIName = Binding.gameObject.name });
         }
 
-        /// <summary>
-        /// 强制销毁（不使用缓存）
-        /// </summary>
-        public virtual void CloseAndDestroy()
+        internal UniTask PlayOpenTransitionAsync()
         {
-            if (m_disposed) return;
+            return Context?.UI?.PlayOpenTransitionAsync(this) ?? UniTask.CompletedTask;
+        }
+
+        internal UniTask PlayCloseTransitionAsync()
+        {
+            return Context?.UI?.PlayCloseTransitionAsync(this) ?? UniTask.CompletedTask;
+        }
+
+        internal void KillTransition()
+        {
+            Context?.UI?.KillTransition(this);
+        }
+
+        internal void PrepareForClose(bool killTransition, bool dispatchCloseEvent = true)
+        {
+            if (dispatchCloseEvent)
+            {
+                DispatchCloseEvent();
+            }
 
             Context?.UI?.RemoveFromStack(this);
 
+            if (killTransition)
+            {
+                KillTransition();
+            }
+        }
+
+        internal void DeactivateForReuse()
+        {
+            if (Binding == null)
+            {
+                return;
+            }
+
+            KillTransition();
+            SetActive(false);
+        }
+
+        internal void Release(bool forceDestroy = false)
+        {
+            if (m_disposed)
+            {
+                return;
+            }
+
             if (Binding != null)
             {
-                // Kill所有DOTween动画，防止销毁后动画仍在运行
-                var animRoot = Binding.GetAnimationRoot();
-                if (animRoot != null)
-                {
-                    animRoot.DOKill(true);
-                    var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-                    if (canvasGroup != null)
-                    {
-                        canvasGroup.DOKill(true);
-                    }
-                }
-
-                GameObject.Destroy(Binding.gameObject);
+                var useCache = !forceDestroy && m_usingCache && !string.IsNullOrEmpty(m_assetPath);
+                Context?.UI?.ReleaseBinding(m_assetPath, Binding, useCache);
                 Binding = null;
             }
+
             m_disposed = true;
         }
 
         #endregion
 
         #region Animation
-
-        /// <summary>
-        /// 带动画打开 View
-        /// </summary>
-        public virtual async UniTask OpenAsync(UILayer layer)
-        {
-            Open(layer);
-            await PlayOpenAnimation();
-        }
-
-        /// <summary>
-        /// 带动画打开 View（使用预配置层级）
-        /// </summary>
-        public virtual async UniTask OpenAsync()
-        {
-            await OpenAsync(m_layer);
-        }
-
-        /// <summary>
-        /// 带动画关闭 View
-        /// </summary>
-        public virtual async UniTask CloseAsync()
-        {
-            await PlayCloseAnimation();
-            Close();
-        }
-
-        /// <summary>
-        /// 播放打开动画
-        /// </summary>
-        protected virtual UniTask PlayOpenAnimation()
-        {
-            var animRoot = Binding?.GetAnimationRoot();
-            if (animRoot == null) return UniTask.CompletedTask;
-
-            float duration = Config.AnimationDuration;
-            if (duration <= 0) duration = 0.25f;
-
-            // 默认动画：Scale 0.8 → 1 + Fade 0 → 1
-            animRoot.localScale = Vector3.one * 0.8f;
-            var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 0f;
-                DOTween.Sequence()
-                    .Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack))
-                    .Join(canvasGroup.DOFade(1f, duration));
-            }
-            else
-            {
-                animRoot.DOScale(1f, duration).SetEase(Ease.OutBack);
-            }
-
-            return UniTask.Delay(TimeSpan.FromSeconds(duration));
-        }
-
-        /// <summary>
-        /// 播放关闭动画
-        /// </summary>
-        protected virtual UniTask PlayCloseAnimation()
-        {
-            var animRoot = Binding?.GetAnimationRoot();
-            if (animRoot == null) return UniTask.CompletedTask;
-
-            float duration = Config.AnimationDuration;
-            if (duration <= 0) duration = 0.25f;
-
-            // 默认动画：Scale 1 → 0.8 + Fade 1 → 0
-            var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                DOTween.Sequence()
-                    .Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack))
-                    .Join(canvasGroup.DOFade(0f, duration));
-            }
-            else
-            {
-                animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack);
-            }
-
-            return UniTask.Delay(TimeSpan.FromSeconds(duration));
-        }
 
         #endregion
 
@@ -387,12 +268,14 @@ namespace EFrameWork.Runtime.UI
         /// <summary>
         /// 设置 Binding 引用（支持延迟初始化）
         /// </summary>
-        public void SetBinding(QUIBinding binding)
+        public void SetBinding(QUIBinding binding, string assetPath = null)
         {
             if (binding == null)
                 throw new ArgumentNullException(nameof(binding));
 
+            m_assetPath = assetPath ?? m_assetPath;
             Binding = binding;
+            m_disposed = false;
             BindContext(EFrame.Current);
             ApplyConfig(binding.Config);
             OnBindingSet();
@@ -433,7 +316,8 @@ namespace EFrameWork.Runtime.UI
             {
                 if (disposing)
                 {
-                    CloseAndDestroy();
+                    PrepareForClose(true, false);
+                    Release(true);
                 }
                 m_disposed = true;
             }

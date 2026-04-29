@@ -91,7 +91,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_bindingItems: []
   m_accessClassName: v_ModuleMainViewTemplate
-  m_accessClassNamespace: EFrameWork.UI.Generated
+  m_accessClassNamespace: EFrameWork.Runtime.UI.Generated
   m_viewConfig:
     DefaultLayer: 1
     IsViewRoot: 1

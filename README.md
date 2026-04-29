@@ -12,6 +12,8 @@ In this repository, the AI layer is a first-class framework feature, not an opti
 
 See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
 
+For the current handle-first UI runtime structure and usage examples, see [UI_FRAMEWORK_GUIDE.md](UI_FRAMEWORK_GUIDE.md).
+
 ## Versioning
 
 The formal starting version for EFrameWork is `0.1.0`.

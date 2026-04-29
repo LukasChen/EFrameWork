@@ -34,6 +34,7 @@ namespace EFrameWork.Runtime
         public EFrameSettings Settings => m_settings;
         public Vector2Int ResolvedDesignSize => m_settings != null ? m_settings.DesignSize : DesignSize;
         public ScreenFitMode ResolvedFitMode => m_settings != null ? m_settings.FitMode : FitMode;
+        public bool ResolvedEnableScreenFitDebugLog => m_settings != null && m_settings.EnableScreenFitDebugLog;
 
         private TimeSpan m_accumulatedTime;
         private DateTime m_startTime;
@@ -133,9 +134,9 @@ namespace EFrameWork.Runtime
                 return;
             }
             DefaultFrameData data = Context.Data.GetTable<DefaultFrameData>();
-            if (data == null || data.Data == null)
+            if (data == null || !data.IsLoaded)
             {
-                Debug.LogWarning("SaveTotalPlayTime: DefaultFrameData or Data is null, skip saving.");
+                Debug.LogWarning("SaveTotalPlayTime: DefaultFrameData is not loaded, skip saving.");
                 return;
             }
 

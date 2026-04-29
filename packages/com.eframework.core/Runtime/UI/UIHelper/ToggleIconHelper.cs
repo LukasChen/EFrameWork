@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AssociaireSort.UI.Components
+namespace EFrameWork.Runtime.UI.UIHelper
 {
     /// <summary>
     /// Helper component to manage toggle icon animations and states.

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AssociaireSort.UI.Components
+namespace EFrameWork.Runtime.UI.UIHelper
 {
     [RequireComponent(typeof(Button))]
     public class SelectButtonHelper : MonoBehaviour

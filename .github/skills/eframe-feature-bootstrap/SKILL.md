@@ -13,13 +13,6 @@ user-invocable: true
 - 将演示代码或旧结构重构为正式结构
 - 给新项目建立 `View + Controller + Procedure + ResPath` 的最小骨架
 - 判断某个需求应该落在主流程、弹层还是独立玩法目录
-- 更新框架模板、冷启动流程或标准目录后，同步补齐 AI instructions 和 skills
-
-## AI Layer Contract
-
-1. EFrame 的 AI 协作层是框架能力的一部分，功能骨架和重构方案必须同时考虑 Unity 代码、`.github` 规则、skills、manifest 和 `tools` 脚本。
-2. 如果本次改动会改变业务项目的推荐目录、启动流程、UI 写法、资源路径或模板生成结果，必须更新对应 instruction 或 skill。
-3. 只要框架托管的 `.github` 或 AI 同步/冷启动工具发生变化，就必须 bump `.github/eframe-ai.manifest.json`。
 
 ## Procedure
 
@@ -38,13 +31,35 @@ user-invocable: true
 
 1. 页面预制体使用 `XxxView.prefab`，控制器使用 `XxxViewController`。
 2. 主页面进 `QuiPanel`，弹窗进 `QuiPopUp`，提示类进 `QuiTooltip` 或 `QuiTop`。
-3. 控制器负责按钮绑定、事件订阅、数据刷新和销毁清理，不直接深层 `transform.Find`。
+3. 新项目或新模块接入 UI 前，先确认项目初始化链路已经补齐 `QUI` 依赖的 Unity SortingLayer；不要把这一步只留给手工菜单操作。
+4. `QUIBinding` 自动生成的访问类默认命名空间保持为 `EFrameWork.Runtime.UI.Generated`；新模板和示例 prefab 不要再写旧的 `EFrameWork.UI.Generated`。
+5. 控制器负责按钮绑定、事件订阅、数据刷新和销毁清理，不直接深层 `transform.Find`。
+6. 控制器构造阶段不读取业务数据或假设框架服务已初始化；资源加载、View 创建和服务访问放在显示/进入流程之后。
+7. 创建、打开、关闭、缓存和释放 View 走 `IUIService/QUI` 与 `UIViewHandle` 语义，不让业务层直接驱动 `BindingViewBase` 生命周期。
+
+## Assets
+
+1. Addressables 资源路径仍通过 `ResPath.Generated`、稳定 `ResPath` 入口或 `AssetReference` 获取。
+2. 运行时加载优先使用 `EFrame.Current.Assets.LoadAsync(...)`、`InstantiateAsync(...)` 与 `AssetHandle`/`InstanceHandle` 的 `Dispose` 释放。
+3. 新业务功能不使用同步加载和 `WaitForCompletion` 作为默认资源加载路径。
+
+## Events And Data
+
+1. 事件订阅优先使用 `EFrame.Current.Events.SubscribeScoped(...)`，并把返回的 `IDisposable` 纳入当前 `Procedure`、Controller 或服务的生命周期清理。
+2. 数据表继承 `DataTable<TData>`，保留无参构造，通过 `EFrame.Current.Data.RegisterTable<T>()` 注册和自动加载。
+3. 每张数据表都显式声明稳定 `StorageKey`，不要默认用类名作为持久化键，避免后续重命名导致断档；新增表时同时确认没有和已有表复用同一个键。
+4. 数据表对外暴露业务属性或方法，不暴露底层 `Data` 作为外部可变入口；属性 setter 使用 `SetValue(...)`，复杂变更使用表内部方法，并让 `Mutate(...)` 或等价逻辑显式返回是否真的改动了数据。
+5. Dirty 只表示数据已变更，框架默认在 pause/quit 保存；业务需要立即保存时显式调用 `SaveAll()` 或表级 `Save()`。
+6. 不在业务模块里自行保存第二份数据表单例，统一从 `EFrame.Current.Data.GetTable<T>()` 读取。
+7. 需要兼容旧存档时，在表内声明 `CurrentVersion` 并实现 `Migrate(data, fromVersion)`；新文件保存为 versioned envelope，旧裸数据会按 `version 0` 进入迁移链。
+8. 如果业务需要根据加载来源决定提示、修复或埋点，优先读取表的 `LastLoadResult.Status` 与 `ReasonCode`，从结构化状态判断是否来自备份、迁移或默认值回退，而不是解析消息文本。
+9. 如果业务需要根据保存结果决定提示、重试或埋点，优先读取表的 `LastSaveResult`，区分已写盘、因不 dirty 跳过和保存失败。
 
 ## Validation
 
 1. 校验生命周期是否成对：进入/退出、创建/销毁、订阅/退订。
 2. 校验命名、目录、资源路径是否符合规范。
-3. 如果项目里仍有过渡目录，明确本次改动是兼容旧结构还是推进到目标结构。
-4. 校验 AI 层是否同步：README/setup 文档、runtime/editor instructions、相关 skill、manifest 和冷启动/同步脚本是否仍然一致。
+3. 如果项目里仍有过渡目录，明确本次改动如何推进到目标结构。
+4. 如果在框架仓库内发现本次功能改变了公共模板、冷启动流程或 AI 协作层，改用 maintainer skill 处理同步和发布检查。
 
 需要更细的骨架和核对项时，加载 [feature checklist](./references/feature-checklist.md)。

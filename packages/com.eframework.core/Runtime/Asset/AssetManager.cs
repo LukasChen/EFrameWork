@@ -18,10 +18,13 @@ namespace EFrameWork.Runtime.Asset
     /// </summary>
     public sealed class AssetManager : IAssetService
     {
+        private const int DefaultMaxPoolSizePerKey = 32;
+
         private static Dictionary<AssetReferenceGameObject, Stack<GameObject>> m_pools = new();
         private static Dictionary<string, Stack<GameObject>> m_pathPools = new();
         public static bool Initialized { get; private set; }
         bool IAssetService.Initialized => Initialized;
+        public static int MaxPoolSizePerKey { get; set; } = DefaultMaxPoolSizePerKey;
 
         #region 初始化
 
@@ -217,6 +220,21 @@ namespace EFrameWork.Runtime.Asset
             return new InstanceHandle(handle);
         }
 
+        public async UniTask<bool> IsValidPathAsync(string assetId)
+        {
+            if (string.IsNullOrEmpty(assetId)) return false;
+
+            var handle = Addressables.LoadResourceLocationsAsync(assetId);
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            var isValid = handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null && handle.Result.Count > 0;
+            if (handle.IsValid()) Addressables.Release(handle);
+            return isValid;
+        }
+
         /// <summary>
         /// 检查资源路径是否有效
         /// </summary>
@@ -224,8 +242,11 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>Addressable 路径是否有效</returns>
         public static bool IsValidPath(string path)
         {
-            var locations = Addressables.LoadResourceLocationsAsync(path).WaitForCompletion();
-            return locations != null && locations.Count > 0;
+            var handle = Addressables.LoadResourceLocationsAsync(path);
+            var locations = handle.WaitForCompletion();
+            var isValid = locations != null && locations.Count > 0;
+            if (handle.IsValid()) Addressables.Release(handle);
+            return isValid;
         }
 
         #endregion
@@ -718,6 +739,12 @@ namespace EFrameWork.Runtime.Asset
             if (go == null) return;
             if (!m_pathPools.ContainsKey(assetPath)) m_pathPools.Add(assetPath, new Stack<GameObject>());
 
+            if (m_pathPools[assetPath].Count >= MaxPoolSizePerKey)
+            {
+                ReleasePooledInstance(go);
+                return;
+            }
+
             go.transform.SetParent(null, false);
             go.SetActive(false);
             m_pathPools[assetPath].Push(go);
@@ -733,7 +760,7 @@ namespace EFrameWork.Runtime.Asset
             {
                 foreach (GameObject go in pool)
                 {
-                    if (go != null) Object.Destroy(go);
+                    ReleasePooledInstance(go);
                 }
                 pool.Clear();
                 m_pathPools.Remove(assetPath);
@@ -749,7 +776,7 @@ namespace EFrameWork.Runtime.Asset
             {
                 foreach (GameObject go in kvp.Value)
                 {
-                    if (go != null) Object.Destroy(go);
+                    ReleasePooledInstance(go);
                 }
                 kvp.Value.Clear();
             }
@@ -958,6 +985,12 @@ namespace EFrameWork.Runtime.Asset
             if (go == null) return;
             if (!m_pools.ContainsKey(assetReference)) m_pools.Add(assetReference, new Stack<GameObject>());
 
+            if (m_pools[assetReference].Count >= MaxPoolSizePerKey)
+            {
+                ReleasePooledInstance(go);
+                return;
+            }
+
             go.transform.SetParent(null, false);
             go.SetActive(false);
             m_pools[assetReference].Push(go);
@@ -973,7 +1006,7 @@ namespace EFrameWork.Runtime.Asset
             {
                 foreach (GameObject go in pool)
                 {
-                    if (go != null) Object.Destroy(go);
+                    ReleasePooledInstance(go);
                 }
                 pool.Clear();
                 m_pools.Remove(assetReference);
@@ -989,11 +1022,27 @@ namespace EFrameWork.Runtime.Asset
             {
                 foreach (GameObject go in kvp.Value)
                 {
-                    if (go != null) Object.Destroy(go);
+                    ReleasePooledInstance(go);
                 }
                 kvp.Value.Clear();
             }
             m_pools.Clear();
+        }
+
+        void IAssetService.ReleaseAllPools()
+        {
+            ReleaseAllPathPools();
+            ReleaseAllPools();
+        }
+
+        private static void ReleasePooledInstance(GameObject go)
+        {
+            if (go == null) return;
+
+            if (!Addressables.ReleaseInstance(go))
+            {
+                Object.Destroy(go);
+            }
         }
 
         public void Dispose()

@@ -16,35 +16,31 @@ namespace EFrameWork.Runtime.DataStorage
 
     public class DefaultFrameData : DataTable<DefaultFrameDataModal>
     {
+        public const string TableStorageKey = "default-frame-data";
+
+        protected override int CurrentVersion => 1;
+
+        protected override string GetStorageKey()
+        {
+            return TableStorageKey;
+        }
 
         public bool VibrationOn
         {
             get => Data.VibrationOn;
-            set
-            {
-                Data.VibrationOn = value;
-                SetDirty();
-            }
+            set => SetValue(ref m_data.VibrationOn, value);
         }
 
         public bool MusicOn
         {
             get => Data.MusicOn;
-            set
-            {
-                Data.MusicOn = value;
-                SetDirty();
-            }
+            set => SetValue(ref m_data.MusicOn, value);
         }
 
         public bool SoundOn
         {
             get => Data.SoundOn;
-            set
-            {
-                Data.SoundOn = value;
-                SetDirty();
-            }
+            set => SetValue(ref m_data.SoundOn, value);
         }
 
         public long RegisterDate
@@ -60,21 +56,13 @@ namespace EFrameWork.Runtime.DataStorage
         public float TotalPlayTime
         {
             get => Data.TotalPlayTime;
-            set
-            {
-                Data.TotalPlayTime = value;
-                SetDirty();
-            }
+            set => SetValue(ref m_data.TotalPlayTime, value);
         }
         
         public float CurPlayTime
         {
             get => Data.CurPlayTime;
-            set
-            {
-                Data.CurPlayTime = value;
-                SetDirty();
-            }
+            set => SetValue(ref m_data.CurPlayTime, value);
         }
 
         // 重写 GetDefaultData 方法，提供默认值
@@ -89,6 +77,29 @@ namespace EFrameWork.Runtime.DataStorage
                 TotalPlayTime = 0f,
                 VibrationOn = true
             };
+        }
+
+        protected override DefaultFrameDataModal Migrate(DefaultFrameDataModal data, int fromVersion)
+        {
+            if (data == null)
+            {
+                return GetDefaultData();
+            }
+
+            if (fromVersion < 1)
+            {
+                if (data.RegisterDate <= 0)
+                {
+                    data.RegisterDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                }
+
+                if (string.IsNullOrEmpty(data.RegisterVersion))
+                {
+                    data.RegisterVersion = Application.version;
+                }
+            }
+
+            return data;
         }
     }
 }

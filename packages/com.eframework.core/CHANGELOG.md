@@ -2,6 +2,48 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Added initialization failure stages and safer cleanup for partially created services.
+- Added async Addressables path validation, bounded object pools, and Addressables-aware pooled instance release.
+- Refined UI cache behavior so cached views reuse `QUIBinding`/GameObject instances while View wrappers remain single-use.
+- Added lazy UIController context validation before showing UI.
+- Added `EFrameSettings.EnableScreenFitDebugLog` and unified data access around `IDataService`.
+- Tightened data table registration/disposal semantics, added scoped event subscriptions, cleared global event hooks on reset, and reset static task queue state on framework disposal.
+- Automated data table dirty marking through table-owned setters/helpers and removed external mutable `Data` access from the persistence model.
+- Added versioned data envelopes and table-owned migration hooks so old raw save files can load as `version 0` and migrate forward without immediate overwrite.
+- Added temporary-file writes and `.bak` fallback recovery to `JsonFileStorage` so save replacement is safer and unreadable primary files can recover from backup.
+- Added structured persistence load diagnostics via `LastLoadResult` so tables can report whether data loaded normally, migrated, fell back to backup, or reverted to defaults.
+- Stabilized persistence keys by requiring each `DataTable` to declare an explicit `StorageKey` instead of defaulting save paths to runtime type names.
+- Added registration-time validation for data table storage keys so empty or duplicate `StorageKey` values fail fast instead of silently sharing one save file.
+- Tightened `DataTable.Mutate(...)` so table-owned mutators must explicitly report whether data changed before dirty is set.
+- Added stable persistence `ReasonCode` values to storage load contexts and `LastLoadResult` so failure and recovery branches no longer depend on free-form messages.
+- Added `LastSaveResult` to `DataTable` so save attempts can report whether they wrote, skipped because data was clean, or failed.
+- Moved QUI sorting layer setup into the project bootstrap flow so initialization can auto-create required UI sorting layers, and added runtime QUI warnings when layers are missing.
+- Reorganized editor tooling into `ProjectBootstrap`, `UI`, and `Tools` groups so initialization utilities, UI inspectors, and developer shortcuts have clearer ownership.
+- Unified legacy UI component namespaces under `EFrameWork.Runtime.UI` so runtime UI widgets and helper components share one framework namespace family.
+- Unified `QUIBinding` generated access classes and built-in UI templates on `EFrameWork.Runtime.UI.Generated` so generated bindings follow the same runtime UI namespace family.
+- Split runtime UI layout adaptors and reusable controls into `Layout` and `Components` namespace groups so core UI services and widget-style utilities are easier to distinguish.
+- Moved `UIBuilder` and `EmptyRayCasterGraphic` out of the runtime UI root so helper/toolbox code and lightweight reusable components align with `UIHelper` and `Components` ownership.
+- Normalized `XListView` folder and namespace casing so component subfolders now match the naming style of the exported runtime types.
+- Moved binding creation and release decisions into `IUIService/QUI` so `BindingViewBase` is reduced toward a view wrapper instead of owning instantiation and cache policy.
+- Moved `UIControllerBase` default View creation onto the `IUIService/QUI` host path so new Views can initialize through parameterless construction and `OnBindingSet()` rather than `assetPath` constructors.
+- Extracted the default open/close animation into a host-owned `IUIViewTransition` strategy so `BindingViewBase` no longer owns DOTween transition details.
+- Introduced `UIViewHandle<TView>` so `UIControllerBase` no longer directly owns the runtime View lifecycle state.
+- Moved opening/closing/released state tracking into `UIViewHandle<TView>` and thinned `BindingViewBase` toward lifecycle primitives instead of full open/close orchestration.
+- Kept cached `UIViewHandle<TView>` instances reusable in a `Closed` state and propagated `assetPath` into host-created View wrappers so cache/release keys remain correct.
+- Moved `QUI` navigation stack storage onto `IUIViewHandle` while retaining `TopView` as a compatibility facade.
+- Removed the temporary `BindingViewBase` navigation compatibility facades from `QUI` and fixed handle-backed stack removal to compare against `IUIViewHandle.View`.
+- Removed the legacy `UIControllerBase<TView>.View` facade and updated generated controller templates to use `TypedViewHandle` explicitly.
+- Reduced `BindingViewBase` lifecycle entrypoints to internal-only APIs so runtime open/close flows now route through `UIViewHandle` only.
+- Reorganized the framework runtime instruction file into layer- and concern-based sections so UI, startup, resource, and persistence rules are easier to maintain.
+- Split AI guidance by sync boundary so synced `eframe-*` files stay business-project-facing while framework-only maintenance notes live in a separate non-synced instruction file.
+- Applied the same sync-boundary cleanup to the editor instruction layer so only stable business-project editor rules remain in synced `eframe-editor.instructions`.
+- Returned event debug type queries as snapshots so external enumeration is not affected by later subscription changes.
+- Removed data storage sample/test classes from the runtime assembly surface.
+
 ## [0.1.0] - 2026-04-29
 
 ### Added
@@ -14,5 +56,5 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ### Changed
 
-- Removed legacy direct service statics such as `EFrame.UI`, `EFrame.Audio`, and `EFrame.DataManager` from the runtime access model.
-- Kept synchronous asset helpers as transitional APIs while documenting async handle-based service access as the preferred path.
+- Standardized runtime service access through `EFrame.Current` and injected `Context`.
+- Documented async handle-based resource service access as the runtime path.

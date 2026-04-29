@@ -90,6 +90,8 @@ EFrame Tools/项目初始化向导
 - `Full Initialize Project`：执行标准初始化链路，包括冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景与示例模板导入
 - `Import Initial Templates`：仅重新导入内置初始范例模板，例如 `HomeView.prefab` 与 `SampleModuleMainView.prefab`
 
+`Full Initialize Project` 现在也会自动补齐 `QUI` 依赖的 Unity SortingLayer（`QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`），避免项目只因遗漏编辑器菜单步骤而在运行时出现 UI 排序异常。
+
 如果当前项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口仍然可以创建启动场景，但 AI 同步按钮会降级提示，需要手动在框架仓库根目录执行对应脚本。
 
 ## 4. 仅同步 AI 的方式
@@ -175,6 +177,7 @@ EFrame Tools/项目初始化向导
 - 新项目只在本项目确有差异时做增量扩展，不要直接改坏通用规则。
 - 通用规范变化时，优先先改框架仓库，再用初始化脚本同步到业务项目。
 - EFrame 托管的 instruction 和 skill 统一使用 `eframe-` 前缀；业务项目自己的 AI 规则请使用其他名称，脚本在 `-Force` 同步时会覆盖 `eframe-*` 项，但会保留项目自定义项。
+- 如果框架仓库需要维护“只给框架维护者 AI 看”的规则，请使用 `maintainer-*` 命名；这类 instruction 不会被 `Initialize-EFrameAI.ps1` 同步到业务项目。
 - 最稳定的落地方式是：框架仓库负责提供和安装同步器，业务项目仓库只负责执行 `Sync-EFrameAIFromFramework.ps1`。
 
 ## 8. 何时更新指令层
