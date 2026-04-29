@@ -6,6 +6,18 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-04-29
+
+### Changed
+
+- Added a repo-root `AGENTS.md` Codex entry point and synced it with the EFrame AI workspace so Codex and Copilot can share the same framework guidance.
+- Refocused `eframe-feature-bootstrap` as a top-level feature coordinator that delegates UI, data-table, resource, and maintainer details to specialized skills.
+- Added cold-start generation for the empty `AudioEventConfig` Resources asset so new projects initialize audio events without missing-config warnings.
+- Split `UIControllerBase<TView>` lifecycle hooks into instance-level create/destroy and per-open/per-close callbacks so cached UI handles no longer trigger release cleanup on every hide.
+- Updated UI binding generation, project bootstrap templates, and editor module scaffolds to use parameterless View wrappers, `OnBindingSet()`, and `TypedViewHandle.TypedView` instead of legacy asset-path constructors or `View` facades.
+- Stabilized default UI transitions so interrupted DOTween open/close animations complete their await path and stale async handle completions cannot overwrite newer UI state.
+- Synchronized UI runtime contract docs, AI runtime instructions, UI feature skill, and audit checklist with the handle-first lifecycle model.
+
 ## [0.2.0] - 2026-04-29
 
 ### Changed

@@ -32,7 +32,7 @@ public sealed class HomeController : UIControllerBase<HomeView>
 {
     protected override string AssetPath => ResPath.Generated.UI.HomeView;
 
-    protected override void OnViewCreated()
+    protected override void OnViewOpened()
     {
         Context.Audio.PlaySfx("Audio/UI/Open");
     }

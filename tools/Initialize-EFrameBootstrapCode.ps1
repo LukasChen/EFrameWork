@@ -209,14 +209,8 @@ namespace $RootNamespace.UI.Views
     {
         public Button ModuleTestButton { get; private set; }
 
-        public HomeView(string assetPath) : base(assetPath)
+        public HomeView()
         {
-            CacheComponents();
-        }
-
-        public HomeView(string assetPath, UILayer layer) : base(assetPath, layer)
-        {
-            CacheComponents();
         }
 
         protected override void OnBindingSet()
@@ -252,7 +246,7 @@ namespace $RootNamespace.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(View.ModuleTestButton, OnModuleTestButtonClick);
+            AddButtonClickListener(TypedViewHandle.TypedView.ModuleTestButton, OnModuleTestButtonClick);
         }
 
         protected override void OnViewDestroyed()
@@ -375,14 +369,8 @@ namespace $moduleNamespace.UI.Views
     {
         public Button BackButton { get; private set; }
 
-        public ${ModuleName}MainView(string assetPath) : base(assetPath)
+        public ${ModuleName}MainView()
         {
-            CacheComponents();
-        }
-
-        public ${ModuleName}MainView(string assetPath, UILayer layer) : base(assetPath, layer)
-        {
-            CacheComponents();
         }
 
         protected override void OnBindingSet()
@@ -416,7 +404,7 @@ namespace $moduleNamespace.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(View.BackButton, OnBackButtonClick);
+            AddButtonClickListener(TypedViewHandle.TypedView.BackButton, OnBackButtonClick);
         }
 
         protected override void OnViewDestroyed()

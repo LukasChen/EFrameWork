@@ -2,11 +2,12 @@
 
 EFrameWork is a lightweight Unity game framework with a synchronized AI collaboration layer. It provides runtime/editor code, project bootstrap tools, AI instructions, skills, and update workflows so new Unity projects can start with both framework conventions and AI coding guidance in one step.
 
-In this repository, the AI layer is a first-class framework feature, not an optional documentation bundle. When EFrame runtime, editor tooling, bootstrap templates, directory rules, resource conventions, or startup flow change, the matching `.github` instructions, skills, manifest, sync scripts, and setup docs must be reviewed and updated together.
+In this repository, the AI layer is a first-class framework feature, not an optional documentation bundle. When EFrame runtime, editor tooling, bootstrap templates, directory rules, resource conventions, or startup flow change, the matching `AGENTS.md`, `.github` instructions, skills, manifest, sync scripts, and setup docs must be reviewed and updated together.
 
 ## Framework Layers
 
 - `packages/com.eframework.core/`: Unity runtime and editor package, including `EFrame`, `Procedure`, `QUI`, UI controllers, assets, audio, data, and bootstrap editor tooling.
+- `AGENTS.md`: Codex-compatible repo entry point that mirrors the EFrame AI contract and points Codex to the synced workflow skills.
 - `.github/`: framework-managed AI collaboration layer, including Copilot instructions, synced `eframe-*` instructions/skills, maintainer-only `maintainer-*` guidance, and the AI manifest.
 - `tools/`: project cold-start and AI sync toolchain for importing, updating, and extending the framework AI layer in business projects.
 
@@ -29,7 +30,7 @@ Use semantic versioning for EFrameWork releases. Before `1.0.0`, minor versions 
 
 Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.
 
-- Framework AI rules live under `.github/`
+- Codex entry rules live in `AGENTS.md`; Copilot and synced workflow rules live under `.github/`
 - Synced business-project rules and workflows use the `eframe-*` prefix; framework-repository maintenance rules and workflows use `maintainer-*` and are not synced to projects.
 - High-value synced skills cover feature bootstrap, guideline audit, UI features, data tables, and resource flows.
 - Sync and installer scripts live under `tools/`

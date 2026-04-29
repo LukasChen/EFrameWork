@@ -20,16 +20,17 @@ user-invocable: true
 3. 检查 UI 是否经过 `QUI` 层级管理，控制器是否承担了正确职责。
 4. 检查项目初始化链路是否会自动补齐 `QUI` 依赖的 Unity SortingLayer，运行时缺层级时是否有明确校验提示。
 5. 检查 UIController 是否避免在构造阶段读取未初始化服务，缓存 UI 是否只复用 `QUIBinding`/GameObject 而不是复用一次性 View wrapper 状态。
-6. 检查 Addressables 运行时加载是否优先使用异步 `EFrame.Current.Assets` 入口和句柄释放，同步 `WaitForCompletion` 是否有明确理由。
-7. 检查事件订阅是否通过作用域订阅或明确成对退订完成清理，数据表是否统一注册到 `EFrame.Current.Data`。
-8. 检查数据表是否声明稳定 `StorageKey`，而不是把类名或命名空间变化暴露为持久化键名；同时确认不同表没有复用同一持久化键。
-9. 检查数据表是否通过属性/方法封装修改并自动 dirty，复杂变更是否只在实际发生修改时标记 dirty，且避免外部直接修改底层数据对象。
-10. 检查需要持久化升级的数据表是否声明 `CurrentVersion` / `Migrate(...)`，以及旧裸数据文件是否能按 `version 0` 进入迁移链。
-11. 检查需要感知存档恢复或回退的业务是否读取 `LastLoadResult` 的结构化状态与 `ReasonCode`，而不是依赖运行日志文本或消息字符串做分支判断。
-12. 检查需要感知保存成功、跳过或失败的业务是否读取 `LastSaveResult`，而不是默认认为每次 `Save()` 调用都实际写盘。
-13. 检查资源和代码目录是否可映射，命名是否稳定。
-14. 检查 `QUIBinding` 默认访问类命名空间与模板 prefab 是否保持一致，避免新生成代码继续落入旧的 `EFrameWork.UI.Generated`。
-15. 检查业务代码是否绕过 `IUIService/QUI` 与 `UIViewHandle` 语义直接驱动 `BindingViewBase` 生命周期。
+6. 检查 `OnViewCreated()` / `OnViewDestroyed()` 是否只承担 View 实例级绑定与释放，`OnViewOpened()` / `OnViewClosed()` 是否承担每次打开关闭的刷新或暂停逻辑。
+7. 检查 Addressables 运行时加载是否优先使用异步 `EFrame.Current.Assets` 入口和句柄释放，同步 `WaitForCompletion` 是否有明确理由。
+8. 检查事件订阅是否通过作用域订阅或明确成对退订完成清理，数据表是否统一注册到 `EFrame.Current.Data`。
+9. 检查数据表是否声明稳定 `StorageKey`，而不是把类名或命名空间变化暴露为持久化键名；同时确认不同表没有复用同一持久化键。
+10. 检查数据表是否通过属性/方法封装修改并自动 dirty，复杂变更是否只在实际发生修改时标记 dirty，且避免外部直接修改底层数据对象。
+11. 检查需要持久化升级的数据表是否声明 `CurrentVersion` / `Migrate(...)`，以及旧裸数据文件是否能按 `version 0` 进入迁移链。
+12. 检查需要感知存档恢复或回退的业务是否读取 `LastLoadResult` 的结构化状态与 `ReasonCode`，而不是依赖运行日志文本或消息字符串做分支判断。
+13. 检查需要感知保存成功、跳过或失败的业务是否读取 `LastSaveResult`，而不是默认认为每次 `Save()` 调用都实际写盘。
+14. 检查资源和代码目录是否可映射，命名是否稳定。
+15. 检查 `QUIBinding` 默认访问类命名空间与模板 prefab 是否保持一致，避免新生成代码继续落入旧的 `EFrameWork.UI.Generated`。
+16. 检查业务代码是否绕过 `IUIService/QUI` 与 `UIViewHandle` 语义直接驱动 `BindingViewBase` 生命周期，或重新引入 `assetPath` View 构造函数 / 旧 `View` facade。
 
 ## AI Layer Audit
 

@@ -423,15 +423,18 @@ namespace EFrameWork.Runtime.UI
         {
             RequireContext();
 
-            if (m_viewHandle != null && m_viewHandle.IsAlive)
-            {
-                m_viewHandle.Open(layer);
-            }
-            else
+            if (m_viewHandle == null || !m_viewHandle.IsAlive)
             {
                 m_viewHandle = CreateViewHandle(layer);
                 OnViewCreated();
-                m_viewHandle.Open(layer);
+            }
+
+            bool wasShowing = m_viewHandle.IsShowing;
+            m_viewHandle.Open(layer);
+
+            if (!wasShowing && m_viewHandle.IsShowing)
+            {
+                OnViewOpened();
             }
         }
 
@@ -443,15 +446,18 @@ namespace EFrameWork.Runtime.UI
         {
             RequireContext();
 
-            if (m_viewHandle != null && m_viewHandle.IsAlive)
-            {
-                await m_viewHandle.OpenAsync(layer);
-            }
-            else
+            if (m_viewHandle == null || !m_viewHandle.IsAlive)
             {
                 m_viewHandle = CreateViewHandle(layer);
                 OnViewCreated();
-                await m_viewHandle.OpenAsync(layer);
+            }
+
+            bool wasShowing = m_viewHandle.IsShowing;
+            await m_viewHandle.OpenAsync(layer);
+
+            if (!wasShowing && m_viewHandle.IsShowing)
+            {
+                OnViewOpened();
             }
         }
 
@@ -462,8 +468,21 @@ namespace EFrameWork.Runtime.UI
         {
             if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
-                OnViewDestroyed();
+                bool wasShowing = m_viewHandle.IsShowing;
+                bool willRelease = !m_viewHandle.UsingCache;
+
+                if (wasShowing)
+                {
+                    OnViewClosed();
+                }
+
+                if (willRelease)
+                {
+                    OnViewDestroyed();
+                }
+
                 m_viewHandle.Close();
+
                 if (m_viewHandle.IsReleased)
                 {
                     m_viewHandle = null;
@@ -479,8 +498,21 @@ namespace EFrameWork.Runtime.UI
         {
             if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
-                OnViewDestroyed();
+                bool wasShowing = m_viewHandle.IsShowing;
+                bool willRelease = !m_viewHandle.UsingCache;
+
+                if (wasShowing)
+                {
+                    OnViewClosed();
+                }
+
+                if (willRelease)
+                {
+                    OnViewDestroyed();
+                }
+
                 await m_viewHandle.CloseAsync();
+
                 if (m_viewHandle.IsReleased)
                 {
                     m_viewHandle = null;
@@ -497,7 +529,21 @@ namespace EFrameWork.Runtime.UI
         }
 
         /// <summary>
-        /// View 销毁前调用（清理逻辑）
+        /// View 每次打开后调用（刷新显示状态等）
+        /// </summary>
+        protected virtual void OnViewOpened()
+        {
+        }
+
+        /// <summary>
+        /// View 每次关闭时调用（暂停刷新等）
+        /// </summary>
+        protected virtual void OnViewClosed()
+        {
+        }
+
+        /// <summary>
+        /// View 释放前调用（解绑事件等）
         /// </summary>
         protected virtual void OnViewDestroyed()
         {
@@ -507,6 +553,12 @@ namespace EFrameWork.Runtime.UI
         {
             if (disposing && m_viewHandle != null)
             {
+                bool wasShowing = m_viewHandle.IsShowing;
+                if (wasShowing)
+                {
+                    OnViewClosed();
+                }
+
                 OnViewDestroyed();
                 m_viewHandle.CloseAndDestroy();
                 m_viewHandle = null;

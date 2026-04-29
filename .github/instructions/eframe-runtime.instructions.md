@@ -24,7 +24,10 @@ Project-local `project-*.instructions.md` overlays may add more specific busines
 - 创建、打开、关闭、缓存和释放 View 统一走 `IUIService/QUI` 与 `UIViewHandle` 语义；业务代码不要直接驱动 `BindingViewBase` 的生命周期。
 - `BindingViewBase` 只保留 binding wrapper、组件缓存初始化和底层生命周期原语；资源实例化、缓存命中、释放决策和 transition 策略属于宿主或 handle。
 - `UIControllerBase` 负责 UI 编排，不在构造函数中依赖业务数据或未初始化服务；显示 UI 前由框架上下文完成绑定。
+- `UIControllerBase<TView>` 的 `OnViewCreated()` / `OnViewDestroyed()` 是 View 实例级钩子；`OnViewOpened()` / `OnViewClosed()` 是每次打开关闭的钩子。缓存 UI 关闭到 `Closed` 状态时不要把实例级清理写进每次 hide 路径。
 - View 模板保持无参构造，通过 `SetBinding()` / `OnBindingSet()` 接入生成的 `QUIBinding`，不要把可复用的业务状态塞进 View 缓存。
+- Controller 访问运行中 View 使用 `TypedViewHandle.TypedView`，不要恢复旧的 `UIControllerBase<TView>.View` facade 或生成依赖 `assetPath` 构造函数的 View。
+- UI transition 由宿主策略管理；自定义 transition 必须能处理中断/kill，避免旧的异步 open/close 完成后覆盖新的 handle 状态。
 
 ## Resource Paths And Addressables
 

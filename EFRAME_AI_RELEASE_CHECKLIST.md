@@ -18,6 +18,7 @@
 - `.github/instructions/maintainer-*.instructions.md`
 - `.github/skills/maintainer-*`
 - `.github/instructions/project-*.instructions.md`
+- `AGENTS.md`
 - 业务项目自定义技能目录名也建议使用 `project-*` 前缀
 
 ## 2. 框架发布前检查
@@ -25,6 +26,7 @@
 只要以下任一内容发生变化，就视为 AI 规则更新：
 
 - `.github/copilot-instructions.md`
+- `AGENTS.md`
 - `.github/instructions/eframe-*.instructions.md`
 - `.github/instructions/maintainer-*.instructions.md`
 - `.github/skills/eframe-*`
@@ -51,8 +53,8 @@
 5. 新增或更新的 instruction / skills 命名符合边界：同步业务项目用 `eframe-*`，框架维护专用用 `maintainer-*`，业务 overlay 用 `project-*`。
 6. `Test-EFrameAIRelease.ps1` 能通过，且会在 AI 影响文件变更但 manifest 未变更、manifest 版本未递增、frontmatter 无效、synced instruction 过长或同步脚本误纳入 `maintainer-*` 时给出错误或警告。
 7. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `-Force` 都能正常运行。
-8. `Initialize-EFrameAI.ps1 -Force` 会同步 `.github`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`，且不会覆盖项目自定义的 `project-*` overlay。
-9. `Initialize-EFrameAI.ps1 -StatusOnly` 会报告框架托管项、项目 `project-*` overlay、根目录 AI 文档和陈旧 `eframe-*` 项。
+8. `Initialize-EFrameAI.ps1 -Force` 会同步 `AGENTS.md`、`.github`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`，且不会覆盖项目自定义的 `project-*` overlay。
+9. `Initialize-EFrameAI.ps1 -StatusOnly` 会报告框架托管项、项目 `project-*` overlay、根目录 Codex/AI 文档和陈旧 `eframe-*` 项。
 10. `Install-EFrameAIProjectUpdater.ps1` 能在一个临时项目目录中生成项目侧更新脚本。
 11. `New-EFrameProjectAIOverlay.ps1` 能正常生成 `project-local.instructions.md` 模板。
 12. `Initialize-EFrameBootstrapCode.ps1` 能在一个临时项目目录中生成最小启动代码和场景说明。
@@ -65,8 +67,10 @@
 19. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
 20. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
 21. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
-22. Always-on 边界保留在 instructions；多步骤生成、审查、发布、迁移流程放在 skills 或 skill references。
-23. 新增 `eframe-*` skill 时，确认它是业务项目常用 workflow，而不是 maintainer-only 发布/同步流程。
+22. UI 主链路变化时，确认 `UI_FRAMEWORK_GUIDE.md`、`eframe-runtime.instructions`、`eframe-ui-feature`、`eframe-guideline-audit`、bootstrap 脚本和编辑器初始化模板都保持同一套 `QUI` / `UIViewHandle` / `UIControllerBase` 契约。
+23. Always-on 边界保留在 instructions；多步骤生成、审查、发布、迁移流程放在 skills 或 skill references。
+24. 新增 `eframe-*` skill 时，确认它是业务项目常用 workflow，而不是 maintainer-only 发布/同步流程。
+25. `eframe-feature-bootstrap` 应保持总控职责；UI、数据表、资源细节应委派给对应 specialized skill，避免重复规则。
 
 ## 3. 业务项目升级流程
 

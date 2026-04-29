@@ -17,6 +17,10 @@
 - 是否通过 `QUI` 层级挂载
 - 是否存在手工新建顶层 Canvas 或多余 `EventSystem`
 - `UIController` 是否负责绑定、刷新、销毁，而不是承担全部业务逻辑
+- `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`
+- View 是否保持无参构造并通过 `OnBindingSet()` 接入 `QUIBinding`
+- Controller 是否通过 `TypedViewHandle.TypedView` 访问 View，而不是恢复旧 `View` facade
+- 自定义 transition 是否能处理中断，避免旧异步 open/close 完成后覆盖新状态
 
 ## 目录与命名
 
@@ -33,6 +37,7 @@
 ## AI 配置
 
 - 新规范是否同步到 `.github/copilot-instructions.md`
+- 新规范是否同步到 `AGENTS.md`
 - 是否需要新增或更新 `.github/instructions/*.instructions.md`
 - 是否需要新增或更新 `.github/skills/*`
 - 初始化脚本和接入文档是否仍可用

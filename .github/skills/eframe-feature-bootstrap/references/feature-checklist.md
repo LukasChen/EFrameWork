@@ -36,13 +36,14 @@
 
 ## 5. 资源与层级
 
-- 资源路径集中管理，不散写字符串
-- 主页面进入 `QuiPanel`
-- 弹窗进入 `QuiPopUp`
-- 提示层进入 `QuiTooltip` 或 `QuiTop`
+- UI 子任务是否已交给 `eframe-ui-feature`
+- 数据表子任务是否已交给 `eframe-data-table`
+- 资源/Addressables 子任务是否已交给 `eframe-resource-flow`
+- 框架维护或 AI 发布子任务是否已交给 `maintainer-ai-contract`
 
 ## 6. 验证
 
 - 能否在不改启动场景业务内容的前提下接入
 - 是否存在成对清理
 - 是否保留了可迁移到标准目录的空间
+- 是否避免在 bootstrap skill 中复制 specialized skill 的细节规则

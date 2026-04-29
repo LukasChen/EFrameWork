@@ -15,6 +15,8 @@ namespace EFrameWork.Runtime.UI.Handles
 
     public sealed class UIViewHandle<TView> : IDisposable, IUIViewHandle where TView : BindingViewBase
     {
+        private int m_operationVersion;
+
         public UIViewHandle(string assetPath, TView view)
         {
             AssetPath = assetPath ?? throw new ArgumentNullException(nameof(assetPath));
@@ -51,7 +53,9 @@ namespace EFrameWork.Runtime.UI.Handles
                 return;
             }
 
+            m_operationVersion++;
             State = UIViewHandleState.Opening;
+            TypedView.KillTransition();
             TypedView.PrepareForOpen(layer);
             State = UIViewHandleState.Open;
         }
@@ -63,7 +67,9 @@ namespace EFrameWork.Runtime.UI.Handles
                 return;
             }
 
+            int operationVersion = ++m_operationVersion;
             State = UIViewHandleState.Opening;
+            TypedView.KillTransition();
             TypedView.PrepareForOpen(layer);
 
             try
@@ -72,7 +78,7 @@ namespace EFrameWork.Runtime.UI.Handles
             }
             finally
             {
-                if (State != UIViewHandleState.Released)
+                if (operationVersion == m_operationVersion && State != UIViewHandleState.Released)
                 {
                     State = UIViewHandleState.Open;
                 }
@@ -86,6 +92,7 @@ namespace EFrameWork.Runtime.UI.Handles
                 return;
             }
 
+            m_operationVersion++;
             State = UIViewHandleState.Closing;
             TypedView.PrepareForClose(true);
 
@@ -107,6 +114,7 @@ namespace EFrameWork.Runtime.UI.Handles
                 return;
             }
 
+            int operationVersion = ++m_operationVersion;
             State = UIViewHandleState.Closing;
             TypedView.PrepareForClose(false);
 
@@ -116,15 +124,19 @@ namespace EFrameWork.Runtime.UI.Handles
             }
             finally
             {
-                if (UsingCache)
+                if (operationVersion == m_operationVersion && State != UIViewHandleState.Released)
                 {
-                    TypedView.DeactivateForReuse();
-                    State = UIViewHandleState.Closed;
-                    return;
+                    if (UsingCache)
+                    {
+                        TypedView.DeactivateForReuse();
+                        State = UIViewHandleState.Closed;
+                    }
+                    else
+                    {
+                        TypedView.Release();
+                        State = UIViewHandleState.Released;
+                    }
                 }
-
-                TypedView.Release();
-                State = UIViewHandleState.Released;
             }
         }
 
@@ -137,6 +149,7 @@ namespace EFrameWork.Runtime.UI.Handles
 
             var dispatchCloseEvent = State == UIViewHandleState.Open || State == UIViewHandleState.Opening;
 
+            m_operationVersion++;
             State = UIViewHandleState.Closing;
             TypedView.PrepareForClose(true, dispatchCloseEvent);
             TypedView.Release(true);

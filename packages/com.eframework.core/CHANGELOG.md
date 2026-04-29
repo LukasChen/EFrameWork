@@ -4,6 +4,14 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-04-29
+
+### Changed
+
+- Split `UIControllerBase<TView>` lifecycle hooks into instance-level create/destroy and per-open/per-close callbacks so cached UI handles keep reusable instances without running release cleanup on every hide.
+- Updated UI binding generation and bootstrap/editor module scaffolds to generate parameterless View wrappers initialized through `OnBindingSet()` and controllers that access views through `TypedViewHandle.TypedView`.
+- Stabilized default `IUIViewTransition` playback so DOTween open/close transitions await actual completion or interruption, and `UIViewHandle<TView>` ignores stale async completions after newer operations start.
+
 ## [0.2.0] - 2026-04-29
 
 ### Changed

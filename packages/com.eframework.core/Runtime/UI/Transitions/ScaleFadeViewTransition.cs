@@ -1,4 +1,3 @@
-using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -19,21 +18,23 @@ namespace EFrameWork.Runtime.UI.Transitions
 
             float duration = GetDuration(view);
 
+            Kill(view);
             animRoot.localScale = Vector3.one * 0.8f;
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
+            Sequence sequence = DOTween.Sequence().SetTarget(animRoot);
             if (canvasGroup != null)
             {
                 canvasGroup.alpha = 0f;
-                DOTween.Sequence()
-                    .Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack))
+                sequence
+                    .Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack).SetTarget(animRoot))
                     .Join(canvasGroup.DOFade(1f, duration));
             }
             else
             {
-                animRoot.DOScale(1f, duration).SetEase(Ease.OutBack);
+                sequence.Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack).SetTarget(animRoot));
             }
 
-            return UniTask.Delay(TimeSpan.FromSeconds(duration));
+            return AwaitTweenAsync(sequence);
         }
 
         public UniTask PlayCloseAsync(BindingViewBase view)
@@ -46,19 +47,21 @@ namespace EFrameWork.Runtime.UI.Transitions
 
             float duration = GetDuration(view);
 
+            Kill(view);
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
+            Sequence sequence = DOTween.Sequence().SetTarget(animRoot);
             if (canvasGroup != null)
             {
-                DOTween.Sequence()
-                    .Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack))
+                sequence
+                    .Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack).SetTarget(animRoot))
                     .Join(canvasGroup.DOFade(0f, duration));
             }
             else
             {
-                animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack);
+                sequence.Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack).SetTarget(animRoot));
             }
 
-            return UniTask.Delay(TimeSpan.FromSeconds(duration));
+            return AwaitTweenAsync(sequence);
         }
 
         public void Kill(BindingViewBase view)
@@ -69,12 +72,27 @@ namespace EFrameWork.Runtime.UI.Transitions
                 return;
             }
 
-            animRoot.DOKill(true);
+            animRoot.DOKill(false);
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
             if (canvasGroup != null)
             {
-                canvasGroup.DOKill(true);
+                canvasGroup.DOKill(false);
             }
+        }
+
+        private static UniTask AwaitTweenAsync(Tween tween)
+        {
+            if (tween == null || !tween.IsActive())
+            {
+                return UniTask.CompletedTask;
+            }
+
+            var completionSource = new UniTaskCompletionSource();
+
+            tween.OnComplete(() => completionSource.TrySetResult());
+            tween.OnKill(() => completionSource.TrySetResult());
+
+            return completionSource.Task;
         }
 
         private static float GetDuration(BindingViewBase view)

@@ -863,9 +863,18 @@ namespace EFrameWork.Editor.UI
             sb.AppendLine("        #region Constructors & Factory Methods");
             sb.AppendLine();
 
-            // 1. 带参构造函数 (QUIBinding)
+            // 1. 无参构造函数（支持 QUI/IUIService 延迟绑定）
             sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 构造函数，自动初始化所有组件引用");
+            sb.AppendLine("        /// 无参构造函数，运行时由 QUI 创建后注入 Binding");
+            sb.AppendLine("        /// </summary>");
+            sb.AppendLine("        public " + m_target.AccessClassName + "() : base()");
+            sb.AppendLine("        {");
+            sb.AppendLine("        }");
+            sb.AppendLine();
+
+            // 2. 带参构造函数 (QUIBinding)，保留给测试或手动包装已存在对象使用
+            sb.AppendLine("        /// <summary>");
+            sb.AppendLine("        /// 使用已有 QUIBinding 构造访问类");
             sb.AppendLine("        /// </summary>");
             sb.AppendLine("        public " + m_target.AccessClassName + "(QUIBinding binding) : base(binding)");
             sb.AppendLine("        {");
@@ -873,37 +882,7 @@ namespace EFrameWork.Editor.UI
             sb.AppendLine("        }");
             sb.AppendLine();
 
-            // 2. 资源路径构造函数
-            sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 从资源路径构造函数，自动加载并初始化");
-            sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public " + m_target.AccessClassName + "(string assetPath) : base(assetPath)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            InitializeFromBinding();");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-
-            // 3. 资源路径构造函数（带UI层级）
-            sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 从资源路径构造函数，自动加载、初始化并打开到指定UI层级");
-            sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public " + m_target.AccessClassName + "(string assetPath, UILayer layer) : base(assetPath, layer)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            InitializeFromBinding();");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-
-            // 4. 无参构造函数（支持延迟初始化）
-            sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 无参构造函数，需要手动调用SetBinding进行初始化");
-            sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public " + m_target.AccessClassName + "() : base()");
-            sb.AppendLine("        {");
-            sb.AppendLine("            // 延迟初始化，等待SetBinding调用");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-
-            // 5. 重写OnBindingSet方法
+            // 3. 重写OnBindingSet方法
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 当Binding被设置时自动调用（支持延迟初始化）");
             sb.AppendLine("        /// </summary>");
@@ -914,9 +893,9 @@ namespace EFrameWork.Editor.UI
             sb.AppendLine("        }");
             sb.AppendLine();
 
-            // 6. 静态工厂方法 - Create(QUIBinding)
+            // 4. 静态工厂方法 - Create(QUIBinding)
             sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 静态工厂方法，创建并初始化实例");
+            sb.AppendLine("        /// 从已有 QUIBinding 创建并初始化实例");
             sb.AppendLine("        /// </summary>");
             sb.AppendLine("        public static " + m_target.AccessClassName + " Create(QUIBinding binding)");
             sb.AppendLine("        {");
@@ -927,33 +906,7 @@ namespace EFrameWork.Editor.UI
             sb.AppendLine("        }");
             sb.AppendLine();
 
-            // 7. 静态工厂方法 - Create(string)
-            sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 从资源路径创建实例");
-            sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(string assetPath)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            if (string.IsNullOrEmpty(assetPath))");
-            sb.AppendLine("                throw new System.ArgumentNullException(nameof(assetPath));");
-            sb.AppendLine();
-            sb.AppendLine("            return new " + m_target.AccessClassName + "(assetPath);");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-
-            // 8. 静态工厂方法 - Create(string, UILayer)
-            sb.AppendLine("        /// <summary>");
-            sb.AppendLine("        /// 从资源路径创建实例并打开到指定UI层级");
-            sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(string assetPath, UILayer layer)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            if (string.IsNullOrEmpty(assetPath))");
-            sb.AppendLine("                throw new System.ArgumentNullException(nameof(assetPath));");
-            sb.AppendLine();
-            sb.AppendLine("            return new " + m_target.AccessClassName + "(assetPath, layer);");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-
-            // 9. 静态工厂方法 - CreateFromGameObject
+            // 5. 静态工厂方法 - CreateFromGameObject
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 从GameObject查找QUIBinding并创建实例");
             sb.AppendLine("        /// </summary>");

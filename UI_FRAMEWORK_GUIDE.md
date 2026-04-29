@@ -89,8 +89,10 @@ It is responsible for:
 
 - deciding when a UI should show or hide
 - owning the view handle
-- binding business events in `OnViewCreated()`
-- clearing controller-side state in `OnViewDestroyed()`
+- binding instance-level events in `OnViewCreated()`
+- refreshing per-open state in `OnViewOpened()`
+- pausing per-open work in `OnViewClosed()` when close starts
+- clearing instance-level state in `OnViewDestroyed()`
 
 It now exposes:
 
@@ -242,6 +244,12 @@ namespace Demo.UI.Controllers
             AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartButtonClick);
         }
 
+        protected override void OnViewOpened()
+        {
+            base.OnViewOpened();
+            Context.Audio.PlaySfx("Audio/UI/Open");
+        }
+
         protected override void OnViewDestroyed()
         {
             BackRequested = null;
@@ -294,6 +302,13 @@ await controller.HideAsync();
 ```
 
 If the underlying view is cache-enabled, the controller keeps a reusable handle instead of losing the instance immediately.
+
+Lifecycle hooks are split by scope:
+
+- `OnViewCreated()` / `OnViewDestroyed()` run when the wrapped view instance is created or released
+- `OnViewOpened()` runs after each successful open
+- `OnViewClosed()` runs when each close starts, while bound components are still available
+- cache-enabled views close into `Closed`, so they do not call `OnViewDestroyed()` until the handle is force-destroyed or released
 
 ## 8. Popup Example
 
@@ -432,6 +447,8 @@ That means:
 
 - views do not hardcode DOTween open/close behavior anymore
 - host policy can be replaced later without rewriting every view
+- interrupted transitions complete their await path through tween completion/kill callbacks
+- stale async open/close completions are ignored by the handle if a newer operation has started
 
 ## 12. What Business Code Should Avoid
 

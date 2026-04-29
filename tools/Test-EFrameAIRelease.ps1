@@ -122,6 +122,7 @@ try {
     }
 
     $aiImpactPatterns = @(
+        "^AGENTS\.md$",
         "^\.github/copilot-instructions\.md$",
         "^\.github/instructions/eframe-.*\.instructions\.md$",
         "^\.github/instructions/maintainer-.*\.instructions\.md$",

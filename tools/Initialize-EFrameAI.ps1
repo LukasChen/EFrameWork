@@ -13,6 +13,7 @@ $manifestName = "eframe-ai.manifest.json"
 $sourceManifestPath = Join-Path $sourceRoot $manifestName
 $destinationManifestPath = Join-Path $destinationRoot $manifestName
 $aiDocumentNames = @(
+    "AGENTS.md",
     "EFRAME_AI_ARCHITECTURE.md",
     "EFRAME_AI_SETUP.md",
     "EFRAME_AI_RELEASE_CHECKLIST.md"
@@ -173,12 +174,13 @@ function Write-SyncStatusReport {
     Write-Host "Framework root: $frameworkRoot"
     Write-Host ""
     Write-List -Title "Framework-managed root files:" -Items @(
+        "AGENTS.md",
         ".github/copilot-instructions.md",
         ".github/$manifestName"
     )
     Write-List -Title "Framework-managed instructions:" -Items $managedInstructionNames
     Write-List -Title "Framework-managed skills:" -Items $managedSkillNames
-    Write-List -Title "Framework AI docs synced to project root:" -Items $aiDocumentNames
+    Write-List -Title "Framework Codex/AI docs synced to project root:" -Items $aiDocumentNames
     Write-List -Title "Project instruction overlays preserved:" -Items $projectInstructionNames
     Write-List -Title "Project skill overlays preserved:" -Items $projectSkillNames
     Write-List -Title "Stale framework instruction items removed only with -Force:" -Items $staleInstructionNames

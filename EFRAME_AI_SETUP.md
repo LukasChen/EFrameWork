@@ -8,7 +8,8 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 
 ## 1. 当前包含的内容
 
-- `.github/copilot-instructions.md`：始终生效的 EFrame 开发总规则
+- `AGENTS.md`：Codex 读取的项目根入口规则，用于承接同一套 EFrame AI 协作契约
+- `.github/copilot-instructions.md`：Copilot 读取的 EFrame 开发总规则
 - `.github/eframe-ai.manifest.json`：AI 配置版本清单，用于检测项目是否落后于框架规则
 - `.github/instructions/eframe-*.instructions.md`：同步到业务项目的短规则，按运行时代码、编辑器代码分层
 - `.github/skills/eframe-feature-bootstrap`：用于新功能骨架搭建和重构收敛
@@ -17,7 +18,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 - `.github/skills/eframe-data-table`：用于持久化数据表、dirty、迁移、保存/加载结果工作流
 - `.github/skills/eframe-resource-flow`：用于资源目录、Addressables、ResPath 和异步句柄释放工作流
 - `.github/instructions/maintainer-*` 与 `.github/skills/maintainer-*`：仅框架仓库维护用，不同步到业务项目
-- `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便项目内查看架构、接入和发布边界
+- `AGENTS.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便 Codex 和项目内文档查看架构、接入和发布边界
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
@@ -39,7 +40,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 - 创建推荐目录骨架
 - 目录骨架内容以 `UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 同步框架 AI 基础层到项目 `.github`
-- 同步 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md` 到项目根目录
+- 同步 `AGENTS.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md` 到项目根目录
 - 安装项目侧更新脚本 `tools/Sync-EFrameAIFromFramework.ps1`
 - 生成项目 overlay 模板 `.github/instructions/project-local.instructions.md`
 - 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
@@ -79,6 +80,8 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 
 这两个 prefab 都带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它们。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这些 prefab。
 
+生成的 View wrapper 采用当前 handle-first UI 契约：View 保持无参构造，通过 `OnBindingSet()` 缓存 `QUIBinding` 组件引用；Controller 通过 `TypedViewHandle.TypedView` 访问运行中 View，并按 `OnViewCreated()` / `OnViewDestroyed()` 管理实例级绑定，按 `OnViewOpened()` / `OnViewClosed()` 管理每次打开关闭的刷新或暂停逻辑。
+
 如果此时 Addressables 已经初始化，窗口会立即重跑目录分组同步并重新生成 `ResPath.Generated.cs`，这样刚复制出来的 UI prefab 会马上进入地址管理。
 
 ## 3. Unity 编辑器内初始化方式
@@ -112,7 +115,7 @@ EFrame Tools/项目初始化向导
 .\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Force
 ```
 
-执行后，目标项目根目录会得到一套标准 `.github` 配置，VS Code / Copilot 就能按 EFrame 规范工作。
+执行后，目标项目根目录会得到一套标准 `.github` 配置和 `AGENTS.md`，VS Code / Copilot 与 Codex 都能按 EFrame 规范工作。
 
 同步过程也会复制 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录，让业务项目内的 instruction 链接和升级说明保持可读。
 
@@ -146,6 +149,7 @@ EFrame Tools/项目初始化向导
 
 真正生效的应该始终是项目根目录 `.github` 下那一套文件，而不是跨仓库引用。推荐分层如下：
 
+- Codex 入口层：由框架仓库同步到项目根目录 `AGENTS.md`
 - 框架层：由框架仓库同步到项目 `.github/instructions/eframe-*.instructions.md`
 - 项目层：项目自己维护 `.github/instructions/project-*.instructions.md`
 - 工作流层：框架同步 `.github/skills/eframe-*`，项目可维护 `.github/skills/project-*` 作为本地补充
@@ -192,20 +196,22 @@ EFrame Tools/项目初始化向导
 
 - 启动场景组织方式
 - `Procedure` 生命周期模板
-- `QUI` 层级和 UIController 边界
+- `QUI` 层级、`UIViewHandle` 状态语义、UIController 生命周期钩子或 View 模板边界
 - 目录结构、命名规则、资源路径入口
 - 新增统一工作流，例如新玩法模板、配置表接入流程、Addressables 分组策略
 - Runtime 或 Editor 重构改变了推荐写法、生成模板或项目落盘结构
 - 冷启动、AI 同步、项目 updater 或初始化窗口的行为发生变化
 
-只要上述内容导致 `.github/copilot-instructions.md`、`.github/instructions/`、`.github/skills/`、AI 同步/冷启动工具或 AI setup/release 文档发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
+只要上述内容导致 `AGENTS.md`、`.github/copilot-instructions.md`、`.github/instructions/`、`.github/skills/`、AI 同步/冷启动工具或 AI setup/release 文档发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
 
 维护原则：instructions 只放短、稳定、始终需要生效的边界规则；多步骤生成、审查、发布和迁移流程放进 skills 或 skill references。同步到业务项目的流程放 `eframe-*` skill，框架仓库维护流程放 `maintainer-*` skill。
+
+`eframe-feature-bootstrap` 只负责顶层分流和总装配；UI、数据表、资源/Addressables 的细节分别由 `eframe-ui-feature`、`eframe-data-table`、`eframe-resource-flow` 承担。
 
 ## 9. 推荐维护流程
 
 1. 先更新规范源文档。
-2. 再更新 `.github/copilot-instructions.md` 和对应 `.instructions.md` / `SKILL.md`。
+2. 再更新 `AGENTS.md`、`.github/copilot-instructions.md` 和对应 `.instructions.md` / `SKILL.md`。
 3. 如果这是框架/包版本发布，更新 `packages/com.eframework.core/package.json` 的 `version`，并维护根目录 [CHANGELOG.md](CHANGELOG.md)。如果 package 代码有变化，也同步维护 `packages/com.eframework.core/CHANGELOG.md`。
 4. 如果 AI 规则、AI 文档、同步脚本或冷启动工具发生变化，递增 `.github/eframe-ai.manifest.json` 的版本号。
 5. 执行发布检查脚本：

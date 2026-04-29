@@ -594,7 +594,6 @@ namespace {moduleNamespace}.Procedure
         private static string BuildModuleViewContent(string moduleName, string moduleNamespace)
         {
             return $@"using EFrameWork.Runtime.UI;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace {moduleNamespace}.UI.Views
@@ -603,15 +602,6 @@ namespace {moduleNamespace}.UI.Views
     {{
         public {moduleName}MainView()
         {{
-        }}
-
-        public {moduleName}MainView(string assetPath) : base(assetPath)
-        {{
-        }}
-
-        public {moduleName}MainView(string assetPath, UILayer layer) : base(assetPath, layer)
-        {{
-            CacheComponents();
         }}
 
         protected override void OnBindingSet()

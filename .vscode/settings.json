@@ -1,5 +1,6 @@
 {
   "files.exclude": {
     "**/*.meta": true
-  }
+  },
+  "python.defaultInterpreterPath": "C:\\Users\\Ethan\\AppData\\Local\\Python\\bin\\python.exe"
 }
