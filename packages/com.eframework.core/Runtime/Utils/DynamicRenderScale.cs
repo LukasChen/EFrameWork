@@ -97,7 +97,7 @@ namespace EFramework.Utils
         {
             if (m_urpAsset == null) return;
 
-            float currentFPS = EFrame.FPS;
+            float currentFPS = EFrame.Current != null ? EFrame.Current.FPS : EFrame.FPS;
             float currentScale = m_urpAsset.renderScale;
             float currentTime = Time.time;
 
@@ -142,7 +142,7 @@ namespace EFramework.Utils
 
         private PerformanceStatus AnalyzePerformance()
         {
-            float currentFPS = EFrame.FPS;
+            float currentFPS = EFrame.Current != null ? EFrame.Current.FPS : EFrame.FPS;
             float targetFrameTime = 1f / TargetFPS;
 
             // 检查性能稳定性

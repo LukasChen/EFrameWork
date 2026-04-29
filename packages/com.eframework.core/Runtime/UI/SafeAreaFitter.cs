@@ -36,9 +36,9 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public void ApplySafeArea()
         {
-            if (EFrame.UI == null) return;
+            if (EFrame.Current?.UI == null) return;
 
-            var ui = EFrame.UI;
+            var ui = EFrame.Current.UI;
             float scaleFactor = ui.ScaleFactor;
             Rect safeArea = ui.SafeAreaRect;
             Rect fitRect = ui.ScreenFitRect;

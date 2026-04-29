@@ -6,11 +6,17 @@ param(
 
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $frameworkRoot = (Resolve-Path (Join-Path $scriptRoot "..")).Path
+$resolvedTargetRoot = (Resolve-Path $TargetRoot).Path
 $sourceRoot = Join-Path $frameworkRoot ".github"
-$destinationRoot = Join-Path (Resolve-Path $TargetRoot).Path ".github"
+$destinationRoot = Join-Path $resolvedTargetRoot ".github"
 $manifestName = "eframe-ai.manifest.json"
 $sourceManifestPath = Join-Path $sourceRoot $manifestName
 $destinationManifestPath = Join-Path $destinationRoot $manifestName
+$aiDocumentNames = @(
+    "EFRAME_AI_ARCHITECTURE.md",
+    "EFRAME_AI_SETUP.md",
+    "EFRAME_AI_RELEASE_CHECKLIST.md"
+)
 
 if (-not (Test-Path $sourceRoot)) {
     throw "Source .github folder not found: $sourceRoot"
@@ -105,6 +111,81 @@ function Sync-ManagedDirectoryItems {
     }
 }
 
+function Get-ManagedItemNames {
+    param(
+        [string]$DirectoryPath,
+        [string]$Pattern
+    )
+
+    if (-not (Test-Path $DirectoryPath)) {
+        return @()
+    }
+
+    return @(Get-ChildItem -Path $DirectoryPath | Where-Object { $_.Name -like $Pattern } | Select-Object -ExpandProperty Name | Sort-Object)
+}
+
+function Write-List {
+    param(
+        [string]$Title,
+        [string[]]$Items
+    )
+
+    Write-Host $Title
+    if (-not $Items -or $Items.Count -eq 0) {
+        Write-Host "  (none)"
+        return
+    }
+
+    foreach ($item in $Items) {
+        Write-Host "  - $item"
+    }
+}
+
+function Get-StaleManagedItemNames {
+    param(
+        [string]$SourceDirectory,
+        [string]$DestinationDirectory,
+        [string]$ManagedPattern
+    )
+
+    $sourceNames = Get-ManagedItemNames -DirectoryPath $SourceDirectory -Pattern $ManagedPattern
+    $destinationNames = Get-ManagedItemNames -DirectoryPath $DestinationDirectory -Pattern $ManagedPattern
+
+    return @($destinationNames | Where-Object { $_ -notin $sourceNames })
+}
+
+function Write-SyncStatusReport {
+    $sourceInstructionDirectory = Join-Path $sourceRoot "instructions"
+    $targetInstructionDirectory = Join-Path $destinationRoot "instructions"
+    $sourceSkillDirectory = Join-Path $sourceRoot "skills"
+    $targetSkillDirectory = Join-Path $destinationRoot "skills"
+
+    $managedInstructionNames = Get-ManagedItemNames -DirectoryPath $sourceInstructionDirectory -Pattern "eframe-*"
+    $managedSkillNames = Get-ManagedItemNames -DirectoryPath $sourceSkillDirectory -Pattern "eframe-*"
+    $projectInstructionNames = Get-ManagedItemNames -DirectoryPath $targetInstructionDirectory -Pattern "project-*"
+    $projectSkillNames = Get-ManagedItemNames -DirectoryPath $targetSkillDirectory -Pattern "project-*"
+    $staleInstructionNames = Get-StaleManagedItemNames -SourceDirectory $sourceInstructionDirectory -DestinationDirectory $targetInstructionDirectory -ManagedPattern "eframe-*"
+    $staleSkillNames = Get-StaleManagedItemNames -SourceDirectory $sourceSkillDirectory -DestinationDirectory $targetSkillDirectory -ManagedPattern "eframe-*"
+
+    Write-Host ""
+    Write-Host "EFrame AI sync preview"
+    Write-Host "Target root: $resolvedTargetRoot"
+    Write-Host "Framework root: $frameworkRoot"
+    Write-Host ""
+    Write-List -Title "Framework-managed root files:" -Items @(
+        ".github/copilot-instructions.md",
+        ".github/$manifestName"
+    )
+    Write-List -Title "Framework-managed instructions:" -Items $managedInstructionNames
+    Write-List -Title "Framework-managed skills:" -Items $managedSkillNames
+    Write-List -Title "Framework AI docs synced to project root:" -Items $aiDocumentNames
+    Write-List -Title "Project instruction overlays preserved:" -Items $projectInstructionNames
+    Write-List -Title "Project skill overlays preserved:" -Items $projectSkillNames
+    Write-List -Title "Stale framework instruction items removed only with -Force:" -Items $staleInstructionNames
+    Write-List -Title "Stale framework skill items removed only with -Force:" -Items $staleSkillNames
+    Write-Host ""
+}
+
 $sourceVersion = Read-ManifestVersion -ManifestPath $sourceManifestPath
 $targetVersion = Read-ManifestVersion -ManifestPath $destinationManifestPath
 
@@ -113,6 +194,7 @@ if ($sourceRoot -eq $destinationRoot) {
         Write-Host "Framework AI version: $sourceVersion"
         Write-Host "Target AI version: $targetVersion"
         Write-Host "AI workspace config is up to date. Source and target are the same workspace."
+        Write-SyncStatusReport
         return
     }
 
@@ -125,6 +207,7 @@ if ($sourceRoot -eq $destinationRoot) {
 
 if ($StatusOnly) {
     Write-Host "Framework AI version: $sourceVersion"
+    Write-SyncStatusReport
 
     if (-not $targetVersion) {
         Write-Warning "Target project has no synced AI manifest yet. Run with -Force to initialize or update."
@@ -150,6 +233,10 @@ Sync-File -SourcePath (Join-Path $sourceRoot "copilot-instructions.md") -Destina
 Sync-File -SourcePath $sourceManifestPath -DestinationPath $destinationManifestPath -Overwrite:$Force
 Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "instructions") -DestinationDirectory (Join-Path $destinationRoot "instructions") -ManagedPattern "eframe-*" -Overwrite:$Force
 Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "skills") -DestinationDirectory (Join-Path $destinationRoot "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
+
+foreach ($documentName in $aiDocumentNames) {
+    Sync-File -SourcePath (Join-Path $frameworkRoot $documentName) -DestinationPath (Join-Path $resolvedTargetRoot $documentName) -Overwrite:$Force
+}
 
 Write-Host "EFrame AI workspace files are ready at $destinationRoot"
 Write-Host "Synced version: $sourceVersion"

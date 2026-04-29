@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -62,12 +63,13 @@ namespace EFrameWork.Runtime.UI
     /// - 支持单例模式（可选）
     /// - 兼容直接 new View() 方式
     /// </summary>
-    public abstract class UIControllerBase : IDisposable
+    public abstract class UIControllerBase : IDisposable, IEFrameContextAware
     {
         private static readonly Dictionary<Type, UIControllerBase> s_instances = new();
         private static readonly object s_lock = new();
 
         private bool m_disposed = false;
+        protected EFrameContext Context { get; private set; }
 
         /// <summary>
         /// 控制器是否存活
@@ -159,8 +161,20 @@ namespace EFrameWork.Runtime.UI
 
         protected UIControllerBase()
         {
+            BindContext(EFrame.Current);
             RegisterInstance();
             OnInit();
+        }
+
+        public void BindContext(EFrameContext context)
+        {
+            if (context == null) return;
+            Context = context;
+            OnContextBound(context);
+        }
+
+        protected virtual void OnContextBound(EFrameContext context)
+        {
         }
 
 
@@ -379,12 +393,16 @@ namespace EFrameWork.Runtime.UI
             // 如果未指定层级，使用单参数构造函数让 View 使用配置的默认层级
             if (layer.HasValue)
             {
-                return (TView)Activator.CreateInstance(typeof(TView), AssetPath, layer.Value);
+                var view = (TView)Activator.CreateInstance(typeof(TView), AssetPath, layer.Value);
+                view.BindContext(Context ?? EFrame.Current);
+                return view;
             }
             else
             {
                 // 使用只有 assetPath 的构造函数，View 会使用配置的默认层级
-                return (TView)Activator.CreateInstance(typeof(TView), AssetPath);
+                var view = (TView)Activator.CreateInstance(typeof(TView), AssetPath);
+                view.BindContext(Context ?? EFrame.Current);
+                return view;
             }
         }
 

@@ -167,7 +167,7 @@ namespace $RootNamespace.Procedure
         {
             base.OnEnter(procedureOwner);
 
-            if (EFrame.UI == null)
+            if (EFrame.Current?.UI == null)
             {
                 Debug.LogError("[ProcedureHome] EFrame UI is not initialized.");
                 return;

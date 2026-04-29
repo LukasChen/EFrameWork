@@ -13,6 +13,13 @@ user-invocable: true
 - 将演示代码或旧结构重构为正式结构
 - 给新项目建立 `View + Controller + Procedure + ResPath` 的最小骨架
 - 判断某个需求应该落在主流程、弹层还是独立玩法目录
+- 更新框架模板、冷启动流程或标准目录后，同步补齐 AI instructions 和 skills
+
+## AI Layer Contract
+
+1. EFrame 的 AI 协作层是框架能力的一部分，功能骨架和重构方案必须同时考虑 Unity 代码、`.github` 规则、skills、manifest 和 `tools` 脚本。
+2. 如果本次改动会改变业务项目的推荐目录、启动流程、UI 写法、资源路径或模板生成结果，必须更新对应 instruction 或 skill。
+3. 只要框架托管的 `.github` 或 AI 同步/冷启动工具发生变化，就必须 bump `.github/eframe-ai.manifest.json`。
 
 ## Procedure
 
@@ -38,5 +45,6 @@ user-invocable: true
 1. 校验生命周期是否成对：进入/退出、创建/销毁、订阅/退订。
 2. 校验命名、目录、资源路径是否符合规范。
 3. 如果项目里仍有过渡目录，明确本次改动是兼容旧结构还是推进到目标结构。
+4. 校验 AI 层是否同步：README/setup 文档、runtime/editor instructions、相关 skill、manifest 和冷启动/同步脚本是否仍然一致。
 
 需要更细的骨架和核对项时，加载 [feature checklist](./references/feature-checklist.md)。

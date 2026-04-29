@@ -8,7 +8,7 @@ Bundled plugin folders include:
 
 - NiceVibrations
 - UGF
-- UniTask
+- UniTask 2.5.10
 - Unity Ingame Debug Console
 
 Unity's official `com.unity.nuget.newtonsoft-json` package is consumed through Unity Package Manager and is not bundled in this package.

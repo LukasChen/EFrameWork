@@ -1,3 +1,4 @@
+using EFrameWork.Runtime;
 using UnityEngine;
 
 namespace EFrameWork.Runtime.Audio
@@ -6,7 +7,7 @@ namespace EFrameWork.Runtime.Audio
     {
         public void PlayAudioAsset(AudioClip audioClip)
         {
-            EFrame.Audio.PlaySfx(audioClip);
+            EFrame.Current?.Audio?.PlaySfx(audioClip);
         }
     }
 }

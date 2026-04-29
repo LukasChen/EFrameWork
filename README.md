@@ -1,14 +1,25 @@
 ﻿# EFrameWork
 
-Unity game framework repository.
+EFrameWork is a lightweight Unity game framework with a synchronized AI collaboration layer. It provides runtime/editor code, project bootstrap tools, AI instructions, skills, and update workflows so new Unity projects can start with both framework conventions and AI coding guidance in one step.
+
+In this repository, the AI layer is a first-class framework feature, not an optional documentation bundle. When EFrame runtime, editor tooling, bootstrap templates, directory rules, resource conventions, or startup flow change, the matching `.github` instructions, skills, manifest, sync scripts, and setup docs must be reviewed and updated together.
+
+## Framework Layers
+
+- `packages/com.eframework.core/`: Unity runtime and editor package, including `EFrame`, `Procedure`, `QUI`, UI controllers, assets, audio, data, and bootstrap editor tooling.
+- `.github/`: framework-managed AI collaboration layer, including Copilot instructions, file instructions, skills, and the AI manifest.
+- `tools/`: project cold-start and AI sync toolchain for importing, updating, and extending the framework AI layer in business projects.
+
+See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
 
 ## AI Workspace Support
 
-This repository now contains a reusable AI workspace layer for Unity projects that adopt EFrameWork.
+Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.
 
 - Framework AI rules live under `.github/`
 - Sync and installer scripts live under `tools/`
 - Setup and upgrade flow is documented in [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md)
+- AI release and manifest rules are documented in [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)
 
 To sync the framework AI layer into a project root:
 
@@ -34,6 +45,12 @@ To install a project-side updater script:
 .\tools\Install-EFrameAIProjectUpdater.ps1 -TargetRoot "D:\YourUnityProject"
 ```
 
+Before releasing AI-layer or bootstrap tooling changes, run:
+
+```powershell
+.\tools\Test-EFrameAIRelease.ps1
+```
+
 Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, and trigger AI/bootstrap initialization from a single window.
 
 ## DOTween Dependency
@@ -47,3 +64,16 @@ Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to c
 ## TextMeshPro Dependency
 
 `com.eframework.core` also uses TextMeshPro directly and now expects the official Unity package dependency `com.unity.textmeshpro` instead of a framework-bundled copy.
+
+## Runtime Access
+
+Runtime services are accessed through `EFrame.Current`, which returns the active `EFrameContext`.
+
+```csharp
+EFrame.Current.UI
+EFrame.Current.Audio
+EFrame.Current.Data
+EFrame.Current.Assets
+```
+
+Framework base classes receive `Context` automatically. Prefer `Context.UI`/`Context.Audio` inside views and controllers, and use `EFrame.Current` only at outer Unity entry points.

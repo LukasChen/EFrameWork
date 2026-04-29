@@ -36,9 +36,9 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public void ApplyFullScreen()
         {
-            if (EFrame.UI == null) return;
+            if (EFrame.Current?.UI == null) return;
 
-            var ui = EFrame.UI;
+            var ui = EFrame.Current.UI;
             float scaleFactor = ui.ScaleFactor;
 
             // 计算各边需要扩展的距离（转换为设计坐标系）

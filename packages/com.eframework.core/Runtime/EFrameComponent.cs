@@ -10,13 +10,16 @@ using System.Collections;
 namespace EFrameWork.Runtime
 {
     [RequireComponent(typeof(ProcedureComponent))]
-    public class EFrameComponent : MonoBehaviour
+    public class EFrameComponent : EFrameBehaviour
     {
         private bool m_initialized;
 
         [Header("Procedure")]
         [Tooltip("UGF ProcedureComponent。建议在启动场景里拖引用，或作为本对象的子节点存在（可禁用）。")]
         [SerializeField] private ProcedureComponent m_procedureComponent;
+
+        [Header("Settings")]
+        [SerializeField] private EFrameSettings m_settings;
 
         [Header("Cameras")]
         [SerializeField] public Camera UICamera;
@@ -27,6 +30,10 @@ namespace EFrameWork.Runtime
         [SerializeField] public Vector2Int DesignSize = new(1080, 1920);
         [Tooltip("屏幕适配模式")]
         [SerializeField] public ScreenFitMode FitMode = ScreenFitMode.FitWidth;
+
+        public EFrameSettings Settings => m_settings;
+        public Vector2Int ResolvedDesignSize => m_settings != null ? m_settings.DesignSize : DesignSize;
+        public ScreenFitMode ResolvedFitMode => m_settings != null ? m_settings.FitMode : FitMode;
 
         private TimeSpan m_accumulatedTime;
         private DateTime m_startTime;
@@ -64,6 +71,11 @@ namespace EFrameWork.Runtime
             yield return null;
             // 初始化EFrame框架
             yield return EFrame.Initialize(this);
+            if (!EFrame.LastInitializationResult.Succeeded)
+            {
+                Debug.LogError($"EFrame initialization failed: {EFrame.LastInitializationResult.Message}");
+                yield break;
+            }
 
             // 启动流程组件
             m_initialized = true;
@@ -115,12 +127,12 @@ namespace EFrameWork.Runtime
         private void SaveTotalPlayTime(float totalSeconds)
         {
             Debug.Log($"本次总游戏时长: {totalSeconds} 秒");
-            if (EFrame.DataManager == null)
+            if (Context?.Data == null)
             {
                 Debug.LogWarning("SaveTotalPlayTime: DataManager is null, skip saving.");
                 return;
             }
-            DefaultFrameData data = EFrame.DataManager.GetTable<DefaultFrameData>();
+            DefaultFrameData data = Context.Data.GetTable<DefaultFrameData>();
             if (data == null || data.Data == null)
             {
                 Debug.LogWarning("SaveTotalPlayTime: DefaultFrameData or Data is null, skip saving.");

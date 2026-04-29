@@ -8,7 +8,7 @@ namespace EFrameWork.Runtime
     /// <summary>
     /// 全局协程管理器
     /// </summary>
-    public class CoroutineManager
+    public class CoroutineManager : ICoroutineService
     {
         private MonoBehaviour m_coroutineRunner;
 

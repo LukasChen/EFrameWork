@@ -15,7 +15,7 @@ namespace EFrameWork.Runtime.Audio
     /// 音效事件管理器
     /// 监听所有 IEvent 事件，根据配置自动播放音效和震动
     /// </summary>
-    public class AudioEventManager
+    public class AudioEventManager : IAudioEventService
     {
         #region Constants
 

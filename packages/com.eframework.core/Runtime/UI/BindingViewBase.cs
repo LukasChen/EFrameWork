@@ -15,12 +15,13 @@ namespace EFrameWork.Runtime.UI
     /// - 支持缓存池复用
     /// - 支持动画开关
     /// </summary>
-    public class BindingViewBase : IDisposable
+    public class BindingViewBase : IDisposable, IEFrameContextAware
     {
         private bool m_disposed = false;
         private string m_assetPath;
         private bool m_usingCache;
         private UILayer m_layer;
+        protected EFrameContext Context { get; private set; }
 
         #region Constructors
 
@@ -32,6 +33,7 @@ namespace EFrameWork.Runtime.UI
             if (binding == null)
                 throw new ArgumentNullException(nameof(binding));
 
+            BindContext(EFrame.Current);
             Binding = binding;
             ApplyConfig(binding.Config);
         }
@@ -47,7 +49,10 @@ namespace EFrameWork.Runtime.UI
             m_assetPath = assetPath;
 
             // 尝试从缓存获取
-            var cached = EFrame.UI.GetViewFromCache<BindingViewBase>(assetPath);
+            BindContext(EFrame.Current);
+            if (Context?.UI == null)
+                throw new InvalidOperationException($"BindingViewBase: EFrame.Current.UI is not initialized. AssetPath: {assetPath}");
+            var cached = Context.UI.GetViewFromCache<BindingViewBase>(assetPath);
             if (cached != null)
             {
                 Binding = cached.Binding;
@@ -57,6 +62,7 @@ namespace EFrameWork.Runtime.UI
 
             // 缓存中没有，实例化新的
             var go = AssetManager.Instantiate(assetPath);
+            Context.InjectInto(go);
             go.name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
             if (go.TryGetComponent<QUIBinding>(out var uiBinding))
             {
@@ -81,14 +87,15 @@ namespace EFrameWork.Runtime.UI
             if (string.IsNullOrEmpty(assetPath))
                 throw new ArgumentNullException(nameof(assetPath));
 
-            if (EFrame.UI == null)
-                throw new InvalidOperationException($"BindingViewBase: EFrame.UI is not initialized. Make sure EFrame.Initialize() is called before creating UI views. AssetPath: {assetPath}");
+            BindContext(EFrame.Current);
+            if (Context?.UI == null)
+                throw new InvalidOperationException($"BindingViewBase: EFrame.Current.UI is not initialized. Make sure EFrame.Initialize() is called before creating UI views. AssetPath: {assetPath}");
 
             m_assetPath = assetPath;
             m_layer = layer;
 
             // 尝试从缓存获取
-            var cached = EFrame.UI.GetViewFromCache<BindingViewBase>(assetPath);
+            var cached = Context.UI.GetViewFromCache<BindingViewBase>(assetPath);
             if (cached != null)
             {
                 Binding = cached.Binding;
@@ -98,8 +105,9 @@ namespace EFrameWork.Runtime.UI
             }
 
             // 缓存中没有，实例化新的
-            var parent = EFrame.UI.UILayer(layer);
+            var parent = Context.UI.UILayer(layer);
             var go = AssetManager.Instantiate(assetPath, parent);
+            Context.InjectInto(go);
             go.name = System.IO.Path.GetFileNameWithoutExtension(assetPath);
             if (go.TryGetComponent<QUIBinding>(out var uiBinding))
             {
@@ -171,7 +179,7 @@ namespace EFrameWork.Runtime.UI
             m_layer = layer;
             if (Binding != null)
             {
-                EFrame.UI.OpenBindingView(this, layer);
+                Context.UI.OpenBindingView(this, layer);
             }
 
             EventBus.Dispatch(new UIOpenEvent() { UIName = Binding.gameObject.name });
@@ -195,7 +203,7 @@ namespace EFrameWork.Runtime.UI
             if (m_disposed) return;
 
             // 从栈中移除（如果在栈中）
-            EFrame.UI.RemoveFromStack(this);
+            Context?.UI?.RemoveFromStack(this);
             if (Binding != null)
             {
                 EventBus.Dispatch(new UICloseEvent() { UIName = Binding.gameObject.name });
@@ -215,7 +223,7 @@ namespace EFrameWork.Runtime.UI
                 if (m_usingCache && !string.IsNullOrEmpty(m_assetPath))
                 {
                     // 回收到缓存池
-                    EFrame.UI.RecycleViewToCache(m_assetPath, this);
+                    Context.UI.RecycleViewToCache(m_assetPath, this);
                 }
                 else
                 {
@@ -235,7 +243,7 @@ namespace EFrameWork.Runtime.UI
         {
             if (m_disposed) return;
 
-            EFrame.UI.RemoveFromStack(this);
+            Context?.UI?.RemoveFromStack(this);
 
             if (Binding != null)
             {
@@ -385,8 +393,15 @@ namespace EFrameWork.Runtime.UI
                 throw new ArgumentNullException(nameof(binding));
 
             Binding = binding;
+            BindContext(EFrame.Current);
             ApplyConfig(binding.Config);
             OnBindingSet();
+        }
+
+        public void BindContext(EFrameContext context)
+        {
+            if (context == null) return;
+            Context = context;
         }
 
         /// <summary>

@@ -14,3 +14,5 @@ applyTo:
 - 工具脚本需要显式校验前置条件，例如目标目录是否存在、资源是否已经存在、是否需要覆盖。
 - 如果工具会创建 UI 预制体、场景对象或绑定代码，命名必须与运行时规范对齐：`XxxView.prefab`、`XxxViewController`、`ProcedureXxx`。
 - 优先让编辑器工具服务于规范化迁移，不要继续固化临时命名和过渡目录。
+- 修改初始化向导、Addressables 同步、ResPath 生成、Prefab 模板导入或冷启动生成逻辑时，必须同步检查 AI instructions、skills、manifest、`EFRAME_AI_SETUP.md` 和发布清单。
+- 编辑器工具如果改变业务项目落盘结构或生成代码样式，必须让 `eframe-feature-bootstrap` 和 `eframe-guideline-audit` 的规则继续匹配新的生成结果。

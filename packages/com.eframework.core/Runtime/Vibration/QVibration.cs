@@ -7,7 +7,7 @@ namespace EFrameWork.Runtime.Vibration
     /// <summary>
     /// 震动管理器，提供多种内置震动方案用于不同游戏场景
     /// </summary>
-    public class QVibration
+    public class QVibration : IVibrationService
     {
         public bool IsOn { get; set; }
 

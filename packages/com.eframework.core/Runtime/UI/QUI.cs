@@ -39,13 +39,13 @@ namespace EFrameWork.Runtime.UI
         FitWidth
     }
 
-    public sealed class QUI
+    public sealed class QUI : IUIService
     {
         public EventSystem EventSystem;
         private Dictionary<UILayer, RectTransform> m_uiLayerNodeTable;
-        public RectTransform Root;
+        public RectTransform Root { get; private set; }
         public Canvas RootCanvas;
-        public Camera UICamera;
+        public Camera UICamera { get; private set; }
         public Rect ScreenFitRect { get; private set; }
         public float ScaleFactor { get; private set; }
         public float ScaleFitFactor { get; private set; }
@@ -257,7 +257,7 @@ namespace EFrameWork.Runtime.UI
         /// <summary>
         /// 从栈中移除指定 View（用于 View 直接关闭时同步栈状态）
         /// </summary>
-        internal void RemoveFromStack(BindingViewBase view)
+        public void RemoveFromStack(BindingViewBase view)
         {
             if (view == null || m_viewStack.Count == 0) return;
 
@@ -449,7 +449,7 @@ namespace EFrameWork.Runtime.UI
 
         private void CreateWorldBackgroundUINode()
         {
-            var bgCamera = EFrame.SceneCamera;
+            var bgCamera = EFrame.Current?.SceneCamera;
             if (bgCamera == null) bgCamera = UICamera;
 
             float cameraDistance = 20f;
@@ -529,6 +529,22 @@ namespace EFrameWork.Runtime.UI
         public void SetInteractive(bool isInteractive)
         {
             EventSystem.enabled = isInteractive;
+        }
+
+        public void Dispose()
+        {
+            ClearViewCache();
+            PopAll();
+            if (Root != null)
+            {
+                Object.Destroy(Root.gameObject);
+            }
+
+            m_uiLayerNodeTable?.Clear();
+            Root = null;
+            RootCanvas = null;
+            UICamera = null;
+            EventSystem = null;
         }
 
         #region UIBinding

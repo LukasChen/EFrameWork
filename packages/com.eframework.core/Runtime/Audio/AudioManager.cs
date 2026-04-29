@@ -12,7 +12,7 @@ namespace EFrameWork.Runtime.Audio
     /// - SFX: 统一音频池(上限30)，支持防抖避免短音频连续播放爆音
     /// - Music: 独立2个AudioSource用于crossfade
     /// </summary>
-    public class AudioManager
+    public class AudioManager : IAudioService
     {
         public const string K_musicGroup = "MUSIC";
         public const string K_sfxGroup = "SFX";

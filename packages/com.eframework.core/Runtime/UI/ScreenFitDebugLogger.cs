@@ -4,7 +4,7 @@ namespace EFrameWork.Runtime.UI
 {
     /// <summary>
     /// 屏幕比例/安全区/ScreenFit 调试输出工具。
-    /// 挂到任意场景物体上，在运行时输出 EFrame.UI 的计算结果，方便验证：
+    /// 挂到任意场景物体上，在运行时输出 EFrame.Current.UI 的计算结果，方便验证：
     /// - 宽屏：按高度适配，左右留白（ScreenFitRect 居中且非全宽）
     /// - 长屏：按宽度适配，全屏铺满（ScreenFitRect 全屏且 HeightDelta > 0）
     /// - SafeAreaFitter：以内缩发生在 ScreenFitRect 内为准
@@ -55,13 +55,18 @@ namespace EFrameWork.Runtime.UI
         [ContextMenu("Dump")]
         public void Dump()
         {
-            if (EFrame.UI == null)
+            if (EFrame.Current?.UI == null)
             {
-                Debug.Log("[ScreenFitDebug] EFrame.UI is null");
+                Debug.Log("[ScreenFitDebug] EFrame.Current.UI is null");
                 return;
             }
 
-            var ui = EFrame.UI;
+            var ui = EFrame.Current.UI as QUI;
+            if (ui == null)
+            {
+                Debug.Log("[ScreenFitDebug] UI service is not QUI, detailed validation skipped.");
+                return;
+            }
 
             Debug.Log("================ [ScreenFitDebug] ================");
             Debug.Log($"Screen: {Screen.width}x{Screen.height}, aspect={(float)Screen.width / Screen.height:F4}");

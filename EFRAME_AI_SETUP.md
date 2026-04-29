@@ -2,6 +2,10 @@
 
 这套配置的目标是把 EFrame 的开发规范沉淀成一套可继承的 AI 工作区层。新项目在引入框架后，只要做一次初始化，就能直接获得统一的 Copilot instruction 和 skills。
 
+AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或升级同步流程发生变化时，必须同步检查并更新配套 instructions、skills、manifest 和说明文档，避免业务项目升级后 AI 仍按旧规范生成代码。
+
+架构边界和同步契约见 [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md)。
+
 ## 1. 当前包含的内容
 
 - `.github/copilot-instructions.md`：始终生效的 EFrame 开发总规则
@@ -9,11 +13,13 @@
 - `.github/instructions/*.instructions.md`：按运行时代码、编辑器代码分层附加规则
 - `.github/skills/eframe-feature-bootstrap`：用于新功能骨架搭建和重构收敛
 - `.github/skills/eframe-guideline-audit`：用于规范审查和回归检查
+- `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便项目内查看架构、接入和发布边界
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
 - `tools/Initialize-EFrameBootstrapCode.ps1`：生成最小启动场景/Procedure 占位代码
 - `RESPATH_CONVENTION.md`：资源地址中心类与自动生成规则说明
+- `EFRAME_AI_ARCHITECTURE.md`：AI 协作层架构、命名边界和同步契约
 - `Packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`：Unity 编辑器初始化窗口
 
 ## 2. 新项目初始化方式
@@ -29,9 +35,16 @@
 - 创建推荐目录骨架
 - 目录骨架内容以 `UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 同步框架 AI 基础层到项目 `.github`
+- 同步 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md` 到项目根目录
 - 安装项目侧更新脚本 `tools/Sync-EFrameAIFromFramework.ps1`
 - 生成项目 overlay 模板 `.github/instructions/project-local.instructions.md`
 - 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
+
+脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、AI 文档、项目 updater、项目 overlay 和 bootstrap code 的状态。状态含义：
+
+- `OK`：本次已生成或目标项目中已存在。
+- `SKIP`：用户通过 `-Skip...` 参数主动跳过。
+- `WARN`：预期产物不存在，需要检查前面的脚本输出。
 
 如果你只想同步 AI，不想创建目录骨架，才单独执行 `Initialize-EFrameAI.ps1`。
 
@@ -95,6 +108,8 @@ EFrame Tools/项目初始化向导
 
 执行后，目标项目根目录会得到一套标准 `.github` 配置，VS Code / Copilot 就能按 EFrame 规范工作。
 
+同步过程也会复制 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录，让业务项目内的 instruction 链接和升级说明保持可读。
+
 ## 5. 框架更新后的同步方式
 
 当框架仓库有人提交了 AI 规则更新，其他项目在拉取框架最新代码后，应该执行两步：
@@ -112,6 +127,14 @@ EFrame Tools/项目初始化向导
 ```
 
 `-StatusOnly` 会比较框架仓库 `.github/eframe-ai.manifest.json` 和目标项目 `.github/eframe-ai.manifest.json` 的版本号。只要版本不同，就说明 instruction 或 skills 需要重新同步。
+
+同时，`-StatusOnly` 会输出同步预览，包括：
+
+- 框架托管的根文件、instructions、skills 和 AI 文档
+- 目标项目会保留的 `project-*` instruction / skill overlay
+- 目标项目里已经不存在于框架源的陈旧 `eframe-*` 项，这些只会在 `-Force` 同步时移除
+
+这让业务项目可以先看清升级影响，再决定是否执行 `-Force`。
 
 ## 6. 框架规则和项目规则如何同时生效
 
@@ -163,16 +186,26 @@ EFrame Tools/项目初始化向导
 - `QUI` 层级和 UIController 边界
 - 目录结构、命名规则、资源路径入口
 - 新增统一工作流，例如新玩法模板、配置表接入流程、Addressables 分组策略
+- Runtime 或 Editor 重构改变了推荐写法、生成模板或项目落盘结构
+- 冷启动、AI 同步、项目 updater 或初始化窗口的行为发生变化
 
-只要上述内容导致 `.github/copilot-instructions.md`、`.github/instructions/` 或 `.github/skills/` 发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
+只要上述内容导致 `.github/copilot-instructions.md`、`.github/instructions/`、`.github/skills/`、AI 同步/冷启动工具或 AI setup/release 文档发生变更，就必须同时递增 `.github/eframe-ai.manifest.json` 的 `version`。
 
 ## 9. 推荐维护流程
 
 1. 先更新规范源文档。
 2. 再更新 `.github/copilot-instructions.md` 和对应 `.instructions.md` / `SKILL.md`。
 3. 递增 `.github/eframe-ai.manifest.json` 的版本号。
-4. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
-5. 最后再把这套 `.github` 同步到其他项目。
+4. 执行发布检查脚本：
+
+```powershell
+.\tools\Test-EFrameAIRelease.ps1
+```
+
+5. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
+6. 最后再把这套 `.github` 同步到其他项目。
+
+`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更，并检查框架仓库里是否误放了 `project-*` overlay。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
 
 更严格的发布与升级边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
 

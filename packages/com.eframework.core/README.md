@@ -9,6 +9,57 @@ EFrameWork Core is a reusable Unity game framework package extracted from `CozyB
 - `Plugins/`: remaining bundled third-party dependencies that still ship with this package.
 - `Samples~/`: sample assets imported from the source project.
 
+Bundled plugin versions:
+
+- UniTask `2.5.10`
+
+## Runtime Access Model
+
+EFrameWork now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
+
+```csharp
+EFrame.Current.UI.SetInteractive(false);
+EFrame.Current.Audio.PlaySfx(clickClip);
+var playerData = EFrame.Current.Data.GetTable<PlayerDataTable>();
+```
+
+Framework-created views, controllers, and `EFrameBehaviour` components receive the active context automatically:
+
+```csharp
+public sealed class HomeController : UIControllerBase<HomeView>
+{
+    protected override string AssetPath => ResPath.Generated.UI.HomeView;
+
+    protected override void OnViewCreated()
+    {
+        Context.Audio.PlaySfx("Audio/UI/Open");
+    }
+}
+```
+
+Legacy direct service statics such as `EFrame.UI`, `EFrame.Audio`, and `EFrame.DataManager` have been removed. Use `EFrame.Current.UI`, `EFrame.Current.Audio`, `EFrame.Current.Data`, or the injected `Context` property from framework base classes.
+
+## Resource Lifetime
+
+New resource service APIs are asynchronous and return explicit handles:
+
+```csharp
+var handle = await EFrame.Current.Assets.LoadAsync<GameObject>("UI/HomeView");
+try
+{
+    var prefab = handle.Asset;
+}
+finally
+{
+    handle.Dispose();
+}
+
+var instance = await EFrame.Current.Assets.InstantiateAsync("Effects/CoinFly", parent);
+instance.Dispose();
+```
+
+Older synchronous `AssetManager` helpers remain as transitional APIs for existing internals, but new code should prefer `EFrame.Current.Assets`.
+
 ## Install
 
 Use Unity Package Manager with this Git repository, targeting this package path:

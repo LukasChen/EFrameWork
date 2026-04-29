@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,11 +16,12 @@ namespace EFrameWork.Runtime.Asset
     /// - 提供 Addressables 资源的同步加载、实例化、对象池管理
     /// - 支持两种对象池：AssetReference 池和 Path 池
     /// </summary>
-    public sealed class AssetManager
+    public sealed class AssetManager : IAssetService
     {
         private static Dictionary<AssetReferenceGameObject, Stack<GameObject>> m_pools = new();
         private static Dictionary<string, Stack<GameObject>> m_pathPools = new();
         public static bool Initialized { get; private set; }
+        bool IAssetService.Initialized => Initialized;
 
         #region 初始化
 
@@ -27,6 +29,7 @@ namespace EFrameWork.Runtime.Asset
         /// 初始化是否失败
         /// </summary>
         public static bool InitializeFailed { get; private set; }
+        bool IAssetService.InitializeFailed => InitializeFailed;
 
         /// <summary>
         /// 初始化 Addressables 系统
@@ -73,6 +76,145 @@ namespace EFrameWork.Runtime.Asset
                 Debug.LogError($"[AssetManager] 初始化失败: {handle.OperationException}");
                 InitializeFailed = true;
             }
+        }
+
+        public async UniTask<bool> InitializeAsync()
+        {
+            if (Initialized) return true;
+
+            Initialized = false;
+            InitializeFailed = false;
+
+            AsyncOperationHandle<UnityEngine.AddressableAssets.ResourceLocators.IResourceLocator> handle;
+            try
+            {
+                handle = Addressables.InitializeAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[AssetManager] Addressables.InitializeAsync exception: {e.Message}");
+                InitializeFailed = true;
+                return false;
+            }
+
+            while (handle.IsValid() && !handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (!handle.IsValid() || handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Initialized = true;
+                return true;
+            }
+
+            Debug.LogError($"[AssetManager] Addressables initialization failed: {handle.OperationException}");
+            InitializeFailed = true;
+            return false;
+        }
+
+        public async UniTask<AssetHandle<T>> LoadAsync<T>(string assetId) where T : Object
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                Debug.LogError("[AssetManager] LoadAsync failed: assetId is empty.");
+                return default;
+            }
+
+            var handle = Addressables.LoadAssetAsync<T>(assetId);
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[AssetManager] LoadAsync failed: {assetId} - {handle.OperationException}");
+                if (handle.IsValid()) Addressables.Release(handle);
+                return default;
+            }
+
+            return new AssetHandle<T>(handle);
+        }
+
+        public async UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object
+        {
+            if (reference == null)
+            {
+                Debug.LogError("[AssetManager] LoadAsync failed: reference is null.");
+                return default;
+            }
+
+            var handle = Addressables.LoadAssetAsync<T>(reference);
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[AssetManager] LoadAsync failed: {reference.RuntimeKey} - {handle.OperationException}");
+                if (handle.IsValid()) Addressables.Release(handle);
+                return default;
+            }
+
+            return new AssetHandle<T>(handle);
+        }
+
+        public async UniTask<InstanceHandle> InstantiateAsync(string assetId, Transform parent = null)
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                Debug.LogError("[AssetManager] InstantiateAsync failed: assetId is empty.");
+                return default;
+            }
+
+            var handle = parent == null
+                ? Addressables.InstantiateAsync(assetId)
+                : Addressables.InstantiateAsync(assetId, parent);
+
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[AssetManager] InstantiateAsync failed: {assetId} - {handle.OperationException}");
+                if (handle.IsValid()) Addressables.Release(handle);
+                return default;
+            }
+
+            EFrame.Current?.InjectInto(handle.Result);
+            return new InstanceHandle(handle);
+        }
+
+        public async UniTask<InstanceHandle> InstantiateAsync(AssetReferenceGameObject reference, Transform parent = null)
+        {
+            if (reference == null)
+            {
+                Debug.LogError("[AssetManager] InstantiateAsync failed: reference is null.");
+                return default;
+            }
+
+            var handle = parent == null
+                ? Addressables.InstantiateAsync(reference)
+                : Addressables.InstantiateAsync(reference, parent);
+
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[AssetManager] InstantiateAsync failed: {reference.RuntimeKey} - {handle.OperationException}");
+                if (handle.IsValid()) Addressables.Release(handle);
+                return default;
+            }
+
+            EFrame.Current?.InjectInto(handle.Result);
+            return new InstanceHandle(handle);
         }
 
         /// <summary>
@@ -199,6 +341,17 @@ namespace EFrameWork.Runtime.Asset
             GC.Collect();
         }
 
+        public void ReleaseUnusedAssets()
+        {
+            UnloadUnusedAssets();
+        }
+
+        private static GameObject BindInstance(GameObject go)
+        {
+            EFrame.Current?.InjectInto(go);
+            return go;
+        }
+
         #endregion
 
         #region 实例化 (Path)
@@ -210,7 +363,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath)
         {
-            return Addressables.InstantiateAsync(assetPath).WaitForCompletion();
+            return BindInstance(Addressables.InstantiateAsync(assetPath).WaitForCompletion());
         }
 
         /// <summary>
@@ -221,7 +374,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath, Transform parent)
         {
-            return Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion();
+            return BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
         }
 
         /// <summary>
@@ -233,7 +386,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath, Transform parent, float destroyTime)
         {
-            var go = Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion();
+            var go = BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -246,7 +399,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath, float destroyTime)
         {
-            var go = Addressables.InstantiateAsync(assetPath).WaitForCompletion();
+            var go = BindInstance(Addressables.InstantiateAsync(assetPath).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -260,7 +413,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath, Vector3 pos, float destroyTime)
         {
-            var go = Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion();
+            var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -275,7 +428,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(string assetPath, Transform parent, Vector3 pos, float destroyTime)
         {
-            var go = Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity, parent).WaitForCompletion();
+            var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -317,7 +470,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(AssetReferenceGameObject reference, float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -331,7 +484,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference, pos, Quaternion.identity).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -346,7 +499,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference, pos, quaternion).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -360,7 +513,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference, parent).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -375,7 +528,7 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>实例化的 GameObject</returns>
         public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference, pos, Quaternion.identity, parent).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -392,7 +545,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, Quaternion quaternion,
             float destroyTime = 0)
         {
-            GameObject go = Addressables.InstantiateAsync(reference, pos, quaternion, parent).WaitForCompletion();
+            GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
             return go;
         }
@@ -513,7 +666,7 @@ namespace EFrameWork.Runtime.Asset
             }
             else
             {
-                go = Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion();
+                go = BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
                 go.transform.localScale = Vector3.one;
                 go.transform.position = pos;
                 go.transform.rotation = Quaternion.identity;
@@ -521,7 +674,7 @@ namespace EFrameWork.Runtime.Asset
 
             if (recycleTime > 0)
             {
-                EFrame.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
+                EFrame.Current?.Coroutine?.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
             }
             return go;
         }
@@ -545,12 +698,12 @@ namespace EFrameWork.Runtime.Asset
             }
             else
             {
-                go = Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion();
+                go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion());
             }
 
             if (recycleTime > 0)
             {
-                EFrame.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
+                EFrame.Current?.Coroutine?.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
             }
             return go;
         }
@@ -841,6 +994,14 @@ namespace EFrameWork.Runtime.Asset
                 kvp.Value.Clear();
             }
             m_pools.Clear();
+        }
+
+        public void Dispose()
+        {
+            ReleaseAllPools();
+            ReleaseAllPathPools();
+            Initialized = false;
+            InitializeFailed = false;
         }
 
         #endregion

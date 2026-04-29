@@ -16,3 +16,5 @@ applyTo:
 - 使用 Addressables 动态加载时，优先依赖 `ResPath.Generated`、稳定入口 `ResPath` 或 `AssetReference`，不要直接把完整地址写进业务逻辑。
 - 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成，再访问 `EFrame.UI`、`EFrame.Audio`、`EFrame.DataManager` 等框架服务。
 - 如果项目仍处于过渡目录结构，新增功能优先朝标准目录收敛，而不是继续堆临时脚本和临时资源路径。
+- 修改 `EFrame`、`EFrameComponent`、`Procedure`、`QUI`、`UIController`、`ResPath`、Addressables 或资源目录约定时，必须同步检查 `.github` instructions、skills、冷启动模板和 setup 文档是否需要更新。
+- 如果 Runtime 重构改变了业务项目应该如何冷启动、加载资源、创建 UI 或组织流程，必须在同一变更中更新 AI 协作层并 bump `.github/eframe-ai.manifest.json`。

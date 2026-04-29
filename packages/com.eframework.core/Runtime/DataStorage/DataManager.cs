@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace EFrameWork.Runtime.DataStorage
 {
-    public sealed class DataManager : IDisposable
+    public sealed class DataManager : IDataService
     {
         private IDataStorage m_storage;
         private Dictionary<string, IDataTable> m_tables = new();

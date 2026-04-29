@@ -765,7 +765,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.FlySoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.FlySoundPlayed) return;
 
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Audio == null) return;
+            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
             seq.FlySoundPlayed = true;
 
@@ -779,7 +779,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.ArriveSoundPlayed) return;
 
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Audio == null) return;
+            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
             seq.ArriveSoundPlayed = true;
 
@@ -790,7 +790,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.FlySoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Audio == null) return;
+            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.FlySoundAsset);
         }
@@ -799,7 +799,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Audio == null) return;
+            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.ArriveSoundAsset);
         }
@@ -807,7 +807,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         private static bool TryPlayAudio(AssetReferenceT<AudioClipAsset> audioClipAssetRef)
         {
             // 音量总开关
-            if (EFrameWork.Runtime.EFrame.Audio != null && !EFrameWork.Runtime.EFrame.Audio.SoundOn)
+            if (EFrameWork.Runtime.EFrame.Current?.Audio != null && !EFrameWork.Runtime.EFrame.Current.Audio.SoundOn)
             {
                 return false;
             }
@@ -819,7 +819,7 @@ namespace EFrameWork.Runtime.Effect.Fly
                     var clipAsset = ResolveAudioClipAsset(audioClipAssetRef);
                     if (clipAsset != null)
                     {
-                        EFrameWork.Runtime.EFrame.Audio.PlayAudioClipAsset(clipAsset);
+                        EFrameWork.Runtime.EFrame.Current.Audio.PlayAudioClipAsset(clipAsset);
                         return true;
                     }
                 }
