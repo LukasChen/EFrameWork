@@ -1,0 +1,6 @@
+{
+  "name": "eframe-ai-workspace",
+  "version": "0.1.41",
+  "updatedAt": "2026-04-29",
+  "notes": "Internal sync marker for EFrameWork AI rules updated with the repo-level AGENTS.md Codex entry point, the handle-first UI lifecycle contract, and cold-start AudioEvent config generation."
+}

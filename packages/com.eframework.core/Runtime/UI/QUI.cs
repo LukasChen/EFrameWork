@@ -1,7 +1,6 @@
 ﻿using EFrameWork.Runtime.Asset;
 using EFrameWork.Runtime.UI.Handles;
 using EFrameWork.Runtime.UI.Transitions;
-using EFrameWork.Runtime.Utils;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -44,6 +43,8 @@ namespace EFrameWork.Runtime.UI
 
     public sealed class QUI : IUIService
     {
+        private const string DefaultLayerName = "Default";
+        private const string UiLayerName = "UI";
         private readonly IUIViewTransition m_defaultTransition = new ScaleFadeViewTransition();
 
         public EventSystem EventSystem;
@@ -141,7 +142,7 @@ namespace EFrameWork.Runtime.UI
 
             if (m_viewCache[assetPath].Count >= MaxCachedViewsPerAsset)
             {
-                Object.Destroy(binding.gameObject);
+                AssetManager.ReleaseInstance(binding.gameObject);
                 return;
             }
 
@@ -164,7 +165,7 @@ namespace EFrameWork.Runtime.UI
                     {
                         if (binding != null)
                         {
-                            Object.Destroy(binding.gameObject);
+                            AssetManager.ReleaseInstance(binding.gameObject);
                         }
                     }
                     kvp.Value.Clear();
@@ -177,7 +178,7 @@ namespace EFrameWork.Runtime.UI
                 {
                     if (binding != null)
                     {
-                        Object.Destroy(binding.gameObject);
+                        AssetManager.ReleaseInstance(binding.gameObject);
                     }
                 }
                 stack.Clear();
@@ -318,7 +319,7 @@ namespace EFrameWork.Runtime.UI
             Root = rootObject.AddComponent<RectTransform>();
             Object.DontDestroyOnLoad(rootObject);
 
-            rootObject.layer = (int)GameLayer.UI;
+            rootObject.layer = ResolveLayerOrDefault(UiLayerName);
             RootCanvas = rootObject.AddComponent<Canvas>();
             EventSystem = rootObject.AddComponent<EventSystem>();
             AddInputModule(rootObject);
@@ -444,6 +445,18 @@ namespace EFrameWork.Runtime.UI
             }
         }
 
+        private static int ResolveLayerOrDefault(string layerName)
+        {
+            int layer = LayerMask.NameToLayer(layerName);
+            if (layer >= 0)
+            {
+                return layer;
+            }
+
+            Debug.LogWarning($"QUI: Unity Layer '{layerName}' is missing. Falling back to '{DefaultLayerName}'. Configure the project layer if you need a dedicated UI layer.");
+            return LayerMask.NameToLayer(DefaultLayerName);
+        }
+
         private void CreateUILayers()
         {
             m_uiLayerNodeTable = new Dictionary<UILayer, RectTransform>();
@@ -459,7 +472,7 @@ namespace EFrameWork.Runtime.UI
                 }
 
                 GameObject layerObject = new(layer);
-                layerObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+                layerObject.layer = ResolveLayerOrDefault(UiLayerName);
                 RectTransform layerNode = layerObject.AddComponent<RectTransform>();
                 Canvas layerCanvas = layerObject.AddComponent<Canvas>();
                 layerObject.AddComponent<GraphicRaycaster>();
@@ -507,7 +520,7 @@ namespace EFrameWork.Runtime.UI
             // ========== 第一层：Canvas（完全覆盖相机视野）==========
             string canvasName = "BackgroundCanvas";
             GameObject canvasObject = new(canvasName);
-            canvasObject.layer = (int)GameLayer.Default;
+            canvasObject.layer = LayerMask.NameToLayer(DefaultLayerName);
 
             RectTransform canvasRect = canvasObject.AddComponent<RectTransform>();
             Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -531,7 +544,7 @@ namespace EFrameWork.Runtime.UI
             // ========== 第二层：BackgroundLayer（屏幕比例适配）==========
             string layerName = UI.UILayer.QuiBackground.ToString();
             GameObject layerObject = new(layerName);
-            layerObject.layer = (int)GameLayer.Default;
+            layerObject.layer = LayerMask.NameToLayer(DefaultLayerName);
 
             RectTransform bgNode = layerObject.AddComponent<RectTransform>();
             bgNode.SetParent(canvasRect, false);
@@ -614,7 +627,7 @@ namespace EFrameWork.Runtime.UI
             var context = EFrame.Current;
             if (context == null)
             {
-                Object.Destroy(go);
+                AssetManager.ReleaseInstance(go);
                 throw new InvalidOperationException($"QUI.CreateBinding requires EFrame.Initialize() to complete before creating UI views. AssetPath: {assetPath}");
             }
 
@@ -626,7 +639,7 @@ namespace EFrameWork.Runtime.UI
                 return uiBinding;
             }
 
-            Object.Destroy(go);
+            AssetManager.ReleaseInstance(go);
             throw new ArgumentException($"The instantiated GameObject from path '{assetPath}' does not contain a QUIBinding component.");
         }
 
@@ -664,7 +677,7 @@ namespace EFrameWork.Runtime.UI
                 return;
             }
 
-            Object.Destroy(binding.gameObject);
+            AssetManager.ReleaseInstance(binding.gameObject);
         }
 
         public UniTask PlayOpenTransitionAsync(BindingViewBase view)

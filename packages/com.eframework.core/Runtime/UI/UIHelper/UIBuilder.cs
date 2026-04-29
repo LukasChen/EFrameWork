@@ -1,4 +1,3 @@
-using EFrameWork.Runtime.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -16,6 +15,21 @@ namespace EFrameWork.Runtime.UI.UIHelper
 
     public sealed class UIBuilder
     {
+        private const string DefaultLayerName = "Default";
+        private const string UiLayerName = "UI";
+
+        private static int ResolveLayerOrDefault(string layerName)
+        {
+            int layer = LayerMask.NameToLayer(layerName);
+            if (layer >= 0)
+            {
+                return layer;
+            }
+
+            Debug.LogWarning($"UIBuilder: Unity Layer '{layerName}' is missing. Falling back to '{DefaultLayerName}'.");
+            return LayerMask.NameToLayer(DefaultLayerName);
+        }
+
         public static RectTransform CreateStretchRectTransform(string name, Transform parent)
         {
             var rectTransform = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
@@ -25,7 +39,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
             rectTransform.offsetMin = Vector2.zero; // Left, Bottom
             rectTransform.offsetMax = Vector2.zero; // Right, Top
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            rectTransform.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             return rectTransform;
         }
 
@@ -47,7 +61,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
             rectTransform.offsetMax = Vector2.zero; // Right, Top
             rectTransform.pivot = new Vector2(0.5f, 0.5f);
             panel.transform.SetParent(parent, false);
-            panel.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            panel.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             return rectTransform;
         }
 
@@ -65,7 +79,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
             textObject.color = color == default ? Color.black : color;
             textObject.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             textObject.fontSize = 24; // Use a default font
-            textObject.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            textObject.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             return textObject;
         }
 
@@ -73,7 +87,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
         {
             var button = new GameObject(name, typeof(RectTransform), typeof(Image)).AddComponent<Button>();
             button.transform.SetParent(parent, false);
-            button.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            button.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
             button.onClick.AddListener(onClick);
 
@@ -89,7 +103,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
             text.color = Color.black; // Set text color to black
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24; // Use a default font
-            text.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            text.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             return button;
         }
 
@@ -97,7 +111,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
         {
             // 创建 ScrollRect GameObject
             var go = new GameObject("ScrollRect", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(ScrollRect), typeof(Mask));
-            go.gameObject.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            go.gameObject.layer = ResolveLayerOrDefault(UiLayerName);
             go.transform.SetParent(parent, false);
             // 设置 ScrollRect 大小
             RectTransform scrollRectTrans = go.GetComponent<RectTransform>();
@@ -108,7 +122,7 @@ namespace EFrameWork.Runtime.UI.UIHelper
 
             // 创建 Content GameObject
             GameObject contentGO = new GameObject("Content", typeof(RectTransform));
-            contentGO.layer = (int)GameLayer.UI; //LayerMask.NameToLayer("UI");
+            contentGO.layer = ResolveLayerOrDefault(UiLayerName);
             contentGO.transform.SetParent(scrollRectTrans, false);
 
             RectTransform contentRect = contentGO.GetComponent<RectTransform>();

@@ -3,7 +3,6 @@ using EFrameWork.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -20,8 +19,9 @@ namespace EFrameWork.Runtime.Asset
     {
         private const int DefaultMaxPoolSizePerKey = 32;
 
-        private static Dictionary<AssetReferenceGameObject, Stack<GameObject>> m_pools = new();
+        private static Dictionary<string, Stack<GameObject>> m_pools = new();
         private static Dictionary<string, Stack<GameObject>> m_pathPools = new();
+        private static Dictionary<GameObject, int> m_poolLeaseVersions = new();
         public static bool Initialized { get; private set; }
         bool IAssetService.Initialized => Initialized;
         public static int MaxPoolSizePerKey { get; set; } = DefaultMaxPoolSizePerKey;
@@ -373,6 +373,52 @@ namespace EFrameWork.Runtime.Asset
             return go;
         }
 
+        public static void ReleaseInstance(GameObject go)
+        {
+            ReleasePooledInstance(go);
+        }
+
+        private static void ReleaseInstance(GameObject go, float delay)
+        {
+            if (go == null) return;
+
+            if (delay <= 0)
+            {
+                ReleaseInstance(go);
+                return;
+            }
+
+            ReleaseInstanceAsync(go, delay).Forget();
+        }
+
+        private static async UniTaskVoid ReleaseInstanceAsync(GameObject go, float delay)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            ReleaseInstance(go);
+        }
+
+        private static string GetPoolKey(AssetReferenceGameObject assetReference)
+        {
+            return assetReference?.RuntimeKey?.ToString();
+        }
+
+        private static int RegisterPoolLease(GameObject go)
+        {
+            if (go == null) return 0;
+
+            m_poolLeaseVersions.TryGetValue(go, out var version);
+            version++;
+            m_poolLeaseVersions[go] = version;
+            return version;
+        }
+
+        private static bool IsCurrentPoolLease(GameObject go, int version)
+        {
+            return go != null
+                && m_poolLeaseVersions.TryGetValue(go, out var currentVersion)
+                && currentVersion == version;
+        }
+
         #endregion
 
         #region 实例化 (Path)
@@ -408,7 +454,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(string assetPath, Transform parent, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -421,7 +467,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(string assetPath, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -435,7 +481,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(string assetPath, Vector3 pos, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -450,7 +496,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(string assetPath, Transform parent, Vector3 pos, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity, parent).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -492,7 +538,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -506,7 +552,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -521,7 +567,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -535,7 +581,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, parent).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -550,7 +596,7 @@ namespace EFrameWork.Runtime.Asset
         public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity, parent).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -567,7 +613,7 @@ namespace EFrameWork.Runtime.Asset
             float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion, parent).WaitForCompletion());
-            if (go != null && destroyTime > 0) Object.Destroy(go, destroyTime);
+            if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
             return go;
         }
 
@@ -693,9 +739,10 @@ namespace EFrameWork.Runtime.Asset
                 go.transform.rotation = Quaternion.identity;
             }
 
+            var leaseVersion = RegisterPoolLease(go);
             if (recycleTime > 0)
             {
-                EFrame.Current?.Coroutine?.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
+                RecycleToPool(assetPath, go, recycleTime, leaseVersion).Forget();
             }
             return go;
         }
@@ -722,11 +769,21 @@ namespace EFrameWork.Runtime.Asset
                 go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion());
             }
 
+            var leaseVersion = RegisterPoolLease(go);
             if (recycleTime > 0)
             {
-                EFrame.Current?.Coroutine?.DelayCall(recycleTime, () => { RecycleToPool(assetPath, go); });
+                RecycleToPool(assetPath, go, recycleTime, leaseVersion).Forget();
             }
             return go;
+        }
+
+        private static async UniTaskVoid RecycleToPool(string assetPath, GameObject go, float recycleTime, int leaseVersion)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(recycleTime));
+            if (IsCurrentPoolLease(go, leaseVersion))
+            {
+                RecycleToPool(assetPath, go);
+            }
         }
 
         /// <summary>
@@ -737,6 +794,7 @@ namespace EFrameWork.Runtime.Asset
         public static void RecycleToPool(string assetPath, GameObject go)
         {
             if (go == null) return;
+            RegisterPoolLease(go);
             if (!m_pathPools.ContainsKey(assetPath)) m_pathPools.Add(assetPath, new Stack<GameObject>());
 
             if (m_pathPools[assetPath].Count >= MaxPoolSizePerKey)
@@ -794,14 +852,24 @@ namespace EFrameWork.Runtime.Asset
         /// <returns>池中的 GameObject</returns>
         public static GameObject GetFromPool(AssetReferenceGameObject assetReference)
         {
-            if (m_pools.ContainsKey(assetReference) && m_pools[assetReference].Count > 0)
+            var key = GetPoolKey(assetReference);
+            if (string.IsNullOrEmpty(key))
             {
-                GameObject go = m_pools[assetReference].Pop();
+                Debug.LogError("[AssetManager] GetFromPool failed: assetReference is null or has no runtime key.");
+                return null;
+            }
+
+            if (m_pools.ContainsKey(key) && m_pools[key].Count > 0)
+            {
+                GameObject go = m_pools[key].Pop();
                 go.SetActive(true);
+                RegisterPoolLease(go);
                 return go;
             }
 
-            return Instantiate(assetReference);
+            var created = Instantiate(assetReference);
+            RegisterPoolLease(created);
+            return created;
         }
 
         /// <summary>
@@ -971,8 +1039,18 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="recycleTime">延迟时间 (秒)</param>
         public static async UniTask RecycleToPool(AssetReferenceGameObject assetReference, GameObject go, float recycleTime)
         {
+            if (go == null) return;
+
+            if (!m_poolLeaseVersions.TryGetValue(go, out var leaseVersion))
+            {
+                leaseVersion = RegisterPoolLease(go);
+            }
+
             await UniTask.Delay(TimeSpan.FromSeconds(recycleTime));
-            RecycleToPool(assetReference, go);
+            if (IsCurrentPoolLease(go, leaseVersion))
+            {
+                RecycleToPool(assetReference, go);
+            }
         }
 
         /// <summary>
@@ -983,9 +1061,17 @@ namespace EFrameWork.Runtime.Asset
         public static void RecycleToPool(AssetReferenceGameObject assetReference, GameObject go)
         {
             if (go == null) return;
-            if (!m_pools.ContainsKey(assetReference)) m_pools.Add(assetReference, new Stack<GameObject>());
+            var key = GetPoolKey(assetReference);
+            if (string.IsNullOrEmpty(key))
+            {
+                ReleasePooledInstance(go);
+                return;
+            }
 
-            if (m_pools[assetReference].Count >= MaxPoolSizePerKey)
+            RegisterPoolLease(go);
+            if (!m_pools.ContainsKey(key)) m_pools.Add(key, new Stack<GameObject>());
+
+            if (m_pools[key].Count >= MaxPoolSizePerKey)
             {
                 ReleasePooledInstance(go);
                 return;
@@ -993,7 +1079,7 @@ namespace EFrameWork.Runtime.Asset
 
             go.transform.SetParent(null, false);
             go.SetActive(false);
-            m_pools[assetReference].Push(go);
+            m_pools[key].Push(go);
         }
 
         /// <summary>
@@ -1002,14 +1088,17 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetReference">资源引用</param>
         public static void ReleasePool(AssetReferenceGameObject assetReference)
         {
-            if (m_pools.TryGetValue(assetReference, out var pool))
+            var key = GetPoolKey(assetReference);
+            if (string.IsNullOrEmpty(key)) return;
+
+            if (m_pools.TryGetValue(key, out var pool))
             {
                 foreach (GameObject go in pool)
                 {
                     ReleasePooledInstance(go);
                 }
                 pool.Clear();
-                m_pools.Remove(assetReference);
+                m_pools.Remove(key);
             }
         }
 
@@ -1039,6 +1128,7 @@ namespace EFrameWork.Runtime.Asset
         {
             if (go == null) return;
 
+            m_poolLeaseVersions.Remove(go);
             if (!Addressables.ReleaseInstance(go))
             {
                 Object.Destroy(go);
@@ -1049,6 +1139,7 @@ namespace EFrameWork.Runtime.Asset
         {
             ReleaseAllPools();
             ReleaseAllPathPools();
+            m_poolLeaseVersions.Clear();
             Initialized = false;
             InitializeFailed = false;
         }

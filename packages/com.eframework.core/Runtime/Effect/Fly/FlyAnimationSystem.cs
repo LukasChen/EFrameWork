@@ -703,7 +703,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             // Destroy 模式：不回收到池，直接销毁实例。
             if (item.DisposeMode == FlyInstanceDisposeMode.Destroy)
             {
-                UnityEngine.Object.Destroy(item.Go);
+                AssetManager.ReleaseInstance(item.Go);
                 return;
             }
 
@@ -716,7 +716,7 @@ namespace EFrameWork.Runtime.Effect.Fly
                 return;
             }
 
-            UnityEngine.Object.Destroy(item.Go);
+            AssetManager.ReleaseInstance(item.Go);
         }
 
         private static FlySequence GetSequence()
