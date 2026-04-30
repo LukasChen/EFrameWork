@@ -4,6 +4,28 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-30
+
+### Added
+
+- Added Procedure-owned asset preload scopes via `EFrameProcedure.OnPreloadAsync(...)` so resources can load before `OnEnter` and release automatically on Procedure leave.
+- Added `IAssetPreloadScope` and asset preload cache APIs to `IAssetService`, with cached instantiate and path-pool hot paths backed by fallback diagnostics.
+- Added runtime audio clip asset preloading, release, and one-time warnings when SFX plays before preload.
+
+### Changed
+
+- Shifted the runtime resource contract to asset ids and `Context.Assets`, keeping `AssetReference` as an editor-authoring concern rather than a runtime business API.
+- Updated `QUI` and Fly animation spawning to instantiate through the asset service so UI, effects, and fly prefabs participate in Procedure preload caches.
+- Refactored `FlyAnimationConfig` to store runtime asset ids for fly prefabs, effects, and audio, while its editor keeps drag-and-resolve authoring.
+- Updated cold-start and module scaffolds so generated Procedures preload their main UI before entering.
+- Reduced public `AssetManager` static synchronous and `AssetReference` APIs to internal fallback helpers.
+- Updated synced AI/runtime/resource guidance and bumped the AI manifest for the new Procedure preload and asset-id resource contract.
+
+### Fixed
+
+- Stabilized data table lookup by keying registered tables by type instead of short type name.
+- Hardened coroutine helpers against null, negative, invalid, and disposed-state inputs.
+
 ## [0.3.0] - 2026-04-30
 
 ### Added

@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace EFrameWork.Runtime.Audio
@@ -15,6 +16,8 @@ namespace EFrameWork.Runtime.Audio
         void SetMusicVolume(float volume);
         void SetSfxVolume(float volume);
         void PlayAudioAsset(string assetPath);
+        UniTask<bool> PreloadAudioClipAssetAsync(AudioClipAsset audioClipAsset);
+        void ReleaseAudioClipAsset(AudioClipAsset audioClipAsset);
         void PlayAudioClipAsset(AudioClipAsset audioClipAsset);
         void PlaySfx(string assetPath, float volume = 1f, float pitch = 1f);
         void PlaySfx(AudioClip audioClip, float volume = 1f, float pitch = 1f);

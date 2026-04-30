@@ -8,7 +8,7 @@ namespace EFrameWork.Runtime.DataStorage
     public sealed class DataManager : IDataService
     {
         private readonly IDataStorage m_storage;
-        private readonly Dictionary<string, IDataTable> m_tables = new();
+        private readonly Dictionary<Type, IDataTable> m_tables = new();
         private readonly Dictionary<string, string> m_storageKeys = new();
         private bool m_disposed;
 
@@ -62,12 +62,14 @@ namespace EFrameWork.Runtime.DataStorage
         {
             ThrowIfDisposed();
 
+            Type tableType = typeof(T);
             var table = new T();
             table.SetDataStorage(m_storage);
             string key = table.Key;
             string storageKey = table.StorageKey;
+            string tableIdentity = tableType.FullName ?? key;
 
-            if (m_tables.TryGetValue(key, out var existingTable))
+            if (m_tables.TryGetValue(tableType, out var existingTable))
             {
                 table.Dispose();
                 return (T)existingTable;
@@ -85,8 +87,8 @@ namespace EFrameWork.Runtime.DataStorage
                 throw new InvalidOperationException($"DataTable '{key}' cannot reuse StorageKey '{storageKey}' because it is already used by '{existingTableKey}'.");
             }
 
-            m_tables.Add(key, table);
-            m_storageKeys.Add(storageKey, key);
+            m_tables.Add(tableType, table);
+            m_storageKeys.Add(storageKey, tableIdentity);
             table.Load();
 
             Debug.Log($"{key} registered successfully.");
@@ -98,10 +100,9 @@ namespace EFrameWork.Runtime.DataStorage
             ThrowIfDisposed();
 
             Type tableType = typeof(T);
-            string key = tableType.Name;
-            if (m_tables.TryGetValue(key, out IDataTable table)) return (T)table;
+            if (m_tables.TryGetValue(tableType, out IDataTable table)) return (T)table;
 
-            Debug.LogError($"{key} is not registered.");
+            Debug.LogError($"{tableType.FullName} is not registered.");
             return default;
         }
 

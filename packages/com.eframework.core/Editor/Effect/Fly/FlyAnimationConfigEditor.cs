@@ -1,5 +1,6 @@
 using EFrameWork.Runtime.Effect.Fly;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
 using UnityEngine;
 
 namespace EFrameWork.Editor.Effect.Fly
@@ -7,7 +8,8 @@ namespace EFrameWork.Editor.Effect.Fly
     [CustomEditor(typeof(FlyAnimationConfig))]
     public sealed class FlyAnimationConfigEditor : UnityEditor.Editor
     {
-        private SerializedProperty m_prefabRef;
+        private SerializedProperty m_prefabAsset;
+        private SerializedProperty m_prefabAssetId;
 
         private SerializedProperty m_pathType;
         private SerializedProperty m_duration;
@@ -34,17 +36,22 @@ namespace EFrameWork.Editor.Effect.Fly
 
         private SerializedProperty m_flySoundMode;
         private SerializedProperty m_flySoundAsset;
+        private SerializedProperty m_flySoundAssetId;
         private SerializedProperty m_arriveSoundMode;
         private SerializedProperty m_arriveSoundAsset;
+        private SerializedProperty m_arriveSoundAssetId;
 
         private SerializedProperty m_startEffect;
+        private SerializedProperty m_startEffectAssetId;
         private SerializedProperty m_startEffectDestroyTime;
         private SerializedProperty m_endEffect;
+        private SerializedProperty m_endEffectAssetId;
         private SerializedProperty m_endEffectDestroyTime;
 
         private void OnEnable()
         {
-            m_prefabRef = serializedObject.FindProperty("PrefabReference");
+            m_prefabAsset = serializedObject.FindProperty("m_prefabAsset");
+            m_prefabAssetId = serializedObject.FindProperty("m_prefabAssetId");
 
             m_pathType = serializedObject.FindProperty("PathType");
             m_duration = serializedObject.FindProperty("Duration");
@@ -70,13 +77,17 @@ namespace EFrameWork.Editor.Effect.Fly
             m_maxVisual = serializedObject.FindProperty("MaxVisualCount");
 
             m_flySoundMode = serializedObject.FindProperty("FlySoundMode");
-            m_flySoundAsset = serializedObject.FindProperty("FlySoundAsset");
+            m_flySoundAsset = serializedObject.FindProperty("m_flySoundAsset");
+            m_flySoundAssetId = serializedObject.FindProperty("m_flySoundAssetId");
             m_arriveSoundMode = serializedObject.FindProperty("ArriveSoundMode");
-            m_arriveSoundAsset = serializedObject.FindProperty("ArriveSoundAsset");
+            m_arriveSoundAsset = serializedObject.FindProperty("m_arriveSoundAsset");
+            m_arriveSoundAssetId = serializedObject.FindProperty("m_arriveSoundAssetId");
 
-            m_startEffect = serializedObject.FindProperty("StartEffect");
+            m_startEffect = serializedObject.FindProperty("m_startEffectAsset");
+            m_startEffectAssetId = serializedObject.FindProperty("m_startEffectAssetId");
             m_startEffectDestroyTime = serializedObject.FindProperty("StartEffectDestroyTime");
-            m_endEffect = serializedObject.FindProperty("EndEffect");
+            m_endEffect = serializedObject.FindProperty("m_endEffectAsset");
+            m_endEffectAssetId = serializedObject.FindProperty("m_endEffectAssetId");
             m_endEffectDestroyTime = serializedObject.FindProperty("EndEffectDestroyTime");
         }
 
@@ -103,7 +114,7 @@ namespace EFrameWork.Editor.Effect.Fly
         private void DrawAssetBlock()
         {
             EditorGUILayout.LabelField("Asset", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(m_prefabRef);
+            DrawAuthoringAssetField(m_prefabAsset, m_prefabAssetId, "Prefab");
         }
 
         private void DrawMotionBlock()
@@ -158,21 +169,109 @@ namespace EFrameWork.Editor.Effect.Fly
             EditorGUILayout.PropertyField(m_flySoundMode);
             if ((FlyAudioPlayMode)m_flySoundMode.enumValueIndex != FlyAudioPlayMode.None)
             {
-                EditorGUILayout.PropertyField(m_flySoundAsset);
+                DrawAuthoringAssetField(m_flySoundAsset, m_flySoundAssetId, "Fly Sound");
             }
 
             EditorGUILayout.PropertyField(m_arriveSoundMode);
             if ((FlyAudioPlayMode)m_arriveSoundMode.enumValueIndex != FlyAudioPlayMode.None)
             {
-                EditorGUILayout.PropertyField(m_arriveSoundAsset);
+                DrawAuthoringAssetField(m_arriveSoundAsset, m_arriveSoundAssetId, "Arrive Sound");
             }
 
             EditorGUILayout.Space(6);
             EditorGUILayout.LabelField("Effect", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(m_startEffect);
+            DrawAuthoringAssetField(m_startEffect, m_startEffectAssetId, "Start Effect");
             EditorGUILayout.PropertyField(m_startEffectDestroyTime);
-            EditorGUILayout.PropertyField(m_endEffect);
+            DrawAuthoringAssetField(m_endEffect, m_endEffectAssetId, "End Effect");
             EditorGUILayout.PropertyField(m_endEffectDestroyTime);
+        }
+
+        private static void DrawAuthoringAssetField(SerializedProperty assetProperty, SerializedProperty assetIdProperty, string label)
+        {
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(assetProperty, new GUIContent(label));
+            if (EditorGUI.EndChangeCheck())
+            {
+                assetIdProperty.stringValue = ResolveAssetId(assetProperty.objectReferenceValue);
+            }
+
+            EditorGUILayout.PropertyField(assetIdProperty, new GUIContent($"{label} Asset Id"));
+
+            if (assetProperty.objectReferenceValue != null && string.IsNullOrEmpty(assetIdProperty.stringValue))
+            {
+                EditorGUILayout.HelpBox($"{label} is not an EFrame managed Addressables asset. Move it under Assets/App/Res, Assets/Scenes, or Assets/Modules/*/Res and sync Addressables.", MessageType.Warning);
+            }
+        }
+
+        private static string ResolveAssetId(UnityEngine.Object asset)
+        {
+            if (asset == null)
+            {
+                return string.Empty;
+            }
+
+            string assetPath = AssetDatabase.GetAssetPath(asset);
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                return string.Empty;
+            }
+
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            var settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+            var entry = !string.IsNullOrEmpty(guid) ? settings?.FindAssetEntry(guid) : null;
+            if (entry != null && !string.IsNullOrEmpty(entry.address))
+            {
+                return entry.address;
+            }
+
+            return TryBuildManagedAddress(assetPath, out var address) ? address : string.Empty;
+        }
+
+        private static bool TryBuildManagedAddress(string assetPath, out string address)
+        {
+            assetPath = (assetPath ?? string.Empty).Replace('\\', '/');
+
+            if (assetPath.StartsWith("Assets/App/Res/", System.StringComparison.OrdinalIgnoreCase))
+            {
+                address = BuildRelativeAddress(assetPath, "Assets/App/Res");
+                return true;
+            }
+
+            if (assetPath.StartsWith("Assets/Scenes/", System.StringComparison.OrdinalIgnoreCase))
+            {
+                address = BuildRelativeAddress(assetPath, "Assets");
+                return true;
+            }
+
+            if (assetPath.StartsWith("Assets/Modules/", System.StringComparison.OrdinalIgnoreCase))
+            {
+                var segments = assetPath.Split('/');
+                if (segments.Length >= 4
+                    && (string.Equals(segments[3], "Res", System.StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(segments[3], "Scenes", System.StringComparison.OrdinalIgnoreCase)))
+                {
+                    address = BuildRelativeAddress(assetPath, "Assets");
+                    return true;
+                }
+            }
+
+            address = string.Empty;
+            return false;
+        }
+
+        private static string BuildRelativeAddress(string assetPath, string rootPath)
+        {
+            string relativePath = assetPath.StartsWith(rootPath + "/", System.StringComparison.OrdinalIgnoreCase)
+                ? assetPath.Substring(rootPath.Length + 1)
+                : System.IO.Path.GetFileName(assetPath);
+
+            string extension = System.IO.Path.GetExtension(relativePath);
+            if (!string.IsNullOrEmpty(extension))
+            {
+                relativePath = relativePath.Substring(0, relativePath.Length - extension.Length);
+            }
+
+            return relativePath.Replace('\\', '/');
         }
 
         private void DrawWarnings()
@@ -182,7 +281,7 @@ namespace EFrameWork.Editor.Effect.Fly
 
             if (!cfg.HasValidAsset)
             {
-                EditorGUILayout.HelpBox("未配置资源：请填写 PrefabReference。", MessageType.Warning);
+                EditorGUILayout.HelpBox("Missing fly prefab asset id.", MessageType.Warning);
             }
 
             if (cfg.Duration < 0.01f)

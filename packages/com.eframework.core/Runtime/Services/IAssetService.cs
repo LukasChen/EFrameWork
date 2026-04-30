@@ -49,15 +49,30 @@ namespace EFrameWork.Runtime.Asset
         }
     }
 
+    public interface IAssetPreloadScope : IDisposable
+    {
+        UniTask<bool> PreloadAsync<T>(string assetId) where T : Object;
+        bool Contains(string assetId);
+        void ReleaseAll();
+    }
+
     public interface IAssetService : IDisposable
     {
         bool Initialized { get; }
         bool InitializeFailed { get; }
         UniTask<bool> InitializeAsync();
+        IAssetPreloadScope CreatePreloadScope();
         UniTask<AssetHandle<T>> LoadAsync<T>(string assetId) where T : Object;
-        UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object;
+        UniTask<bool> PreloadAssetAsync<T>(string assetId) where T : Object;
+        bool TryGetPreloadedAsset<T>(string assetId, out T asset) where T : Object;
+        void ReleasePreloadedAsset(string assetId);
+        void ReleaseAllPreloadedAssets();
+        GameObject Instantiate(string assetId, Transform parent = null);
+        GameObject GetFromPool(string assetId, Transform parent, Vector3 position, float recycleTime = 0f);
+        GameObject GetFromPool(string assetId, Vector3 position, float recycleTime = 0f);
+        void RecycleToPool(string assetId, GameObject gameObject);
+        void ReleasePathPool(string assetId);
         UniTask<InstanceHandle> InstantiateAsync(string assetId, Transform parent = null);
-        UniTask<InstanceHandle> InstantiateAsync(AssetReferenceGameObject reference, Transform parent = null);
         UniTask<bool> IsValidPathAsync(string assetId);
         void ReleaseAllPools();
         void ReleaseUnusedAssets();

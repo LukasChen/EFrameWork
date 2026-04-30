@@ -626,14 +626,17 @@ namespace EFrameWork.Runtime.UI
                 return cached;
             }
 
-            var parent = layer.HasValue ? UILayer(layer.Value) : null;
-            var go = parent != null ? AssetManager.Instantiate(assetPath, parent) : AssetManager.Instantiate(assetPath);
-
             var context = EFrame.Current;
             if (context == null)
             {
-                AssetManager.ReleaseInstance(go);
                 throw new InvalidOperationException($"QUI.CreateBinding requires EFrame.Initialize() to complete before creating UI views. AssetPath: {assetPath}");
+            }
+
+            var parent = layer.HasValue ? UILayer(layer.Value) : null;
+            var go = context.Assets.Instantiate(assetPath, parent);
+            if (go == null)
+            {
+                throw new ArgumentException($"The UI asset path '{assetPath}' could not be instantiated.");
             }
 
             context.InjectInto(go);

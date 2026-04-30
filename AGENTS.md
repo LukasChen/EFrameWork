@@ -8,9 +8,9 @@ Codex should treat this file as the repo-level entry point. GitHub Copilot reads
 
 - Follow the EFrame framework rules in `.github/copilot-instructions.md` for Unity startup, `Procedure`, `QUI`, `UIController`, resource paths, Addressables, directory structure, and AI sync boundaries.
 - Keep runtime code under clear Unity project structure such as `Assets/App/Runtime`, `Assets/App/Res`, and `Assets/Modules/*`; do not introduce temporary directories for production code.
-- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for state switching and lifecycle orchestration only. Put page, popup, and gameplay behavior in the appropriate UI/controller/module layer.
+- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for state switching, `OnPreloadAsync` resource preparation, and lifecycle orchestration only. Put page, popup, and gameplay behavior in the appropriate UI/controller/module layer.
 - Manage UI through `QUI`, `UIController`, and `UIViewHandle`; do not bypass the framework by hand-building persistent top-level Canvas or EventSystem objects in scenes.
-- Centralize resource paths through `ResPath`, `ResPath.Generated`, `AssetReference`, or an equivalent module path center. Avoid scattered raw Addressables strings.
+- Centralize runtime resource ids through `ResPath`, `ResPath.Generated`, or an equivalent module path center. `AssetReference` is acceptable for editor authoring fields, but runtime calls should resolve to asset ids instead of flowing references through business logic.
 - Treat resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as EFrame-managed Addressables entries. Put assets in the mapped directory and let the framework automation own group, address, and label; use the report window to choose which directory subtrees generate `ResPath.Generated`.
 - Keep Unity scene, prefab, and `.asset` edits narrow and avoid unrelated serialization churn.
 

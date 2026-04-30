@@ -11,6 +11,7 @@ namespace EFrameWork.Runtime
     public class CoroutineManager : ICoroutineService
     {
         private MonoBehaviour m_coroutineRunner;
+        private bool m_disposed;
 
         // WaitForSeconds 对象池，避免频繁 new 对象
         private Dictionary<float, WaitForSeconds> m_waitForSecondsCache = new Dictionary<float, WaitForSeconds>();
@@ -45,15 +46,18 @@ namespace EFrameWork.Runtime
         /// <returns>返回协程对象，可用于停止协程</returns>
         public UnityEngine.Coroutine StartCoroutine(IEnumerator coroutine)
         {
-            if (m_coroutineRunner != null)
+            if (coroutine == null)
             {
-                return m_coroutineRunner.StartCoroutine(coroutine);
-            }
-            else
-            {
-                Debug.LogError("CoroutineManager is not initialized. Cannot start coroutine.");
+                Debug.LogError("CoroutineManager cannot start a null coroutine.");
                 return null;
             }
+
+            if (!CanUseRunner("start coroutine"))
+            {
+                return null;
+            }
+
+            return m_coroutineRunner.StartCoroutine(coroutine);
         }
 
         /// <summary>
@@ -62,14 +66,17 @@ namespace EFrameWork.Runtime
         /// <param name="coroutine">要停止的协程对象</param>
         public void StopCoroutine(UnityEngine.Coroutine coroutine)
         {
-            if (m_coroutineRunner != null && coroutine != null)
+            if (coroutine == null)
             {
-                m_coroutineRunner.StopCoroutine(coroutine);
+                return;
             }
-            else if (m_coroutineRunner == null)
+
+            if (!CanUseRunner("stop coroutine"))
             {
-                Debug.LogError("CoroutineManager is not initialized. Cannot stop coroutine.");
+                return;
             }
+
+            m_coroutineRunner.StopCoroutine(coroutine);
         }
 
         /// <summary>
@@ -78,14 +85,17 @@ namespace EFrameWork.Runtime
         /// <param name="coroutine">要停止的协程IEnumerator</param>
         public void StopCoroutine(IEnumerator coroutine)
         {
-            if (m_coroutineRunner != null && coroutine != null)
+            if (coroutine == null)
             {
-                m_coroutineRunner.StopCoroutine(coroutine);
+                return;
             }
-            else if (m_coroutineRunner == null)
+
+            if (!CanUseRunner("stop coroutine"))
             {
-                Debug.LogError("CoroutineManager is not initialized. Cannot stop coroutine.");
+                return;
             }
+
+            m_coroutineRunner.StopCoroutine(coroutine);
         }
 
         /// <summary>
@@ -93,14 +103,17 @@ namespace EFrameWork.Runtime
         /// </summary>
         public void StopAllCoroutines()
         {
-            if (m_coroutineRunner != null)
+            if (m_disposed)
             {
-                m_coroutineRunner.StopAllCoroutines();
+                return;
             }
-            else
+
+            if (!CanUseRunner("stop all coroutines"))
             {
-                Debug.LogError("CoroutineManager is not initialized. Cannot stop all coroutines.");
+                return;
             }
+
+            m_coroutineRunner.StopAllCoroutines();
         }
 
         /// <summary>
@@ -121,7 +134,7 @@ namespace EFrameWork.Runtime
         /// <returns>协程对象</returns>
         public UnityEngine.Coroutine WaitForFrames(int frameCount)
         {
-            return StartCoroutine(WaitForFramesCoroutine(frameCount));
+            return StartCoroutine(WaitForFramesCoroutine(Mathf.Max(0, frameCount)));
         }
 
         /// <summary>
@@ -131,6 +144,12 @@ namespace EFrameWork.Runtime
         /// <returns>协程对象</returns>
         public UnityEngine.Coroutine WaitUntil(Func<bool> condition)
         {
+            if (condition == null)
+            {
+                Debug.LogError("CoroutineManager.WaitUntil requires a non-null condition.");
+                return null;
+            }
+
             return StartCoroutine(WaitUntilCoroutine(condition));
         }
 
@@ -141,6 +160,12 @@ namespace EFrameWork.Runtime
         /// <returns>协程对象</returns>
         public UnityEngine.Coroutine WaitWhile(Func<bool> condition)
         {
+            if (condition == null)
+            {
+                Debug.LogError("CoroutineManager.WaitWhile requires a non-null condition.");
+                return null;
+            }
+
             return StartCoroutine(WaitWhileCoroutine(condition));
         }
 
@@ -171,6 +196,8 @@ namespace EFrameWork.Runtime
         /// <returns>WaitForSeconds 对象</returns>
         public WaitForSeconds GetWaitForSeconds(float seconds)
         {
+            seconds = NormalizeWaitSeconds(seconds);
+
             // 先检查缓存中是否存在
             if (m_waitForSecondsCache.TryGetValue(seconds, out WaitForSeconds waitForSeconds))
             {
@@ -195,7 +222,14 @@ namespace EFrameWork.Runtime
         private IEnumerator DelayCoroutine(float delay, Action action)
         {
             yield return GetWaitForSeconds(delay);
-            action?.Invoke();
+            try
+            {
+                action?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
         }
 
         /// <summary>
@@ -261,14 +295,49 @@ namespace EFrameWork.Runtime
         /// </summary>
         public void Dispose()
         {
+            if (m_disposed)
+            {
+                return;
+            }
+
+            m_disposed = true;
+
             if (m_coroutineRunner != null)
             {
-                StopAllCoroutines();
+                m_coroutineRunner.StopAllCoroutines();
                 m_coroutineRunner = null;
             }
 
             // 清理缓存
             m_waitForSecondsCache?.Clear();
+        }
+
+        private bool CanUseRunner(string operation)
+        {
+            if (m_disposed)
+            {
+                Debug.LogWarning($"CoroutineManager has been disposed. Cannot {operation}.");
+                return false;
+            }
+
+            if (m_coroutineRunner == null)
+            {
+                Debug.LogError($"CoroutineManager is not initialized. Cannot {operation}.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static float NormalizeWaitSeconds(float seconds)
+        {
+            if (float.IsNaN(seconds) || float.IsInfinity(seconds))
+            {
+                Debug.LogWarning($"CoroutineManager received an invalid wait duration '{seconds}'. Using 0 seconds instead.");
+                return 0f;
+            }
+
+            return Mathf.Max(0f, seconds);
         }
     }
 }

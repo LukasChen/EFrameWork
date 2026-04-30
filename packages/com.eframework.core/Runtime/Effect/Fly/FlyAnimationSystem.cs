@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using EFrameWork.Runtime.Asset;
 using EFrameWork.Runtime.Audio;
 using EFrameWork.Runtime.Utils;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 namespace EFrameWork.Runtime.Effect.Fly
@@ -220,7 +220,7 @@ namespace EFrameWork.Runtime.Effect.Fly
     /// <summary>
     /// 框架层通用飞行动画系统：
     /// - 单 Update 驱动（订阅 AppUpdateEvent）
-    /// - 复用 AssetManager 对象池（Addressables 路径 / AssetReference）
+    /// - 复用 IAssetService 对象池（Addressables assetId）
     /// - 统一支持 SpriteRenderer 与 UI Image（Graphic）
     /// </summary>
     public static class FlyAnimationSystem
@@ -406,6 +406,14 @@ namespace EFrameWork.Runtime.Effect.Fly
 
             // 实例化（池化）
             var go = SpawnGameObject(seq.Config, seq.Parent, start);
+            if (go == null)
+            {
+                Debug.LogError($"[FlyAnimationSystem] Spawn failed: prefab asset id is invalid. Config: {seq.Config.name}");
+                seq.Completed++;
+                RecycleItem(item);
+                return;
+            }
+
             item.Go = go;
             item.Transform = go.transform;
             item.RectTransform = go.GetComponent<RectTransform>();
@@ -413,7 +421,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             go.transform.localScale = Vector3.one * item.BaseScale;
 
             // 开始特效（每个飞行体 spawn 时）
-            TrySpawnEffect(seq.Config.StartEffect, seq.Parent, start, seq.Config.StartEffectDestroyTime);
+            TrySpawnEffect(seq.Config.StartEffectAssetId, seq.Parent, start, seq.Config.StartEffectDestroyTime);
 
             // 缓存渲染器引用（SpriteRenderer 或 Graphic）
             go.TryGetComponent(out item.SpriteRenderer);
@@ -613,7 +621,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (item.Config != null)
             {
                 Transform effectParent = item.Transform != null ? item.Transform.parent : null;
-                TrySpawnEffect(item.Config.EndEffect, effectParent, item.Target, item.Config.EndEffectDestroyTime);
+                TrySpawnEffect(item.Config.EndEffectAssetId, effectParent, item.Target, item.Config.EndEffectDestroyTime);
             }
 
             // 回收
@@ -692,8 +700,15 @@ namespace EFrameWork.Runtime.Effect.Fly
 
         private static GameObject SpawnGameObject(FlyAnimationConfig cfg, Transform parent, Vector3 pos)
         {
-            if (parent != null) return AssetManager.GetFromPool(cfg.PrefabReference, parent, pos);
-            return AssetManager.GetFromPool(cfg.PrefabReference, pos);
+            var assets = EFrame.Current?.Assets;
+            if (assets == null)
+            {
+                Debug.LogError("[FlyAnimationSystem] Spawn failed: EFrame asset service is not available.");
+                return null;
+            }
+
+            if (parent != null) return assets.GetFromPool(cfg.PrefabAssetId, parent, pos);
+            return assets.GetFromPool(cfg.PrefabAssetId, pos);
         }
 
         private static void RecycleGameObject(FlyItem item)
@@ -712,7 +727,14 @@ namespace EFrameWork.Runtime.Effect.Fly
 
             if (item.Config != null)
             {
-                AssetManager.RecycleToPool(item.Config.PrefabReference, item.Go);
+                var assets = EFrame.Current?.Assets;
+                if (assets != null)
+                {
+                    assets.RecycleToPool(item.Config.PrefabAssetId, item.Go);
+                    return;
+                }
+
+                AssetManager.ReleaseInstance(item.Go);
                 return;
             }
 
@@ -769,7 +791,7 @@ namespace EFrameWork.Runtime.Effect.Fly
 
             seq.FlySoundPlayed = true;
 
-            TryPlayAudio(cfg.FlySoundAsset);
+            TryPlayAudio(cfg.FlySoundAssetId);
         }
 
         private static void TryPlaySequenceArriveSound(FlySequence seq)
@@ -783,7 +805,7 @@ namespace EFrameWork.Runtime.Effect.Fly
 
             seq.ArriveSoundPlayed = true;
 
-            TryPlayAudio(cfg.ArriveSoundAsset);
+            TryPlayAudio(cfg.ArriveSoundAssetId);
         }
 
         private static void TryPlayPerItemStartSound(FlyAnimationConfig cfg)
@@ -792,7 +814,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.FlySoundMode != FlyAudioPlayMode.PerItem) return;
             if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
-            TryPlayAudio(cfg.FlySoundAsset);
+            TryPlayAudio(cfg.FlySoundAssetId);
         }
 
         private static void TryPlayPerItemArriveSound(FlyAnimationConfig cfg)
@@ -801,25 +823,25 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.PerItem) return;
             if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
 
-            TryPlayAudio(cfg.ArriveSoundAsset);
+            TryPlayAudio(cfg.ArriveSoundAssetId);
         }
 
-        private static bool TryPlayAudio(AssetReferenceT<AudioClipAsset> audioClipAssetRef)
+        private static bool TryPlayAudio(string audioClipAssetId)
         {
-            // 音量总开关
-            if (EFrameWork.Runtime.EFrame.Current?.Audio != null && !EFrameWork.Runtime.EFrame.Current.Audio.SoundOn)
+            var audio = EFrame.Current?.Audio;
+            if (audio == null || !audio.SoundOn)
             {
                 return false;
             }
 
-            if (audioClipAssetRef != null && audioClipAssetRef.RuntimeKeyIsValid())
+            if (!string.IsNullOrEmpty(audioClipAssetId))
             {
                 try
                 {
-                    var clipAsset = ResolveAudioClipAsset(audioClipAssetRef);
+                    var clipAsset = ResolveAudioClipAsset(audioClipAssetId);
                     if (clipAsset != null)
                     {
-                        EFrameWork.Runtime.EFrame.Current.Audio.PlayAudioClipAsset(clipAsset);
+                        audio.PlayAudioClipAsset(clipAsset);
                         return true;
                     }
                 }
@@ -831,33 +853,53 @@ namespace EFrameWork.Runtime.Effect.Fly
             return false;
         }
 
-        private static void TrySpawnEffect(AssetReferenceGameObject effectRef, Transform parent, Vector3 pos, float destroyTime)
+        private static void TrySpawnEffect(string effectAssetId, Transform parent, Vector3 pos, float destroyTime)
         {
-            if (effectRef == null || !effectRef.RuntimeKeyIsValid()) return;
+            if (string.IsNullOrEmpty(effectAssetId)) return;
 
-            if (parent != null)
+            var assets = EFrame.Current?.Assets;
+            if (assets == null)
             {
-                AssetManager.Instantiate(effectRef, parent, pos, destroyTime);
+                Debug.LogWarning($"[FlyAnimationSystem] Effect skipped because EFrame asset service is not available. AssetId: {effectAssetId}");
                 return;
             }
 
-            AssetManager.Instantiate(effectRef, pos, destroyTime);
+            var go = assets.Instantiate(effectAssetId, parent);
+            if (go == null) return;
+
+            go.transform.position = pos;
+            if (destroyTime > 0f)
+            {
+                ReleaseEffectAfterDelay(go, destroyTime).Forget();
+            }
         }
 
-        private static AudioClipAsset ResolveAudioClipAsset(AssetReferenceT<AudioClipAsset> audioClipAssetRef)
+        private static async UniTaskVoid ReleaseEffectAfterDelay(GameObject go, float delay)
         {
-            // key 优先用 AssetGUID（稳定），没有则用 RuntimeKey
-            string key = audioClipAssetRef.AssetGUID;
-            if (string.IsNullOrEmpty(key)) key = audioClipAssetRef.RuntimeKey?.ToString();
-            if (string.IsNullOrEmpty(key)) return null;
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            AssetManager.ReleaseInstance(go);
+        }
 
-            if (s_audioClipAssetCache.TryGetValue(key, out var cached))
+        private static AudioClipAsset ResolveAudioClipAsset(string audioClipAssetId)
+        {
+            if (string.IsNullOrEmpty(audioClipAssetId)) return null;
+
+            var assets = EFrame.Current?.Assets;
+            if (assets != null && assets.TryGetPreloadedAsset<AudioClipAsset>(audioClipAssetId, out var preloaded))
+            {
+                return preloaded;
+            }
+
+            if (s_audioClipAssetCache.TryGetValue(audioClipAssetId, out var cached))
             {
                 return cached;
             }
 
-            var loaded = AssetManager.LoadAsset(audioClipAssetRef);
-            s_audioClipAssetCache[key] = loaded;
+            var loaded = AssetManager.LoadAsset<AudioClipAsset>(audioClipAssetId);
+            if (loaded != null)
+            {
+                s_audioClipAssetCache[audioClipAssetId] = loaded;
+            }
             return loaded;
         }
     }

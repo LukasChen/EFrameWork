@@ -149,8 +149,11 @@ namespace $RootNamespace.Procedure
 "@
 
 $procedureHomeContent = @"
+using Cysharp.Threading.Tasks;
 using EFrameWork.Runtime;
+using EFrameWork.Runtime.Asset;
 using EFrameWork.Runtime.Procedure;
+using $RootNamespace.Common;
 using $RootNamespace.Modules.SampleModule.Procedure;
 using $RootNamespace.UI.Controllers;
 using UnityEngine;
@@ -160,6 +163,11 @@ namespace $RootNamespace.Procedure
     public sealed class ProcedureHome : EFrameProcedure
     {
         private HomeViewController m_homeViewController;
+
+        protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
+        {
+            await assets.PreloadAsync<GameObject>(ResPath.App.UI.Panel("Home", "HomeView"));
+        }
 
         protected override void OnEnter(ProcedureEnterContext context)
         {
@@ -316,8 +324,11 @@ namespace $moduleNamespace.Common
 "@
 
     $moduleProcedureContent = @"
+using Cysharp.Threading.Tasks;
 using $RootNamespace.Procedure;
+using EFrameWork.Runtime.Asset;
 using EFrameWork.Runtime.Procedure;
+using $moduleNamespace.Common;
 using $moduleNamespace.UI.Controllers;
 using UnityEngine;
 
@@ -326,6 +337,11 @@ namespace $moduleNamespace.Procedure
     public sealed class Procedure${ModuleName}Entry : EFrameProcedure
     {
         private ${ModuleName}MainViewController m_viewController;
+
+        protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
+        {
+            await assets.PreloadAsync<GameObject>(${ModuleName}ResPath.MainView);
+        }
 
         protected override void OnEnter(ProcedureEnterContext context)
         {

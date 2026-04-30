@@ -1,4 +1,6 @@
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime.Asset;
 
 namespace EFrameWork.Runtime.Procedure
 {
@@ -45,6 +47,11 @@ namespace EFrameWork.Runtime.Procedure
 
         protected internal virtual void OnInit()
         {
+        }
+
+        protected internal virtual UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
+        {
+            return UniTask.CompletedTask;
         }
 
         protected internal virtual void OnEnter(ProcedureEnterContext context)

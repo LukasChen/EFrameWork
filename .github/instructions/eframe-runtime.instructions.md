@@ -32,14 +32,14 @@ Project-local `project-*.instructions.md` overlays may add more specific busines
 ## Resource Paths And Addressables
 
 - 资源路径不要散落硬编码；如果当前模块还没有 `ResPath`，至少新增集中常量，不要在多个类里重复写字符串。
-- 使用 Addressables 动态加载时，优先依赖 `ResPath.Generated`、稳定入口 `ResPath` 或 `AssetReference`，不要直接把完整地址写进业务逻辑。
-- 使用 Addressables 加载或实例化运行时资源时，走 `EFrame.Current.Assets.LoadAsync(...)`、`InstantiateAsync(...)` 和句柄释放。
+- 使用 Addressables 动态加载时，运行时优先依赖 `ResPath.Generated`、稳定入口 `ResPath` 或集中 assetId；`AssetReference` 更适合作为 Editor 配置字段，并应在进入运行时调用前解析为 assetId。
+- Runtime resource hot paths should be preloaded by the owning `Procedure` and then instantiated through `Context.Assets.Instantiate(...)` or `Context.Assets.GetFromPool(...)`; `LoadAsync(...)` and `InstantiateAsync(...)` remain available for explicit async ownership, and fallback sync loading is treated as a diagnostic path.
 - Managed resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` follow the EFrame directory contract. Do not hand-edit their Addressables group, address, or managed label.
-- New, moved, and deleted managed resources are expected to be synchronized by the EFrame editor automation and verified before player builds. Business code should consume `ResPath.Generated` for selected code-driven load directories, stable `ResPath` wrappers, or `AssetReference` values instead of treating the Addressables window as the source of truth.
+- New, moved, and deleted managed resources are expected to be synchronized by the EFrame editor automation and verified before player builds. Business code should consume `ResPath.Generated` for selected code-driven load directories, stable `ResPath` wrappers, or editor-resolved asset ids instead of treating the Addressables window as the source of truth.
 
 ## Startup And Runtime Access
 
-- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for startup flow state.
+- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for startup flow state. Preload Procedure-owned UI, effects, audio config, and gameplay prefabs in `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`; business logic should instantiate through `Context.Assets` after enter and let the Procedure scope release on leave.
 - 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成，再访问 `EFrame.Current.UI`、`EFrame.Current.Audio`、`EFrame.Current.Data` 等框架服务。
 - `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 - EFrameWork runtime currently targets Universal RP; `QUI` scene-camera overlay binding depends on URP camera stack APIs.

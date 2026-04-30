@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.53",
+  "version": "0.1.55",
   "updatedAt": "2026-04-30",
-  "notes": "Document EFrame-owned Procedure runtime and update startup Procedure guidance and templates."
+  "notes": "Document runtime assetId resource contract and keep AssetReference in editor-authoring guidance."
 }

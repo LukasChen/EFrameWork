@@ -13,12 +13,14 @@ namespace EFrameWork.Runtime.Asset
     /// <summary>
     /// 资源管理器
     /// - 提供 Addressables 资源的同步加载、实例化、对象池管理
-    /// - 支持两种对象池：AssetReference 池和 Path 池
+    /// - 运行时业务入口使用 IAssetService；静态同步入口仅保留为框架内部 fallback
     /// </summary>
     public sealed class AssetManager : IAssetService
     {
         private const int DefaultMaxPoolSizePerKey = 32;
 
+        private readonly Dictionary<string, PreloadedAssetEntry> m_preloadedAssets = new();
+        private readonly HashSet<string> m_unpreloadedInstantiateWarnings = new();
         private static Dictionary<string, Stack<GameObject>> m_pools = new();
         private static Dictionary<string, Stack<GameObject>> m_pathPools = new();
         private static Dictionary<GameObject, int> m_poolLeaseVersions = new();
@@ -140,7 +142,7 @@ namespace EFrameWork.Runtime.Asset
             return new AssetHandle<T>(handle);
         }
 
-        public async UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object
+        internal async UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object
         {
             if (reference == null)
             {
@@ -162,6 +164,184 @@ namespace EFrameWork.Runtime.Asset
             }
 
             return new AssetHandle<T>(handle);
+        }
+
+        public IAssetPreloadScope CreatePreloadScope()
+        {
+            return new AssetPreloadScope(this);
+        }
+
+        public async UniTask<bool> PreloadAssetAsync<T>(string assetId) where T : Object
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                Debug.LogError("[AssetManager] PreloadAssetAsync failed: assetId is empty.");
+                return false;
+            }
+
+            if (m_preloadedAssets.TryGetValue(assetId, out var existingEntry))
+            {
+                if (existingEntry.IsValid)
+                {
+                    if (existingEntry.Asset is T)
+                    {
+                        existingEntry.Retain();
+                        m_unpreloadedInstantiateWarnings.Remove(assetId);
+                        return true;
+                    }
+
+                    Debug.LogError($"[AssetManager] PreloadAssetAsync failed: '{assetId}' is already preloaded as {existingEntry.AssetType.Name}, not {typeof(T).Name}.");
+                    return false;
+                }
+
+                existingEntry.ForceRelease();
+                m_preloadedAssets.Remove(assetId);
+            }
+
+            var handle = Addressables.LoadAssetAsync<T>(assetId);
+            while (!handle.IsDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.LogError($"[AssetManager] PreloadAssetAsync failed: {assetId} - {handle.OperationException}");
+                if (handle.IsValid()) Addressables.Release(handle);
+                return false;
+            }
+
+            m_preloadedAssets[assetId] = new PreloadedAssetEntry(typeof(T), handle.Result, () =>
+            {
+                if (handle.IsValid())
+                {
+                    Addressables.Release(handle);
+                }
+            });
+            m_unpreloadedInstantiateWarnings.Remove(assetId);
+            return true;
+        }
+
+        public bool TryGetPreloadedAsset<T>(string assetId, out T asset) where T : Object
+        {
+            asset = null;
+
+            if (string.IsNullOrEmpty(assetId))
+            {
+                return false;
+            }
+
+            if (!m_preloadedAssets.TryGetValue(assetId, out var entry) || !entry.IsValid)
+            {
+                return false;
+            }
+
+            asset = entry.Asset as T;
+            return asset != null;
+        }
+
+        public void ReleasePreloadedAsset(string assetId)
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                return;
+            }
+
+            if (!m_preloadedAssets.TryGetValue(assetId, out var entry))
+            {
+                return;
+            }
+
+            if (entry.ReleaseReference())
+            {
+                m_preloadedAssets.Remove(assetId);
+                m_unpreloadedInstantiateWarnings.Remove(assetId);
+            }
+        }
+
+        public void ReleaseAllPreloadedAssets()
+        {
+            foreach (var entry in m_preloadedAssets.Values)
+            {
+                entry.ForceRelease();
+            }
+
+            m_preloadedAssets.Clear();
+            m_unpreloadedInstantiateWarnings.Clear();
+        }
+
+        GameObject IAssetService.Instantiate(string assetId, Transform parent)
+        {
+            return InstantiateFromPreloadOrFallback(assetId, parent);
+        }
+
+        GameObject IAssetService.GetFromPool(string assetId, Transform parent, Vector3 position, float recycleTime)
+        {
+            return GetFromPoolFromPreloadOrFallback(assetId, parent, position, recycleTime);
+        }
+
+        GameObject IAssetService.GetFromPool(string assetId, Vector3 position, float recycleTime)
+        {
+            return GetFromPoolFromPreloadOrFallback(assetId, null, position, recycleTime);
+        }
+
+        private GameObject InstantiateFromPreloadOrFallback(string assetId, Transform parent = null)
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                Debug.LogError("[AssetManager] Instantiate failed: assetId is empty.");
+                return null;
+            }
+
+            if (TryGetPreloadedAsset<GameObject>(assetId, out var prefab))
+            {
+                var instance = parent == null
+                    ? Object.Instantiate(prefab)
+                    : Object.Instantiate(prefab, parent);
+                return BindInstance(instance);
+            }
+
+            LogUnpreloadedInstantiateWarning(assetId);
+            return parent == null ? AssetManager.Instantiate(assetId) : AssetManager.Instantiate(assetId, parent);
+        }
+
+        private GameObject GetFromPoolFromPreloadOrFallback(string assetId, Transform parent, Vector3 position, float recycleTime = 0f)
+        {
+            if (string.IsNullOrEmpty(assetId))
+            {
+                Debug.LogError("[AssetManager] GetFromPool failed: assetId is empty.");
+                return null;
+            }
+
+            var go = TakeFromPathPool(assetId);
+            if (go == null)
+            {
+                if (TryGetPreloadedAsset<GameObject>(assetId, out var prefab))
+                {
+                    go = BindInstance(Object.Instantiate(prefab, parent));
+                }
+                else
+                {
+                    LogUnpreloadedInstantiateWarning(assetId);
+                    return parent == null
+                        ? AssetManager.GetFromPool(assetId, position, recycleTime)
+                        : AssetManager.GetFromPool(assetId, parent, position, recycleTime);
+                }
+            }
+
+            PreparePathPoolInstance(go, parent, position);
+            SchedulePathPoolRecycle(assetId, go, recycleTime);
+            return go;
+        }
+
+        void IAssetService.RecycleToPool(string assetId, GameObject gameObject)
+        {
+            RecycleToPool(assetId, gameObject);
+        }
+
+        void IAssetService.ReleasePathPool(string assetId)
+        {
+            ReleasePathPool(assetId);
         }
 
         public async UniTask<InstanceHandle> InstantiateAsync(string assetId, Transform parent = null)
@@ -192,7 +372,7 @@ namespace EFrameWork.Runtime.Asset
             return new InstanceHandle(handle);
         }
 
-        public async UniTask<InstanceHandle> InstantiateAsync(AssetReferenceGameObject reference, Transform parent = null)
+        internal async UniTask<InstanceHandle> InstantiateAsync(AssetReferenceGameObject reference, Transform parent = null)
         {
             if (reference == null)
             {
@@ -240,7 +420,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="path">资源路径</param>
         /// <returns>Addressable 路径是否有效</returns>
-        public static bool IsValidPath(string path)
+        internal static bool IsValidPath(string path)
         {
             var handle = Addressables.LoadResourceLocationsAsync(path);
             var locations = handle.WaitForCompletion();
@@ -258,7 +438,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="assetId">资源地址</param>
         /// <returns>加载的资源对象</returns>
-        public static Object LoadAsset(string assetId)
+        internal static Object LoadAsset(string assetId)
         {
             try
             {
@@ -292,7 +472,7 @@ namespace EFrameWork.Runtime.Asset
         /// <typeparam name="T">资源类型</typeparam>
         /// <param name="reference">资源引用</param>
         /// <returns>加载的资源对象</returns>
-        public static T LoadAsset<T>(AssetReferenceT<T> reference) where T : Object
+        internal static T LoadAsset<T>(AssetReferenceT<T> reference) where T : Object
         {
             return Addressables.LoadAssetAsync<T>(reference).WaitForCompletion();
         }
@@ -303,7 +483,7 @@ namespace EFrameWork.Runtime.Asset
         /// <typeparam name="T">资源类型</typeparam>
         /// <param name="assetId">资源地址</param>
         /// <returns>加载的资源对象</returns>
-        public static T LoadAsset<T>(string assetId) where T : Object
+        internal static T LoadAsset<T>(string assetId) where T : Object
         {
             try
             {
@@ -339,7 +519,7 @@ namespace EFrameWork.Runtime.Asset
         /// 释放资源 (通过 AssetReference)
         /// </summary>
         /// <param name="reference">资源引用</param>
-        public static void UnloadAsset(AssetReference reference)
+        internal static void UnloadAsset(AssetReference reference)
         {
             Addressables.Release(reference);
         }
@@ -348,7 +528,7 @@ namespace EFrameWork.Runtime.Asset
         /// 释放资源 (通过资源对象)
         /// </summary>
         /// <param name="asset">资源对象</param>
-        public static void UnloadAsset(Object asset)
+        internal static void UnloadAsset(Object asset)
         {
             Addressables.Release(asset);
         }
@@ -356,7 +536,7 @@ namespace EFrameWork.Runtime.Asset
         /// <summary>
         /// 释放未使用的资源，触发垃圾回收
         /// </summary>
-        public static void UnloadUnusedAssets()
+        internal static void UnloadUnusedAssets()
         {
             Resources.UnloadUnusedAssets();
             GC.Collect();
@@ -373,7 +553,7 @@ namespace EFrameWork.Runtime.Asset
             return go;
         }
 
-        public static void ReleaseInstance(GameObject go)
+        internal static void ReleaseInstance(GameObject go)
         {
             ReleasePooledInstance(go);
         }
@@ -419,6 +599,57 @@ namespace EFrameWork.Runtime.Asset
                 && currentVersion == version;
         }
 
+        private static GameObject TakeFromPathPool(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath) || !m_pathPools.TryGetValue(assetPath, out var pool))
+            {
+                return null;
+            }
+
+            while (pool.Count > 0)
+            {
+                var go = pool.Pop();
+                if (go != null)
+                {
+                    go.SetActive(true);
+                    return go;
+                }
+            }
+
+            return null;
+        }
+
+        private static void PreparePathPoolInstance(GameObject go, Transform parent, Vector3 position)
+        {
+            if (go == null) return;
+
+            go.transform.SetParent(parent, false);
+            go.transform.localScale = Vector3.one;
+            go.transform.position = position;
+            go.transform.rotation = Quaternion.identity;
+        }
+
+        private static void SchedulePathPoolRecycle(string assetPath, GameObject go, float recycleTime)
+        {
+            if (go == null) return;
+
+            var leaseVersion = RegisterPoolLease(go);
+            if (recycleTime > 0)
+            {
+                RecycleToPool(assetPath, go, recycleTime, leaseVersion).Forget();
+            }
+        }
+
+        private void LogUnpreloadedInstantiateWarning(string assetId)
+        {
+            if (!m_unpreloadedInstantiateWarnings.Add(assetId))
+            {
+                return;
+            }
+
+            Debug.LogWarning($"[AssetManager] Asset '{assetId}' was instantiated before preload. Falling back to synchronous Addressables instantiate; preload it during loading for realtime use.");
+        }
+
         #endregion
 
         #region 实例化 (Path)
@@ -428,7 +659,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="assetPath">资源路径</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath)
+        internal static GameObject Instantiate(string assetPath)
         {
             return BindInstance(Addressables.InstantiateAsync(assetPath).WaitForCompletion());
         }
@@ -439,7 +670,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetPath">资源路径</param>
         /// <param name="parent">父节点</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath, Transform parent)
+        internal static GameObject Instantiate(string assetPath, Transform parent)
         {
             return BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
         }
@@ -451,7 +682,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="parent">父节点</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath, Transform parent, float destroyTime)
+        internal static GameObject Instantiate(string assetPath, Transform parent, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -464,7 +695,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetPath">资源路径</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath, float destroyTime)
+        internal static GameObject Instantiate(string assetPath, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -478,7 +709,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath, Vector3 pos, float destroyTime)
+        internal static GameObject Instantiate(string assetPath, Vector3 pos, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -493,7 +724,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(string assetPath, Transform parent, Vector3 pos, float destroyTime)
+        internal static GameObject Instantiate(string assetPath, Transform parent, Vector3 pos, float destroyTime)
         {
             var go = BindInstance(Addressables.InstantiateAsync(assetPath, pos, Quaternion.identity, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -506,7 +737,7 @@ namespace EFrameWork.Runtime.Asset
         /// <typeparam name="T">组件类型</typeparam>
         /// <param name="assetPath">资源路径</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(string assetPath) where T : Component
+        internal static T Instantiate<T>(string assetPath) where T : Component
         {
             var go = Instantiate(assetPath);
             return go?.GetComponent<T>();
@@ -519,7 +750,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetPath">资源路径</param>
         /// <param name="parent">父节点</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(string assetPath, Transform parent) where T : Component
+        internal static T Instantiate<T>(string assetPath, Transform parent) where T : Component
         {
             var go = Instantiate(assetPath, parent);
             return go?.GetComponent<T>();
@@ -535,7 +766,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="reference">资源引用</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, float destroyTime = 0)
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -549,7 +780,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0)
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -564,7 +795,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -578,7 +809,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="parent">父节点</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0)
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -593,7 +824,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, Quaternion.identity, parent).WaitForCompletion());
             if (go != null && destroyTime > 0) ReleaseInstance(go, destroyTime);
@@ -609,7 +840,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化的 GameObject</returns>
-        public static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, Quaternion quaternion,
+        internal static GameObject Instantiate(AssetReferenceGameObject reference, Transform parent, Vector3 pos, Quaternion quaternion,
             float destroyTime = 0)
         {
             GameObject go = BindInstance(Addressables.InstantiateAsync(reference, pos, quaternion, parent).WaitForCompletion());
@@ -624,7 +855,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="reference">资源引用</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, float destroyTime = 0) where T : Component
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, float destroyTime = 0) where T : Component
         {
             GameObject go = Instantiate(reference, destroyTime);
             return go?.GetComponent<T>();
@@ -638,7 +869,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="parent">父节点</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0) where T : Component
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, float destroyTime = 0) where T : Component
         {
             GameObject go = Instantiate(reference, parent, destroyTime);
             return go?.GetComponent<T>();
@@ -652,7 +883,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0) where T : Component
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, Vector3 pos, float destroyTime = 0) where T : Component
         {
             GameObject go = Instantiate(reference, pos, destroyTime);
             return go?.GetComponent<T>();
@@ -667,7 +898,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, Vector3 pos, float destroyTime = 0)
             where T : Component
         {
             GameObject go = Instantiate(reference, parent, pos, destroyTime);
@@ -684,7 +915,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, Vector3 pos, Quaternion quaternion,
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, Transform parent, Vector3 pos, Quaternion quaternion,
             float destroyTime = 0) where T : Component
         {
             GameObject go = Instantiate(reference, parent, pos, quaternion, destroyTime);
@@ -700,7 +931,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="destroyTime">自动销毁时间 (秒)，0 表示不自动销毁</param>
         /// <returns>实例化对象上的组件</returns>
-        public static T Instantiate<T>(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
+        internal static T Instantiate<T>(AssetReferenceGameObject reference, Vector3 pos, Quaternion quaternion, float destroyTime = 0)
             where T : Component
         {
             GameObject go = Instantiate(reference, pos, quaternion, destroyTime);
@@ -719,7 +950,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="recycleTime">自动回收时间 (秒)，0 表示不自动回收</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(string assetPath, Transform parent, Vector3 pos, float recycleTime = 0)
+        internal static GameObject GetFromPool(string assetPath, Transform parent, Vector3 pos, float recycleTime = 0)
         {
             GameObject go;
             if (m_pathPools.ContainsKey(assetPath) && m_pathPools[assetPath].Count > 0)
@@ -754,7 +985,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="recycleTime">自动回收时间 (秒)，0 表示不自动回收</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(string assetPath, Vector3 pos, float recycleTime = 0)
+        internal static GameObject GetFromPool(string assetPath, Vector3 pos, float recycleTime = 0)
         {
             GameObject go;
             if (m_pathPools.ContainsKey(assetPath) && m_pathPools[assetPath].Count > 0)
@@ -791,7 +1022,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="assetPath">资源路径</param>
         /// <param name="go">要回收的 GameObject</param>
-        public static void RecycleToPool(string assetPath, GameObject go)
+        internal static void RecycleToPool(string assetPath, GameObject go)
         {
             if (go == null) return;
             RegisterPoolLease(go);
@@ -812,7 +1043,7 @@ namespace EFrameWork.Runtime.Asset
         /// 释放指定路径的对象池
         /// </summary>
         /// <param name="assetPath">资源路径</param>
-        public static void ReleasePathPool(string assetPath)
+        internal static void ReleasePathPool(string assetPath)
         {
             if (m_pathPools.TryGetValue(assetPath, out var pool))
             {
@@ -828,7 +1059,7 @@ namespace EFrameWork.Runtime.Asset
         /// <summary>
         /// 释放所有路径对象池
         /// </summary>
-        public static void ReleaseAllPathPools()
+        internal static void ReleaseAllPathPools()
         {
             foreach (var kvp in m_pathPools)
             {
@@ -850,7 +1081,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="assetReference">资源引用</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference)
         {
             var key = GetPoolKey(assetReference);
             if (string.IsNullOrEmpty(key))
@@ -878,7 +1109,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetReference">资源引用</param>
         /// <param name="parent">父节点</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent)
         {
             GameObject go = GetFromPool(assetReference);
             go.transform.SetParent(parent);
@@ -891,7 +1122,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetReference">资源引用</param>
         /// <param name="pos">世界坐标位置</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos)
         {
             GameObject go = GetFromPool(assetReference);
             go.transform.position = pos;
@@ -905,7 +1136,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="parent">父节点</param>
         /// <param name="pos">世界坐标位置</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos)
         {
             GameObject go = GetFromPool(assetReference);
             go.transform.SetParent(parent);
@@ -920,7 +1151,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="quaternion">旋转</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, Quaternion quaternion)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, Quaternion quaternion)
         {
             GameObject go = GetFromPool(assetReference);
             go.transform.SetPositionAndRotation(pos, quaternion);
@@ -935,7 +1166,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="quaternion">旋转</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, Quaternion quaternion)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, Quaternion quaternion)
         {
             GameObject go = GetFromPool(assetReference);
             go.transform.SetParent(parent);
@@ -949,7 +1180,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetReference">资源引用</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, float recycleTime)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, float recycleTime)
         {
             GameObject go = GetFromPool(assetReference);
             RecycleToPool(assetReference, go, recycleTime).Forget();
@@ -963,7 +1194,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="parent">父节点</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, float recycleTime)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, float recycleTime)
         {
             GameObject go = GetFromPool(assetReference, parent);
             RecycleToPool(assetReference, go, recycleTime).Forget();
@@ -977,7 +1208,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, float recycleTime)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, float recycleTime)
         {
             GameObject go = GetFromPool(assetReference, pos);
             RecycleToPool(assetReference, go, recycleTime).Forget();
@@ -992,7 +1223,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="pos">世界坐标位置</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, float recycleTime)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, float recycleTime)
         {
             GameObject go = GetFromPool(assetReference, parent, pos);
             RecycleToPool(assetReference, go, recycleTime).Forget();
@@ -1007,7 +1238,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, Quaternion quaternion, float recycleTime)
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Vector3 pos, Quaternion quaternion, float recycleTime)
         {
             GameObject go = GetFromPool(assetReference, pos, quaternion);
             RecycleToPool(assetReference, go, recycleTime).Forget();
@@ -1023,7 +1254,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="quaternion">旋转</param>
         /// <param name="recycleTime">自动回收时间 (秒)</param>
         /// <returns>池中的 GameObject</returns>
-        public static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, Quaternion quaternion,
+        internal static GameObject GetFromPool(AssetReferenceGameObject assetReference, Transform parent, Vector3 pos, Quaternion quaternion,
             float recycleTime)
         {
             GameObject go = GetFromPool(assetReference, parent, pos, quaternion);
@@ -1037,7 +1268,7 @@ namespace EFrameWork.Runtime.Asset
         /// <param name="assetReference">资源引用</param>
         /// <param name="go">要回收的 GameObject</param>
         /// <param name="recycleTime">延迟时间 (秒)</param>
-        public static async UniTask RecycleToPool(AssetReferenceGameObject assetReference, GameObject go, float recycleTime)
+        internal static async UniTask RecycleToPool(AssetReferenceGameObject assetReference, GameObject go, float recycleTime)
         {
             if (go == null) return;
 
@@ -1058,7 +1289,7 @@ namespace EFrameWork.Runtime.Asset
         /// </summary>
         /// <param name="assetReference">资源引用</param>
         /// <param name="go">要回收的 GameObject</param>
-        public static void RecycleToPool(AssetReferenceGameObject assetReference, GameObject go)
+        internal static void RecycleToPool(AssetReferenceGameObject assetReference, GameObject go)
         {
             if (go == null) return;
             var key = GetPoolKey(assetReference);
@@ -1086,7 +1317,7 @@ namespace EFrameWork.Runtime.Asset
         /// 释放指定 AssetReference 的对象池
         /// </summary>
         /// <param name="assetReference">资源引用</param>
-        public static void ReleasePool(AssetReferenceGameObject assetReference)
+        internal static void ReleasePool(AssetReferenceGameObject assetReference)
         {
             var key = GetPoolKey(assetReference);
             if (string.IsNullOrEmpty(key)) return;
@@ -1105,7 +1336,7 @@ namespace EFrameWork.Runtime.Asset
         /// <summary>
         /// 释放所有 AssetReference 对象池
         /// </summary>
-        public static void ReleaseAllPools()
+        internal static void ReleaseAllPools()
         {
             foreach (var kvp in m_pools)
             {
@@ -1139,11 +1370,138 @@ namespace EFrameWork.Runtime.Asset
         {
             ReleaseAllPools();
             ReleaseAllPathPools();
+            ReleaseAllPreloadedAssets();
             m_poolLeaseVersions.Clear();
             Initialized = false;
             InitializeFailed = false;
         }
 
         #endregion
+
+        private sealed class AssetPreloadScope : IAssetPreloadScope
+        {
+            private readonly AssetManager m_assetManager;
+            private readonly Dictionary<string, int> m_assetRefCounts = new();
+            private bool m_disposed;
+
+            public AssetPreloadScope(AssetManager assetManager)
+            {
+                m_assetManager = assetManager ?? throw new ArgumentNullException(nameof(assetManager));
+            }
+
+            public async UniTask<bool> PreloadAsync<T>(string assetId) where T : Object
+            {
+                if (m_disposed)
+                {
+                    Debug.LogWarning("[AssetPreloadScope] Preload skipped because the scope is already disposed.");
+                    return false;
+                }
+
+                bool succeeded = await m_assetManager.PreloadAssetAsync<T>(assetId);
+                if (!succeeded)
+                {
+                    return false;
+                }
+
+                if (m_assetRefCounts.TryGetValue(assetId, out var count))
+                {
+                    m_assetRefCounts[assetId] = count + 1;
+                }
+                else
+                {
+                    m_assetRefCounts.Add(assetId, 1);
+                }
+
+                return true;
+            }
+
+            public bool Contains(string assetId)
+            {
+                return !string.IsNullOrEmpty(assetId) && m_assetRefCounts.ContainsKey(assetId);
+            }
+
+            public void ReleaseAll()
+            {
+                if (m_disposed)
+                {
+                    return;
+                }
+
+                foreach (var kvp in m_assetRefCounts)
+                {
+                    for (int i = 0; i < kvp.Value; i++)
+                    {
+                        m_assetManager.ReleasePreloadedAsset(kvp.Key);
+                    }
+                }
+
+                m_assetRefCounts.Clear();
+            }
+
+            public void Dispose()
+            {
+                ReleaseAll();
+                m_disposed = true;
+            }
+        }
+
+        private sealed class PreloadedAssetEntry
+        {
+            private readonly Action m_release;
+            private bool m_released;
+
+            public PreloadedAssetEntry(Type assetType, Object asset, Action release)
+            {
+                AssetType = assetType;
+                Asset = asset;
+                m_release = release;
+                RefCount = 1;
+            }
+
+            public Type AssetType { get; }
+            public Object Asset { get; private set; }
+            public int RefCount { get; private set; }
+            public bool IsValid => Asset != null;
+
+            public void Retain()
+            {
+                if (m_released)
+                {
+                    return;
+                }
+
+                RefCount++;
+            }
+
+            public bool ReleaseReference()
+            {
+                if (m_released)
+                {
+                    return true;
+                }
+
+                RefCount = Mathf.Max(0, RefCount - 1);
+                if (RefCount > 0)
+                {
+                    return false;
+                }
+
+                ForceRelease();
+                return true;
+            }
+
+            public void ForceRelease()
+            {
+                if (m_released)
+                {
+                    return;
+                }
+
+                m_released = true;
+                RefCount = 0;
+                m_release?.Invoke();
+                Asset = null;
+            }
+        }
     }
 }

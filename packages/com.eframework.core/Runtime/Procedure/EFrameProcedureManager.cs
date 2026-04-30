@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime.Asset;
 using UnityEngine;
 
 namespace EFrameWork.Runtime.Procedure
@@ -8,8 +11,11 @@ namespace EFrameWork.Runtime.Procedure
     {
         private readonly Dictionary<Type, EFrameProcedure> m_procedures = new();
         private readonly Queue<ProcedureTransition> m_pendingTransitions = new();
+        private readonly CancellationTokenSource m_shutdownCancellationTokenSource = new();
         private bool m_isTransitioning;
         private EFrameProcedure m_currentProcedure;
+        private EFrameProcedure m_enteringProcedure;
+        private IAssetPreloadScope m_currentPreloadScope;
 
         public EFrameProcedureManager(EFrameContext context, IEnumerable<EFrameProcedure> procedures)
         {
@@ -91,6 +97,7 @@ namespace EFrameWork.Runtime.Procedure
         {
             if (m_currentProcedure == null)
             {
+                ProcessPendingTransitions();
                 return;
             }
 
@@ -102,6 +109,14 @@ namespace EFrameWork.Runtime.Procedure
         public void Shutdown()
         {
             m_pendingTransitions.Clear();
+            m_shutdownCancellationTokenSource.Cancel();
+
+            if (m_enteringProcedure != null)
+            {
+                m_enteringProcedure.BeginLeave();
+                m_enteringProcedure.EndLeave();
+                m_enteringProcedure = null;
+            }
 
             if (m_currentProcedure != null)
             {
@@ -110,6 +125,8 @@ namespace EFrameWork.Runtime.Procedure
                 m_currentProcedure.EndLeave();
                 m_currentProcedure = null;
             }
+
+            ReleaseCurrentPreloadScope();
 
             foreach (var procedure in m_procedures.Values)
             {
@@ -142,27 +159,51 @@ namespace EFrameWork.Runtime.Procedure
 
         private void ProcessPendingTransitions()
         {
+            if (m_pendingTransitions.Count == 0)
+            {
+                return;
+            }
+
             if (m_isTransitioning)
             {
                 return;
             }
 
             m_isTransitioning = true;
+            ProcessPendingTransitionsAsync(m_shutdownCancellationTokenSource.Token).Forget();
+        }
+
+        private async UniTaskVoid ProcessPendingTransitionsAsync(CancellationToken cancellationToken)
+        {
             try
             {
                 while (m_pendingTransitions.Count > 0)
                 {
                     var transition = m_pendingTransitions.Dequeue();
-                    ExecuteTransition(transition);
+                    await ExecuteTransitionAsync(transition, cancellationToken);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
             }
             finally
             {
                 m_isTransitioning = false;
+
+                if (!cancellationToken.IsCancellationRequested && m_pendingTransitions.Count > 0)
+                {
+                    ProcessPendingTransitions();
+                }
             }
         }
 
-        private void ExecuteTransition(ProcedureTransition transition)
+        private async UniTask ExecuteTransitionAsync(ProcedureTransition transition, CancellationToken cancellationToken)
         {
             var previousProcedure = m_currentProcedure;
             var previousProcedureType = previousProcedure?.GetType();
@@ -172,6 +213,8 @@ namespace EFrameWork.Runtime.Procedure
                 previousProcedure.BeginLeave();
                 previousProcedure.OnLeave(false);
                 previousProcedure.EndLeave();
+                ReleaseCurrentPreloadScope();
+                m_currentProcedure = null;
             }
 
             if (!m_procedures.TryGetValue(transition.ProcedureType, out var nextProcedure))
@@ -181,9 +224,45 @@ namespace EFrameWork.Runtime.Procedure
                 return;
             }
 
-            m_currentProcedure = nextProcedure;
+            var enterContext = new ProcedureEnterContext(previousProcedureType, transition.Payload);
+            var preloadScope = Context.Assets.CreatePreloadScope();
+            m_enteringProcedure = nextProcedure;
             nextProcedure.BeginEnter();
-            nextProcedure.OnEnter(new ProcedureEnterContext(previousProcedureType, transition.Payload));
+
+            try
+            {
+                await nextProcedure.OnPreloadAsync(preloadScope, enterContext);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                preloadScope.Dispose();
+                nextProcedure.BeginLeave();
+                nextProcedure.EndLeave();
+                return;
+            }
+            finally
+            {
+                m_enteringProcedure = null;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                preloadScope.Dispose();
+                nextProcedure.BeginLeave();
+                nextProcedure.EndLeave();
+                return;
+            }
+
+            m_currentPreloadScope = preloadScope;
+            m_currentProcedure = nextProcedure;
+            nextProcedure.OnEnter(enterContext);
+        }
+
+        private void ReleaseCurrentPreloadScope()
+        {
+            m_currentPreloadScope?.Dispose();
+            m_currentPreloadScope = null;
         }
 
         private readonly struct ProcedureTransition

@@ -568,17 +568,25 @@ namespace {moduleNamespace}.Common
 
         private static string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
-            return $@"using EFrameWork.Runtime.Procedure;
+            return $@"using Cysharp.Threading.Tasks;
+using EFrameWork.Runtime.Asset;
+using EFrameWork.Runtime.Procedure;
+using {moduleNamespace}.Common;
 using UnityEngine;
 
 namespace {moduleNamespace}.Procedure
 {{
     public sealed class Procedure{moduleName}Entry : EFrameProcedure
     {{
+        protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
+        {{
+            await assets.PreloadAsync<GameObject>({moduleName}ResPath.MainView);
+        }}
+
         protected override void OnEnter(ProcedureEnterContext context)
         {{
             base.OnEnter(context);
-            Debug.Log(""[Procedure{moduleName}Entry] Entered. TODO: preload module resources and open {moduleName}MainView."");
+            Debug.Log(""[Procedure{moduleName}Entry] Entered. TODO: open {moduleName}MainView."");
         }}
 
         protected override void OnLeave(bool isShutdown)

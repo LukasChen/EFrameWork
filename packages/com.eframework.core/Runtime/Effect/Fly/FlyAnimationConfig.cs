@@ -1,7 +1,6 @@
 using System;
 using EFrameWork.Runtime.Audio;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace EFrameWork.Runtime.Effect.Fly
 {
@@ -27,8 +26,15 @@ namespace EFrameWork.Runtime.Effect.Fly
     public sealed class FlyAnimationConfig : ScriptableObject
     {
         [Header("Asset")]
-        [Tooltip("飞行体预制体引用（Addressables AssetReference）")]
-        public AssetReferenceGameObject PrefabReference;
+        [SerializeField]
+        private string m_prefabAssetId;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private GameObject m_prefabAsset;
+#endif
+
+        public string PrefabAssetId => m_prefabAssetId;
 
         [Header("Motion")]
         public FlyPathType PathType = FlyPathType.QuadraticBezier;
@@ -97,34 +103,60 @@ namespace EFrameWork.Runtime.Effect.Fly
         [Header("Audio")]
         public FlyAudioPlayMode FlySoundMode = FlyAudioPlayMode.OncePerSequence;
 
-        [Tooltip("音效资源引用（AudioClipAsset）。如果设置则优先生效")]
-        public AssetReferenceT<AudioClipAsset> FlySoundAsset;
+        [SerializeField]
+        private string m_flySoundAssetId;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private AudioClipAsset m_flySoundAsset;
+#endif
+
+        public string FlySoundAssetId => m_flySoundAssetId;
 
         public FlyAudioPlayMode ArriveSoundMode = FlyAudioPlayMode.OncePerSequence;
 
-        [Tooltip("音效资源引用（AudioClipAsset）。如果设置则优先生效")]
-        public AssetReferenceT<AudioClipAsset> ArriveSoundAsset;
+        [SerializeField]
+        private string m_arriveSoundAssetId;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private AudioClipAsset m_arriveSoundAsset;
+#endif
+
+        public string ArriveSoundAssetId => m_arriveSoundAssetId;
 
         [Header("Effect")]
-        [Tooltip("开始特效预制体引用（每个飞行体 spawn 时播放一次）。为空则不播放")]
-        public AssetReferenceGameObject StartEffect;
+        [SerializeField]
+        private string m_startEffectAssetId;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private GameObject m_startEffectAsset;
+#endif
+
+        public string StartEffectAssetId => m_startEffectAssetId;
 
         [Min(0f)]
-        [Tooltip("开始特效自动销毁时间（秒），0 表示不自动销毁")]
         public float StartEffectDestroyTime = 2f;
 
-        [Tooltip("结束特效预制体引用（每个飞行体到达时播放一次）。为空则不播放")]
-        public AssetReferenceGameObject EndEffect;
+        [SerializeField]
+        private string m_endEffectAssetId;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private GameObject m_endEffectAsset;
+#endif
+
+        public string EndEffectAssetId => m_endEffectAssetId;
 
         [Min(0f)]
-        [Tooltip("结束特效自动销毁时间（秒），0 表示不自动销毁")]
         public float EndEffectDestroyTime = 2f;
 
         public bool HasValidAsset
         {
             get
             {
-                return PrefabReference != null && PrefabReference.RuntimeKeyIsValid();
+                return !string.IsNullOrEmpty(m_prefabAssetId);
             }
         }
 

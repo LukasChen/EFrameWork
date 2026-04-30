@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using EFrameWork.Runtime.Asset;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ namespace EFrameWork.Runtime.Audio
         // SFX: 统一音频池
         private List<AudioSource> m_audioSourcePool;
         private Dictionary<AudioClip, float> m_lastPlayTimeByClip;
+        private readonly HashSet<AudioClipAsset> m_unpreloadedAudioClipAssetWarnings = new();
 
         public AudioManager(EFrameComponent baseComponent)
         {
@@ -124,6 +126,7 @@ namespace EFrameWork.Runtime.Audio
             m_musicAudioSourceCache?.Clear();
             m_audioSourcePool?.Clear();
             m_lastPlayTimeByClip?.Clear();
+            m_unpreloadedAudioClipAssetWarnings.Clear();
         }
 
         private void InitAudioCache()
@@ -266,17 +269,51 @@ namespace EFrameWork.Runtime.Audio
                 PlayAudioClipAsset(audioClipAsset);
         }
 
+        public async UniTask<bool> PreloadAudioClipAssetAsync(AudioClipAsset audioClipAsset)
+        {
+            return audioClipAsset != null && await audioClipAsset.PreloadAsync();
+        }
+
+        public void ReleaseAudioClipAsset(AudioClipAsset audioClipAsset)
+        {
+            if (audioClipAsset == null) return;
+
+            audioClipAsset.ReleaseLoadedClips();
+            m_unpreloadedAudioClipAssetWarnings.Remove(audioClipAsset);
+        }
+
         /// <summary>
         /// 播放AudioClipAsset (支持随机音量/音调/防抖间隔)
         /// </summary>
         public void PlayAudioClipAsset(AudioClipAsset audioClipAsset)
         {
             if (audioClipAsset == null) return;
-            AudioClip audioClip = audioClipAsset.LoadClip();
+
+            AudioClip audioClip;
+            if (audioClipAsset.IsPreloaded)
+            {
+                audioClipAsset.TryGetPreloadedClip(out audioClip);
+            }
+            else
+            {
+                LogUnpreloadedAudioClipAssetWarning(audioClipAsset);
+                audioClip = audioClipAsset.LoadClip();
+            }
+
             if (audioClip == null) return;
 
             PlaySfxInternal(audioClip, audioClipAsset.MinIntervalTime,
                 audioClipAsset.Volume.RandomValue, audioClipAsset.Pitch.RandomValue);
+        }
+
+        private void LogUnpreloadedAudioClipAssetWarning(AudioClipAsset audioClipAsset)
+        {
+            if (audioClipAsset == null || !m_unpreloadedAudioClipAssetWarnings.Add(audioClipAsset))
+            {
+                return;
+            }
+
+            Debug.LogWarning($"AudioClipAsset '{audioClipAsset.name}' was played before preload. Falling back to synchronous load; preload it during loading for realtime SFX.");
         }
 
         /// <summary>
