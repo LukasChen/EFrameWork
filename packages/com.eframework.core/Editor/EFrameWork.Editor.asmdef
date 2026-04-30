@@ -1,0 +1,24 @@
+{
+    "name": "EFrameWork.Editor",
+    "rootNamespace": "",
+    "references": [
+        "EFrameWork",
+        "UniTask",
+        "Lofelt.NiceVibrations",
+        "UnityGameFramwork",
+        "Unity.Addressables",
+        "Unity.TextMeshPro",
+        "Unity.Addressables.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

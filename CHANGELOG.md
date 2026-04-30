@@ -6,6 +6,20 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-04-30
+
+### Added
+
+- Added a dedicated `EFrameWork.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
+
+### Changed
+
+- Declared Universal RP as a required package dependency and documented the URP camera-stack contract for `QUI` scene-camera overlay binding.
+
+### Fixed
+
+- Removed the stale repo-root `eframe-ai.manifest.json` duplicate so `.github/eframe-ai.manifest.json` remains the only canonical AI sync marker.
+
 ## [0.2.3] - 2026-04-30
 
 ### Added

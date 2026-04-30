@@ -9,6 +9,8 @@ EFrameWork Core is a reusable Unity game framework package extracted from `CozyB
 - `Plugins/`: remaining bundled third-party dependencies that still ship with this package.
 - `Samples~/`: sample assets imported from the source project.
 
+Unity package dependencies include Addressables, UGUI, Input System, Universal RP, TextMeshPro, and Unity Newtonsoft.Json.
+
 Bundled plugin versions:
 
 - UniTask `2.5.10`
@@ -76,6 +78,10 @@ https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 - Keep DOTween as a normal project plugin under `Assets`
 - Use `EFrame Tools/项目初始化向导` to create or open `Assets/Resources/DOTweenSettings.asset`
 - Do not expect DOTween Utility Panel module management to work against a package-local copy
+
+## URP Requirement
+
+`com.eframework.core` requires Universal RP. The runtime UI camera contract uses URP overlay-camera APIs to attach the persistent UI camera to the selected `EFrameSceneCamera`, so consuming projects should configure a URP pipeline asset before relying on scene-camera UI overlay binding.
 
 ## TextMeshPro Dependency
 

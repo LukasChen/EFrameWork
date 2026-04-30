@@ -1,7 +1,7 @@
 ﻿{
   "name": "com.eframework.core",
   "displayName": "EFrameWork Core",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "unity": "6000.0",
   "description": "Reusable Unity game framework extracted from CozyBloom.",
   "keywords": [
@@ -17,6 +17,7 @@
     "com.unity.addressables": "2.9.1",
     "com.unity.ugui": "2.0.0",
     "com.unity.inputsystem": "1.19.0",
+    "com.unity.render-pipelines.universal": "17.0.4",
     "com.unity.textmeshpro": "3.2.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1"
   },

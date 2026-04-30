@@ -31,7 +31,7 @@ When one part changes the expected project shape, the matching AI guidance must 
 - `instructions/eframe-*.instructions.md` contains short, stable runtime and editor rules that are part of the synced business-project contract.
 - `skills/eframe-*` contains on-demand business-project workflows that are also synced into business projects.
 - `instructions/maintainer-*.instructions.md` and `skills/maintainer-*` contain framework-repository-only guidance and workflows; these files are not part of the synced project contract because the sync scripts only manage `eframe-*` items.
-- `eframe-ai.manifest.json` declares the synced AI layer version.
+- `.github/eframe-ai.manifest.json` declares the synced AI layer version; no repo-root duplicate manifest should exist.
 
 `AGENTS.md`
 

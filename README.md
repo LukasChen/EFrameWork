@@ -77,6 +77,10 @@ Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to c
 - Then use `EFrame Tools/项目初始化向导` to create or open `Assets/Resources/DOTweenSettings.asset`
 - Do not rely on configuring DOTween through a package-local copy
 
+## URP Dependency
+
+`com.eframework.core` requires the Universal Render Pipeline package. `QUI` binds the persistent UI camera into the active `EFrameSceneCamera` stack through URP overlay-camera APIs, so consuming projects should be URP projects.
+
 ## TextMeshPro Dependency
 
 `com.eframework.core` also uses TextMeshPro directly and now expects the official Unity package dependency `com.unity.textmeshpro` instead of a framework-bundled copy.
