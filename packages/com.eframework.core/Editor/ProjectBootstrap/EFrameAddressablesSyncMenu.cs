@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
 
 namespace EFrameWork.Editor.ProjectBootstrap
 {
@@ -11,23 +10,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
         [MenuItem(MenuPath, false, 30)]
         private static void SyncGroupsAndGenerateResPath()
         {
-            EditorUtility.DisplayProgressBar("EFrame Addressables", "Syncing managed groups and generating ResPath...", 0.5f);
-            try
-            {
-                if (!EFrameAddressablesBootstrapUtility.SyncProjectAddressablesAndGenerateResPath(out var message))
-                {
-                    Debug.LogError($"[EFrame Addressables] {message}");
-                    EditorUtility.DisplayDialog("EFrame Addressables Sync Failed", message, "OK");
-                    return;
-                }
-
-                Debug.Log($"[EFrame Addressables] {message}");
-                EditorUtility.DisplayDialog("EFrame Addressables Sync Complete", message, "OK");
-            }
-            finally
-            {
-                EditorUtility.ClearProgressBar();
-            }
+            EFrameAddressablesReportWindow.Open();
         }
     }
 }

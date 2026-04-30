@@ -54,6 +54,24 @@
                 </header>
 
                 <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Managed Addressables</div><h2>EFrame resources are directory-owned, not manually address-owned.</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>Mapped directories</h3>
+                            <p>Put managed runtime assets under `Assets/App/Res`, project scenes under `Assets/Scenes`, and module assets under `Assets/Modules/&lt;Name&gt;/Res` or `Assets/Modules/&lt;Name&gt;/Scenes`.</p>
+                        </div>
+                        <div class="callout">
+                            <h3>Automatic sync</h3>
+                            <p>The editor syncs managed resources after import, move, or delete. `ResPath.Generated.cs` is generated from the directory subtrees selected in the report window.</p>
+                        </div>
+                        <div class="callout">
+                            <h3>Build preflight</h3>
+                            <p>Player builds run an EFrame Addressables preflight. Stale groups, addresses, labels, selected generated addresses, or stale `ResPath.Generated` fail the build before content ships.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
                     <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>关键 API 参数与返回值</h2></div></div>
                     <div class="panel">
                         <h3>`LoadAsync<T>(string assetId)`</h3>

@@ -659,21 +659,9 @@ namespace {moduleNamespace}.UI.Controllers
 
         private bool SyncAddressablesAfterAssetChanges(string changeMessage)
         {
-            if (!EFrameAddressablesBootstrapUtility.AreAddressablesInitialized())
+            if (!EFrameAddressablesBootstrapUtility.SyncProjectAddressablesAndGenerateResPath(out var syncMessage))
             {
-                SetStatus($"{changeMessage} Addressables is not initialized yet, so group sync and ResPath generation were skipped.", false);
-                return true;
-            }
-
-            if (!EFrameAddressablesBootstrapUtility.EnsureProjectAddressablesGroups(out var groupsMessage))
-            {
-                SetStatus(groupsMessage, true);
-                return false;
-            }
-
-            if (!EFrameAddressablesBootstrapUtility.GenerateResPathCode(out var resPathMessage))
-            {
-                SetStatus(resPathMessage, true);
+                SetStatus(syncMessage, true);
                 return false;
             }
 

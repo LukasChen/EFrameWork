@@ -12,6 +12,7 @@ AI 协作层是框架一级能力，不是附属文档。后续优化或重构�
 - 需要承载框架 UI overlay 的运行时场景相机必须挂载 `EFrameSceneCamera`，由 `QUI` 事件式维护 UI camera stack；不要在业务代码里轮询相机或手动改 UI 相机 stack。
 - 资源路径应该集中管理，优先使用 `ResPath` 或等价路径中心类，避免在业务代码中散写路径字符串。
 - 对 Addressables 动态加载，优先使用 `ResPath.Generated`、稳定入口 `ResPath` 或 `AssetReference`，不要在业务代码里直接写裸地址字符串。
+- Managed resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` are owned by EFrame Addressables automation; business projects should place assets in the mapped directory, avoid manual Addressables group/address edits, and use the report window to choose which directories generate `ResPath.Generated`.
 - 新增代码优先落到明确结构，例如 `Assets/App/Runtime`、`Assets/App/Res`、`Assets/Modules/*`，不要扩散临时目录。
 - 基础目录结构以 `UNITY_DIRECTORY_STRUCTURE.md` 为准；如果业务项目有差异，只在 `project-*` overlay 里补充差异，不复制整份规范。
 - 命名保持稳定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`、`StartUp.unity`、`Boot`、`Main Camera`。

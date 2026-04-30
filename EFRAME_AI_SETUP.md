@@ -82,7 +82,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 
 生成的 View wrapper 采用当前 handle-first UI 契约：View 保持无参构造，通过 `OnBindingSet()` 缓存 `QUIBinding` 组件引用；Controller 通过 `TypedViewHandle.TypedView` 访问运行中 View，并按 `OnViewCreated()` / `OnViewDestroyed()` 管理实例级绑定，按 `OnViewOpened()` / `OnViewClosed()` 管理每次打开关闭的刷新或暂停逻辑。
 
-如果此时 Addressables 已经初始化，窗口会立即重跑目录分组同步并重新生成 `ResPath.Generated.cs`，这样刚复制出来的 UI prefab 会马上进入地址管理。
+初始化窗口会立即重跑目录分组同步并按当前 ResPath 目录选择重新生成 `ResPath.Generated.cs`，这样刚复制出来的 UI prefab 会马上进入地址管理；后续托管目录里的导入、移动和删除也会由编辑器自动同步。
 
 ## 3. Unity 编辑器内初始化方式
 
@@ -103,7 +103,7 @@ EFrame Tools/项目初始化向导
 
 Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，`AudioEventConfig.asset` 由冷启动脚本生成，运行时通过 `AudioResourcePaths` 集中加载。
 
-资源迁移或新增完成后，可以通过菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 单独同步 Addressables 分组并重新生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。这个入口不会执行完整项目初始化，也不会刷新启动场景，适合业务项目升级、资源移动或模块整理后的日常同步。
+资源迁移或新增完成后，`Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的托管资源会自动同步 Addressables 分组。菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 会打开托管资源窗口，用于选择哪些目录根下的直接文件生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`；子目录不会继承父目录选择，需要单独勾选。窗口也可查看 Addressables 与 `ResPath.Generated` 对应关系、目录规范问题，以及执行手动修复/验证。
 
 ## 4. 仅同步 AI 的方式
 

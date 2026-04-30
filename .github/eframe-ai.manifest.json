@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.48",
+  "version": "0.1.52",
   "updatedAt": "2026-04-30",
-  "notes": "Removed the legacy repo-root manifest duplicate and kept .github/eframe-ai.manifest.json as the only canonical AI sync marker."
+  "notes": "Clarify that ResPath directory selection is exact and does not inherit into subdirectories."
 }

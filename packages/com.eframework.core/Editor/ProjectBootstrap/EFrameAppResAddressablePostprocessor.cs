@@ -35,9 +35,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
         {
             foreach (var assetPath in assetPaths)
             {
-                if (assetPath.StartsWith(EFrameAddressablesBootstrapUtility.AppResRootPath + "/", System.StringComparison.OrdinalIgnoreCase)
-                    || assetPath.StartsWith(EFrameAddressablesBootstrapUtility.ProjectScenesRootPath + "/", System.StringComparison.OrdinalIgnoreCase)
-                    || assetPath.StartsWith(EFrameAddressablesBootstrapUtility.ModulesRootPath + "/", System.StringComparison.OrdinalIgnoreCase))
+                if (EFrameAddressablesBootstrapUtility.IsManagedAssetChangePath(assetPath))
                 {
                     return true;
                 }
@@ -50,7 +48,13 @@ namespace EFrameWork.Editor.ProjectBootstrap
         {
             s_syncScheduled = false;
 
-            EFrameAddressablesBootstrapUtility.SyncImportedAssets(null, out _);
+            if (!EFrameAddressablesBootstrapUtility.SyncImportedAssets(null, out var message))
+            {
+                UnityEngine.Debug.LogError($"[EFrame Addressables] Auto sync failed. {message}");
+                return;
+            }
+
+            UnityEngine.Debug.Log($"[EFrame Addressables] Auto sync complete. {message}");
         }
     }
 }

@@ -34,6 +34,8 @@ Project-local `project-*.instructions.md` overlays may add more specific busines
 - 资源路径不要散落硬编码；如果当前模块还没有 `ResPath`，至少新增集中常量，不要在多个类里重复写字符串。
 - 使用 Addressables 动态加载时，优先依赖 `ResPath.Generated`、稳定入口 `ResPath` 或 `AssetReference`，不要直接把完整地址写进业务逻辑。
 - 使用 Addressables 加载或实例化运行时资源时，走 `EFrame.Current.Assets.LoadAsync(...)`、`InstantiateAsync(...)` 和句柄释放。
+- Managed resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` follow the EFrame directory contract. Do not hand-edit their Addressables group, address, or managed label.
+- New, moved, and deleted managed resources are expected to be synchronized by the EFrame editor automation and verified before player builds. Business code should consume `ResPath.Generated` for selected code-driven load directories, stable `ResPath` wrappers, or `AssetReference` values instead of treating the Addressables window as the source of truth.
 
 ## Startup And Runtime Access
 

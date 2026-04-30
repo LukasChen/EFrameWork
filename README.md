@@ -73,6 +73,16 @@ Before releasing AI-layer or bootstrap tooling changes, run:
 
 Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, and trigger AI/bootstrap initialization from a single window.
 
+## Managed Resource Convention
+
+EFrameWork treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as framework-managed Addressables content. Put assets in the mapped directory and let the editor automation own the Addressables group, address, and `eframe-managed` label.
+
+- Importing, moving, or deleting managed resources automatically syncs Addressables groups.
+- `ResPath.Generated` is generated only from direct child files of the directories selected in the managed resource report window. Select subdirectories explicitly when their files also need code-driven load constants.
+- Player builds run an EFrame Addressables preflight and fail if managed entries, addresses, labels, or generated paths are stale.
+- Use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to open the managed resource report window, choose ResPath source directories, inspect Addressables-to-ResPath mappings, review directory convention issues, or run a manual repair/check.
+- Runtime code should use `ResPath.Generated`, stable handwritten `ResPath` wrappers, or inspector-authored `AssetReference` values instead of raw Addressables strings.
+
 ## DOTween Dependency
 
 `com.eframework.core` uses DOTween directly in several runtime components. Consumer projects should install DOTween into the project `Assets` before using tween-enabled EFrameWork features.

@@ -341,11 +341,47 @@ Assets/Modules/<Name>/
 
 ResPath 约束：
 
-- 业务代码优先使用 `ResPath.Generated.*` 常量访问 Addressables 地址。
+- 业务代码优先使用 `ResPath.Generated.*` 常量访问“代码主动加载”的 Addressables 地址。
 - 手写 `ResPath.cs` 负责稳定 API，不承担整表手工维护。
 - 详细规范见 `RESPATH_CONVENTION.md`。
 
-## 9. 禁止事项
+## 9. 自动 Addressables 与 ResPath
+
+EFrame 的资源自动化建立在严格目录规范之上：资源放入约定目录后，Addressables 分组、地址和 `eframe-managed` 标签由框架工具统一管理，业务项目不再手动维护这些托管资源的 Addressables entry。
+
+托管根目录：
+
+- `Assets/App/Res/...`
+- `Assets/Scenes/...`
+- `Assets/Modules/<Name>/Res/...`
+- `Assets/Modules/<Name>/Scenes/...`
+
+自动映射规则：
+
+- `Assets/App/Res/Bootstrap/...` -> `App Bootstrap Group`，地址相对 `Assets/App/Res` 生成，例如 `Bootstrap/LoadingView`
+- `Assets/App/Res/SceneAssets/...` -> `App SceneAssets Group`，地址相对 `Assets/App/Res` 生成
+- `Assets/App/Res/...` -> `App Shared Group`，地址相对 `Assets/App/Res` 生成
+- `Assets/Scenes/...` -> `App Scenes Group`，地址相对 `Assets` 生成，例如 `Scenes/StartUp`
+- `Assets/Modules/<Name>/Res/...` -> `Module <Name> Assets Group`，地址相对 `Assets` 生成
+- `Assets/Modules/<Name>/Scenes/...` -> `Module <Name> Scenes Group`，地址相对 `Assets` 生成
+
+生成物：
+
+- `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` 由 Addressables 同步工具按“已选择的 ResPath 目录”生成，不要手动编辑。
+- `Assets/App/Runtime/Common/ResPath.cs` 保留为手写稳定入口和动态辅助方法，不承担逐条资源清单维护。
+- 业务代码优先使用 `ResPath.Generated.*`、稳定 `ResPath` 包装或 inspector-authored `AssetReference`，不要散写裸 Addressables 字符串。
+- `ResPath.Generated` 是代码加载入口清单，不是完整资源总账。只被 prefab、材质、配置或其他 asset 引用的依赖资源可以继续由 Addressables 作为依赖收集，不必生成 ResPath 常量。
+
+编辑器工具：
+
+- `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 打开托管资源窗口。
+- 窗口可以选择哪些目录根下的直接文件参与 `ResPath.Generated`；子目录不会继承父目录选择，需要单独勾选。窗口也可查看当前 Addressables entry、期望目录映射、生成地址和 ResPath 成员之间的对应关系。
+- 窗口会标记 `Synced`、`Needs Sync`、`Stale` 项，并显示目录结构检查结果。
+- 导入、移动、删除托管目录资源时会自动同步；Player Build 前会执行同步与校验。
+
+目录规范和自动化必须一起维护：如果项目把资源放到约定目录之外，框架不会把它纳入自动 Addressables 管线；如果项目确实需要额外目录，应在项目 overlay 中声明差异，并补充等价的路径中心和同步规则。是否进入 `ResPath.Generated` 则由同步工具中的目录选择决定。
+
+## 10. 禁止事项
 
 - 不要在 `Assets` 根下长期堆放零散脚本目录。
 - 不要把 Editor 代码混入 Runtime 目录。
@@ -353,7 +389,7 @@ ResPath 约束：
 - 不要把生成代码写进手写业务目录。
 - 不要为一个普通页面单独新建 Module 目录。
 
-## 10. 迁移原则
+## 11. 迁移原则
 
 - 如果项目仍处于过渡结构，新增功能优先收敛到上述标准目录。
 - 旧目录可以逐步迁移，但新代码不要继续扩散旧结构。

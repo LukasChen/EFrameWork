@@ -63,8 +63,9 @@
 15. Unity 编辑器菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
 16. 初始化窗口会自动补齐 `QUI` 依赖的 Unity SortingLayer；手动菜单修复入口仍可单独执行。
 17. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
-18. 初始化窗口或 Addressables 同步流程能生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
-19. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
+18. 初始化窗口或 Addressables 同步流程能按当前 ResPath 目录选择生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
+19. 托管资源目录导入、移动、删除后会自动同步 Addressables，且 Player Build 前会执行同步与校验；如果 `ResPath.Generated` 在构建前被刷新，构建应中止并提示等待 Unity 重新编译。
+20. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明仍然准确。
 20. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约仍然准确。
 21. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步更新。
 22. UI 主链路变化时，确认 `UI_FRAMEWORK_GUIDE.md`、`eframe-runtime.instructions`、`eframe-ui-feature`、`eframe-guideline-audit`、bootstrap 脚本和编辑器初始化模板都保持同一套 `QUI` / `UIViewHandle` / `UIControllerBase` 契约。

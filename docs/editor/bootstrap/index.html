@@ -52,10 +52,23 @@
                     <p class="lead">EFrameWork 当前已经把项目初始化、Addressables 同步、模板导入、Audio 初始化、DOTween 前置条件整理成 Editor 工具链。文档页要做的是告诉你每个入口负责什么，而不是只罗列菜单名。</p>
                     <div class="meta-list">
                         <div><dt>主入口</dt><dd>`EFrame Tools/项目初始化向导`</dd></div>
-                        <div><dt>日常同步</dt><dd>`Addressables/Sync Groups And Generate ResPath`</dd></div>
+                        <div><dt>日常同步</dt><dd>Managed directory auto-sync + build preflight</dd></div>
                         <div><dt>目标</dt><dd>让新项目和升级项目都走统一路径</dd></div>
                     </div>
                 </header>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Strong Resource Convention</div>
+                            <h2>Managed resources should be placed, not hand-wired.</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <p>`Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` are EFrame-managed Addressables roots. The framework owns group selection, generated address, `eframe-managed` label, and stale entry cleanup for those directories.</p>
+                        <p>`Sync Groups And Generate ResPath` opens the report window where projects choose which directory subtrees generate `ResPath.Generated`; import/move/delete automation and build preflight handle normal Addressables correctness.</p>
+                    </div>
+                </section>
 
                 <section class="section">
                     <div class="section-header">
@@ -71,7 +84,7 @@
                         </div>
                         <div class="module-row">
                             <strong>`EFrameAddressablesSyncMenu`</strong>
-                            <p>只做日常资源同步和 `ResPath.Generated.cs` 生成，不触发完整初始化流程。</p>
+                            <p>作为资源地址修复/验证入口，重新同步托管 Addressables 分组，并按窗口中选择的目录生成 `ResPath.Generated.cs`，不触发完整初始化流程。</p>
                         </div>
                         <div class="module-row">
                             <strong>`EFrameUIBootstrapUtility` / `EFrameSampleUIPrefabUtility`</strong>
@@ -99,7 +112,7 @@
                             <tbody>
                                 <tr><td>全新项目接入</td><td>`Full Initialize Project`</td><td>一次补齐场景、目录、资源、UI layer、Audio、DOTween 和模板。</td></tr>
                                 <tr><td>只重新导入示例 UI</td><td>`Import Initial Templates`</td><td>避免整套初始化重跑，只更新示例 prefab。</td></tr>
-                                <tr><td>资源移动后重新整理地址</td><td>`Sync Groups And Generate ResPath`</td><td>只做 Addressables 与路径中心同步，适合高频日常维护。</td></tr>
+                                <tr><td>资源移动后重新整理地址</td><td>Auto-sync, or `Sync Groups And Generate ResPath` for repair</td><td>托管目录变化会自动同步；菜单入口保留给手动修复和验证。</td></tr>
                             </tbody>
                         </table>
                     </div>

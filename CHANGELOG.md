@@ -6,6 +6,12 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+### Added
+
+- Added the strong managed Addressables convention: EFrame-owned resource directories auto-sync groups, addresses, labels, and generated `ResPath`, with build-time validation and synced AI guidance.
+- Added the managed resource report window contract so the Addressables sync entry can inspect Addressables-to-ResPath mappings and directory convention issues.
+- Split managed Addressables automation from ResPath generation so the framework owns Addressables directories while the report window chooses which directory subtrees generate `ResPath.Generated`.
+
 ## [0.2.4] - 2026-04-30
 
 ### Added
