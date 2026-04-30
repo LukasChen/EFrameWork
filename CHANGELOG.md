@@ -6,11 +6,20 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-30
+
 ### Added
 
+- Added EFrame-owned Procedure runtime and editor configuration (`EFrameProcedure`, `EFrameProcedureComponent`, payload enter context, and inspector).
 - Added the strong managed Addressables convention: EFrame-owned resource directories auto-sync groups, addresses, labels, and generated `ResPath`, with build-time validation and synced AI guidance.
 - Added the managed resource report window contract so the Addressables sync entry can inspect Addressables-to-ResPath mappings and directory convention issues.
 - Split managed Addressables automation from ResPath generation so the framework owns Addressables directories while the report window chooses which directory subtrees generate `ResPath.Generated`.
+
+## [0.2.5] - 2026-04-30
+
+### Fixed
+
+- Removed the deprecated `com.unity.textmeshpro` package dependency and documented TextMeshPro as part of `com.unity.ugui` for current Unity versions.
 
 ## [0.2.4] - 2026-04-30
 

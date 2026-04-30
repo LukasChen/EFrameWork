@@ -126,24 +126,23 @@ namespace $RootNamespace.Common
 "@
 
 $procedureLauncherContent = @"
-using GameFramework.Procedure;
+using EFrameWork.Runtime.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace $RootNamespace.Procedure
 {
-    public sealed class ProcedureLauncher : ProcedureBase
+    public sealed class ProcedureLauncher : EFrameProcedure
     {
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(ProcedureEnterContext context)
         {
-            base.OnEnter(procedureOwner);
+            base.OnEnter(context);
             Debug.Log("[ProcedureLauncher] Entered. Switching to ProcedureHome.");
-            ChangeState<ProcedureHome>(procedureOwner);
+            ChangeState<ProcedureHome>();
         }
 
-        protected override void OnLeave(ProcedureOwner procedureOwner, bool isShutdown)
+        protected override void OnLeave(bool isShutdown)
         {
-            base.OnLeave(procedureOwner, isShutdown);
+            base.OnLeave(isShutdown);
         }
     }
 }
@@ -151,23 +150,22 @@ namespace $RootNamespace.Procedure
 
 $procedureHomeContent = @"
 using EFrameWork.Runtime;
+using EFrameWork.Runtime.Procedure;
 using $RootNamespace.Modules.SampleModule.Procedure;
 using $RootNamespace.UI.Controllers;
-using GameFramework.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace $RootNamespace.Procedure
 {
-    public sealed class ProcedureHome : ProcedureBase
+    public sealed class ProcedureHome : EFrameProcedure
     {
         private HomeViewController m_homeViewController;
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(ProcedureEnterContext context)
         {
-            base.OnEnter(procedureOwner);
+            base.OnEnter(context);
 
-            if (EFrame.Current?.UI == null)
+            if (Context?.UI == null)
             {
                 Debug.LogError("[ProcedureHome] EFrame UI is not initialized.");
                 return;
@@ -175,14 +173,14 @@ namespace $RootNamespace.Procedure
 
             m_homeViewController = new HomeViewController
             {
-                ModuleTestRequested = () => ChangeState<ProcedureSampleModuleEntry>(procedureOwner)
+                ModuleTestRequested = () => ChangeState<ProcedureSampleModuleEntry>()
             };
 
             m_homeViewController.Show();
             Debug.Log("[ProcedureHome] Entered. HomeView is shown.");
         }
 
-        protected override void OnLeave(ProcedureOwner procedureOwner, bool isShutdown)
+        protected override void OnLeave(bool isShutdown)
         {
             if (m_homeViewController != null)
             {
@@ -191,7 +189,7 @@ namespace $RootNamespace.Procedure
                 m_homeViewController = null;
             }
 
-            base.OnLeave(procedureOwner, isShutdown);
+            base.OnLeave(isShutdown);
         }
     }
 }
@@ -319,31 +317,30 @@ namespace $moduleNamespace.Common
 
     $moduleProcedureContent = @"
 using $RootNamespace.Procedure;
+using EFrameWork.Runtime.Procedure;
 using $moduleNamespace.UI.Controllers;
-using GameFramework.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace $moduleNamespace.Procedure
 {
-    public sealed class Procedure${ModuleName}Entry : ProcedureBase
+    public sealed class Procedure${ModuleName}Entry : EFrameProcedure
     {
         private ${ModuleName}MainViewController m_viewController;
 
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(ProcedureEnterContext context)
         {
-            base.OnEnter(procedureOwner);
+            base.OnEnter(context);
 
             m_viewController = new ${ModuleName}MainViewController
             {
-                BackRequested = () => ChangeState<ProcedureHome>(procedureOwner)
+                BackRequested = () => ChangeState<ProcedureHome>()
             };
 
             m_viewController.Show();
             Debug.Log("[Procedure${ModuleName}Entry] Entered. ${ModuleName}MainView is shown.");
         }
 
-        protected override void OnLeave(ProcedureOwner procedureOwner, bool isShutdown)
+        protected override void OnLeave(bool isShutdown)
         {
             if (m_viewController != null)
             {
@@ -352,7 +349,7 @@ namespace $moduleNamespace.Procedure
                 m_viewController = null;
             }
 
-            base.OnLeave(procedureOwner, isShutdown);
+            base.OnLeave(isShutdown);
         }
     }
 }
@@ -455,17 +452,17 @@ Create a startup scene named `StartUp.unity` under `Assets/Scenes` and keep the 
 ```text
 StartUp
 |- Boot
-|  |- ProcedureComponent
+|  |- EFrameProcedureComponent
 |  |- EFrameComponent
 |- Main Camera
 ```
 
 Required setup:
 
-1. Add `ProcedureComponent` and `EFrameComponent` to `Boot`
-2. Assign the same `ProcedureComponent` instance to `EFrameComponent.m_procedureComponent`
+1. Add `EFrameProcedureComponent` and `EFrameComponent` to `Boot`
+2. Assign the same `EFrameProcedureComponent` instance to `EFrameComponent.m_procedureComponent`
 3. Set `Main Camera` and UI camera references on `EFrameComponent`
-4. Register these procedures in `ProcedureComponent`:
+4. Register these procedures in `EFrameProcedureComponent`:
     - `$RootNamespace.Procedure.ProcedureLauncher`
     - `$RootNamespace.Procedure.ProcedureHome`
     - `$RootNamespace.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry`

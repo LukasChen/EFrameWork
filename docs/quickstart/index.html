@@ -59,7 +59,7 @@
                     <h1>第一次把 EFrameWork 接进一个 Unity 项目时，先走这条最短链路。</h1>
                     <p class="lead">这页只覆盖最容易踩偏的入口：启动场景、`EFrameComponent`、`EFrame.Initialize()`、服务访问和第一批运行时能力。更细的 UI、Data、Editor 和 AI 细节分别去模块页看。</p>
                     <div class="meta-list">
-                        <div><dt>入口组件</dt><dd>`EFrameComponent` + `ProcedureComponent`</dd></div>
+                        <div><dt>入口组件</dt><dd>`EFrameComponent` + `EFrameProcedureComponent`</dd></div>
                         <div><dt>静态入口</dt><dd>`EFrame.Current`</dd></div>
                         <div><dt>优先目标</dt><dd>确保初始化链正确，再开始业务功能开发</dd></div>
                     </div>
@@ -75,7 +75,7 @@
                     <div class="callout-grid">
                         <div class="callout">
                             <h3>1. 把 `EFrameComponent` 放在启动场景</h3>
-                            <p>该组件会在 `Awake()` 里暂停 `ProcedureComponent`，执行 `EFrame.Initialize(this)`，成功后再启用流程系统。</p>
+                            <p>该组件会在 `Awake()` 里暂停 `EFrameProcedureComponent`，执行 `EFrame.Initialize(this)`，成功后再初始化并启动流程系统。</p>
                         </div>
                         <div class="callout">
                             <h3>2. 只在初始化完成后访问服务</h3>
@@ -97,7 +97,7 @@
                     </div>
                     <div class="panel">
                         <ol>
-                            <li>`EFrameComponent.Awake()` 确保存在 `ProcedureComponent`。</li>
+                            <li>`EFrameComponent.Awake()` 确保存在 `EFrameProcedureComponent`。</li>
                             <li>启动协程 `FrameWorkInitialize()`。</li>
                             <li>调用 `EFrame.Initialize(this)`。</li>
                             <li>初始化 Addressables、Data、Audio、UI、Event、Coroutine、Vibration。</li>

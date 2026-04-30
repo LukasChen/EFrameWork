@@ -61,7 +61,7 @@
                     <div class="section-header"><div><div class="eyebrow">Flow</div><h2>初始化时序</h2></div></div>
                     <div class="panel">
                         <ol>
-                            <li>`EFrameComponent.Awake()` 确保有 `ProcedureComponent`。</li>
+                            <li>`EFrameComponent.Awake()` 确保有 `EFrameProcedureComponent`。</li>
                             <li>暂停流程组件，等待 `EFrame.Initialize(this)` 完成。</li>
                             <li>创建 Asset、Coroutine、Data、Event、UI、Audio、Vibration 服务。</li>
                             <li>组装成 `EFrameContext`，绑定到 `EFrame.Current`。</li>

@@ -39,6 +39,7 @@ Project-local `project-*.instructions.md` overlays may add more specific busines
 
 ## Startup And Runtime Access
 
+- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for startup flow state.
 - 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成，再访问 `EFrame.Current.UI`、`EFrame.Current.Audio`、`EFrame.Current.Data` 等框架服务。
 - `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 - EFrameWork runtime currently targets Universal RP; `QUI` scene-camera overlay binding depends on URP camera stack APIs.

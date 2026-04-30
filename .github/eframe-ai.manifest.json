@@ -1,6 +1,6 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.52",
+  "version": "0.1.53",
   "updatedAt": "2026-04-30",
-  "notes": "Clarify that ResPath directory selection is exact and does not inherit into subdirectories."
+  "notes": "Document EFrame-owned Procedure runtime and update startup Procedure guidance and templates."
 }

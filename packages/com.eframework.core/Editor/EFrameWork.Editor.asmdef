@@ -5,7 +5,6 @@
         "EFrameWork",
         "UniTask",
         "Lofelt.NiceVibrations",
-        "UnityGameFramwork",
         "Unity.Addressables",
         "Unity.TextMeshPro",
         "Unity.Addressables.Editor"

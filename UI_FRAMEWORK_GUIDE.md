@@ -2,8 +2,6 @@
 
 This document describes the current UI runtime structure in EFrameWork after the UI main chain was refactored to a handle-first model.
 
-For the full runtime and editor API index, see [API_REFERENCE.md](API_REFERENCE.md).
-
 For the new browsable docs site, start from [docs/index.html](docs/index.html) and then open [docs/runtime/ui/index.html](docs/runtime/ui/index.html).
 
 The key rule is simple: runtime UI lifecycle now flows through `QUI` + `UIViewHandle`, not through direct `BindingViewBase.Open/Close` calls.
@@ -482,13 +480,15 @@ Avoid these patterns:
 ## 14. Minimal End-To-End Example
 
 ```csharp
-public sealed class LobbyProcedure : ProcedureBase
+using EFrameWork.Runtime.Procedure;
+
+public sealed class LobbyProcedure : EFrameProcedure
 {
     private HomeController m_homeController;
 
-    protected override void OnEnter()
+    protected override void OnEnter(ProcedureEnterContext context)
     {
-        base.OnEnter();
+        base.OnEnter(context);
 
         m_homeController = new HomeController
         {
@@ -498,11 +498,11 @@ public sealed class LobbyProcedure : ProcedureBase
         m_homeController.Show(UILayer.QuiPanel);
     }
 
-    protected override void OnExit()
+    protected override void OnLeave(bool isShutdown)
     {
         m_homeController?.Hide();
         m_homeController = null;
-        base.OnExit();
+        base.OnLeave(isShutdown);
     }
 
     private void OnBackRequested()

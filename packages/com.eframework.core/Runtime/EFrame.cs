@@ -7,7 +7,6 @@ using EFrameWork.Runtime.Event;
 using EFrameWork.Runtime.UI;
 using EFrameWork.Runtime.Utils;
 using EFrameWork.Runtime.Vibration;
-using GameFramework;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -140,7 +139,6 @@ namespace EFrameWork.Runtime
         {
             if (!Initialized) return;
 
-            GameFrameworkEntry.Update(deltaTime, unscaledDeltaTime);
             s_frameCount++;
             s_timePassed += Time.unscaledDeltaTime;
             if (s_timePassed >= SampleDuration)
@@ -154,7 +152,6 @@ namespace EFrameWork.Runtime
 
         public static void Dispose()
         {
-            GameFrameworkEntry.Shutdown();
             TaskQueue.Reset();
 
             Current?.Dispose();

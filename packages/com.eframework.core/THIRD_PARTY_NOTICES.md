@@ -7,7 +7,6 @@ Review and normalize third-party dependency licensing before publishing this pac
 Bundled plugin folders include:
 
 - NiceVibrations
-- UGF
 - UniTask 2.5.10
 - Unity Ingame Debug Console
 

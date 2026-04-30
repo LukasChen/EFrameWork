@@ -28,6 +28,8 @@ user-invocable: true
 
 ## Procedure
 
+Use `EFrameWork.Runtime.Procedure.EFrameProcedure` for new procedures and `ChangeState<TProcedure>(payload)` for one-shot enter data; persistent state belongs in `Context.Data`, module services, or events.
+
 1. 先判定需求是否真的需要新 `Procedure`。
 2. 如果不涉及状态切换、场景生命周期或玩法根对象切换，优先落成当前流程内的 UI 行为。
 3. 如果需要新 `Procedure`，约束进入退出对称、资源清理完整、跳转条件明确。

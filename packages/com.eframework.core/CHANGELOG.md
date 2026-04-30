@@ -4,8 +4,11 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-30
+
 ### Added
 
+- Added EFrame-owned Procedure runtime and editor configuration (`EFrameProcedure`, `EFrameProcedureComponent`, payload enter context, and inspector).
 - Added EFrame-managed Addressables automation so resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` auto-sync groups, addresses, labels, and `ResPath.Generated`, with build-time validation before player builds.
 - Added a managed resource report window behind `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to inspect Addressables entries, generated ResPath members, sync status, and directory convention issues.
 - Split managed Addressables synchronization from ResPath generation with a project-level ResPath directory selection stored under `Assets/Settings/EFrameAddressablesResPathSettings.json`.

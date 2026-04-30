@@ -7,7 +7,7 @@ AI 协作层是框架一级能力，不是附属文档。后续优化或重构�
 始终遵守以下原则：
 
 - 启动场景只负责框架启动和流程切换，不承载具体业务玩法和常驻业务 UI。
-- `Procedure` 只负责状态切换、进入退出编排和生命周期清理，不承担细碎业务逻辑。
+- `Procedure` uses EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent`; it only handles state switching, enter/leave orchestration, and lifecycle cleanup, not detailed business logic.
 - UI 必须通过 `QUI` 与对应 `UIController` 管理，不在场景里手工堆顶层 Canvas 与 `EventSystem`。
 - 需要承载框架 UI overlay 的运行时场景相机必须挂载 `EFrameSceneCamera`，由 `QUI` 事件式维护 UI camera stack；不要在业务代码里轮询相机或手动改 UI 相机 stack。
 - 资源路径应该集中管理，优先使用 `ResPath` 或等价路径中心类，避免在业务代码中散写路径字符串。

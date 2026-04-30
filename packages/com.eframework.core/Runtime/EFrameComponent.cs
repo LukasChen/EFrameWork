@@ -1,22 +1,21 @@
 using EFrameWork.Runtime.DataStorage;
 using EFrameWork.Runtime.Event;
+using EFrameWork.Runtime.Procedure;
 using EFrameWork.Runtime.UI;
 using System;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
-using UnityGameFramework.Runtime;
 using System.Collections;
 
 namespace EFrameWork.Runtime
 {
-    [RequireComponent(typeof(ProcedureComponent))]
+    [RequireComponent(typeof(EFrameProcedureComponent))]
     public class EFrameComponent : EFrameBehaviour
     {
         private bool m_initialized;
 
         [Header("Procedure")]
-        [Tooltip("UGF ProcedureComponent。建议在启动场景里拖引用，或作为本对象的子节点存在（可禁用）。")]
-        [SerializeField] private ProcedureComponent m_procedureComponent;
+        [Tooltip("EFrame procedure component. Keep it on the startup Boot object with EFrameComponent.")]
+        [SerializeField] private EFrameProcedureComponent m_procedureComponent;
 
         [Header("Settings")]
         [SerializeField] private EFrameSettings m_settings;
@@ -44,7 +43,7 @@ namespace EFrameWork.Runtime
         {
             if (!TryEnsureProcedureComponent())
             {
-                Debug.LogError("EFrameComponent requires a ProcedureComponent.");
+                Debug.LogError("EFrameComponent requires an EFrameProcedureComponent.");
                 return;
             }
 
@@ -79,6 +78,14 @@ namespace EFrameWork.Runtime
             }
 
             // 启动流程组件
+            m_procedureComponent.Initialize(EFrame.Current);
+            m_procedureComponent.StartProcedure();
+            if (!m_procedureComponent.IsRunning)
+            {
+                Debug.LogError("EFrame procedure startup failed.");
+                yield break;
+            }
+
             m_initialized = true;
             m_procedureComponent.enabled = true;
             m_startTime = DateTime.Now;
@@ -91,6 +98,7 @@ namespace EFrameWork.Runtime
         {
             if (!m_initialized) return;
             EFrame.Update(Time.deltaTime, Time.unscaledDeltaTime);
+            m_procedureComponent.Tick(Time.deltaTime, Time.unscaledDeltaTime);
             EventBus.Dispatch(new AppUpdateEvent { DeltaTime = Time.deltaTime, UnscaledDeltaTime = Time.unscaledDeltaTime });
 
             // 每秒触发一次事件            
@@ -122,6 +130,7 @@ namespace EFrameWork.Runtime
             m_accumulatedTime += DateTime.Now - m_startTime;
             SaveTotalPlayTime((float)m_accumulatedTime.TotalSeconds);
             EventBus.Dispatch(new AppQuitEvent());
+            m_procedureComponent?.Shutdown();
             EFrame.Dispose();
         }
 
@@ -151,7 +160,7 @@ namespace EFrameWork.Runtime
                 return true;
             }
 
-            m_procedureComponent = GetComponent<ProcedureComponent>();
+            m_procedureComponent = GetComponent<EFrameProcedureComponent>();
             return m_procedureComponent != null;
         }
     }

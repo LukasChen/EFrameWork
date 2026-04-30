@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using EFrameWork.Runtime;
+using EFrameWork.Runtime.Procedure;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityGameFramework.Runtime;
 using Debug = UnityEngine.Debug;
 
 namespace EFrameWork.Editor.ProjectBootstrap
@@ -167,8 +167,8 @@ namespace EFrameWork.Editor.ProjectBootstrap
             camera.clearFlags = CameraClearFlags.Skybox;
             camera.orthographic = false;
 
-            var bootObject = new GameObject("Boot", typeof(ProcedureComponent), typeof(EFrameComponent));
-            var procedureComponent = bootObject.GetComponent<ProcedureComponent>();
+            var bootObject = new GameObject("Boot", typeof(EFrameProcedureComponent), typeof(EFrameComponent));
+            var procedureComponent = bootObject.GetComponent<EFrameProcedureComponent>();
             var eframeComponent = bootObject.GetComponent<EFrameComponent>();
 
             ConfigureProcedureComponent(procedureComponent, m_rootNamespace);
@@ -187,11 +187,11 @@ namespace EFrameWork.Editor.ProjectBootstrap
             AssetDatabase.Refresh();
         }
 
-        private static void ConfigureProcedureComponent(ProcedureComponent procedureComponent, string rootNamespace)
+        private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent, string rootNamespace)
         {
             var procedureObject = new SerializedObject(procedureComponent);
-            var availableProcedures = procedureObject.FindProperty("m_AvailableProcedureTypeNames");
-            var entranceProcedure = procedureObject.FindProperty("m_EntranceProcedureTypeName");
+            var availableProcedures = procedureObject.FindProperty("m_availableProcedureTypeNames");
+            var entranceProcedure = procedureObject.FindProperty("m_entranceProcedureTypeName");
 
             var launcher = $"{rootNamespace}.Procedure.ProcedureLauncher";
             var home = $"{rootNamespace}.Procedure.ProcedureHome";
@@ -206,7 +206,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             procedureObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void ConfigureEFrameComponent(EFrameComponent eframeComponent, ProcedureComponent procedureComponent, Camera mainCamera)
+        private static void ConfigureEFrameComponent(EFrameComponent eframeComponent, EFrameProcedureComponent procedureComponent, Camera mainCamera)
         {
             var eframeObject = new SerializedObject(eframeComponent);
             eframeObject.FindProperty("m_procedureComponent").objectReferenceValue = procedureComponent;
@@ -568,23 +568,22 @@ namespace {moduleNamespace}.Common
 
         private static string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
-            return $@"using GameFramework.Procedure;
+            return $@"using EFrameWork.Runtime.Procedure;
 using UnityEngine;
-using ProcedureOwner = GameFramework.Fsm.IFsm<GameFramework.Procedure.IProcedureManager>;
 
 namespace {moduleNamespace}.Procedure
 {{
-    public sealed class Procedure{moduleName}Entry : ProcedureBase
+    public sealed class Procedure{moduleName}Entry : EFrameProcedure
     {{
-        protected override void OnEnter(ProcedureOwner procedureOwner)
+        protected override void OnEnter(ProcedureEnterContext context)
         {{
-            base.OnEnter(procedureOwner);
+            base.OnEnter(context);
             Debug.Log(""[Procedure{moduleName}Entry] Entered. TODO: preload module resources and open {moduleName}MainView."");
         }}
 
-        protected override void OnLeave(ProcedureOwner procedureOwner, bool isShutdown)
+        protected override void OnLeave(bool isShutdown)
         {{
-            base.OnLeave(procedureOwner, isShutdown);
+            base.OnLeave(isShutdown);
         }}
     }}
 }}
