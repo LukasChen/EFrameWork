@@ -237,9 +237,12 @@ namespace EFrameWork.Runtime.Audio
 
         private void EnsureAudioListener()
         {
-            foreach (var listener in Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
+            foreach (var listener in Resources.FindObjectsOfTypeAll<AudioListener>())
             {
-                if (listener != null && listener.enabled && listener.gameObject.activeInHierarchy)
+                if (listener != null
+                    && listener.gameObject.scene.IsValid()
+                    && listener.enabled
+                    && listener.gameObject.activeInHierarchy)
                     return;
             }
 

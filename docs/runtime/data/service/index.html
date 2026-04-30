@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Data / Service - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Data / Service</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Data 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / Data</a>
+                        <a href="index.html">Data Service</a>
+                        <a href="../table/index.html">DataTable</a>
+                        <a href="../storage/index.html">Storage & Results</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>Data</span><span>Service</span></div>
+                    <div class="eyebrow">Orchestration</div>
+                    <h1>`IDataService` / `DataManager` 负责的是注册、批量加载保存和应用生命周期接线，而不是表内部业务语义。</h1>
+                    <p class="lead">数据系统里最上层的职责很明确：统一管理有哪些表、这些表什么时候加载、什么时候保存，以及在暂停和退出时触发什么保存策略。具体字段怎么变、什么时候标 dirty，不属于这里。</p>
+                    <div class="meta-list">
+                        <div><dt>接口</dt><dd>`IDataService`</dd></div>
+                        <div><dt>实现</dt><dd>`DataManager`</dd></div>
+                        <div><dt>关键方法</dt><dd>`RegisterTable` / `GetTable` / `SaveAll` / `LoadAll`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>服务层 API</h2></div></div>
+                    <div class="panel">
+                        <h3>`T RegisterTable&lt;T&gt;() where T : IDataTable, new()`</h3>
+                        <table>
+                            <thead><tr><th>行为</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>创建并注入存储</td><td>内部 `new T()` 后会立即 `SetDataStorage(m_storage)`。</td></tr>
+                                <tr><td>校验唯一性</td><td>同时校验 `Key` 和 `StorageKey`，避免不同表写到同一份存档。</td></tr>
+                                <tr><td>自动加载</td><td>注册完成后立即 `table.Load()`，不是只登记不加载。</td></tr>
+                                <tr><td>重复注册</td><td>若同类型表已存在，直接返回已注册实例。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`GetTable&lt;T&gt;()`</h3>
+                        <p>通过类型名作为 key 获取已注册表。如果表未注册，`DataManager` 会记录错误并返回默认值。因此推荐在启动流程统一注册，不要依赖“先用再说”的惰性调用。</p>
+                    </div>
+                    <div class="panel section">
+                        <h3>`SaveAll(bool forceFlush = false)` / `LoadAll()`</h3>
+                        <p>`SaveAll()` 会遍历所有表并转发 `forceFlush`。`LoadAll()` 会重新执行每张表的加载流程。它们本身不理解单张表的数据结构，只负责批量编排。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Lifecycle</div><h2>DataManager 自动接了哪些应用事件</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>`AppPausedEvent`</strong>
+                            <p>调用 `SaveAll()`，只保存 dirty 表。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`AppQuitEvent`</strong>
+                            <p>调用 `SaveAll(true)`，强制冲刷，避免退出时漏写。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`Dispose()`</strong>
+                            <p>再次 `SaveAll(true)`，随后逐张 `Dispose()` 并清空注册表。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Boundary</div><h2>服务层不该承担什么</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>应该做</h3>
+                            <p>注册、加载、保存、唯一性校验、应用生命周期接线。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>不应该做</h3>
+                            <p>字段级变更、版本迁移细节、业务规则判断。这些应留在 `DataTable&lt;T&gt;` 内部。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -23,6 +23,9 @@ namespace EFrameWork.Runtime.UI.Layout
         private RawImage m_rawImage;
         private bool m_isApplying;
         private Vector2 m_fallbackSourceSize;
+#if UNITY_EDITOR
+        private bool m_editorApplyQueued;
+#endif
 
         [SerializeField] private ImageScaleFitMode m_fitMode = ImageScaleFitMode.Contain;
 
@@ -65,6 +68,31 @@ namespace EFrameWork.Runtime.UI.Layout
             if (!Application.isPlaying)
             {
                 CacheFallbackSize();
+                QueueEditorApplyFit();
+                return;
+            }
+
+            ApplyFit();
+        }
+
+        private void QueueEditorApplyFit()
+        {
+            if (m_editorApplyQueued)
+            {
+                return;
+            }
+
+            m_editorApplyQueued = true;
+            UnityEditor.EditorApplication.delayCall += ApplyFitFromEditorDelay;
+        }
+
+        private void ApplyFitFromEditorDelay()
+        {
+            m_editorApplyQueued = false;
+
+            if (this == null || !isActiveAndEnabled)
+            {
+                return;
             }
 
             ApplyFit();

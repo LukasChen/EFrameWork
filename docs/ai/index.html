@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI 协作层 - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <script defer src="../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>AI Layer</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">首页</a>
+                        <a href="../quickstart/index.html">快速开始</a>
+                        <a href="../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>模块页</h2>
+                    <nav class="nav-links">
+                        <a href="../runtime/ui/index.html">Runtime / UI</a>
+                        <a href="../runtime/data/index.html">Runtime / Data</a>
+                        <a href="../editor/bootstrap/index.html">Editor / Bootstrap</a>
+                        <a href="index.html">AI 协作层</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../index.html">Docs</a></span>
+                        <span>AI Layer</span>
+                    </div>
+                    <div class="eyebrow">Synced AI Contract</div>
+                    <h1>AI 层在 EFrameWork 里不是附属说明，而是框架合同的一部分。</h1>
+                    <p class="lead">这一层负责把框架的运行时规范、编辑器规范、目录结构、资源约束、冷启动和升级流程同步给业务项目，让 Copilot 和 Codex 在项目里直接工作在正确上下文里。</p>
+                    <div class="meta-list">
+                        <div><dt>项目侧同步前缀</dt><dd>`eframe-*`</dd></div>
+                        <div><dt>项目侧自定义前缀</dt><dd>`project-*`</dd></div>
+                        <div><dt>仓库维护前缀</dt><dd>`maintainer-*`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Layer Map</div>
+                            <h2>这层由什么组成</h2>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>`AGENTS.md`</strong>
+                            <p>Codex 入口规则，镜像高层框架合同，并指向相关 skill。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`.github/copilot-instructions.md`</strong>
+                            <p>Copilot 的常驻总规则，承载 EFrameWork 的基础工程约束。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`.github/instructions/eframe-*.instructions.md`</strong>
+                            <p>同步到业务项目的短规则，保持稳定、通用、长期有效。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`.github/skills/eframe-*`</strong>
+                            <p>同步到业务项目的按需工作流，例如 UI、数据表、资源和 guideline audit。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Boundary</div>
+                            <h2>三类命名边界必须分清</h2>
+                        </div>
+                    </div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>`eframe-*`</h3>
+                            <p>框架托管、可同步到业务项目。业务项目不应手工 fork 这些文件。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>`project-*`</h3>
+                            <p>业务项目本地 overlay，只写差异，不复制整份框架规则。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>`maintainer-*`</h3>
+                            <p>仅框架仓库维护使用，不属于业务项目同步面，不能误发布成项目合同。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Workflow</div>
+                            <h2>接入和升级怎么走</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+<pre><code class="language-powershell">.\tools\Initialize-EFrameColdStart.ps1 -TargetRoot "D:\YourUnityProject" -Force
+
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -StatusOnly
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Force</code></pre>
+                        <p>冷启动面向新项目，AI 同步面向已有项目升级。两条链最终都依赖 `.github/eframe-ai.manifest.json` 作为同步版本信号。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">When To Update</div>
+                            <h2>哪些变化必须联动 AI 层</h2>
+                        </div>
+                    </div>
+                    <div class="card-grid">
+                        <article class="feature-card">
+                            <h3>Runtime / UI 合同变更</h3>
+                            <p>例如 `QUI`、`UIViewHandle`、`UIControllerBase` 的职责或模板边界改变。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>Editor / 冷启动流程变更</h3>
+                            <p>例如初始化窗口、脚本、模板导入和生成产物发生调整。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>目录、命名、资源入口变更</h3>
+                            <p>例如 `ResPath`、Addressables 分组、目录规范或命名规范变化。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>发布与同步流程变更</h3>
+                            <p>变更 `.github` 规则、skills、同步脚本或 AI setup/release 文档时，要同步 bump manifest。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

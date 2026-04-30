@@ -9,7 +9,7 @@ EFrameWork Core is a reusable Unity game framework package extracted from `CozyB
 - `Plugins/`: remaining bundled third-party dependencies that still ship with this package.
 - `Samples~/`: sample assets imported from the source project.
 
-Unity package dependencies include Addressables, UGUI, Input System, Universal RP, TextMeshPro, and Unity Newtonsoft.Json.
+Unity package dependencies include Addressables, UGUI, Input System, Universal RP, and Unity Newtonsoft.Json. TextMeshPro functionality is supplied through UGUI.
 
 Bundled plugin versions:
 
@@ -18,6 +18,10 @@ Bundled plugin versions:
 ## Runtime Access Model
 
 For the current UI runtime structure and handle-based usage model, see [../../UI_FRAMEWORK_GUIDE.md](../../UI_FRAMEWORK_GUIDE.md).
+
+For the framework-level public API reference, see [../../API_REFERENCE.md](../../API_REFERENCE.md).
+
+For the browsable HTML docs site, see [../../docs/index.html](../../docs/index.html).
 
 EFrameWork now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
 
@@ -85,10 +89,10 @@ https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 
 ## TextMeshPro Dependency
 
-`com.eframework.core` uses TextMeshPro directly in runtime and editor code. The package now declares `com.unity.textmeshpro` as a Unity package dependency, so consumer projects should rely on the official Unity TextMeshPro package instead of a bundled copy.
+`com.eframework.core` uses TextMeshPro directly in runtime and editor code. In current Unity versions, TextMeshPro functionality is included in `com.unity.ugui`, so consumer projects should rely on the UGUI package instead of the deprecated standalone `com.unity.textmeshpro` package.
 
 - This package no longer redistributes the old framework-local TextMeshPro plugin copy
-- Keep TextMeshPro sourced from `com.unity.textmeshpro`
+- Keep TextMeshPro sourced from `com.unity.ugui`
 - Do not add another framework-local TextMeshPro copy
 
 ## JSON Dependency

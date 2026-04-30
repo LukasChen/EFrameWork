@@ -56,12 +56,13 @@ namespace EFrameWork.Runtime.UI
                 return;
             }
 
-            var sceneCameras = UnityEngine.Object.FindObjectsByType<EFrameSceneCamera>(
-                FindObjectsInactive.Exclude,
-                FindObjectsSortMode.None);
-
-            foreach (var sceneCamera in sceneCameras)
+            foreach (var sceneCamera in Resources.FindObjectsOfTypeAll<EFrameSceneCamera>())
             {
+                if (!IsSceneRuntimeObject(sceneCamera))
+                {
+                    continue;
+                }
+
                 RegisterInternal(sceneCamera);
             }
 
@@ -184,6 +185,13 @@ namespace EFrameWork.Runtime.UI
                 && camera != m_uiCamera
                 && camera.gameObject.activeInHierarchy;
         }
+
+            private static bool IsSceneRuntimeObject(Component component)
+            {
+                return component != null
+                && component.gameObject.scene.IsValid()
+                && component.gameObject.activeInHierarchy;
+            }
 
         private static bool IsBetter(EFrameSceneCamera candidate, int candidateOrder, EFrameSceneCamera current, int currentOrder)
         {

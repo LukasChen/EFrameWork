@@ -4,6 +4,12 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-04-30
+
+### Fixed
+
+- Removed the deprecated `com.unity.textmeshpro` package dependency and documented TextMeshPro as part of `com.unity.ugui` for current Unity versions.
+
 ## [0.2.4] - 2026-04-30
 
 ### Added

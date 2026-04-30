@@ -19,7 +19,7 @@ namespace EFrameWork.Runtime.Base
         {
             if (m_instance == null)
             {
-                m_instance = FindFirstObjectByType<T>();
+                m_instance = FindAnyObjectByType<T>();
                 if (m_instance == null)
                 {
                     GameObject singletonObject = new(typeof(T).Name);

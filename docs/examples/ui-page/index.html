@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>示例 / 创建一个 UI 页面 - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Example / UI Page</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>示例</h2>
+                    <nav class="nav-links">
+                        <a href="index.html">创建一个 UI 页面</a>
+                        <a href="../data-table/index.html">创建一个 DataTable</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Examples</span><span>UI Page</span></div>
+                    <div class="eyebrow">Workflow Example</div>
+                    <h1>创建一个 UI 页面时，先搭 Controller 和 Binding，而不是先把业务逻辑塞进 View。</h1>
+                    <p class="lead">这条示例以当前 handle-first UI 契约为准。目标是从资源路径、View wrapper、Controller、按钮绑定到显示调用，串出一条最小可用链路。</p>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 1</div><h2>准备资源入口</h2></div></div>
+                    <div class="panel">
+                        <p>先保证 UI prefab 有稳定资源路径，并通过 `ResPath` 或生成常量暴露给代码层。不要在 Controller 里散写裸字符串。</p>
+                        <div class="api-signature"><pre><code class="language-csharp">protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;</code></pre></div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 2</div><h2>写一个轻量 View wrapper</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">public sealed class HomeView : BindingViewBase
+{
+    public Button StartButton { get; private set; }
+
+    protected override void OnBindingSet()
+    {
+        StartButton = Binding.transform.Find("Panel/StartButton")?.GetComponent&lt;Button&gt;();
+    }
+}</code></pre>
+                        <p>View 只负责把 `QUIBinding` 包装成强类型访问入口。不要让它重新承担公开生命周期或控制器职责。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 3</div><h2>在 Controller 里绑定实例级行为</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeView&gt;
+{
+    protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;
+
+    protected override void OnViewCreated()
+    {
+        base.OnViewCreated();
+        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+    }
+
+    protected override void OnViewOpened()
+    {
+        Context.Audio.PlaySfx("Audio/UI/Open");
+    }
+
+    private void OnStartClicked()
+    {
+    }
+}</code></pre>
+                        <p>实例级监听放 `OnViewCreated()`，每次打开的刷新放 `OnViewOpened()`。缓存复用时，这两个时机的区别非常重要。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 4</div><h2>显示页面</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">var controller = UIControllerBase.GetOrCreateInstance&lt;HomeController&gt;();
+await controller.ShowAsync();</code></pre>
+                        <p>页面显示的公开入口应该在 Controller，而不是直接对 View 或 `QUIBinding` 做 open/close 操作。</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

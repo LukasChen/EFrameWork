@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / UI / BindingViewBase - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / UI / BindingViewBase</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>UI 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / UI</a>
+                        <a href="../qui/index.html">QUI</a>
+                        <a href="index.html">BindingViewBase</a>
+                        <a href="../view-handle/index.html">UIViewHandle</a>
+                        <a href="../controller/index.html">UIControllerBase</a>
+                        <a href="../lifecycle/index.html">Lifecycle</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>UI</span><span>BindingViewBase</span></div>
+                    <div class="eyebrow">View Wrapper</div>
+                    <h1>`BindingViewBase` 是 prefab binding 的强类型包装层，不是业务生命周期入口。</h1>
+                    <p class="lead">这层负责接住 `QUIBinding`、读取 `ViewConfig`、缓存组件引用、处理 open/close 底层动作，并把真正的实例生命周期原语暴露给 `UIViewHandle&lt;TView&gt;` 和 `QUI`。业务代码不应该把它当成独立 UI 管理器来使用。</p>
+                    <div class="meta-list">
+                        <div><dt>核心输入</dt><dd>`QUIBinding` / `ViewConfig`</dd></div>
+                        <div><dt>核心输出</dt><dd>强类型组件访问入口</dd></div>
+                        <div><dt>关键扩展点</dt><dd>`OnBindingSet()` / `RefreshComponents()` / `ValidateReferences()`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Construction</div><h2>构造与绑定时机</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>入口</th><th>语义</th></tr></thead>
+                            <tbody>
+                                <tr><td>`BindingViewBase(QUIBinding binding)`</td><td>直接从现成 binding 构造，不自动打开。</td></tr>
+                                <tr><td>`BindingViewBase(string assetPath)`</td><td>通过 `Context.UI.CreateBinding(assetPath)` 创建 binding，再应用 `ViewConfig`。</td></tr>
+                                <tr><td>`BindingViewBase(string assetPath, UILayer layer, bool? useCache = null)`</td><td>创建 binding 时就带层级覆盖和缓存覆盖。</td></tr>
+                                <tr><td>`SetBinding(QUIBinding binding, string assetPath = null)`</td><td>延迟注入 binding，并触发 `OnBindingSet()`。</td></tr>
+                            </tbody>
+                        </table>
+                        <p>当前框架更常见的路径不是直接 `new BindingViewBase(assetPath)`，而是 `QUI.CreateView&lt;TView&gt;()` 先创建实例，再调用 `SetBinding(...)`。这也是自动生成访问类围绕 `OnBindingSet()` 生成代码的原因。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">State Helpers</div><h2>它实际提供了哪些底层原语</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>`PrepareForOpen(UILayer? layer = null)`</strong>
+                            <p>激活 GameObject、挂到目标层级、广播 `UIOpenEvent`。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`PrepareForClose(bool killTransition, bool dispatchCloseEvent = true)`</strong>
+                            <p>广播关闭事件、从导航栈移除，并视情况终止 transition。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`DeactivateForReuse()`</strong>
+                            <p>用于缓存模式：停止 transition，禁用节点，但不释放实例。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`Release(bool forceDestroy = false)`</strong>
+                            <p>根据 `UsingCache` 和 `forceDestroy` 决定回收到缓存还是直接释放实例。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Override Points</div><h2>子类最应该重写的点</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>方法</th><th>推荐用途</th></tr></thead>
+                            <tbody>
+                                <tr><td>`OnBindingSet()`</td><td>拿到 binding 后缓存 Button、Text、Image 等组件引用。</td></tr>
+                                <tr><td>`RefreshComponents()`</td><td>需要重新扫描或刷新组件引用时使用。</td></tr>
+                                <tr><td>`ValidateReferences()`</td><td>在开发期快速检查关键引用是否完整。</td></tr>
+                                <tr><td>`SetActive(bool active)`</td><td>极少数需要特殊显隐行为时可覆盖。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+<pre><code class="language-csharp">public sealed class HomeView : BindingViewBase
+{
+    public Button StartButton { get; private set; }
+
+    protected override void OnBindingSet()
+    {
+        base.OnBindingSet();
+        StartButton = Binding.transform.Find("Panel/StartButton")?.GetComponent&lt;Button&gt;();
+    }
+}</code></pre>
+                        <p>这里的重点是“拿到 binding 后完成强类型映射”，而不是在 View 里自己决定何时打开关闭。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Boundary</div><h2>这层不该承担什么</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>应该做</h3>
+                            <p>组件映射、配置承接、低层显隐原语、对 `QUI` / Handle 的生命周期配合。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>不应该做</h3>
+                            <p>页面业务逻辑、按钮点击编排、弹窗结果流转、资源路径决策。那些仍然属于 Controller 或更上层流程。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

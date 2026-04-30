@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor / Bootstrap - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Editor / Bootstrap</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>模块页</h2>
+                    <nav class="nav-links">
+                        <a href="../../runtime/ui/index.html">Runtime / UI</a>
+                        <a href="../../runtime/data/index.html">Runtime / Data</a>
+                        <a href="../../runtime/effects/index.html">Runtime / Effects</a>
+                        <a href="index.html">Editor / Bootstrap</a>
+                        <a href="../ui-tools/index.html">Editor / UI Tools</a>
+                        <a href="../audio-tools/index.html">Editor / Audio Tools</a>
+                        <a href="../../ai/index.html">AI 协作层</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../../index.html">Docs</a></span>
+                        <span>Editor</span>
+                        <span>Bootstrap</span>
+                    </div>
+                    <div class="eyebrow">Project Bootstrap</div>
+                    <h1>Editor 侧最有价值的不是零散菜单，而是把冷启动和升级动作收敛成稳定入口。</h1>
+                    <p class="lead">EFrameWork 当前已经把项目初始化、Addressables 同步、模板导入、Audio 初始化、DOTween 前置条件整理成 Editor 工具链。文档页要做的是告诉你每个入口负责什么，而不是只罗列菜单名。</p>
+                    <div class="meta-list">
+                        <div><dt>主入口</dt><dd>`EFrame Tools/项目初始化向导`</dd></div>
+                        <div><dt>日常同步</dt><dd>`Addressables/Sync Groups And Generate ResPath`</dd></div>
+                        <div><dt>目标</dt><dd>让新项目和升级项目都走统一路径</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Tool Map</div>
+                            <h2>核心入口怎么分工</h2>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>`EFrameProjectInitializationWindow`</strong>
+                            <p>项目初始化总入口，负责冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景和初始模板导入。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`EFrameAddressablesSyncMenu`</strong>
+                            <p>只做日常资源同步和 `ResPath.Generated.cs` 生成，不触发完整初始化流程。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`EFrameUIBootstrapUtility` / `EFrameSampleUIPrefabUtility`</strong>
+                            <p>负责 UI sorting layer、示例 prefab、运行时必需资源模板的落地。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`EFrameAudioBootstrapUtility` / `EFrameDotweenBootstrapUtility`</strong>
+                            <p>负责运行前置资产和框架依赖的初始化，不建议让业务项目自己重复手工搭。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Recommended Usage</div>
+                            <h2>什么时候用哪个入口</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <table>
+                            <thead>
+                                <tr><th>场景</th><th>推荐入口</th><th>原因</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>全新项目接入</td><td>`Full Initialize Project`</td><td>一次补齐场景、目录、资源、UI layer、Audio、DOTween 和模板。</td></tr>
+                                <tr><td>只重新导入示例 UI</td><td>`Import Initial Templates`</td><td>避免整套初始化重跑，只更新示例 prefab。</td></tr>
+                                <tr><td>资源移动后重新整理地址</td><td>`Sync Groups And Generate ResPath`</td><td>只做 Addressables 与路径中心同步，适合高频日常维护。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Related Editor Flows</div>
+                            <h2>Bootstrap 之外的编辑器工作流</h2>
+                        </div>
+                    </div>
+                    <div class="card-grid">
+                        <article class="feature-card">
+                            <h3><a href="../ui-tools/index.html">Editor / UI Tools</a></h3>
+                            <p>当项目已经完成基础初始化后，日常 UI 维护更多发生在 `QUIBinding`、访问类生成和组件绑定编辑器里。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3><a href="../audio-tools/index.html">Editor / Audio Tools</a></h3>
+                            <p>音频资源和事件映射在初始化后继续演进，应通过专用音频工具维护而不是回到脚本硬编码。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Bootstrap Checklist</div>
+                            <h2>这条链实际会补哪些东西</h2>
+                        </div>
+                    </div>
+                    <div class="card-grid">
+                        <article class="feature-card">
+                            <h3>StartUp 场景</h3>
+                            <p>包含 `Boot`、`EFrameComponent`、`ProcedureComponent` 等启动期核心对象关系。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>SortingLayer</h3>
+                            <p>自动补齐 `QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>模板与资源</h3>
+                            <p>导入 `HomeView.prefab`、示例模块 prefab、Audio 配置和相关资源约束。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3>Addressables / ResPath</h3>
+                            <p>把新增资源纳入分组，并生成稳定的代码入口，避免业务手写裸地址。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

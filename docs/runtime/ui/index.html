@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / UI - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / UI</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>模块页</h2>
+                    <nav class="nav-links">
+                        <a href="index.html">Runtime / UI</a>
+                        <a href="qui/index.html">QUI</a>
+                        <a href="binding-view/index.html">BindingViewBase</a>
+                        <a href="view-handle/index.html">UIViewHandle</a>
+                        <a href="controller/index.html">UIControllerBase</a>
+                        <a href="lifecycle/index.html">Lifecycle</a>
+                        <a href="../data/index.html">Runtime / Data</a>
+                        <a href="../../editor/bootstrap/index.html">Editor / Bootstrap</a>
+                        <a href="../../ai/index.html">AI 协作层</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../../index.html">Docs</a></span>
+                        <span>Runtime</span>
+                        <span>UI</span>
+                    </div>
+                    <div class="eyebrow">Handle-First UI</div>
+                    <h1>当前 UI 契约的核心不是“View 怎么写”，而是“生命周期归谁管”。</h1>
+                    <p class="lead">EFrameWork 的当前 UI 主链是 `Procedure / Gameplay -> UIControllerBase&lt;TView&gt; -> UIViewHandle&lt;TView&gt; -> QUI -> BindingViewBase`。控制器负责编排，句柄负责状态，`QUI` 负责宿主和缓存，View 保持轻量包装。</p>
+                    <div class="meta-list">
+                        <div><dt>入口宿主</dt><dd>`QUI : IUIService`</dd></div>
+                        <div><dt>状态中心</dt><dd>`UIViewHandleState`</dd></div>
+                        <div><dt>场景相机</dt><dd>`EFrameSceneCamera` + URP Overlay</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Sub Pages</div>
+                            <h2>按职责继续下钻</h2>
+                        </div>
+                    </div>
+                    <div class="card-grid">
+                        <article class="article-card">
+                            <div class="eyebrow">UI Host</div>
+                            <h3><a href="qui/index.html">QUI</a></h3>
+                            <p>实例化、缓存、层级容器、默认 transition 和场景相机绑定。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">View Wrapper</div>
+                            <h3><a href="binding-view/index.html">BindingViewBase</a></h3>
+                            <p>binding 注入、组件映射、底层 open/close 原语和缓存释放配合。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">State Machine</div>
+                            <h3><a href="view-handle/index.html">UIViewHandle&lt;TView&gt;</a></h3>
+                            <p>Created/Open/Closed/Released 状态流转与缓存语义。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Orchestration</div>
+                            <h3><a href="controller/index.html">UIControllerBase&lt;TView&gt;</a></h3>
+                            <p>Show/Hide 生命周期、Hook 分工和队列化显示入口。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Sequence</div>
+                            <h3><a href="lifecycle/index.html">Lifecycle</a></h3>
+                            <p>把 `ShowAsync()` / `HideAsync()` 的真实调用顺序展开成时序图。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Lifecycle</div>
+                            <h2>先看一眼主链时序</h2>
+                        </div>
+                    </div>
+                    <div class="sequence-board is-compact">
+                        <div class="sequence-lanes">
+                            <div class="sequence-lane">Controller</div>
+                            <div class="sequence-lane">Handle</div>
+                            <div class="sequence-lane">View</div>
+                            <div class="sequence-lane">QUI</div>
+                        </div>
+                        <div class="sequence-steps">
+                            <div class="sequence-arrow">ShowAsync → CreateViewHandle → SetBinding → PrepareForOpen → PlayOpenTransitionAsync → OnViewOpened</div>
+                            <div class="sequence-arrow">HideAsync → OnViewClosed → PrepareForClose → CloseTransition → Closed or Released</div>
+                        </div>
+                    </div>
+                    <div class="panel section">
+                        <p>如果你想确认 `OnBindingSet()`、`OnViewCreated()`、`OnViewOpened()` 和 `OnViewDestroyed()` 的相对顺序，直接看 <a href="lifecycle/index.html">Lifecycle</a> 子页。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Responsibilities</div>
+                            <h2>四个核心类型分别负责什么</h2>
+                        </div>
+                    </div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>`QUI`</strong>
+                            <p>负责创建/复用 `QUIBinding`、创建 View/Handle、维护 layer、播放 transition、维护缓存和导航栈、绑定 UI Camera。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`BindingViewBase`</strong>
+                            <p>负责把 prefab binding 变成强类型访问入口，缓存组件引用，暴露底层生命周期原语；它不再是业务公开生命周期入口。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`UIViewHandle&lt;TView&gt;`</strong>
+                            <p>负责 `Created -> Opening -> Open -> Closing -> Closed/Released` 的状态转换，以及缓存型复用与强制销毁语义。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>`UIControllerBase&lt;TView&gt;`</strong>
+                            <p>负责编排显示/隐藏时机、实例级绑定、每次打开刷新、每次关闭暂停和业务层的对外交互。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Key APIs</div>
+                            <h2>关键 API 细节</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>`IUIService.CreateViewHandle&lt;TView&gt;(string assetPath, UILayer? layer = null)`</h3>
+                        <table>
+                            <thead>
+                                <tr><th>参数</th><th>类型</th><th>说明</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>`assetPath`</td><td>`string`</td><td>UI prefab 的资源路径。推荐使用 `ResPath` 或生成常量，不要散写裸地址。</td></tr>
+                                <tr><td>`layer`</td><td>`UILayer?`</td><td>可选覆盖层级。传 `null` 时使用 `QUIBinding` 里的默认层设置。</td></tr>
+                                <tr><td>返回值</td><td>`UIViewHandle&lt;TView&gt;`</td><td>可复用的生命周期句柄。后续 open/close 都通过它进行。</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="api-signature">
+<pre><code class="language-csharp">var handle = Context.UI.CreateViewHandle&lt;HomeView&gt;(ResPath.Generated.UI.HomeView);
+await handle.OpenAsync();</code></pre>
+                        </div>
+                    </div>
+                    <div class="panel section">
+                        <h3>`UIViewHandle&lt;TView&gt;.OpenAsync(UILayer? layer = null)`</h3>
+                        <table>
+                            <thead>
+                                <tr><th>参数</th><th>类型</th><th>说明</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>`layer`</td><td>`UILayer?`</td><td>本次打开时的层级覆盖。通常让 Controller 决定，不建议业务散写。</td></tr>
+                                <tr><td>返回值</td><td>`UniTask`</td><td>等待打开动画完成。若 transition 被打断，最终状态仍由 handle 控制。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`UIViewHandle&lt;TView&gt;.CloseAsync()`</h3>
+                        <table>
+                            <thead>
+                                <tr><th>行为</th><th>说明</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>缓存开启</td><td>关闭后进入 `Closed`，实例和 binding 可复用。</td></tr>
+                                <tr><td>缓存关闭</td><td>关闭后进入 `Released`，释放 binding。</td></tr>
+                                <tr><td>强制销毁</td><td>`CloseAndDestroy()` 永远释放，不保留缓存。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Controller Pattern</div>
+                            <h2>推荐写法</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+<pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeView&gt;
+{
+    protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;
+
+    protected override void OnViewCreated()
+    {
+        base.OnViewCreated();
+        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+    }
+
+    protected override void OnViewOpened()
+    {
+        Context.Audio.PlaySfx("Audio/UI/Open");
+    }
+
+    private void OnStartClicked()
+    {
+    }
+}</code></pre>
+                        <p>实例级绑定放 `OnViewCreated()` / `OnViewDestroyed()`，每次打开刷新的内容放 `OnViewOpened()` / `OnViewClosed()`。不要把这两类逻辑混在一起，否则缓存复用时容易出错。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Do / Don't</div>
+                            <h2>必须守住的边界</h2>
+                        </div>
+                    </div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>Do</h3>
+                            <p>通过 Controller 和 Handle 管理打开/关闭；通过 `QUIBinding` 维护默认层级和缓存设置；通过 `EFrameSceneCamera` 决定 UI overlay 的宿主场景相机。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>Don't</h3>
+                            <p>不要在业务层绕开 `QUI` 自己搭长期顶层 Canvas；不要把 View 当公开生命周期 API；不要手工轮询或直接篡改 UI camera stack。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

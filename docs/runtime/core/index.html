@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Core - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Core</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Runtime</h2>
+                    <nav class="nav-links">
+                        <a href="index.html">Core</a>
+                        <a href="../ui/index.html">UI</a>
+                        <a href="../data/index.html">Data</a>
+                        <a href="../assets/index.html">Assets</a>
+                        <a href="../audio/index.html">Audio</a>
+                        <a href="../events/index.html">Events</a>
+                        <a href="../utils/index.html">Utils</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../../index.html">Docs</a></span>
+                        <span>Runtime</span>
+                        <span>Core</span>
+                    </div>
+                    <div class="eyebrow">Runtime Entry</div>
+                    <h1>Core 模块定义了 EFrameWork 的启动、上下文注入和服务聚合方式。</h1>
+                    <p class="lead">这一层不直接承载业务能力，但它决定了所有业务能力如何被初始化、如何被访问、以及在退出时如何被清理。理解 `EFrame`、`EFrameContext`、`EFrameComponent` 的职责，是后续所有模块页面的前提。</p>
+                    <div class="meta-list">
+                        <div><dt>静态入口</dt><dd>`EFrame`</dd></div>
+                        <div><dt>上下文容器</dt><dd>`EFrameContext`</dd></div>
+                        <div><dt>启动宿主</dt><dd>`EFrameComponent`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Flow</div><h2>初始化时序</h2></div></div>
+                    <div class="panel">
+                        <ol>
+                            <li>`EFrameComponent.Awake()` 确保有 `ProcedureComponent`。</li>
+                            <li>暂停流程组件，等待 `EFrame.Initialize(this)` 完成。</li>
+                            <li>创建 Asset、Coroutine、Data、Event、UI、Audio、Vibration 服务。</li>
+                            <li>组装成 `EFrameContext`，绑定到 `EFrame.Current`。</li>
+                            <li>让 `EFrameComponent` 和运行时对象拿到 `Context`。</li>
+                            <li>初始化完成后启用流程并广播启动事件。</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>关键 API 参数与返回值</h2></div></div>
+                    <div class="panel">
+                        <h3>`EFrame.Initialize(EFrameComponent component)`</h3>
+                        <table>
+                            <thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`component`</td><td>`EFrameComponent`</td><td>当前启动场景中的框架宿主。必须非空，并提供 UI/Scene Camera 与 Procedure 依附对象。</td></tr>
+                                <tr><td>返回值</td><td>`IEnumerator`</td><td>协程式初始化链，可由 Unity 生命周期直接驱动。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`EFrameContext.InjectInto(GameObject gameObject)`</h3>
+                        <table>
+                            <thead><tr><th>项</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>输入</td><td>任意 GameObject，方法会扫描其自身和子节点上的 `MonoBehaviour`。</td></tr>
+                                <tr><td>作用</td><td>将 `EFrameContext` 注入给实现了 `IEFrameContextAware` 的对象。</td></tr>
+                                <tr><td>典型场景</td><td>Addressables 实例化对象、运行时生成 UI 或模块对象时补齐上下文。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`ICoroutineService`</h3>
+                        <table>
+                            <thead><tr><th>方法</th><th>用途</th></tr></thead>
+                            <tbody>
+                                <tr><td>`StartCoroutine(IEnumerator coroutine)`</td><td>由框架宿主统一启动协程。</td></tr>
+                                <tr><td>`DelayCall(float delayInSeconds, Action action)`</td><td>延迟执行回调，适合轻量时序动作。</td></tr>
+                                <tr><td>`CallNextFrame(Action action)`</td><td>下一帧执行回调，适合初始化后回填或延迟绑定。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Best Practice</div><h2>你应该怎么用</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>Do</h3>
+                            <p>让 `EFrameComponent` 成为启动场景唯一的框架初始化入口；在拿到 `Context` 的对象里优先使用实例上下文；在外层边界才使用 `EFrame.Current`。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>Don't</h3>
+                            <p>不要在多个场景对象里重复初始化 EFrame；不要在初始化完成前预取服务；不要把 `EFrame.Current` 当作到处可用的全局状态。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

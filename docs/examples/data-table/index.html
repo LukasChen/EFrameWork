@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>示例 / 创建一个 DataTable - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Example / DataTable</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>示例</h2>
+                    <nav class="nav-links">
+                        <a href="../ui-page/index.html">创建一个 UI 页面</a>
+                        <a href="index.html">创建一个 DataTable</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Examples</span><span>DataTable</span></div>
+                    <div class="eyebrow">Workflow Example</div>
+                    <h1>创建一个 DataTable 的关键不是定义模型，而是把改值入口、版本和结果诊断都留在表内。</h1>
+                    <p class="lead">这条示例覆盖默认数据、注册、读取、改值和保存。目标是让业务代码只依赖表的公共 API，而不是直接碰底层存储结构。</p>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 1</div><h2>定义数据模型和表</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">[Serializable]
+public sealed class PlayerSettingsModel
+{
+    public bool MusicOn;
+    public bool SfxOn;
+}
+
+public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsModel&gt;
+{
+    protected override int CurrentVersion =&gt; 1;
+
+    public bool MusicOn
+    {
+        get =&gt; Data.MusicOn;
+        set =&gt; SetValue(ref Data.MusicOn, value);
+    }
+
+    protected override PlayerSettingsModel GetDefaultData()
+    {
+        return new PlayerSettingsModel { MusicOn = true, SfxOn = true };
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 2</div><h2>注册表</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">EFrame.Current.Data.RegisterTable&lt;PlayerSettingsTable&gt;();
+var table = EFrame.Current.Data.GetTable&lt;PlayerSettingsTable&gt;();</code></pre>
+                        <p>推荐在启动流程里统一注册，不要到处懒注册。这样加载和保存行为更稳定，也更容易审计。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 3</div><h2>改值时只走表自己的 API</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">table.MusicOn = false;
+table.Save();
+
+var saveResult = table.LastSaveResult;
+Debug.Log(saveResult.Message);</code></pre>
+                        <p>你应该读取 `LastSaveResult` / `LastLoadResult` 来判断结果，而不是单纯依赖控制台日志。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Step 4</div><h2>需要升级时再引入版本迁移</h2></div></div>
+                    <div class="panel">
+                        <p>当数据模型发生向前兼容变化时，通过 `CurrentVersion` 和 `Migrate(...)` 让旧存档迁移到新版本。迁移逻辑也应留在表内部，避免散落在业务代码里。</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

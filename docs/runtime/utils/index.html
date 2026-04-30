@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Utils - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Utils</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Runtime</h2>
+                    <nav class="nav-links">
+                        <a href="../core/index.html">Core</a>
+                        <a href="../ui/index.html">UI</a>
+                        <a href="../data/index.html">Data</a>
+                        <a href="../assets/index.html">Assets</a>
+                        <a href="../audio/index.html">Audio</a>
+                        <a href="../events/index.html">Events</a>
+                        <a href="index.html">Utils</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Utils</span></div>
+                    <div class="eyebrow">Utilities</div>
+                    <h1>Utils 不是主流程入口，但它们定义了很多常用的低层模式和约定。</h1>
+                    <p class="lead">这里的工具类跨度很大，从输入、对象池、时间、HTTP 到 UI 辅助都有。实际使用时应优先判断是否已有更高层的服务接口，只有在服务层不合适时再直接依赖工具类。</p>
+                    <div class="meta-list">
+                        <div><dt>输入</dt><dd>`QInput`</dd></div>
+                        <div><dt>池化</dt><dd>`ObjectPool<T>` / `PooledList<T>`</dd></div>
+                        <div><dt>时间</dt><dd>`GameTimeService`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Representative APIs</div><h2>代表性工具 API</h2></div></div>
+                    <div class="panel">
+                        <h3>`QInput.GetPrimaryPointerDown()`</h3>
+                        <table>
+                            <thead><tr><th>项</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>返回值</td><td>`bool`，在启用 Input System 时统一判断鼠标左键或主触点是否本帧按下。</td></tr>
+                                <tr><td>用途</td><td>适合轻量跨平台点击/触摸判断，不用在业务层重复分支 Mouse 和 Touchscreen。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`QInput.TryGetPrimaryPointerPosition(out Vector2 position)`</h3>
+                        <table>
+                            <thead><tr><th>项</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>返回值</td><td>是否成功取得当前主指针位置。</td></tr>
+                                <tr><td>输出参数</td><td>`position` 为屏幕坐标；若失败则返回默认值。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Catalog</div><h2>常用工具分组</h2></div></div>
+                    <div class="card-grid">
+                        <article class="feature-card"><h3>输入与 UI</h3><p>`QInput`、`UIUtils`、`GameObjectExtends`、`UnityExtension`。</p></article>
+                        <article class="feature-card"><h3>集合与池化</h3><p>`ObjectPool<T>`、`PooledObject<T>`、`PooledList<T>`、`PriorityQueue<T>`、`ListUtils`。</p></article>
+                        <article class="feature-card"><h3>时间与通用计算</h3><p>`GameTimeService`、`DateUtils`、`RandomHelper`、`BezierHelper`。</p></article>
+                        <article class="feature-card"><h3>系统辅助</h3><p>`HttpHelper`、`ActionQueue`、`IslandDetector`、`DynamicRenderScale`、`StringExtension`。</p></article>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Guideline</div><h2>使用原则</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>先看有没有服务层</h3>
+                            <p>例如资源加载优先 `IAssetService`，事件分发优先 `IEventService`，不要因为工具类直接可用就绕过框架抽象。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>把通用逻辑留在工具层</h3>
+                            <p>工具类应保持通用，不要塞入强业务命名、模块特定路径或玩法常量。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Data / DataTable - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Data / DataTable</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Data 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / Data</a>
+                        <a href="../service/index.html">Data Service</a>
+                        <a href="index.html">DataTable</a>
+                        <a href="../storage/index.html">Storage & Results</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>Data</span><span>DataTable</span></div>
+                    <div class="eyebrow">Model Boundary</div>
+                    <h1>`DataTable&lt;T&gt;` 的核心价值不是“包一层泛型”，而是把 dirty、迁移、加载结果和默认数据统一收口。</h1>
+                    <p class="lead">业务项目真正高频接触的是这一层。它要求你把字段修改收回到表内部，而不是把 `Data` 暴露给外部随手改。只有这样，`IsDirty`、`LastLoadResult`、`LastSaveResult` 和迁移策略才有一致语义。</p>
+                    <div class="meta-list">
+                        <div><dt>表键</dt><dd>`Key` / `StorageKey`</dd></div>
+                        <div><dt>状态</dt><dd>`IsDirty` / `IsLoaded` / `LoadedVersion`</dd></div>
+                        <div><dt>诊断</dt><dd>`LastLoadResult` / `LastSaveResult`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Mutation</div><h2>为什么建议把字段修改包回表内</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>方法</th><th>作用</th></tr></thead>
+                            <tbody>
+                                <tr><td>`SetValue(ref field, value)`</td><td>只有值真正变化时才标记 dirty。</td></tr>
+                                <tr><td>`Mutate(Func&lt;T, bool&gt; mutator)`</td><td>把复杂修改收进一个统一入口，由返回值决定是否标 dirty。</td></tr>
+                                <tr><td>`MarkDirty()`</td><td>底层显式标记。通常由表内部受控调用，而不是对外开放乱用。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+<pre><code class="language-csharp">public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsModel&gt;
+{
+    protected override int CurrentVersion =&gt; 2;
+
+    public bool MusicOn
+    {
+        get =&gt; Data.MusicOn;
+        set =&gt; SetValue(ref m_data.MusicOn, value);
+    }
+
+    protected override PlayerSettingsModel GetDefaultData()
+    {
+        return new PlayerSettingsModel
+        {
+            MusicOn = true,
+            SfxOn = true
+        };
+    }
+}</code></pre>
+                        <p>关键不是属性语法，而是所有改值路径都经过表自己，从而保住 dirty 语义。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Load & Migrate</div><h2>加载时 DataTable 在做什么</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>有版本化 envelope</strong>
+                            <p>读取 `DataEnvelope&lt;T&gt;`，得到版本、时间和数据体。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>旧版本</strong>
+                            <p>调用 `Migrate(data, fromVersion)`，迁移成功后更新到 `CurrentVersion` 并标记 dirty，等待后续写回。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>未来版本</strong>
+                            <p>允许加载，但会记录 `FutureVersionLoaded`，提醒运行时版本落后于存档。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>无存档或读取失败</strong>
+                            <p>回到 `GetDefaultData()`，并通过 `LastLoadResult` 明确说明是默认创建还是失败回退。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Override Points</div><h2>子类最应该实现的扩展点</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>成员</th><th>用途</th></tr></thead>
+                            <tbody>
+                                <tr><td>`GetStorageKey()`</td><td>声明稳定存档 key。必须非空。</td></tr>
+                                <tr><td>`GetDefaultData()`</td><td>提供无存档、回退或 reset 时的默认值。</td></tr>
+                                <tr><td>`Migrate(T data, int fromVersion)`</td><td>处理旧版本存档升级。</td></tr>
+                                <tr><td>`OnInit()` / `OnDispose()`</td><td>首次加载后做初始化，Dispose 时做清理，例如事件订阅解绑。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Data / Storage - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Data / Storage</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Data 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / Data</a>
+                        <a href="../service/index.html">Data Service</a>
+                        <a href="../table/index.html">DataTable</a>
+                        <a href="index.html">Storage & Results</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>Data</span><span>Storage</span></div>
+                    <div class="eyebrow">Persistence Backend</div>
+                    <h1>底层存储层最重要的不是“写成 JSON”，而是要明确这次数据究竟来自主文件、备份还是失败回退。</h1>
+                    <p class="lead">`JsonFileStorage` 负责文件读写、临时文件替换、备份回退和反序列化失败诊断；`DataLoadResult` / `DataSaveResult` 则把这些信息提升成可被上层直接使用的结构化结果，而不是只留在日志里。</p>
+                    <div class="meta-list">
+                        <div><dt>存储接口</dt><dd>`IDataStorage`</dd></div>
+                        <div><dt>默认实现</dt><dd>`JsonFileStorage`</dd></div>
+                        <div><dt>结果对象</dt><dd>`DataLoadResult` / `DataSaveResult`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">JsonFileStorage</div><h2>默认文件存储实现做了什么</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>写入路径</strong>
+                            <p>先写 `*.tmp`，再替换主文件；若平台不支持 `File.Replace`，退化到 best-effort 替换逻辑。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>备份文件</strong>
+                            <p>主文件替换时会生成 `*.bak`，读取主文件失败时优先尝试从备份恢复。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>Editor 与非 Editor 差异</strong>
+                            <p>非 Editor 环境会对字节流做 XOR 编码；Editor 下保持可读，方便调试。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>存储位置</strong>
+                            <p>统一落到 `Application.persistentDataPath` 下，文件名基于 `StorageKey`。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Load Result</div><h2>`DataLoadResult` 里有什么</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>字段</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`Status`</td><td>例如 `Loaded`、`Migrated`、`FallbackToDefault`、`FutureVersionLoaded`。</td></tr>
+                                <tr><td>`ReasonCode`</td><td>给出更细的失败或来源原因，例如 `LoadedBackup`、`DeserializeFailed`、`MigrationFailed`。</td></tr>
+                                <tr><td>`Source`</td><td>数据来自主文件、备份还是无来源。</td></tr>
+                                <tr><td>`SourceVersion` / `TargetVersion`</td><td>原始版本和当前期望版本，方便判断迁移路径。</td></tr>
+                                <tr><td>`UsedLegacyData`</td><td>是否回退读取了旧的裸数据格式。</td></tr>
+                                <tr><td>`Message`</td><td>可直接展示给调试 UI 或日志面板的文本说明。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Save Result</div><h2>`DataSaveResult` 里有什么</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>字段</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`Status`</td><td>例如 `Saved`、`Skipped`、`Failed`。</td></tr>
+                                <tr><td>`ReasonCode`</td><td>说明是 `SavedDirty`、`SavedForceFlush`、`SkippedNotDirty` 还是底层异常。</td></tr>
+                                <tr><td>`ForceFlush`</td><td>这次保存是否来自强制冲刷路径。</td></tr>
+                                <tr><td>`SavedVersion`</td><td>本次保存时的表版本。</td></tr>
+                                <tr><td>`Message`</td><td>给调试工具或日志直接使用的人类可读说明。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <p>这也是为什么文档一直强调“不要只看日志”。如果业务或调试 UI 需要向外展示存档状态，应优先读表上的 `LastLoadResult` / `LastSaveResult`。</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

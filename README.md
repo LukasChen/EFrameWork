@@ -15,6 +15,10 @@ See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer cont
 
 For the current handle-first UI runtime structure and usage examples, see [UI_FRAMEWORK_GUIDE.md](UI_FRAMEWORK_GUIDE.md).
 
+For a framework-level API catalog covering runtime and editor public surfaces, see [API_REFERENCE.md](API_REFERENCE.md).
+
+For the new browsable HTML docs site skeleton, open [docs/index.html](docs/index.html).
+
 ## Versioning
 
 The formal starting version for EFrameWork is `0.1.0`.
@@ -83,7 +87,7 @@ Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to c
 
 ## TextMeshPro Dependency
 
-`com.eframework.core` also uses TextMeshPro directly and now expects the official Unity package dependency `com.unity.textmeshpro` instead of a framework-bundled copy.
+`com.eframework.core` also uses TextMeshPro directly. In current Unity versions, TextMeshPro functionality comes from `com.unity.ugui`, so consumer projects should depend on UGUI instead of the deprecated standalone `com.unity.textmeshpro` package.
 
 ## Runtime Access
 

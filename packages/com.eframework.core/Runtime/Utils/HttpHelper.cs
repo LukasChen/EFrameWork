@@ -32,8 +32,19 @@ public class HttpHelper : MonoBehaviour
             {
                 if (m_instance == null)
                 {
-                    m_instance = FindFirstObjectByType<HttpHelper>();
-                    if (FindObjectsByType<HttpHelper>(FindObjectsSortMode.None).Length > 1)
+                    int instanceCount = 0;
+                    foreach (var helper in Resources.FindObjectsOfTypeAll<HttpHelper>())
+                    {
+                        if (!IsRuntimeInstance(helper))
+                        {
+                            continue;
+                        }
+
+                        instanceCount++;
+                        m_instance ??= helper;
+                    }
+
+                    if (instanceCount > 1)
                     {
                         Debug.LogWarning($">>> HttpHelper >> 存在多个实例！");
                         return m_instance;
@@ -64,6 +75,13 @@ public class HttpHelper : MonoBehaviour
     {
         m_appQuit = true;
         StopAllCoroutines();
+    }
+
+    private static bool IsRuntimeInstance(HttpHelper helper)
+    {
+        return helper != null
+            && helper.gameObject.scene.IsValid()
+            && helper.gameObject.activeInHierarchy;
     }
 
     #endregion

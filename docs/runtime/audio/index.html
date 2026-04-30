@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / Audio - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / Audio</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Runtime</h2>
+                    <nav class="nav-links">
+                        <a href="../core/index.html">Core</a>
+                        <a href="../ui/index.html">UI</a>
+                        <a href="../data/index.html">Data</a>
+                        <a href="../assets/index.html">Assets</a>
+                        <a href="index.html">Audio</a>
+                        <a href="../events/index.html">Events</a>
+                        <a href="../utils/index.html">Utils</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Audio</span></div>
+                    <div class="eyebrow">Audio Runtime</div>
+                    <h1>Audio 模块负责的不是单次播放，而是框架级的音频路由、池化和事件驱动控制。</h1>
+                    <p class="lead">`AudioManager` 统一处理 Music、SFX、Mixer 音量控制和基础池化；`AudioEventManager` 负责配置驱动的事件式播放；`QVibration` 作为音频事件链的一部分，补齐触觉反馈。</p>
+                    <div class="meta-list">
+                        <div><dt>播放服务</dt><dd>`IAudioService` / `AudioManager`</dd></div>
+                        <div><dt>事件服务</dt><dd>`IAudioEventService` / `AudioEventManager`</dd></div>
+                        <div><dt>资源约定</dt><dd>`AudioResourcePaths` + Resources 资产</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>关键 API 参数与返回值</h2></div></div>
+                    <div class="panel">
+                        <h3>`Initialize(bool musicOn = true, bool soundOn = true)`</h3>
+                        <table>
+                            <thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`musicOn`</td><td>`bool`</td><td>初始化时音乐默认开关。</td></tr>
+                                <tr><td>`soundOn`</td><td>`bool`</td><td>初始化时音效默认开关。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`PlaySfx(string assetPath, float volume = 1f, float pitch = 1f)`</h3>
+                        <table>
+                            <thead><tr><th>参数</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`assetPath`</td><td>音频资源路径。可由 `AudioClipAsset` 间接包装，也可直接指向音频资源。</td></tr>
+                                <tr><td>`volume` / `pitch`</td><td>本次播放级别的局部调节，仍会叠加全局 volume 和开关状态。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel section">
+                        <h3>`PlayMusic(string assetPath, bool fade = true, float fadeDuration = AudioManager.K_fadeDuration)`</h3>
+                        <table>
+                            <thead><tr><th>项</th><th>说明</th></tr></thead>
+                            <tbody>
+                                <tr><td>`fade`</td><td>是否进行 crossfade 切换。</td></tr>
+                                <tr><td>`fadeDuration`</td><td>过渡时长，默认使用 `AudioManager.K_fadeDuration`。</td></tr>
+                                <tr><td>内部结构</td><td>`AudioManager` 维护 2 个独立 Music `AudioSource` 做切换。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Runtime Behavior</div><h2>当前实现的关键行为</h2></div></div>
+                    <div class="card-grid">
+                        <article class="feature-card"><h3>SFX 池</h3><p>统一的音频池，带基础防抖和上限控制，避免短音频连续触发造成爆音和对象暴涨。</p></article>
+                        <article class="feature-card"><h3>Music Crossfade</h3><p>独立的双 `AudioSource` 切换模型，适合常见 BGM 平滑过渡。</p></article>
+                        <article class="feature-card"><h3>Mixer 回退</h3><p>若 Mixer 或分组缺失，仍可退回基础播放路径，但会输出警告提示初始化资产未准备完整。</p></article>
+                        <article class="feature-card"><h3>Fallback Listener</h3><p>如果场景里没有活动中的 `AudioListener`，会在 `AudioSourceHolder` 上添加一个兜底监听器。</p></article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

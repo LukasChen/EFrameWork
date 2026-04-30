@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / UI / UIControllerBase - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / UI / UIControllerBase</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>UI 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / UI</a>
+                        <a href="../qui/index.html">QUI</a>
+                        <a href="../binding-view/index.html">BindingViewBase</a>
+                        <a href="../view-handle/index.html">UIViewHandle</a>
+                        <a href="index.html">UIControllerBase</a>
+                        <a href="../lifecycle/index.html">Lifecycle</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>UI</span><span>UIControllerBase</span></div>
+                    <div class="eyebrow">Orchestration</div>
+                    <h1>`UIControllerBase` 管的是编排，不是 prefab 细节；它站在 Handle 上面，把显示时机和业务响应组织起来。</h1>
+                    <p class="lead">泛型版本 `UIControllerBase&lt;TView&gt;` 自动持有 `UIViewHandle&lt;TView&gt;`，负责在第一次显示时创建 View，在后续显示时复用，在关闭时区分“只是关闭”还是“彻底释放”。</p>
+                    <div class="meta-list">
+                        <div><dt>控制器入口</dt><dd>`Show()` / `ShowAsync()` / `Hide()` / `HideAsync()`</dd></div>
+                        <div><dt>View 访问</dt><dd>`TypedViewHandle` / `ViewHandle`</dd></div>
+                        <div><dt>扩展点</dt><dd>`OnViewCreated` / `OnViewOpened` / `OnViewClosed` / `OnViewDestroyed`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Lifecycle Hooks</div><h2>四个 Hook 的分工</h2></div></div>
+                    <div class="panel">
+                        <table>
+                            <thead><tr><th>Hook</th><th>调用时机</th><th>适合放什么</th></tr></thead>
+                            <tbody>
+                                <tr><td>`OnViewCreated()`</td><td>第一次创建 Handle / View 之后</td><td>实例级绑定，例如按钮监听、一次性组件缓存。</td></tr>
+                                <tr><td>`OnViewOpened()`</td><td>每次成功显示之后</td><td>每次进入页面都要刷新的 UI 状态。</td></tr>
+                                <tr><td>`OnViewClosed()`</td><td>每次关闭前</td><td>停止轮询、结束临时状态、暂停页面行为。</td></tr>
+                                <tr><td>`OnViewDestroyed()`</td><td>实例真正释放前</td><td>解绑、清理强引用、释放和实例寿命一致的资源。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Show & Hide</div><h2>显示与关闭的真实流程</h2></div></div>
+                    <div class="panel">
+                        <p>`Show()` / `ShowAsync()` 会先检查 `m_viewHandle` 是否存在且存活；如果没有，就通过 `CreateViewHandle(layer)` 创建，再触发 `OnViewCreated()`。随后调用 Handle 的 `Open` 或 `OpenAsync`，如果从未显示变成已显示，再触发 `OnViewOpened()`。</p>
+                    </div>
+                    <div class="panel section">
+                        <p>`Hide()` / `HideAsync()` 先判断当前是否在显示，再根据 `UsingCache` 决定只是关闭还是释放。也就是说，`OnViewDestroyed()` 只有在实例要真正释放时才会触发。</p>
+                     </div>
+                 </section>
+
+                 <section class="section">
+                     <div class="section-header"><div><div class="eyebrow">Helpers</div><h2>控制器侧的便捷能力</h2></div></div>
+                     <div class="panel">
+                         <table>
+                             <thead><tr><th>方法</th><th>用途</th></tr></thead>
+                             <tbody>
+                                 <tr><td>`AddButtonClickListener`</td><td>统一按钮点击绑定，可选择先移除旧监听。</td></tr>
+                                 <tr><td>`AddToggleValueChangedListener`</td><td>设置初值并绑定 Toggle 事件。</td></tr>
+                                 <tr><td>`AddSliderValueChangedListener`</td><td>设置初值并绑定 Slider 事件。</td></tr>
+                                 <tr><td>`EnqueueToShow` / `EnqueueAsChild`</td><td>接入全局 TaskQueue，把页面显示编排进队列。</td></tr>
+                             </tbody>
+                         </table>
+                     </div>
+                 </section>
+
+                 <section class="section">
+                     <div class="section-header"><div><div class="eyebrow">Pattern</div><h2>推荐写法</h2></div></div>
+                     <div class="panel">
+<pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeView&gt;
+{
+    protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;
+
+    protected override void OnViewCreated()
+    {
+        base.OnViewCreated();
+        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+    }
+
+    protected override void OnViewOpened()
+    {
+        base.OnViewOpened();
+        TypedViewHandle.TypedView.RefreshComponents();
+    }
+
+    private void OnStartClicked()
+    {
+    }
+}</code></pre>
+                        <p>这里的关键不是继承本身，而是职责切分：Controller 只用 `TypedViewHandle.TypedView` 读写当前活着的 View，不自己承担实例化和释放规则。</p>
+                    </div>
+                 </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

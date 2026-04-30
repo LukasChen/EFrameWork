@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runtime / UI / Lifecycle - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../../assets/style.css">
+    <script defer src="../../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Runtime / UI / Lifecycle</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../../index.html">首页</a>
+                        <a href="../../../quickstart/index.html">快速开始</a>
+                        <a href="../../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>UI 子页</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">Runtime / UI</a>
+                        <a href="../qui/index.html">QUI</a>
+                        <a href="../binding-view/index.html">BindingViewBase</a>
+                        <a href="../view-handle/index.html">UIViewHandle</a>
+                        <a href="../controller/index.html">UIControllerBase</a>
+                        <a href="index.html">Lifecycle</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>UI</span><span>Lifecycle</span></div>
+                    <div class="eyebrow">Sequence</div>
+                    <h1>这条时序图回答的是：一次 `ShowAsync()` 和 `HideAsync()`，到底是谁在什么时候做了什么。</h1>
+                    <p class="lead">当前 UI 契约的关键不是类名，而是调用顺序。Controller 决定时机，Handle 驱动状态，View 承接低层动作，QUI 负责宿主环境。下面这张静态时序图对应源码里的真实主链。</p>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Sequence Diagram</div><h2>`ShowAsync()` -> `HideAsync()` 主链</h2></div></div>
+                    <div class="sequence-board">
+                        <div class="sequence-lanes">
+                            <div class="sequence-lane">Gameplay / Procedure</div>
+                            <div class="sequence-lane">UIControllerBase&lt;TView&gt;</div>
+                            <div class="sequence-lane">UIViewHandle&lt;TView&gt;</div>
+                            <div class="sequence-lane">BindingViewBase</div>
+                            <div class="sequence-lane">QUI</div>
+                        </div>
+                        <div class="sequence-steps">
+                            <div class="sequence-step">
+                                <div class="sequence-step-meta">1</div>
+                                <div class="sequence-step-body">
+                                    <strong>外层流程请求显示页面</strong>
+                                    <p>Gameplay / Procedure 调用 `controller.ShowAsync(layer)`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">Gameplay / Procedure → UIControllerBase&lt;TView&gt;</div>
+
+                            <div class="sequence-step">
+                                <div class="sequence-step-meta">2</div>
+                                <div class="sequence-step-body">
+                                    <strong>Controller 决定是否首次创建</strong>
+                                    <p>如果还没有存活的 `m_viewHandle`，就通过 `CreateViewHandle(layer)` 创建，并触发 `OnViewCreated()`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">UIControllerBase&lt;TView&gt; → QUI → BindingViewBase → UIViewHandle&lt;TView&gt;</div>
+
+                            <div class="sequence-step">
+                                <div class="sequence-step-meta">3</div>
+                                <div class="sequence-step-body">
+                                    <strong>QUI 创建 binding 和 view</strong>
+                                    <p>`QUI.CreateBinding()` 实例化 prefab、注入上下文，`CreateView&lt;TView&gt;()` 再调用 `view.SetBinding(...)`，最终触发 `OnBindingSet()`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">QUI → BindingViewBase</div>
+
+                            <div class="sequence-step">
+                                <div class="sequence-step-meta">4</div>
+                                <div class="sequence-step-body">
+                                    <strong>Handle 进入 Opening</strong>
+                                    <p>`OpenAsync()` 会 `KillTransition()`，调用 `PrepareForOpen(layer)`，再等待 `PlayOpenTransitionAsync()`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">UIViewHandle&lt;TView&gt; → BindingViewBase → QUI</div>
+
+                            <div class="sequence-step">
+                                <div class="sequence-step-meta">5</div>
+                                <div class="sequence-step-body">
+                                    <strong>Controller 收到“已显示”时机</strong>
+                                    <p>当 Handle 成功变成 `IsShowing`，Controller 才触发 `OnViewOpened()`，做每次打开都要刷新的逻辑。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">UIViewHandle&lt;TView&gt; → UIControllerBase&lt;TView&gt;</div>
+
+                            <div class="sequence-step is-closing">
+                                <div class="sequence-step-meta">6</div>
+                                <div class="sequence-step-body">
+                                    <strong>外层流程请求关闭页面</strong>
+                                    <p>Gameplay / Procedure 调用 `controller.HideAsync()`，Controller 先按需触发 `OnViewClosed()`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">Gameplay / Procedure → UIControllerBase&lt;TView&gt;</div>
+
+                            <div class="sequence-step is-closing">
+                                <div class="sequence-step-meta">7</div>
+                                <div class="sequence-step-body">
+                                    <strong>Handle 执行关闭与释放决策</strong>
+                                    <p>`CloseAsync()` 会调用 `PrepareForClose(false)` 并等待关闭过渡；若 `UsingCache` 为真则进入 `Closed`，否则 `Release()` 进入 `Released`。</p>
+                                </div>
+                            </div>
+                            <div class="sequence-arrow">UIControllerBase&lt;TView&gt; → UIViewHandle&lt;TView&gt; → BindingViewBase → QUI</div>
+
+                            <div class="sequence-step is-closing">
+                                <div class="sequence-step-meta">8</div>
+                                <div class="sequence-step-body">
+                                    <strong>Controller 按释放结果补收尾</strong>
+                                    <p>只有实例真正释放时，Controller 才需要进入 `OnViewDestroyed()` 路径；只是缓存关闭时，不会重建实例级绑定。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Interpretation</div><h2>看这张图时最容易踩错的点</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>`OnViewCreated()` 不是每次打开都触发</h3>
+                            <p>缓存启用时，只在第一次创建实例时调用；后续 reopen 只会走 `OnViewOpened()`。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>`OnBindingSet()` 比 `OnViewCreated()` 更底层</h3>
+                            <p>它发生在 View 被注入 binding 的时候，通常比 Controller 的实例级初始化更早。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>关闭不等于销毁</h3>
+                            <p>缓存模式下关闭只是 `Closed`，实例还活着；只有 release 路径才会走真正的销毁收尾。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

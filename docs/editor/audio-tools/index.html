@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor / Audio Tools - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Editor / Audio Tools</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Editor</h2>
+                    <nav class="nav-links">
+                        <a href="../bootstrap/index.html">Bootstrap</a>
+                        <a href="../ui-tools/index.html">UI Tools</a>
+                        <a href="index.html">Audio Tools</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Editor</span><span>Audio Tools</span></div>
+                    <div class="eyebrow">Audio Authoring</div>
+                    <h1>Audio 编辑器工具负责把事件、配置资产和资源组织成可维护的音频工作流。</h1>
+                    <p class="lead">当前核心能力包括 `AudioEventEditorWindow`、`AudioClipAssetEditor` 和 `AudioEventConfigCreator`。重点不是单次预览，而是为所有 `IEvent` 事件建立可配置的音效和震动映射。</p>
+                    <div class="meta-list">
+                        <div><dt>主窗口</dt><dd>`AudioEventEditorWindow`</dd></div>
+                        <div><dt>配置资产</dt><dd>`AudioEventConfigAsset`</dd></div>
+                        <div><dt>资源入口</dt><dd>`AudioResourcePaths`</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Main Tool</div><h2>`AudioEventEditorWindow` 工作流</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>扫描事件类型</strong>
+                            <p>窗口在 `OnEnable()` 时扫描所有实现 `IEvent` 的结构体，整理成可筛选事件列表。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>按命名空间和关键字过滤</strong>
+                            <p>支持按命名空间、搜索词和“仅看已配置事件”筛选，适合大型项目逐步补音频事件。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>配置音效与震动</strong>
+                            <p>为事件配置音频组、条件、顺序播放、权重、震动模式等逻辑，并保存到统一资产里。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>预览与保存</strong>
+                            <p>窗口内部维护预览 `AudioSource`，并在禁用或关闭时保存配置资产。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Recommended Usage</div><h2>推荐工作流</h2></div></div>
+                    <div class="panel">
+                        <ol>
+                            <li>先确保项目已经完成 Audio Bootstrap，资源路径和配置资产已经就位。</li>
+                            <li>打开 `Audio Event Editor`，从事件列表选择目标 `IEvent`。</li>
+                            <li>为该事件配置音效片段、播放策略、条件和震动。</li>
+                            <li>使用预览能力验证结果，再保存到统一 `AudioEventConfigAsset`。</li>
+                            <li>运行时让 `AudioEventManager` 消费这份配置，而不是在业务代码里散写音效分支。</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Related Tools</div><h2>相关 Editor 能力</h2></div></div>
+                    <div class="card-grid">
+                        <article class="feature-card"><h3>`AudioClipAssetEditor`</h3><p>用于维护 `AudioClipAsset`，把一个或多个音频片段整理成运行时可消费的资产入口。</p></article>
+                        <article class="feature-card"><h3>`AudioEventConfigCreator`</h3><p>提供配置资产创建入口，避免手工建错路径或类型。</p></article>
+                        <article class="feature-card"><h3>Bootstrap 协作</h3><p>Audio Tools 不是孤立的。它依赖 Bootstrap 先把 Mixer、Resources 路径和默认配置资产准备好。</p></article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

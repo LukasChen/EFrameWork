@@ -2,6 +2,10 @@
 
 This document describes the current UI runtime structure in EFrameWork after the UI main chain was refactored to a handle-first model.
 
+For the full runtime and editor API index, see [API_REFERENCE.md](API_REFERENCE.md).
+
+For the new browsable docs site, start from [docs/index.html](docs/index.html) and then open [docs/runtime/ui/index.html](docs/runtime/ui/index.html).
+
 The key rule is simple: runtime UI lifecycle now flows through `QUI` + `UIViewHandle`, not through direct `BindingViewBase.Open/Close` calls.
 
 ## 0. Quick Visual Overview

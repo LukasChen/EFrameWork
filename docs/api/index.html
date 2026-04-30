@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>API 总览 - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <script defer src="../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>API Overview</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">首页</a>
+                        <a href="../quickstart/index.html">快速开始</a>
+                        <a href="index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>模块页</h2>
+                    <nav class="nav-links">
+                        <a href="../runtime/core/index.html">Runtime / Core</a>
+                        <a href="../runtime/ui/index.html">Runtime / UI</a>
+                        <a href="../runtime/data/index.html">Runtime / Data</a>
+                        <a href="../runtime/assets/index.html">Runtime / Assets</a>
+                        <a href="../runtime/audio/index.html">Runtime / Audio</a>
+                        <a href="../runtime/events/index.html">Runtime / Events</a>
+                        <a href="../runtime/effects/index.html">Runtime / Effects</a>
+                        <a href="../runtime/utils/index.html">Runtime / Utils</a>
+                        <a href="../editor/bootstrap/index.html">Editor / Bootstrap</a>
+                        <a href="../editor/ui-tools/index.html">Editor / UI Tools</a>
+                        <a href="../editor/audio-tools/index.html">Editor / Audio Tools</a>
+                        <a href="../ai/index.html">AI 协作层</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../index.html">Docs</a></span>
+                        <span>API Overview</span>
+                    </div>
+                    <div class="eyebrow">API Map</div>
+                    <h1>先找到模块，再进入参数细节页。</h1>
+                    <p class="lead">这页保留总览索引的价值，但不再承担所有细节。详细参数、返回值、约束和范例要下沉到具体模块页，避免一页过长。</p>
+                </header>
+
+                <section class="section">
+                    <div class="card-grid">
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime Entry</div>
+                            <h3>EFrame / EFrameContext</h3>
+                            <p>统一静态入口和服务上下文，负责初始化、生命周期和服务聚合。</p>
+                            <ul>
+                                <li>`EFrame.Current`</li>
+                                <li>`EFrame.Initialize()`</li>
+                                <li>`EFrameContext.InjectInto()`</li>
+                            </ul>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/core/index.html">Core 细节页</a></h3>
+                            <p>补充 `EFrameComponent`、`ICoroutineService`、初始化时序和上下文注入细节。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/ui/index.html">UI 主链</a></h3>
+                            <p>总览页负责讲主链，细节已拆到 <a href="../runtime/ui/qui/index.html">QUI</a>、<a href="../runtime/ui/binding-view/index.html">BindingViewBase</a>、<a href="../runtime/ui/view-handle/index.html">UIViewHandle&lt;TView&gt;</a>、<a href="../runtime/ui/controller/index.html">UIControllerBase&lt;TView&gt;</a> 和 <a href="../runtime/ui/lifecycle/index.html">Lifecycle</a>。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/data/index.html">Data 主链</a></h3>
+                            <p>总览页负责讲主链，细节已拆到 <a href="../runtime/data/service/index.html">Data Service</a>、<a href="../runtime/data/table/index.html">DataTable</a> 和 <a href="../runtime/data/storage/index.html">Storage &amp; Results</a>。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/assets/index.html">Assets</a></h3>
+                            <p>Addressables 句柄、实例化与释放责任。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/audio/index.html">Audio</a></h3>
+                            <p>音频池、Mixer、Music/SFX 播放和事件驱动配置。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/events/index.html">Events</a></h3>
+                            <p>结构体事件、Scoped 订阅与 App 生命周期广播。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/effects/index.html">Effects</a></h3>
+                            <p>飞行动画、图标回弹、相机抖动和相关配置资产。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Runtime</div>
+                            <h3><a href="../runtime/utils/index.html">Utils</a></h3>
+                            <p>输入、池化、时间和通用工具的边界说明。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Editor</div>
+                            <h3><a href="../editor/bootstrap/index.html">Bootstrap 工具</a></h3>
+                            <p>重点看初始化窗口、Addressables 同步菜单、模板导入和资源生成入口。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Editor</div>
+                            <h3><a href="../editor/ui-tools/index.html">UI Tools</a></h3>
+                            <p>`QUIBinding`、访问类生成、ViewConfig 和滚动组件编辑能力。</p>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Editor</div>
+                            <h3><a href="../editor/audio-tools/index.html">Audio Tools</a></h3>
+                            <p>音频事件窗口、配置资产和音频 authoring 工作流。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

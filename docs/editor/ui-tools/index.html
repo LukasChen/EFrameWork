@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor / UI Tools - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../../assets/style.css">
+    <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Editor / UI Tools</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../../index.html">首页</a>
+                        <a href="../../quickstart/index.html">快速开始</a>
+                        <a href="../../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>Editor</h2>
+                    <nav class="nav-links">
+                        <a href="../bootstrap/index.html">Bootstrap</a>
+                        <a href="index.html">UI Tools</a>
+                        <a href="../audio-tools/index.html">Audio Tools</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Editor</span><span>UI Tools</span></div>
+                    <div class="eyebrow">UI Authoring</div>
+                    <h1>UI 编辑器工具的目标不是多一个 Inspector，而是把 `QUIBinding` 和 UI 生成约定固定下来。</h1>
+                    <p class="lead">当前 UI 编辑器能力主要围绕 `UIAutoBindingEditor` 和 `QScrollerEditor`。它们帮助你在 prefab 侧维护 binding、ViewConfig、生成访问类和滚动组件设置，减少手写绑定和命名漂移。</p>
+                    <div class="meta-list">
+                        <div><dt>绑定编辑器</dt><dd>`UIAutoBindingEditor`</dd></div>
+                        <div><dt>滚动组件</dt><dd>`QScrollerEditor`</dd></div>
+                        <div><dt>作用对象</dt><dd>`QUIBinding` 与相关 UI 组件</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Main Tool</div><h2>`UIAutoBindingEditor` 在做什么</h2></div></div>
+                    <div class="module-list">
+                        <div class="module-row">
+                            <strong>ViewConfig 编辑</strong>
+                            <p>维护 `DefaultLayer`、`IsViewRoot`、`UsingCache`、`AnimationRootName`、`AnimationDuration` 等运行时配置。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>组件树浏览</strong>
+                            <p>扫描 `RectTransform` 树并展示可绑定组件，让 prefab 结构和 binding 信息保持同步。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>生成访问类</strong>
+                            <p>通过 `Generate Class` 生成访问类代码，减少手写 `transform.Find(...)` 的重复劳动。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>验证与清理</strong>
+                            <p>提供 `Validate` 和 `Clear All`，用于检查绑定有效性和快速回到干净状态。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Usage</div><h2>推荐工作流</h2></div></div>
+                    <div class="panel">
+                        <ol>
+                            <li>先给 prefab 挂上 `QUIBinding`。</li>
+                            <li>在 Inspector 中配置 `ViewConfig`，确定默认层级、缓存和动画根节点。</li>
+                            <li>刷新组件树，选择需要暴露到访问类的节点和组件。</li>
+                            <li>使用 `Generate Class` 生成访问类，再由 View wrapper 或生成类消费。</li>
+                            <li>资源结构变化后重新 `Validate`，避免运行时拿到失效引用。</li>
+                        </ol>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">End-to-End Example</div><h2>从 `QUIBinding` 到 View wrapper 的完整链路</h2></div></div>
+                    <div class="panel">
+                        <ol>
+                            <li>在 prefab 根节点挂 `QUIBinding`。</li>
+                            <li>在 `UIAutoBindingEditor` 中配置 `ViewConfig`，至少确定默认层级、缓存和动画根节点。</li>
+                            <li>从组件树选择需要暴露的 Button、Text、Image 等组件。</li>
+                            <li>点击 `Generate Class` 生成访问类，这个类继承 `BindingViewBase`，并在 `OnBindingSet()` 里缓存组件引用。</li>
+                            <li>让业务 View wrapper 直接使用这份生成类，或者以相同模式手写一个轻量 View wrapper。</li>
+                            <li>在 `UIControllerBase<TView>` 中通过 `TypedViewHandle.TypedView` 消费这些引用。</li>
+                        </ol>
+                    </div>
+                    <div class="panel section">
+                        <h3>生成类的核心结构</h3>
+<pre><code class="language-csharp">public class HomeViewAccess : BindingViewBase
+{
+    public Button StartButton { get; private set; }
+
+    protected override void OnBindingSet()
+    {
+        base.OnBindingSet();
+        StartButton = Binding.transform.Find("Panel/StartButton")?.GetComponent&lt;Button&gt;();
+    }
+}</code></pre>
+                        <p>这和旧式“构造时传路径并直接承担生命周期”的 View 写法不同。当前生成模型明确围绕 `BindingViewBase + OnBindingSet()` 构建。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Controller Integration</div><h2>再把生成类接进 Controller</h2></div></div>
+                    <div class="panel">
+<pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeViewAccess&gt;
+{
+    protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;
+
+    protected override void OnViewCreated()
+    {
+        base.OnViewCreated();
+        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+    }
+
+    private void OnStartClicked()
+    {
+    }
+}</code></pre>
+                        <p>关键点是：Controller 访问实时实例时应始终走 `TypedViewHandle.TypedView`，不要回退到已经被移除的 `controller.View` 习惯。</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">QScroller</div><h2>`QScrollerEditor` 在补什么</h2></div></div>
+                    <div class="panel">
+                        <p>`QScrollerEditor` 是在 Unity 自带 `ScrollRectEditor` 基础上补充框架特有字段，而不是重写一套完整滚动面板。它额外暴露的重点是：</p>
+                        <table>
+                            <thead><tr><th>字段</th><th>作用</th></tr></thead>
+                            <tbody>
+                                <tr><td>`m_snapHorizontalUnits`</td><td>横向吸附单位设置。</td></tr>
+                                <tr><td>`m_snapVerticalUnits`</td><td>纵向吸附单位设置。</td></tr>
+                                <tr><td>`OnSnapToHorizontalSegment`</td><td>横向吸附完成后的 UnityEvent。</td></tr>
+                                <tr><td>`OnSnapToVerticalSegment`</td><td>纵向吸附完成后的 UnityEvent。</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><div><div class="eyebrow">Boundary</div><h2>这里要守住的边界</h2></div></div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>Do</h3>
+                            <p>把 binding 和 ViewConfig 信息留在 `QUIBinding` 侧；让生成代码服务于当前 handle-first UI 契约。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>Don't</h3>
+                            <p>不要回到手写大量硬编码路径和运行时散绑定的旧模式；不要让生成模板重新引入旧 `View` facade 习惯。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

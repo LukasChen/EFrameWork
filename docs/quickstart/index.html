@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>快速开始 - EFrameWork Docs</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <script defer src="../assets/site.js"></script>
+</head>
+<body>
+    <div class="site-shell">
+        <aside class="site-nav">
+            <a class="brand" href="../index.html">
+                <small>EFrameWork</small>
+                <strong>Framework Docs</strong>
+                <span>Quickstart</span>
+            </a>
+            <button class="nav-toggle" type="button">展开文档导航</button>
+            <div class="nav-sections">
+                <section class="nav-section">
+                    <h2>开始</h2>
+                    <nav class="nav-links">
+                        <a href="../index.html">首页</a>
+                        <a href="index.html">快速开始</a>
+                        <a href="../api/index.html">API 总览</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>核心模块</h2>
+                    <nav class="nav-links">
+                        <a href="../runtime/core/index.html">Runtime / Core</a>
+                        <a href="../runtime/ui/index.html">Runtime / UI</a>
+                        <a href="../runtime/data/index.html">Runtime / Data</a>
+                        <a href="../runtime/assets/index.html">Runtime / Assets</a>
+                        <a href="../runtime/audio/index.html">Runtime / Audio</a>
+                        <a href="../runtime/events/index.html">Runtime / Events</a>
+                        <a href="../runtime/utils/index.html">Runtime / Utils</a>
+                        <a href="../editor/bootstrap/index.html">Editor / Bootstrap</a>
+                        <a href="../ai/index.html">AI 协作层</a>
+                    </nav>
+                </section>
+                <section class="nav-section">
+                    <h2>示例</h2>
+                    <nav class="nav-links">
+                        <a href="../examples/ui-page/index.html">创建一个 UI 页面</a>
+                        <a href="../examples/data-table/index.html">创建一个 DataTable</a>
+                    </nav>
+                </section>
+            </div>
+        </aside>
+        <main class="content-area">
+            <div class="page">
+                <header class="page-header">
+                    <div class="breadcrumbs">
+                        <span><a href="../index.html">Docs</a></span>
+                        <span>Quickstart</span>
+                    </div>
+                    <div class="eyebrow">Getting Started</div>
+                    <h1>第一次把 EFrameWork 接进一个 Unity 项目时，先走这条最短链路。</h1>
+                    <p class="lead">这页只覆盖最容易踩偏的入口：启动场景、`EFrameComponent`、`EFrame.Initialize()`、服务访问和第一批运行时能力。更细的 UI、Data、Editor 和 AI 细节分别去模块页看。</p>
+                    <div class="meta-list">
+                        <div><dt>入口组件</dt><dd>`EFrameComponent` + `ProcedureComponent`</dd></div>
+                        <div><dt>静态入口</dt><dd>`EFrame.Current`</dd></div>
+                        <div><dt>优先目标</dt><dd>确保初始化链正确，再开始业务功能开发</dd></div>
+                    </div>
+                </header>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Minimum Path</div>
+                            <h2>最小接入路径</h2>
+                        </div>
+                    </div>
+                    <div class="callout-grid">
+                        <div class="callout">
+                            <h3>1. 把 `EFrameComponent` 放在启动场景</h3>
+                            <p>该组件会在 `Awake()` 里暂停 `ProcedureComponent`，执行 `EFrame.Initialize(this)`，成功后再启用流程系统。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>2. 只在初始化完成后访问服务</h3>
+                            <p>在启动链以外的业务代码里，优先通过 `Context.UI`、`Context.Data` 访问；只有外层入口用 `EFrame.Current.*`。</p>
+                        </div>
+                        <div class="callout">
+                            <h3>3. UI 走 Controller + Handle</h3>
+                            <p>当前 UI 契约是 handle-first，不要把 View 重新当作公开生命周期入口。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Startup Flow</div>
+                            <h2>初始化链路在做什么</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <ol>
+                            <li>`EFrameComponent.Awake()` 确保存在 `ProcedureComponent`。</li>
+                            <li>启动协程 `FrameWorkInitialize()`。</li>
+                            <li>调用 `EFrame.Initialize(this)`。</li>
+                            <li>初始化 Addressables、Data、Audio、UI、Event、Coroutine、Vibration。</li>
+                            <li>创建 `EFrameContext`，并绑定到 `EFrame.Current`。</li>
+                            <li>成功后启用流程组件，并广播 `AppStartedEvent`。</li>
+                        </ol>
+                        <div class="api-signature">
+<pre><code class="language-csharp">yield return EFrame.Initialize(frameComponent);
+
+if (!EFrame.LastInitializationResult.Succeeded)
+{
+    Debug.LogError(EFrame.LastInitializationResult.Message);
+    yield break;
+}
+
+var ui = EFrame.Current.UI;
+var data = EFrame.Current.Data;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Service Access</div>
+                            <h2>运行时服务访问模型</h2>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <p>核心约束只有一条：`EFrame` 是静态入口，服务所有权在 `EFrameContext`。这意味着你应该把业务逻辑尽量放在能拿到 `Context` 的对象中，而不是全局到处直接取 `EFrame.Current`。</p>
+                        <ul class="inline-list">
+                            <li>`EFrame.Current.UI`</li>
+                            <li>`EFrame.Current.Audio`</li>
+                            <li>`EFrame.Current.Data`</li>
+                            <li>`EFrame.Current.Events`</li>
+                            <li>`EFrame.Current.Assets`</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <div>
+                            <div class="eyebrow">Next Moves</div>
+                            <h2>下一步该去哪里</h2>
+                        </div>
+                    </div>
+                    <div class="card-grid">
+                        <article class="feature-card">
+                            <h3><a href="../runtime/ui/index.html">如果你要先做界面</a></h3>
+                            <p>继续看 `QUI`、`UIControllerBase`、`UIViewHandle` 的职责边界和示例。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3><a href="../runtime/data/index.html">如果你要先落配置或存档</a></h3>
+                            <p>继续看 `IDataService`、`DataTable&lt;T&gt;`、脏标记和迁移结果。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3><a href="../editor/bootstrap/index.html">如果你要初始化一个新项目</a></h3>
+                            <p>继续看 Unity 初始化窗口、冷启动脚本和资源/模板导入入口。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3><a href="../examples/ui-page/index.html">如果你想照着做一个页面</a></h3>
+                            <p>直接走 UI 页面示例，按资源路径、View、Controller、显示入口一步步落地。</p>
+                        </article>
+                        <article class="feature-card">
+                            <h3><a href="../examples/data-table/index.html">如果你想照着做一个存档表</a></h3>
+                            <p>直接走 DataTable 示例，把注册、改值、保存和结果检查串成完整流程。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
