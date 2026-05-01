@@ -3,6 +3,26 @@ name: eframe-ui-feature
 description: 'Build or refactor EFrame UI pages, popups, tooltips, View prefabs, UIController classes, QUIBinding usage, UI layer placement, and UI lifecycle wiring. Use when adding or fixing EFrame runtime UI features in a business project.'
 argument-hint: 'Describe the UI feature, target layer, prefab/controller names, and whether it is a page, popup, tooltip, or top-layer UI.'
 user-invocable: true
+capabilities:
+  - eframe.ui.page
+  - eframe.ui.popup
+  - eframe.ui.controller
+  - eframe.ui.binding
+owns:
+  - QUI layer placement
+  - UIController and View wrapper lifecycle
+  - UI prefab naming and resource placement
+delegatesTo:
+  - eframe-resource-flow
+  - eframe-guideline-audit
+outputs:
+  - handle-first UI controller wiring
+  - thin parameterless View wrapper
+  - prefab/resource path alignment
+forbiddenPatterns:
+  - hand-built persistent runtime Canvas or EventSystem
+  - legacy UIControllerBase View facade usage
+  - assetPath constructors in generated View wrappers
 ---
 
 # EFrame UI Feature

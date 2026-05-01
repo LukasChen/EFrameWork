@@ -41,6 +41,63 @@ function Convert-ToVersion {
     }
 }
 
+function Get-FileSha256 {
+    param(
+        [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    return (Get-FileHash -Path $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+function Convert-ToRepoRelativePath {
+    param(
+        [string]$Path
+    )
+
+    $fullPath = (Resolve-Path $Path).Path
+    return $fullPath.Substring($frameworkRoot.Length + 1).Replace("\", "/")
+}
+
+function Get-ExpectedManifestFilePaths {
+    $paths = New-Object System.Collections.Generic.List[string]
+
+    foreach ($rootFile in @(
+        "AGENTS.md",
+        "EFRAME_AI_API_INDEX.md",
+        "EFRAME_AI_ARCHITECTURE.md",
+        "EFRAME_AI_SETUP.md",
+        "EFRAME_AI_RELEASE_CHECKLIST.md"
+    )) {
+        if (Test-Path $rootFile) {
+            $paths.Add($rootFile)
+        }
+    }
+
+    if (Test-Path ".github/copilot-instructions.md") {
+        $paths.Add(".github/copilot-instructions.md")
+    }
+
+    if (Test-Path ".github/instructions") {
+        foreach ($file in Get-ChildItem -Path ".github/instructions" -Filter "eframe-*.instructions.md" -File) {
+            $paths.Add((Convert-ToRepoRelativePath -Path $file.FullName))
+        }
+    }
+
+    if (Test-Path ".github/skills") {
+        foreach ($skillDirectory in Get-ChildItem -Path ".github/skills" -Directory -Filter "eframe-*") {
+            foreach ($file in Get-ChildItem -Path $skillDirectory.FullName -Recurse -File) {
+                $paths.Add((Convert-ToRepoRelativePath -Path $file.FullName))
+            }
+        }
+    }
+
+    return @($paths | Sort-Object -Unique)
+}
+
 function Test-FrontMatterFile {
     param(
         [string]$Path,
@@ -133,9 +190,11 @@ try {
         "^tools/Install-EFrameAIProjectUpdater\.ps1$",
         "^tools/Initialize-EFrameColdStart\.ps1$",
         "^tools/Initialize-EFrameBootstrapCode\.ps1$",
+        "^tools/Test-EFrameAIProject\.ps1$",
         "^tools/Test-EFrameAIRelease\.ps1$",
         "^packages/com\.eframework\.core/Editor/EFrameProjectInitializationWindow\.cs$",
         "^README\.md$",
+        "^EFRAME_AI_API_INDEX\.md$",
         "^EFRAME_AI_ARCHITECTURE\.md$",
         "^EFRAME_AI_SETUP\.md$",
         "^EFRAME_AI_RELEASE_CHECKLIST\.md$",
@@ -180,6 +239,66 @@ try {
         }
     }
 
+    $manifestObject = $null
+    try {
+        $manifestObject = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    }
+    catch {
+        $errors.Add("$manifestPath is not valid JSON.")
+    }
+
+    if ($manifestObject) {
+        $expectedManifestFilePaths = Get-ExpectedManifestFilePaths
+        $manifestFileEntries = @($manifestObject.files)
+
+        if ($manifestFileEntries.Count -eq 0) {
+            $errors.Add("$manifestPath must contain file hash entries for synced AI files.")
+        }
+        else {
+            $manifestPaths = @($manifestFileEntries | ForEach-Object { [string]$_.path } | Sort-Object -Unique)
+            $missingManifestPaths = @($expectedManifestFilePaths | Where-Object { $_ -notin $manifestPaths })
+            $extraManifestPaths = @($manifestPaths | Where-Object { $_ -notin $expectedManifestFilePaths })
+
+            if ($missingManifestPaths.Count -gt 0) {
+                $errors.Add("$manifestPath is missing synced file entries: $($missingManifestPaths -join ', ')")
+            }
+
+            if ($extraManifestPaths.Count -gt 0) {
+                $errors.Add("$manifestPath contains non-synced file entries: $($extraManifestPaths -join ', ')")
+            }
+
+            foreach ($entry in $manifestFileEntries) {
+                $entryPath = [string]$entry.path
+                $entryHash = [string]$entry.sha256
+
+                if ([string]::IsNullOrWhiteSpace($entryPath) -or [string]::IsNullOrWhiteSpace($entryHash)) {
+                    $errors.Add("$manifestPath contains a file entry without path or sha256.")
+                    continue
+                }
+
+                if ($entryPath -match "\\") {
+                    $errors.Add("$manifestPath file entry must use '/' separators: $entryPath")
+                    continue
+                }
+
+                if ($entryPath -match "maintainer-|project-") {
+                    $errors.Add("$manifestPath must not track maintainer-only or project-owned files: $entryPath")
+                    continue
+                }
+
+                if (-not (Test-Path $entryPath)) {
+                    $errors.Add("$manifestPath tracks a missing file: $entryPath")
+                    continue
+                }
+
+                $actualHash = Get-FileSha256 -Path $entryPath
+                if ($actualHash -ne $entryHash.ToLowerInvariant()) {
+                    $errors.Add("$manifestPath hash mismatch for $entryPath.")
+                }
+            }
+        }
+    }
+
     $frameworkProjectInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "project-*.instructions.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
     if ($frameworkProjectInstructions.Count -gt 0) {
         $errors.Add("Framework repo contains project-owned instruction overlays: $($frameworkProjectInstructions -join ', ')")
@@ -214,6 +333,16 @@ try {
     foreach ($skillFile in $skillFiles) {
         foreach ($issue in (Test-FrontMatterFile -Path $skillFile -RequireApplyTo $false)) {
             $errors.Add($issue)
+        }
+    }
+
+    foreach ($eframeSkillName in $eframeSkills) {
+        $skillPath = Join-Path ".github/skills" (Join-Path $eframeSkillName "SKILL.md")
+        $skillText = Get-Content -LiteralPath $skillPath -Raw -Encoding UTF8
+        foreach ($requiredMetadataField in @("capabilities", "owns", "outputs", "forbiddenPatterns")) {
+            if ($skillText -notmatch "(?m)^$requiredMetadataField\s*:") {
+                $errors.Add("$skillPath frontmatter is missing machine-readable '$requiredMetadataField' metadata.")
+            }
         }
     }
 

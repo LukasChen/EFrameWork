@@ -15,7 +15,9 @@ See [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) for the AI layer cont
 
 For the current handle-first UI runtime structure and usage examples, see [UI_FRAMEWORK_GUIDE.md](UI_FRAMEWORK_GUIDE.md).
 
-For a framework-level API catalog covering runtime and editor public surfaces, see [API_REFERENCE.md](API_REFERENCE.md).
+For a compact AI-oriented map of stable framework APIs and tool entry points, see [EFRAME_AI_API_INDEX.md](EFRAME_AI_API_INDEX.md).
+
+For a framework-level API catalog covering runtime and editor public surfaces, see [docs/api/index.html](docs/api/index.html).
 
 For the new browsable HTML docs site skeleton, open [docs/index.html](docs/index.html).
 
@@ -69,6 +71,12 @@ Before releasing AI-layer or bootstrap tooling changes, run:
 
 ```powershell
 .\tools\Test-EFrameAIRelease.ps1
+```
+
+To inspect a business project after AI sync or framework upgrades, run:
+
+```powershell
+.\tools\Test-EFrameAIProject.ps1 -TargetRoot "D:\YourUnityProject" -FrameworkRoot "."
 ```
 
 Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, and trigger AI/bootstrap initialization from a single window.

@@ -6,6 +6,26 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-05-01
+
+### Added
+
+- Added machine-readable capability metadata to synced `eframe-*` skills so AI agents and release checks can reason about ownership, outputs, delegation, and forbidden patterns.
+- Added `EFRAME_AI_API_INDEX.md`, a synced AI-oriented index of stable EFrame runtime, editor bootstrap, and workspace tooling entry points.
+- Added business-project AI health checking through `tools/Test-EFrameAIProject.ps1`.
+- Added manifest-tracked file hashes so projects can detect local drift even when the synced AI version number matches.
+
+### Changed
+
+- Updated AI sync/status reporting to include manifest file integrity checks and to sync the AI API index into business projects.
+- Strengthened AI release validation so synced file hashes and `eframe-*` skill capability metadata are checked before release.
+
+### Fixed
+
+- Fixed the README API reference link to point at the generated docs site.
+- Reduced fallback AudioListener creation from a warning to an informational log.
+- Guarded pause/quit handling before framework initialization completes and waited briefly for Procedure startup to report running.
+
 ## [0.3.0] - 2026-04-30
 
 ### Added

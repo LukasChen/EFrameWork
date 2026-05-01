@@ -3,6 +3,25 @@ name: eframe-guideline-audit
 description: 'Review Unity EFrame changes for compliance. Use when auditing startup scene, Procedure lifecycle, QUI usage, UIController structure, directory layout, naming, resource paths, or AI customization sync.'
 argument-hint: 'Describe the change set or module to audit.'
 user-invocable: true
+capabilities:
+  - eframe.audit.runtime
+  - eframe.audit.ui
+  - eframe.audit.resources
+  - eframe.audit.data
+owns:
+  - EFrame guideline compliance review
+  - runtime lifecycle risk detection
+  - business-project AI contract drift triage
+delegatesTo:
+  - maintainer-ai-contract
+outputs:
+  - prioritized guideline findings
+  - missing validation risks
+  - maintainer-skill handoff when scope is framework AI release
+forbiddenPatterns:
+  - mixing maintainer-only release checks into business project audit conclusions
+  - treating logs as data/load/save contract
+  - approving unmanaged Addressables edits under managed resource directories
 ---
 
 # EFrame Guideline Audit

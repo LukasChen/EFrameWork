@@ -31,7 +31,7 @@ When one part changes the expected project shape, the matching AI guidance must 
 - `instructions/eframe-*.instructions.md` contains short, stable runtime and editor rules that are part of the synced business-project contract.
 - `skills/eframe-*` contains on-demand business-project workflows that are also synced into business projects.
 - `instructions/maintainer-*.instructions.md` and `skills/maintainer-*` contain framework-repository-only guidance and workflows; these files are not part of the synced project contract because the sync scripts only manage `eframe-*` items.
-- `.github/eframe-ai.manifest.json` declares the synced AI layer version; no repo-root duplicate manifest should exist.
+- `.github/eframe-ai.manifest.json` declares the synced AI layer version and file hashes for framework-managed AI files; no repo-root duplicate manifest should exist.
 
 `AGENTS.md`
 
@@ -39,12 +39,19 @@ When one part changes the expected project shape, the matching AI guidance must 
 - Mirrors the stable EFrame AI contract at a high level and directs Codex to the relevant `.github/skills/*/SKILL.md` workflow files when a task matches a synced or maintainer workflow.
 - Is synced to business projects together with the AI docs so Codex and Copilot can share the same framework guidance from different entry points.
 
+`EFRAME_AI_API_INDEX.md`
+
+- Provides a compact AI-oriented map of stable Runtime, Editor bootstrap, and AI tooling APIs.
+- Is synced to business projects as a quick lookup layer before AI agents inspect implementation files.
+- Should describe stable project-facing entry points, not every internal implementation detail.
+
 `tools/`
 
 - Imports and updates the AI layer in business projects.
 - Creates cold-start project structure and bootstrap code.
 - Installs project-side sync scripts.
 - Generates project overlay templates without overwriting local project rules.
+- Checks business-project AI workspace health after sync or framework upgrades.
 
 Business project `.github/`
 
@@ -94,9 +101,9 @@ EFrameWork should be maintained as one product surface, not as a Unity framework
 
 For the formal starting release, both values start at `0.1.0`. After that, think in terms of the EFrameWork release first. Bump the package version when publishing a framework/package release. Bump the manifest when the synced AI rules, AI docs, sync scripts, or cold-start tooling change, but do not describe it as a separate product version.
 
-Whenever `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, AI sync scripts, cold-start scripts, or AI setup docs change, bump `.github/eframe-ai.manifest.json`.
+Whenever `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, `EFRAME_AI_API_INDEX.md`, AI sync scripts, cold-start scripts, or AI setup docs change, bump `.github/eframe-ai.manifest.json`.
 
-The manifest version is only the signal business projects use to detect whether their synced AI layer is stale.
+The manifest version is the broad signal business projects use to detect whether their synced AI layer is stale. Manifest file hashes provide a narrower integrity check so projects can also detect local edits, missing files, or partial syncs when the version number appears current.
 
 Recommended release sequence:
 

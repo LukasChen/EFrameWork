@@ -1,6 +1,80 @@
 {
   "name": "eframe-ai-workspace",
-  "version": "0.1.55",
-  "updatedAt": "2026-04-30",
-  "notes": "Document runtime assetId resource contract and keep AssetReference in editor-authoring guidance."
+  "version": "0.1.57",
+  "updatedAt": "2026-05-01",
+  "notes": "Add machine-readable skill capability metadata and a synced AI API index.",
+  "files": [
+    {
+      "path": ".github/copilot-instructions.md",
+      "sha256": "a5ae8fe299e8fe840bc7769dbd1f78f397c49d0db8cca3d5dd95f295640beb67"
+    },
+    {
+      "path": ".github/instructions/eframe-editor.instructions.md",
+      "sha256": "e5f123f9074bca19f3e97b4eeebacc514d5ea68a7270eb61797ff574888a2548"
+    },
+    {
+      "path": ".github/instructions/eframe-runtime.instructions.md",
+      "sha256": "4b32cb922e9d0ff835b0f4471f77c47573863cfe7fb16f015248e56318853919"
+    },
+    {
+      "path": ".github/skills/eframe-data-table/SKILL.md",
+      "sha256": "f6e97b8101d4c60fab83a724dad5dc5c53b5bdb01505eb87af4da6e02c0d88ca"
+    },
+    {
+      "path": ".github/skills/eframe-data-table/references/data-table-checklist.md",
+      "sha256": "49259ae80eb2d0bd292af41e55a4c8d2d184c6cd1594c537babfa81ec911b91e"
+    },
+    {
+      "path": ".github/skills/eframe-feature-bootstrap/SKILL.md",
+      "sha256": "6af3cd545eb94fd5135573c4c1cebd7c4a90735f85ff14569205f81c0961c84a"
+    },
+    {
+      "path": ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
+      "sha256": "0d9f2e0ae0ca9f29cea03b9c2539c8c4ec0b6ed702147ca6dd225f839ff58435"
+    },
+    {
+      "path": ".github/skills/eframe-guideline-audit/SKILL.md",
+      "sha256": "a71280b5e7f5b22f3a797a953f0d6a10278c34a0b3796b07c0b9356c4422f296"
+    },
+    {
+      "path": ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
+      "sha256": "54b8ff2d51de66350c8380738d85dce964df86f343d9a95206780734486484db"
+    },
+    {
+      "path": ".github/skills/eframe-resource-flow/SKILL.md",
+      "sha256": "ae8a98c5eb87dad4c4a3d744cd1b1aa55a05193032b487b4cb2327fe5e5558b3"
+    },
+    {
+      "path": ".github/skills/eframe-resource-flow/references/resource-checklist.md",
+      "sha256": "51b38efac00a591cfec97b5ba0584ae2f20dac9606ef67b3dcdd492496f4204e"
+    },
+    {
+      "path": ".github/skills/eframe-ui-feature/SKILL.md",
+      "sha256": "0196fae4b1597d7d6d34b96a430ca1665d7829dddbfbe274192308bd6949242a"
+    },
+    {
+      "path": ".github/skills/eframe-ui-feature/references/ui-checklist.md",
+      "sha256": "b156605af702642360f4b5823f04b4fb92ba55682856ee4093f1c2727c167492"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "788164c0222d5ca4ece344d99b3640f4ddfafea1379720256e410e4e4a3a4fd2"
+    },
+    {
+      "path": "EFRAME_AI_API_INDEX.md",
+      "sha256": "c6e1ebbbb4360f8ac6a44950019efec4941c294a3de210d35918ad9745f99035"
+    },
+    {
+      "path": "EFRAME_AI_ARCHITECTURE.md",
+      "sha256": "97e944c36e26f470e954bffe6c51276c10c6baa6901f3ffecd79daf8fd29deef"
+    },
+    {
+      "path": "EFRAME_AI_RELEASE_CHECKLIST.md",
+      "sha256": "c17654d75465c37aea85b28d61f0f7accf32458f069b81d830937f50af36fe65"
+    },
+    {
+      "path": "EFRAME_AI_SETUP.md",
+      "sha256": "2c659978804f30b82332b356b2e4d65dad7eb7ad5ac2972f5f7d0ec998992682"
+    }
+  ]
 }

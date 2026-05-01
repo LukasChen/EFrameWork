@@ -3,6 +3,26 @@ name: eframe-resource-flow
 description: 'Set up, refactor, or audit EFrame resource loading through Addressables, ResPath, ResPath.Generated, editor-authored AssetReference fields, App/Res and Modules/Res directories, async asset handles, and release/dispose paths. Use when adding prefabs, UI assets, scene assets, audio, or module resources.'
 argument-hint: 'Describe the resource, expected directory, loading caller, and whether Addressables/ResPath generation is involved.'
 user-invocable: true
+capabilities:
+  - eframe.resources.addressables
+  - eframe.resources.respath
+  - eframe.assets.preload
+  - eframe.assets.release
+owns:
+  - managed resource directory placement
+  - ResPath and assetId flow
+  - async asset handle ownership
+delegatesTo:
+  - eframe-ui-feature
+  - eframe-guideline-audit
+outputs:
+  - centralized resource id plan
+  - preload and release lifecycle mapping
+  - Addressables automation alignment
+forbiddenPatterns:
+  - manually editing managed Addressables entries
+  - runtime business logic passing AssetReference objects downstream
+  - undocumented WaitForCompletion in hot paths
 ---
 
 # EFrame Resource Flow

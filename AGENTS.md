@@ -33,4 +33,4 @@ Codex does not automatically load GitHub Copilot workspace skills. When a task m
 - Resources, Addressables, `ResPath`, async handles: `.github/skills/eframe-resource-flow/SKILL.md`
 - Framework AI/release/sync/template maintenance: `.github/skills/maintainer-ai-contract/SKILL.md`
 
-For architecture, setup, and release boundaries, see `EFRAME_AI_ARCHITECTURE.md`, `EFRAME_AI_SETUP.md`, and `EFRAME_AI_RELEASE_CHECKLIST.md`.
+For AI-oriented API lookup, architecture, setup, and release boundaries, see `EFRAME_AI_API_INDEX.md`, `EFRAME_AI_ARCHITECTURE.md`, `EFRAME_AI_SETUP.md`, and `EFRAME_AI_RELEASE_CHECKLIST.md`.

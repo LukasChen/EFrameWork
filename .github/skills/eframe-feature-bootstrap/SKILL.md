@@ -3,6 +3,27 @@ name: eframe-feature-bootstrap
 description: 'Plan and assemble Unity EFrame feature scaffolding across Procedure, UI, data, resources, startup flow, popup flow, or MiniGame modules. Use as the top-level coordinator when a feature spans multiple EFrame concerns; delegate detailed UI, data-table, or resource work to the specialized eframe skills.'
 argument-hint: 'Describe the feature, target state, and whether it is a Procedure, popup, page, or MiniGame.'
 user-invocable: true
+capabilities:
+  - eframe.feature.coordinate
+  - eframe.procedure.scaffold
+  - eframe.module.scaffold
+owns:
+  - feature boundary classification
+  - cross-skill integration plan
+  - Procedure-level lifecycle placement
+delegatesTo:
+  - eframe-ui-feature
+  - eframe-data-table
+  - eframe-resource-flow
+  - eframe-guideline-audit
+outputs:
+  - smallest valid EFrame feature boundary
+  - coordinated file and resource placement
+  - validation handoff checklist
+forbiddenPatterns:
+  - putting business gameplay logic in the startup scene
+  - bypassing QUI/UIController for feature UI
+  - scattering runtime resource address strings
 ---
 
 # EFrame Feature Bootstrap

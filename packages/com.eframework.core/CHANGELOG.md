@@ -4,6 +4,13 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-05-01
+
+### Fixed
+
+- Reduced fallback AudioListener creation from a warning to an informational log.
+- Guarded pause/quit handling before framework initialization completes and waited briefly for Procedure startup to report running.
+
 ## [0.4.0] - 2026-04-30
 
 ### Added

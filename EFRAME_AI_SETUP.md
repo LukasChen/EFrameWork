@@ -18,7 +18,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 - `.github/skills/eframe-data-table`：用于持久化数据表、dirty、迁移、保存/加载结果工作流
 - `.github/skills/eframe-resource-flow`：用于资源目录、Addressables、ResPath 和异步句柄释放工作流
 - `.github/instructions/maintainer-*` 与 `.github/skills/maintainer-*`：仅框架仓库维护用，不同步到业务项目
-- `AGENTS.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便 Codex 和项目内文档查看架构、接入和发布边界
+- `AGENTS.md`、`EFRAME_AI_API_INDEX.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md`：会随 AI 层同步到业务项目根目录，方便 Codex 和项目内文档查看 API 入口、架构、接入和发布边界
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
@@ -40,7 +40,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。框架的 Runtime、Editor
 - 创建推荐目录骨架
 - 目录骨架内容以 `UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 同步框架 AI 基础层到项目 `.github`
-- 同步 `AGENTS.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md` 到项目根目录
+- 同步 `AGENTS.md`、`EFRAME_AI_API_INDEX.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`、`EFRAME_AI_RELEASE_CHECKLIST.md` 到项目根目录
 - 安装项目侧更新脚本 `tools/Sync-EFrameAIFromFramework.ps1`
 - 生成项目 overlay 模板 `.github/instructions/project-local.instructions.md`
 - 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
@@ -121,7 +121,7 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 
 执行后，目标项目根目录会得到一套标准 `.github` 配置和 `AGENTS.md`，VS Code / Copilot 与 Codex 都能按 EFrame 规范工作。
 
-同步过程也会复制 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录，让业务项目内的 instruction 链接和升级说明保持可读。
+同步过程也会复制 `EFRAME_AI_API_INDEX.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录，让业务项目内的 instruction 链接、API 入口索引和升级说明保持可读。
 
 ## 5. 框架更新后的同步方式
 
@@ -146,8 +146,17 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 - 框架托管的根文件、instructions、skills 和 AI 文档
 - 目标项目会保留的 `project-*` instruction / skill overlay
 - 目标项目里已经不存在于框架源的陈旧 `eframe-*` 项，这些只会在 `-Force` 同步时移除
+- manifest 记录的框架托管文件 hash 校验结果，用于发现版本号一致但本地 `eframe-*`、`AGENTS.md` 或 AI 文档被误改的情况
 
 这让业务项目可以先看清升级影响，再决定是否执行 `-Force`。
+
+如果想对业务项目做一次更完整的 AI 健康检查，可以在框架仓库根目录执行：
+
+```powershell
+.\tools\Test-EFrameAIProject.ps1 -TargetRoot "D:\YourUnityProject" -FrameworkRoot "."
+```
+
+该检查会验证 manifest-tracked 文件 hash、框架版本差异、`eframe-*` instruction/skill 是否存在、`project-*` overlay 是否存在，并提示常见的运行时代码风险，例如同步 Addressables 等待或手工创建 runtime Canvas。
 
 ## 6. 框架规则和项目规则如何同时生效
 
@@ -224,10 +233,11 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 .\tools\Test-EFrameAIRelease.ps1
 ```
 
-6. 用实际项目做一次小范围验证，确认 AI 能按新规范生成或修改代码。
-7. 最后再把这套 `.github` 同步到其他项目。
+6. 用实际项目做一次小范围验证，并运行 `Test-EFrameAIProject.ps1`，确认同步后的 AI 文件没有漂移。
+7. 确认 AI 能按新规范生成或修改代码。
+8. 最后再把这套 `.github` 同步到其他项目。
 
-`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更、manifest 版本是否真实递增、instruction/skill frontmatter 是否有效、synced instruction 是否过长、同步脚本是否误纳入 `maintainer-*`，并报告当前 `eframe-*` / `maintainer-*` instruction 和 skill 数量。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
+`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更、manifest 版本是否真实递增、manifest-tracked 文件清单和 hash 是否匹配、instruction/skill frontmatter 是否有效、`eframe-*` skill 是否带有机器可读能力元数据、synced instruction 是否过长、同步脚本是否误纳入 `maintainer-*`，并报告当前 `eframe-*` / `maintainer-*` instruction 和 skill 数量。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
 
 版本号建议：
 

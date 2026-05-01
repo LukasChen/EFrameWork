@@ -250,7 +250,7 @@ namespace EFrameWork.Runtime.Audio
             }
 
             m_audioSourceHolder.AddComponent<AudioListener>();
-            Debug.LogWarning("[AudioManager] No active AudioListener found. Added a fallback listener to AudioSourceHolder.");
+            Debug.Log("[AudioManager] No active AudioListener found. Added a fallback listener to AudioSourceHolder.");
         }
 
         #region SFX 播放接口

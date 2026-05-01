@@ -3,6 +3,25 @@ name: eframe-data-table
 description: 'Create, refactor, or audit EFrame persistent data tables, StorageKey values, dirty tracking, save/load behavior, migrations, LastLoadResult, and LastSaveResult usage. Use when adding gameplay settings, player progress, inventory, options, or other persistent runtime data.'
 argument-hint: 'Describe the data shape, storage key, load/save timing, and whether migration from old data is needed.'
 user-invocable: true
+capabilities:
+  - eframe.data.table
+  - eframe.data.persistence
+  - eframe.data.migration
+  - eframe.data.dirty-state
+owns:
+  - DataTable model and mutation boundary
+  - stable StorageKey contract
+  - load/save result interpretation
+delegatesTo:
+  - eframe-guideline-audit
+outputs:
+  - serializable data model
+  - dirty-aware table API
+  - migration and recovery notes
+forbiddenPatterns:
+  - deriving StorageKey from mutable class or namespace names
+  - mutating raw data outside table-owned methods
+  - parsing log text for load/save decisions
 ---
 
 # EFrame Data Table

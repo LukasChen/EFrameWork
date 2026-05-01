@@ -80,6 +80,12 @@ namespace EFrameWork.Runtime
             // 启动流程组件
             m_procedureComponent.Initialize(EFrame.Current);
             m_procedureComponent.StartProcedure();
+            float startupDeadline = Time.realtimeSinceStartup + 5f;
+            while (!m_procedureComponent.IsRunning && Time.realtimeSinceStartup < startupDeadline)
+            {
+                yield return null;
+            }
+
             if (!m_procedureComponent.IsRunning)
             {
                 Debug.LogError("EFrame procedure startup failed.");
@@ -111,6 +117,11 @@ namespace EFrameWork.Runtime
 
         private void OnApplicationPause(bool pauseStatus)
         {
+            if (!m_initialized)
+            {
+                return;
+            }
+
             if (pauseStatus)
             {
                 m_accumulatedTime += DateTime.Now - m_startTime;
@@ -127,9 +138,13 @@ namespace EFrameWork.Runtime
 
         private void OnApplicationQuit()
         {
-            m_accumulatedTime += DateTime.Now - m_startTime;
-            SaveTotalPlayTime((float)m_accumulatedTime.TotalSeconds);
-            EventBus.Dispatch(new AppQuitEvent());
+            if (m_initialized)
+            {
+                m_accumulatedTime += DateTime.Now - m_startTime;
+                SaveTotalPlayTime((float)m_accumulatedTime.TotalSeconds);
+                EventBus.Dispatch(new AppQuitEvent());
+            }
+
             m_procedureComponent?.Shutdown();
             EFrame.Dispose();
         }

@@ -14,6 +14,7 @@ $sourceManifestPath = Join-Path $sourceRoot $manifestName
 $destinationManifestPath = Join-Path $destinationRoot $manifestName
 $aiDocumentNames = @(
     "AGENTS.md",
+    "EFRAME_AI_API_INDEX.md",
     "EFRAME_AI_ARCHITECTURE.md",
     "EFRAME_AI_SETUP.md",
     "EFRAME_AI_RELEASE_CHECKLIST.md"
@@ -38,6 +39,97 @@ function Read-ManifestVersion {
 
     $manifest = Get-Content -Path $ManifestPath -Raw | ConvertFrom-Json
     return $manifest.version
+}
+
+function Get-ManifestFileEntries {
+    param(
+        [string]$ManifestPath
+    )
+
+    if (-not (Test-Path $ManifestPath)) {
+        return @()
+    }
+
+    $manifest = Get-Content -Path $ManifestPath -Raw | ConvertFrom-Json
+    if (-not $manifest.files) {
+        return @()
+    }
+
+    return @($manifest.files)
+}
+
+function Get-FileSha256 {
+    param(
+        [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    return (Get-FileHash -Path $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+function Get-ManifestFileStatus {
+    param(
+        [string]$RootPath,
+        [object[]]$Entries
+    )
+
+    $results = New-Object System.Collections.Generic.List[object]
+    foreach ($entry in $Entries) {
+        $relativePath = [string]$entry.path
+        $expectedHash = ([string]$entry.sha256).ToLowerInvariant()
+        $absolutePath = Join-Path $RootPath ($relativePath -replace "/", "\")
+
+        if (-not (Test-Path $absolutePath)) {
+            $results.Add([pscustomobject]@{
+                Path = $relativePath
+                Status = "Missing"
+                Expected = $expectedHash
+                Actual = $null
+            })
+            continue
+        }
+
+        $actualHash = Get-FileSha256 -Path $absolutePath
+        $status = if ($actualHash -eq $expectedHash) { "OK" } else { "Mismatch" }
+        $results.Add([pscustomobject]@{
+            Path = $relativePath
+            Status = $status
+            Expected = $expectedHash
+            Actual = $actualHash
+        })
+    }
+
+    return $results.ToArray()
+}
+
+function Write-ManifestFileIntegrityReport {
+    param(
+        [string]$RootPath,
+        [object[]]$Entries
+    )
+
+    Write-Host "Framework-managed file integrity:"
+    if (-not $Entries -or $Entries.Count -eq 0) {
+        Write-Warning "  Manifest has no file hash entries; version-only sync checks are less precise."
+        return @()
+    }
+
+    $statuses = Get-ManifestFileStatus -RootPath $RootPath -Entries $Entries
+    $problems = @($statuses | Where-Object { $_.Status -ne "OK" })
+
+    if ($problems.Count -eq 0) {
+        Write-Host "  All manifest-tracked files match the framework manifest."
+        return @()
+    }
+
+    foreach ($problem in $problems) {
+        Write-Warning "  $($problem.Status): $($problem.Path)"
+    }
+
+    return $problems
 }
 
 function Sync-File {
@@ -190,6 +282,7 @@ function Write-SyncStatusReport {
 
 $sourceVersion = Read-ManifestVersion -ManifestPath $sourceManifestPath
 $targetVersion = Read-ManifestVersion -ManifestPath $destinationManifestPath
+$sourceManifestFileEntries = Get-ManifestFileEntries -ManifestPath $sourceManifestPath
 
 if ($sourceRoot -eq $destinationRoot) {
     if ($StatusOnly) {
@@ -197,6 +290,7 @@ if ($sourceRoot -eq $destinationRoot) {
         Write-Host "Target AI version: $targetVersion"
         Write-Host "AI workspace config is up to date. Source and target are the same workspace."
         Write-SyncStatusReport
+        Write-ManifestFileIntegrityReport -RootPath $resolvedTargetRoot -Entries $sourceManifestFileEntries | Out-Null
         return
     }
 
@@ -210,6 +304,7 @@ if ($sourceRoot -eq $destinationRoot) {
 if ($StatusOnly) {
     Write-Host "Framework AI version: $sourceVersion"
     Write-SyncStatusReport
+    $integrityProblems = Write-ManifestFileIntegrityReport -RootPath $resolvedTargetRoot -Entries $sourceManifestFileEntries
 
     if (-not $targetVersion) {
         Write-Warning "Target project has no synced AI manifest yet. Run with -Force to initialize or update."
@@ -219,6 +314,11 @@ if ($StatusOnly) {
     Write-Host "Target AI version: $targetVersion"
 
     if ($sourceVersion -eq $targetVersion) {
+        if ($integrityProblems.Count -gt 0) {
+            Write-Warning "AI workspace manifest version matches, but one or more managed files differ. Run with -Force to restore framework-managed files."
+            return
+        }
+
         Write-Host "AI workspace config is up to date."
         return
     }
@@ -232,13 +332,14 @@ if (-not (Test-Path $destinationRoot)) {
 }
 
 Sync-File -SourcePath (Join-Path $sourceRoot "copilot-instructions.md") -DestinationPath (Join-Path $destinationRoot "copilot-instructions.md") -Overwrite:$Force
-Sync-File -SourcePath $sourceManifestPath -DestinationPath $destinationManifestPath -Overwrite:$Force
 Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "instructions") -DestinationDirectory (Join-Path $destinationRoot "instructions") -ManagedPattern "eframe-*" -Overwrite:$Force
 Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "skills") -DestinationDirectory (Join-Path $destinationRoot "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
 
 foreach ($documentName in $aiDocumentNames) {
     Sync-File -SourcePath (Join-Path $frameworkRoot $documentName) -DestinationPath (Join-Path $resolvedTargetRoot $documentName) -Overwrite:$Force
 }
+
+Sync-File -SourcePath $sourceManifestPath -DestinationPath $destinationManifestPath -Overwrite:$Force
 
 Write-Host "EFrame AI workspace files are ready at $destinationRoot"
 Write-Host "Synced version: $sourceVersion"
