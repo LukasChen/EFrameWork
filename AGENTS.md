@@ -1,36 +1,36 @@
-# EFrameWork Codex Guide
+# EFrameWork Codex 指南
 
-This repository is the canonical EFrameWork framework source. EFrameWork is a lightweight Unity game framework plus a synchronized AI collaboration layer and project cold-start/update toolchain.
+本仓库是 EFrameWork 框架标准源。EFrameWork 是轻量 Unity 游戏框架，同时包含可同步的 AI 协作层和项目冷启动/升级工具链。
 
-Codex should treat this file as the repo-level entry point. GitHub Copilot reads `.github/copilot-instructions.md`; Codex reads `AGENTS.md`. Keep both aligned when the framework AI contract changes.
+Codex 应将本文件视为仓库级入口。GitHub Copilot 读取 `.github/copilot-instructions.md`；Claude Code 读取 `CLAUDE.md`；Codex 读取 `AGENTS.md`。框架 AI 契约必须保持所有客户端入口一致。
 
-## Core Rules
+## 核心规则
 
-- Follow the EFrame framework rules in `.github/copilot-instructions.md` for Unity startup, `Procedure`, `QUI`, `UIController`, resource paths, Addressables, directory structure, and AI sync boundaries.
-- Keep runtime code under clear Unity project structure such as `Assets/App/Runtime`, `Assets/App/Res`, and `Assets/Modules/*`; do not introduce temporary directories for production code.
-- Use EFrame-owned `EFrameProcedure` and `EFrameProcedureComponent` for state switching, `OnPreloadAsync` resource preparation, and lifecycle orchestration only. Put page, popup, and gameplay behavior in the appropriate UI/controller/module layer.
-- Manage UI through `QUI`, `UIController`, and `UIViewHandle`; do not bypass the framework by hand-building persistent top-level Canvas or EventSystem objects in scenes.
-- Centralize runtime resource ids through `ResPath`, `ResPath.Generated`, or an equivalent module path center. `AssetReference` is acceptable for editor authoring fields, but runtime calls should resolve to asset ids instead of flowing references through business logic.
-- Treat resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as EFrame-managed Addressables entries. Put assets in the mapped directory and let the framework automation own group, address, and label; use the report window to choose which directory subtrees generate `ResPath.Generated`.
-- Keep Unity scene, prefab, and `.asset` edits narrow and avoid unrelated serialization churn.
+- 遵守 `.github/copilot-instructions.md` 中关于 Unity 启动、`Procedure`、`QUI`、`UIController`、资源路径、Addressables、目录结构和 AI 同步边界的 EFrame 框架规则。
+- 运行时代码应落在清晰的 Unity 项目结构中，例如 `Assets/App/Runtime`、`Assets/App/Res` 和 `Assets/Modules/*`；不要为生产代码引入非标准目录。
+- 只用 EFrame 自有的 `EFrameProcedure` 和 `EFrameProcedureComponent` 处理状态切换、`OnPreloadAsync` 资源准备和生命周期编排。页面、弹窗和玩法行为应放在对应 UI、controller 或 module 层。
+- UI 通过 `EFrame.Current.UI` / `IUIService`、`UIControllerBase` 和 `UIViewHandle` 管理；`QUI` 是默认 UI 服务实现和层级宿主，不要绕过它在场景里手工堆常驻顶层 Canvas 或 EventSystem。
+- 运行时资源 id 应来自自动生成的 `ResPath.Generated`。`AssetReference` 可以作为 Editor 配置字段，但运行时调用应先解析为生成的 asset id，不要让引用对象继续流入业务逻辑。
+- `Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的资源视为 EFrame 管理的 Addressables 条目。资源应放入映射目录，由框架自动化维护 group、address 和 label；需要生成 `ResPath.Generated` 的目录树通过 report window 选择。
+- 编辑 Unity scene、prefab 和 `.asset` 文件时保持窄改，避免无关序列化噪音。
 
-## AI Layer Maintenance
+## AI 层维护
 
-- The AI collaboration layer is a first-class framework surface. When framework code, templates, startup flow, directory rules, resource rules, or sync tools change, review the matching `.github` instructions, skills, manifest, scripts, and docs in the same change.
-- Bump `.github/eframe-ai.manifest.json` whenever `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, AI sync scripts, cold-start scripts, or AI setup/release docs change.
-- `eframe-*` files are framework-managed and synced to business projects.
-- `project-*` files are business-project overlays and must not be created in the framework repo.
-- `maintainer-*` files are framework-repository-only and must not be synced to business projects.
+- AI 协作层是框架一级能力。修改框架代码、模板、启动流程、目录规则、资源规则或同步工具时，同步检查匹配的 `.github` instructions、skills、脚本和文档。
+- AI 规则发布、manifest 和 release check 边界以 `EFRAME_AI_RELEASE_CHECKLIST.md` 为准。
+- `eframe-*` 文件由框架管理，并同步到业务项目。
+- 框架同步只能更新 EFrame managed block 和 `eframe-*` 文件。
+- `maintainer-*` 文件只服务框架仓库，不应同步到业务项目。
 
-## Codex Skill Discovery
+## Codex Skill 发现
 
-Codex does not automatically load GitHub Copilot workspace skills. When a task matches one of these workflows, read the corresponding `SKILL.md` before making changes:
+Codex 不会自动加载 GitHub Copilot 工作区 skills。当任务匹配以下工作流时，修改前先阅读对应的 `SKILL.md`：
 
-- Feature scaffolding and cross-cutting gameplay work: `.github/skills/eframe-feature-bootstrap/SKILL.md`
-- EFrame guideline review and regression checks: `.github/skills/eframe-guideline-audit/SKILL.md`
-- UI pages, popups, prefabs, controllers, bindings: `.github/skills/eframe-ui-feature/SKILL.md`
-- Persistent data tables, dirty state, migration, save/load results: `.github/skills/eframe-data-table/SKILL.md`
-- Resources, Addressables, `ResPath`, async handles: `.github/skills/eframe-resource-flow/SKILL.md`
-- Framework AI/release/sync/template maintenance: `.github/skills/maintainer-ai-contract/SKILL.md`
+- 功能骨架和跨层玩法工作：`.github/skills/eframe-feature-bootstrap/SKILL.md`
+- EFrame 规范审查和回归检查：`.github/skills/eframe-guideline-audit/SKILL.md`
+- UI 页面、弹窗、prefab、controller 和 binding：`.github/skills/eframe-ui-feature/SKILL.md`
+- 持久化数据表、dirty state、迁移和保存/加载结果：`.github/skills/eframe-data-table/SKILL.md`
+- 资源、Addressables、`ResPath` 和异步 handle：`.github/skills/eframe-resource-flow/SKILL.md`
+- 框架 AI/release/sync/template 维护：`.github/skills/maintainer-ai-contract/SKILL.md`
 
-For AI-oriented API lookup, architecture, setup, and release boundaries, see `EFRAME_AI_API_INDEX.md`, `EFRAME_AI_ARCHITECTURE.md`, `EFRAME_AI_SETUP.md`, and `EFRAME_AI_RELEASE_CHECKLIST.md`.
+AI 相关 API 查询、架构、setup 和 release 边界见 `EFRAME_AI_API_INDEX.md`、`EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md`。

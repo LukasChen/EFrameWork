@@ -6,6 +6,17 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-02
+
+### Added
+
+- Added `CLAUDE.md` as the Claude Code project entry point.
+- Added Unity Editor AI workspace platform selection plus `EFrame Tools/AI` menu entries for sync status, AI workspace sync, and project AI health checks.
+
+### Changed
+
+- Decoupled Unity cold-start from AI contract sync; users now choose Codex, Copilot, Claude Code, or all platforms before manually syncing AI guidance.
+
 ## [0.4.1] - 2026-05-01
 
 ### Added

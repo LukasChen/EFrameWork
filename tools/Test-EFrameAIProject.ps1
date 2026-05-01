@@ -40,6 +40,70 @@ function Get-FileSha256 {
     return (Get-FileHash -Path $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Normalize-ManagedBlockText {
+    param(
+        [string]$Text
+    )
+
+    if ($null -eq $Text) {
+        $Text = ""
+    }
+
+    $normalized = $Text -replace "`r`n", "`n"
+    $normalized = $normalized -replace "`r", "`n"
+    return $normalized.TrimEnd() + "`n"
+}
+
+function Get-TextSha256 {
+    param(
+        [string]$Text
+    )
+
+    $normalized = Normalize-ManagedBlockText -Text $Text
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hashBytes = $sha.ComputeHash($bytes)
+        return ([System.BitConverter]::ToString($hashBytes) -replace "-", "").ToLowerInvariant()
+    }
+    finally {
+        $sha.Dispose()
+    }
+}
+
+function Get-ManagedBlockBody {
+    param(
+        [string]$Text,
+        [string]$BlockId
+    )
+
+    if ($null -eq $Text) {
+        return $null
+    }
+
+    $beginMarker = "<!-- BEGIN EFRAMEWORK AI MANAGED BLOCK: $BlockId -->"
+    $endMarker = "<!-- END EFRAMEWORK AI MANAGED BLOCK: $BlockId -->"
+    $beginIndex = $Text.IndexOf($beginMarker, [System.StringComparison]::Ordinal)
+    if ($beginIndex -lt 0) {
+        return $null
+    }
+
+    $contentStart = $beginIndex + $beginMarker.Length
+    if ($contentStart -lt $Text.Length -and $Text[$contentStart] -eq "`r") {
+        $contentStart++
+    }
+    if ($contentStart -lt $Text.Length -and $Text[$contentStart] -eq "`n") {
+        $contentStart++
+    }
+
+    $endIndex = $Text.IndexOf($endMarker, $contentStart, [System.StringComparison]::Ordinal)
+    if ($endIndex -lt 0) {
+        return $null
+    }
+
+    return $Text.Substring($contentStart, $endIndex - $contentStart)
+}
+
 function Get-RelativeManagedNames {
     param(
         [string]$DirectoryPath,
@@ -57,11 +121,16 @@ Write-Host "EFrame AI project health check"
 Write-Host "Target root: $resolvedTargetRoot"
 
 $targetManifest = Read-JsonFile -Path $targetManifestPath
+$targetClients = @("codex", "copilot", "claude-code")
 if (-not $targetManifest) {
     $errors.Add("Target project is missing a readable $manifestRelativePath. Run Initialize-EFrameAI.ps1 or the project updater with -Force.")
 }
 else {
     Write-Host "Target AI manifest version: $($targetManifest.version)"
+    if ($targetManifest.clients -and $targetManifest.clients.Count -gt 0) {
+        $targetClients = @($targetManifest.clients | ForEach-Object { [string]$_ })
+        Write-Host "Target AI clients: $($targetClients -join ', ')"
+    }
 
     if (-not $targetManifest.files -or $targetManifest.files.Count -eq 0) {
         $warnings.Add("Target manifest has no file hash entries. Re-sync from a newer EFrameWork framework checkout.")
@@ -71,15 +140,28 @@ else {
             $relativePath = [string]$entry.path
             $expectedHash = ([string]$entry.sha256).ToLowerInvariant()
             $targetPath = Join-Path $resolvedTargetRoot ($relativePath -replace "/", "\")
+            $kind = [string]$entry.kind
 
             if (-not (Test-Path $targetPath)) {
                 $errors.Add("Manifest-tracked file is missing: $relativePath")
                 continue
             }
 
-            $actualHash = Get-FileSha256 -Path $targetPath
+            if ($kind -eq "managedBlock") {
+                $blockBody = Get-ManagedBlockBody -Text (Get-Content -Path $targetPath -Raw -Encoding UTF8) -BlockId ([string]$entry.blockId)
+                if ($null -eq $blockBody) {
+                    $errors.Add("Manifest-tracked managed block is missing: $relativePath [$($entry.blockId)]")
+                    continue
+                }
+
+                $actualHash = Get-TextSha256 -Text $blockBody
+            }
+            else {
+                $actualHash = Get-FileSha256 -Path $targetPath
+            }
+
             if ($actualHash -ne $expectedHash) {
-                $errors.Add("Manifest-tracked file differs from synced framework version: $relativePath")
+                $errors.Add("Manifest-tracked item differs from synced framework version: $relativePath")
             }
         }
     }
@@ -103,17 +185,22 @@ $instructionsDirectory = Join-Path $resolvedTargetRoot ".github\instructions"
 $skillsDirectory = Join-Path $resolvedTargetRoot ".github\skills"
 $eframeInstructions = Get-RelativeManagedNames -DirectoryPath $instructionsDirectory -Pattern "eframe-*"
 $eframeSkills = Get-RelativeManagedNames -DirectoryPath $skillsDirectory -Pattern "eframe-*"
-$projectInstructions = Get-RelativeManagedNames -DirectoryPath $instructionsDirectory -Pattern "project-*"
-$projectSkills = Get-RelativeManagedNames -DirectoryPath $skillsDirectory -Pattern "project-*"
 
-if ($eframeInstructions.Count -eq 0) {
-    $errors.Add("No synced eframe-* instruction files were found.")
+if ($targetClients -contains "codex" -and -not (Test-Path (Join-Path $resolvedTargetRoot "AGENTS.md"))) {
+    $errors.Add("Codex client is selected, but AGENTS.md is missing.")
 }
-if ($eframeSkills.Count -eq 0) {
-    $errors.Add("No synced eframe-* skills were found.")
+
+if ($targetClients -contains "claude-code" -and -not (Test-Path (Join-Path $resolvedTargetRoot "CLAUDE.md"))) {
+    $errors.Add("Claude Code client is selected, but CLAUDE.md is missing.")
 }
-if ($projectInstructions.Count -eq 0) {
-    $warnings.Add("No project-* instruction overlay was found. Add one for project-specific startup, module, UI, and resource rules.")
+
+if ($targetClients -contains "copilot") {
+    if ($eframeInstructions.Count -eq 0) {
+        $errors.Add("Copilot client is selected, but no synced eframe-* instruction files were found.")
+    }
+    if ($eframeSkills.Count -eq 0) {
+        $errors.Add("Copilot client is selected, but no synced eframe-* skills were found.")
+    }
 }
 
 $runtimeSearchRoots = @(
@@ -140,8 +227,6 @@ foreach ($root in $runtimeSearchRoots) {
 
 Write-Host "Framework instructions: $($eframeInstructions.Count)"
 Write-Host "Framework skills: $($eframeSkills.Count)"
-Write-Host "Project instruction overlays: $($projectInstructions.Count)"
-Write-Host "Project skill overlays: $($projectSkills.Count)"
 
 foreach ($warning in $warnings) {
     Write-Warning $warning

@@ -29,8 +29,8 @@ forbiddenPatterns:
 ## When To Use
 
 - 审查新页面、新玩法、新流程是否符合 EFrame 规范
-- 评估一个目录或提交是否继续扩散了过渡结构
-- 检查业务项目是否正确使用已同步的 EFrame runtime/editor 契约
+- 评估一个目录或提交是否扩散了非标准结构
+- 检查业务项目是否正确使用已同步的 EFrame framework 契约
 
 ## Audit Flow
 
@@ -46,12 +46,12 @@ forbiddenPatterns:
 8. 检查事件订阅是否通过作用域订阅或明确成对退订完成清理，数据表是否统一注册到 `EFrame.Current.Data`。
 9. 检查数据表是否声明稳定 `StorageKey`，而不是把类名或命名空间变化暴露为持久化键名；同时确认不同表没有复用同一持久化键。
 10. 检查数据表是否通过属性/方法封装修改并自动 dirty，复杂变更是否只在实际发生修改时标记 dirty，且避免外部直接修改底层数据对象。
-11. 检查需要持久化升级的数据表是否声明 `CurrentVersion` / `Migrate(...)`，以及旧裸数据文件是否能按 `version 0` 进入迁移链。
+11. 检查需要持久化升级的数据表是否声明 `CurrentVersion` / `Migrate(...)`，以及未版本化数据文件是否能按 `version 0` 进入迁移链。
 12. 检查需要感知存档恢复或回退的业务是否读取 `LastLoadResult` 的结构化状态与 `ReasonCode`，而不是依赖运行日志文本或消息字符串做分支判断。
 13. 检查需要感知保存成功、跳过或失败的业务是否读取 `LastSaveResult`，而不是默认认为每次 `Save()` 调用都实际写盘。
 14. 检查资源和代码目录是否可映射，命名是否稳定。
-15. 检查 `QUIBinding` 默认访问类命名空间与模板 prefab 是否保持一致，避免新生成代码继续落入旧的 `EFrameWork.UI.Generated`。
-16. 检查业务代码是否绕过 `IUIService/QUI` 与 `UIViewHandle` 语义直接驱动 `BindingViewBase` 生命周期，或重新引入 `assetPath` View 构造函数 / 旧 `View` facade。
+15. 检查 `QUIBinding` 默认访问类命名空间与模板 prefab 是否保持一致，生成代码应落在 `EFrameWork.Runtime.UI.Generated`。
+16. 检查业务代码是否绕过 `IUIService/QUI` 与 `UIViewHandle` 语义直接驱动 `BindingViewBase` 生命周期，或使用 `assetPath` View 构造函数 / `View` facade。
 
 ## AI Layer Audit
 
@@ -62,6 +62,6 @@ forbiddenPatterns:
 - 先给出高风险问题和潜在回归点。
 - 明确指出违反的是哪一类边界：启动场景、`Procedure`、UI、目录、命名、资源路径或 AI 配置同步。
 - 如果发现问题属于框架维护而不是业务项目使用，明确建议切换到 maintainer skill。
-- 如果没有问题，也要说明剩余风险，例如缺少验证、仍处于过渡目录、缺少模板沉淀等。
+- 如果没有问题，也要说明剩余风险，例如缺少验证、存在非标准目录、缺少模板沉淀等。
 
 详细核查项见 [audit checklist](./references/audit-checklist.md)。

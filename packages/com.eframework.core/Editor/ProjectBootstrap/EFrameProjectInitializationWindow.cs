@@ -23,11 +23,21 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private const string AutoPopupSessionKey = "EFrameWork.ProjectInitializationWindow.AutoPopupShown";
         private const string NamespacePrefsKey = "EFrameWork.ProjectInitializationWindow.RootNamespace";
         private const string ModuleNamePrefsKey = "EFrameWork.ProjectInitializationWindow.ModuleName";
+        private const string AiClientPrefsKey = "EFrameWork.ProjectInitializationWindow.AIClient";
 
         private string m_rootNamespace;
         private string m_moduleName;
+        private AIClientSelection m_aiClientSelection;
         private string m_statusMessage;
         private bool m_statusIsError;
+
+        private enum AIClientSelection
+        {
+            All,
+            Codex,
+            Copilot,
+            ClaudeCode
+        }
 
         [MenuItem("EFrame Tools/项目初始化向导", false, -100)]
         public static void OpenWindow()
@@ -84,6 +94,34 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 EditorGUILayout.HelpBox("Full Initialize Project runs the standard bootstrap chain. Import Initial Templates only re-copies the built-in Home and SampleModule UI templates into Assets.", MessageType.None);
             }
 
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("AI Workspace", EditorStyles.boldLabel);
+                m_aiClientSelection = (AIClientSelection)EditorGUILayout.EnumPopup("AI Platform", m_aiClientSelection);
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Check AI Sync Status"))
+                    {
+                        RunAiSyncStatus();
+                    }
+
+                    if (GUILayout.Button("Sync AI Workspace"))
+                    {
+                        RunAiSync();
+                    }
+                }
+
+                if (GUILayout.Button("Run AI Health Check"))
+                {
+                    RunAiHealthCheck();
+                }
+
+                EditorGUILayout.HelpBox("These actions use the framework repo tools to check, sync, and validate the project AI workspace while preserving project-owned instruction text outside EFrame managed blocks.", MessageType.None);
+            }
+
             if (!string.IsNullOrEmpty(m_statusMessage))
             {
                 EditorGUILayout.Space();
@@ -95,6 +133,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
         {
             m_rootNamespace = EditorPrefs.GetString(NamespacePrefsKey, GetDefaultNamespace());
             m_moduleName = EditorPrefs.GetString(ModuleNamePrefsKey, string.Empty);
+            m_aiClientSelection = (AIClientSelection)EditorPrefs.GetInt(AiClientPrefsKey, (int)AIClientSelection.All);
         }
 
         private static string ProjectRootPath => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
@@ -309,6 +348,90 @@ namespace EFrameWork.Editor.ProjectBootstrap
             EnsureSampleUIPrefabs();
         }
 
+        [MenuItem("EFrame Tools/AI/Check Sync Status", false, 40)]
+        private static void MenuRunAiSyncStatus()
+        {
+            OpenWindow();
+            GetWindow<EFrameProjectInitializationWindow>(true, WindowTitle).RunAiSyncStatus();
+        }
+
+        [MenuItem("EFrame Tools/AI/Sync Workspace", false, 41)]
+        private static void MenuRunAiSync()
+        {
+            OpenWindow();
+            GetWindow<EFrameProjectInitializationWindow>(true, WindowTitle).RunAiSync();
+        }
+
+        [MenuItem("EFrame Tools/AI/Run Health Check", false, 42)]
+        private static void MenuRunAiHealthCheck()
+        {
+            OpenWindow();
+            GetWindow<EFrameProjectInitializationWindow>(true, WindowTitle).RunAiHealthCheck();
+        }
+
+        private void RunAiSyncStatus()
+        {
+            EditorPrefs.SetInt(AiClientPrefsKey, (int)m_aiClientSelection);
+            RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {GetSelectedAIClientArgument()} -StatusOnly");
+        }
+
+        private void RunAiSync()
+        {
+            EditorPrefs.SetInt(AiClientPrefsKey, (int)m_aiClientSelection);
+            if (!EditorUtility.DisplayDialog(
+                    "Sync EFrame AI Workspace",
+                    $"This will sync framework-managed AI files for {GetSelectedAIClientLabel()}, while preserving project-owned instruction text outside EFrame managed blocks.",
+                    "Sync",
+                    "Cancel"))
+            {
+                return;
+            }
+
+            if (!RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {GetSelectedAIClientArgument()} -Force"))
+            {
+                return;
+            }
+
+            if (TryGetFrameworkRoot(out var frameworkRoot, out _))
+            {
+                RunToolScript("Install-EFrameAIProjectUpdater.ps1", $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\" -Force");
+            }
+
+        }
+
+        private void RunAiHealthCheck()
+        {
+            if (!TryGetFrameworkRoot(out var frameworkRoot, out var error))
+            {
+                SetStatus(error, true);
+                return;
+            }
+
+            RunToolScript("Test-EFrameAIProject.ps1", $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\"");
+        }
+
+        private string GetSelectedAIClientArgument()
+        {
+            return m_aiClientSelection switch
+            {
+                AIClientSelection.Codex => "codex",
+                AIClientSelection.Copilot => "copilot",
+                AIClientSelection.ClaudeCode => "claude-code",
+                _ => "all"
+            };
+        }
+
+        private string GetSelectedAIClientLabel()
+        {
+            return m_aiClientSelection switch
+            {
+                AIClientSelection.Codex => "Codex",
+                AIClientSelection.Copilot => "GitHub Copilot",
+                AIClientSelection.ClaudeCode => "Claude Code",
+                _ => "Codex, GitHub Copilot, and Claude Code"
+            };
+        }
+
         private void CreateModuleScaffold()
         {
             var sanitizedModuleName = SanitizeIdentifier(m_moduleName);
@@ -505,7 +628,6 @@ namespace EFrameWork.Editor.ProjectBootstrap
             var moduleRoot = Path.Combine(ProjectRootPath, "Assets", "Modules", moduleName);
 
             WriteScaffoldFile(Path.Combine(moduleRoot, "README.md"), BuildModuleGuideContent(moduleName));
-            WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "Common", $"{moduleName}ResPath.cs"), BuildModuleResPathContent(moduleName, moduleNamespace));
             WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "Procedure", $"Procedure{moduleName}Entry.cs"), BuildModuleProcedureContent(moduleName, moduleNamespace));
             WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "UI", "Views", $"{moduleName}MainView.cs"), BuildModuleViewContent(moduleName, moduleNamespace));
             WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "UI", "Controllers", $"{moduleName}MainViewController.cs"), BuildModuleControllerContent(moduleName, moduleNamespace));
@@ -547,31 +669,12 @@ Recommended next steps:
 ";
         }
 
-        private string BuildModuleResPathContent(string moduleName, string moduleNamespace)
-        {
-            return $@"using {m_rootNamespace}.Common;
-
-namespace {moduleNamespace}.Common
-{{
-    public static class {moduleName}ResPath
-    {{
-        public static string MainView => ResPath.Modules.Asset(""{moduleName}"", ""Res/UI/Panels/{moduleName}Main/{moduleName}MainView"");
-
-        public static string GetScene(string sceneName)
-        {{
-            return ResPath.Modules.Scene(""{moduleName}"", sceneName);
-        }}
-    }}
-}}
-";
-        }
-
-        private static string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
+        private string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
             return $@"using Cysharp.Threading.Tasks;
 using EFrameWork.Runtime.Asset;
 using EFrameWork.Runtime.Procedure;
-using {moduleNamespace}.Common;
+using {m_rootNamespace}.Common;
 using UnityEngine;
 
 namespace {moduleNamespace}.Procedure
@@ -580,7 +683,7 @@ namespace {moduleNamespace}.Procedure
     {{
         protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
         {{
-            await assets.PreloadAsync<GameObject>({moduleName}ResPath.MainView);
+            await assets.PreloadAsync<GameObject>(ResPath.Generated.Modules.{moduleName}.Res.UI.Panels.{moduleName}Main.{moduleName}MainView);
         }}
 
         protected override void OnEnter(ProcedureEnterContext context)
@@ -628,11 +731,11 @@ namespace {moduleNamespace}.UI.Views
 ";
         }
 
-        private static string BuildModuleControllerContent(string moduleName, string moduleNamespace)
+        private string BuildModuleControllerContent(string moduleName, string moduleNamespace)
         {
             return $@"using System;
 using EFrameWork.Runtime.UI;
-using {moduleNamespace}.Common;
+using {m_rootNamespace}.Common;
 using {moduleNamespace}.UI.Views;
 
 namespace {moduleNamespace}.UI.Controllers
@@ -641,7 +744,7 @@ namespace {moduleNamespace}.UI.Controllers
     {{
         public Action BackRequested {{ get; set; }}
 
-        protected override string AssetPath => {moduleName}ResPath.MainView;
+        protected override string AssetPath => ResPath.Generated.Modules.{moduleName}.Res.UI.Panels.{moduleName}Main.{moduleName}MainView;
 
         protected override void OnViewCreated()
         {{

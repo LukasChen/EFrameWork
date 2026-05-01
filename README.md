@@ -36,7 +36,7 @@ Use semantic versioning for EFrameWork releases. Before `1.0.0`, minor versions 
 
 Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.
 
-- Codex entry rules live in `AGENTS.md`; Copilot and synced workflow rules live under `.github/`
+- Codex entry rules live in `AGENTS.md`; Claude Code entry rules live in `CLAUDE.md`; Copilot and synced workflow rules live under `.github/`
 - Synced business-project rules and workflows use the `eframe-*` prefix; framework-repository maintenance rules and workflows use `maintainer-*` and are not synced to projects.
 - High-value synced skills cover feature bootstrap, guideline audit, UI features, data tables, and resource flows.
 - Sync and installer scripts live under `tools/`
@@ -46,7 +46,7 @@ Unity projects that adopt EFrameWork should receive both the Unity framework str
 To sync the framework AI layer into a project root:
 
 ```powershell
-.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Force
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
 ```
 
 To cold-start a new project in one command:
@@ -79,17 +79,17 @@ To inspect a business project after AI sync or framework upgrades, run:
 .\tools\Test-EFrameAIProject.ps1 -TargetRoot "D:\YourUnityProject" -FrameworkRoot "."
 ```
 
-Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, and trigger AI/bootstrap initialization from a single window.
+Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, run Unity bootstrap initialization, choose an AI platform, check AI sync status, sync the AI workspace, and run the AI health check from a single window. The same AI actions are available from `EFrame Tools/AI`.
 
 ## Managed Resource Convention
 
 EFrameWork treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as framework-managed Addressables content. Put assets in the mapped directory and let the editor automation own the Addressables group, address, and `eframe-managed` label.
 
 - Importing, moving, or deleting managed resources automatically syncs Addressables groups.
-- `ResPath.Generated` is generated only from direct child files of the directories selected in the managed resource report window. Select subdirectories explicitly when their files also need code-driven load constants.
+- `ResPath.Generated` is generated from resources under the directory trees selected in the managed resource report window.
 - Player builds run an EFrame Addressables preflight and fail if managed entries, addresses, labels, or generated paths are stale.
 - Use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to open the managed resource report window, choose ResPath source directories, inspect Addressables-to-ResPath mappings, review directory convention issues, or run a manual repair/check.
-- Runtime code should use `ResPath.Generated`, stable handwritten `ResPath` wrappers, or inspector-authored `AssetReference` values instead of raw Addressables strings.
+- Runtime code should use `ResPath.Generated` instead of raw Addressables strings or handwritten resource path wrappers. `AssetReference` remains appropriate for inspector-authored editor fields, but runtime business calls should receive generated asset ids.
 
 ## DOTween Dependency
 

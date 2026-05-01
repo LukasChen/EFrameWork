@@ -10,7 +10,7 @@
 
 - 是否只做状态跳转与资源编排
 - `OnEnter` / `OnLeave` 是否对称
-- 是否避免在流程里堆 UI 动画、临时数据计算和深层节点操作
+- 是否避免在流程里堆 UI 动画、一次性数据计算和深层节点操作
 
 ## UI / QUI
 
@@ -20,25 +20,24 @@
 - `UIController` 是否负责绑定、刷新、销毁，而不是承担全部业务逻辑
 - `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`
 - View 是否保持无参构造并通过 `OnBindingSet()` 接入 `QUIBinding`
-- Controller 是否通过 `TypedViewHandle.TypedView` 访问 View，而不是恢复旧 `View` facade
-- 自定义 transition 是否能处理中断，避免旧异步 open/close 完成后覆盖新状态
+- Controller 是否通过 `TypedViewHandle.TypedView` 访问 View，而不是使用 `View` facade
+- 自定义 transition 是否能处理中断，避免已失效 open/close 异步结果覆盖活跃状态
 
 ## 目录与命名
 
 - 代码与资源是否分离
-- 是否继续向临时目录写入新功能
+- 是否向非标准目录写入新功能
 - 命名是否符合 `ProcedureXxx`、`XxxViewController`、`XxxView.prefab`
 
 ## 资源路径
 
 - 是否集中管理路径
 - 是否出现重复硬编码字符串
-- 是否为迁移到 `ResPath` 预留明确位置
+- 是否使用 `ResPath.Generated` 或明确资源 id 入口
 
 ## AI 配置
 
-- 新规范是否同步到 `.github/copilot-instructions.md`
-- 新规范是否同步到 `AGENTS.md`
-- 是否需要新增或更新 `.github/instructions/*.instructions.md`
+- 新规范是否同步到框架仓库 AI 入口或 `.github/managed-blocks/`
+- 是否需要新增或更新 `.github/instructions/eframe-instructions.md`
 - 是否需要新增或更新 `.github/skills/*`
-- 初始化脚本和接入文档是否仍可用
+- 初始化脚本和接入文档是否可用

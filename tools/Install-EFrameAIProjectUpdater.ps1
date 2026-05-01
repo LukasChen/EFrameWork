@@ -27,6 +27,7 @@ $escapedFrameworkRoot = $resolvedFrameworkRoot.Replace("'", "''")
 $content = @'
 param(
     [string]$FrameworkRoot = '__FRAMEWORK_ROOT__',
+    [string[]]$Clients = @("all"),
     [switch]$Force,
     [switch]$StatusOnly
 )
@@ -38,7 +39,7 @@ if (-not (Test-Path $syncScript)) {
     throw "Framework sync script not found: $syncScript"
 }
 
-& $syncScript -TargetRoot $projectRoot -Force:$Force -StatusOnly:$StatusOnly
+& $syncScript -TargetRoot $projectRoot -Clients $Clients -Force:$Force -StatusOnly:$StatusOnly
 '@
 
 $content = $content.Replace('__FRAMEWORK_ROOT__', $escapedFrameworkRoot)

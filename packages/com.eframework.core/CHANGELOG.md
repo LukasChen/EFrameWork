@@ -4,6 +4,16 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-02
+
+### Added
+
+- Added Unity Editor AI workspace platform selection plus `EFrame Tools/AI` menu entries for sync status, AI workspace sync, and project AI health checks.
+
+### Changed
+
+- Decoupled Unity cold-start from AI contract sync; users now choose Codex, Copilot, Claude Code, or all platforms before manually syncing AI guidance.
+
 ## [0.4.1] - 2026-05-01
 
 ### Fixed

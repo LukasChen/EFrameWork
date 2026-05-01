@@ -53,6 +53,37 @@ function Get-FileSha256 {
     return (Get-FileHash -Path $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Normalize-ManagedBlockText {
+    param(
+        [string]$Text
+    )
+
+    if ($null -eq $Text) {
+        $Text = ""
+    }
+
+    $normalized = $Text -replace "`r`n", "`n"
+    $normalized = $normalized -replace "`r", "`n"
+    return $normalized.TrimEnd() + "`n"
+}
+
+function Get-TextSha256 {
+    param(
+        [string]$Text
+    )
+
+    $normalized = Normalize-ManagedBlockText -Text $Text
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hashBytes = $sha.ComputeHash($bytes)
+        return ([System.BitConverter]::ToString($hashBytes) -replace "-", "").ToLowerInvariant()
+    }
+    finally {
+        $sha.Dispose()
+    }
+}
+
 function Convert-ToRepoRelativePath {
     param(
         [string]$Path
@@ -67,6 +98,7 @@ function Get-ExpectedManifestFilePaths {
 
     foreach ($rootFile in @(
         "AGENTS.md",
+        "CLAUDE.md",
         "EFRAME_AI_API_INDEX.md",
         "EFRAME_AI_ARCHITECTURE.md",
         "EFRAME_AI_SETUP.md",
@@ -82,7 +114,7 @@ function Get-ExpectedManifestFilePaths {
     }
 
     if (Test-Path ".github/instructions") {
-        foreach ($file in Get-ChildItem -Path ".github/instructions" -Filter "eframe-*.instructions.md" -File) {
+        foreach ($file in Get-ChildItem -Path ".github/instructions" -Filter "eframe-*.md" -File) {
             $paths.Add((Convert-ToRepoRelativePath -Path $file.FullName))
         }
     }
@@ -180,9 +212,10 @@ try {
 
     $aiImpactPatterns = @(
         "^AGENTS\.md$",
+        "^CLAUDE\.md$",
         "^\.github/copilot-instructions\.md$",
-        "^\.github/instructions/eframe-.*\.instructions\.md$",
-        "^\.github/instructions/maintainer-.*\.instructions\.md$",
+        "^\.github/managed-blocks/eframe-.*\.md$",
+        "^\.github/instructions/eframe-.*\.md$",
         "^\.github/skills/eframe-.*",
         "^\.github/skills/maintainer-.*",
         "^tools/Initialize-EFrameAI\.ps1$",
@@ -270,6 +303,7 @@ try {
             foreach ($entry in $manifestFileEntries) {
                 $entryPath = [string]$entry.path
                 $entryHash = [string]$entry.sha256
+                $entryKind = [string]$entry.kind
 
                 if ([string]::IsNullOrWhiteSpace($entryPath) -or [string]::IsNullOrWhiteSpace($entryHash)) {
                     $errors.Add("$manifestPath contains a file entry without path or sha256.")
@@ -286,6 +320,37 @@ try {
                     continue
                 }
 
+                if ($entryKind -eq "managedBlock") {
+                    $blockId = [string]$entry.blockId
+                    $sourcePath = [string]$entry.sourcePath
+                    if ([string]::IsNullOrWhiteSpace($blockId) -or [string]::IsNullOrWhiteSpace($sourcePath)) {
+                        $errors.Add("$manifestPath managed block entry must include blockId and sourcePath: $entryPath")
+                        continue
+                    }
+
+                    if ($sourcePath -match "\\" -or $sourcePath -match "maintainer-|project-") {
+                        $errors.Add("$manifestPath managed block sourcePath is invalid: $sourcePath")
+                        continue
+                    }
+
+                    if (-not (Test-Path $sourcePath)) {
+                        $errors.Add("$manifestPath managed block tracks a missing source file: $sourcePath")
+                        continue
+                    }
+
+                    $actualHash = Get-TextSha256 -Text (Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8)
+                    if ($actualHash -ne $entryHash.ToLowerInvariant()) {
+                        $errors.Add("$manifestPath managed block hash mismatch for $entryPath from $sourcePath.")
+                    }
+
+                    continue
+                }
+
+                if ($entryPath -in @("AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md")) {
+                    $errors.Add("$manifestPath must track $entryPath as a managedBlock, not a whole project-owned file.")
+                    continue
+                }
+
                 if (-not (Test-Path $entryPath)) {
                     $errors.Add("$manifestPath tracks a missing file: $entryPath")
                     continue
@@ -299,7 +364,7 @@ try {
         }
     }
 
-    $frameworkProjectInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "project-*.instructions.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+    $frameworkProjectInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "project-*.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
     if ($frameworkProjectInstructions.Count -gt 0) {
         $errors.Add("Framework repo contains project-owned instruction overlays: $($frameworkProjectInstructions -join ', ')")
     }
@@ -309,10 +374,13 @@ try {
         $errors.Add("Framework repo contains project-owned skills: $($frameworkProjectSkills -join ', ')")
     }
 
-    $eframeInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "eframe-*.instructions.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+    $eframeInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "eframe-*.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
     $eframeSkills = @(Get-ChildItem -Path ".github/skills" -Directory -Filter "eframe-*" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
-    $maintainerInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "maintainer-*.instructions.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+    $maintainerInstructions = @(Get-ChildItem -Path ".github/instructions" -Filter "maintainer-*.md" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
     $maintainerSkills = @(Get-ChildItem -Path ".github/skills" -Directory -Filter "maintainer-*" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)
+    if ($maintainerInstructions.Count -gt 0) {
+        $errors.Add("Framework repo should keep maintainer rules in AGENTS.md or maintainer-* skills, not maintainer instruction files: $($maintainerInstructions -join ', ')")
+    }
     if ($eframeInstructions.Count -eq 0) {
         $warnings.Add("No framework-managed eframe instruction files were found.")
     }
@@ -320,7 +388,7 @@ try {
         $warnings.Add("No framework-managed eframe skills were found.")
     }
 
-    $instructionFiles = @(Get-ChildItem -Path ".github/instructions" -Filter "*.instructions.md" -ErrorAction SilentlyContinue)
+    $instructionFiles = @(Get-ChildItem -Path ".github/instructions" -Filter "*.md" -ErrorAction SilentlyContinue)
     foreach ($instructionFile in $instructionFiles) {
         foreach ($issue in (Test-FrontMatterFile -Path $instructionFile.FullName -RequireApplyTo $true)) {
             $errors.Add($issue)
@@ -356,7 +424,7 @@ try {
 
     $syncScriptText = Get-Content -LiteralPath "tools/Initialize-EFrameAI.ps1" -Raw -Encoding UTF8
     if ($syncScriptText -match "ManagedPattern\s+`"maintainer-\*`"" -or $syncScriptText -match "ManagedPattern\s+'maintainer-\*'") {
-        $errors.Add("Initialize-EFrameAI.ps1 must not sync maintainer-* instructions or skills.")
+        $errors.Add("Initialize-EFrameAI.ps1 must not sync maintainer-* files.")
     }
 
     Write-Host "EFrame AI release check"
@@ -368,7 +436,6 @@ try {
     Write-Host "Manifest changed: $manifestChanged"
     Write-Host "Framework instructions: $($eframeInstructions.Count)"
     Write-Host "Framework skills: $($eframeSkills.Count)"
-    Write-Host "Maintainer instructions: $($maintainerInstructions.Count)"
     Write-Host "Maintainer skills: $($maintainerSkills.Count)"
 
     foreach ($warning in $warnings) {

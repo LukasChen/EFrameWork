@@ -1,0 +1,11 @@
+## EFrameWork Framework Rules
+
+This project uses EFrameWork. Treat this block as the framework-supplied baseline; keep project-specific AI rules outside this managed block.
+
+- Follow the synced EFrame framework contract in `.github/instructions/eframe-instructions.md`.
+- For feature scaffolding, UI work, data tables, resource flow, or EFrame audits, read the matching `.github/skills/eframe-*/SKILL.md` before editing.
+- Use `EFrameProcedure` and `EFrameProcedureComponent` for state transitions, preload work, and lifecycle orchestration.
+- Route UI through `EFrame.Current.UI` / `IUIService`, `UIControllerBase`, `UIViewHandle`, and the default `QUI` service; do not hand-build persistent top-level runtime Canvas or EventSystem objects.
+- Runtime asset ids should come from generated `ResPath.Generated`; editor `AssetReference` fields may exist for authoring, but business logic should resolve to generated asset ids.
+- Treat `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as EFrame managed Addressables resource areas and let EFrame editor automation maintain groups, addresses, labels, and generated paths.
+- Do not edit EFrame managed instruction or skill files to express project rules. Put project rules anywhere the project owns outside this managed block.

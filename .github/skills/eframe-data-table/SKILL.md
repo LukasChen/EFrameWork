@@ -41,5 +41,5 @@ forbiddenPatterns:
 
 - Confirm no external code mutates the raw data object directly.
 - Confirm duplicate or empty `StorageKey` values fail review.
-- Confirm migration handles legacy raw files as `version 0` when compatibility is needed.
+- Confirm migration handles existing unversioned raw files as `version 0` when compatibility is needed.
 - For detailed review, read [data-table-checklist](./references/data-table-checklist.md).

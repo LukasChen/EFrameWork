@@ -17,7 +17,7 @@
 ## Lifecycle
 
 - View wrappers have parameterless constructors and initialize prefab references from `OnBindingSet()`
-- Controllers access the current View through `TypedViewHandle.TypedView`
+- Controllers access the active View through `TypedViewHandle.TypedView`
 - `OnViewCreated()` / `OnViewDestroyed()` are used for instance-level binding and release
 - `OnViewOpened()` / `OnViewClosed()` are used for per-open refresh and pause behavior
 - Cached UI can close into `UIViewHandleState.Closed` without running release cleanup

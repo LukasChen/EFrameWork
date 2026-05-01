@@ -31,7 +31,7 @@ forbiddenPatterns:
 ## When To Use
 
 - 新建业务页面、弹窗、业务模块或 `Procedure`
-- 将演示代码或旧结构重构为正式结构
+- 将演示代码或非标准结构收敛到正式结构
 - 给新项目建立 `View + Controller + Procedure + ResPath` 的最小骨架
 - 判断某个需求应该落在主流程、弹层还是独立玩法目录
 
@@ -52,21 +52,21 @@ forbiddenPatterns:
 Use `EFrameWork.Runtime.Procedure.EFrameProcedure` for new procedures, preload Procedure-owned resources in `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`, and use `ChangeState<TProcedure>(payload)` for one-shot enter data; persistent state belongs in `Context.Data`, module services, or events.
 
 1. 先判定需求是否真的需要新 `Procedure`。
-2. 如果不涉及状态切换、场景生命周期或玩法根对象切换，优先落成当前流程内的 UI 行为。
+2. 如果不涉及状态切换、场景生命周期或玩法根对象切换，优先落成所在流程内的 UI 行为。
 3. 如果需要新 `Procedure`，约束进入退出对称、资源清理完整、跳转条件明确。
 
 ## Structure
 
 1. 把运行时代码放入目标结构：`Assets/App/Runtime/...` 或 `Assets/Modules/<Name>/Runtime/...`。
 2. 把资源放入可映射目录：`Assets/App/Res/UI/...`、`Assets/App/Res/SceneAssets/...`、`Assets/Modules/<Name>/Res/...` 等。
-3. 为资源路径建立集中入口，避免散写字符串。
-4. 具体目录职责和命名边界以仓库根的 `UNITY_DIRECTORY_STRUCTURE.md` 为准；项目特殊约束只写进 `project-*` overlay。
+3. 将资源放入 EFrame 托管目录，并通过 `ResPath.Generated` 使用自动生成的资源 id，避免散写字符串或新增手写路径中心类。
+4. 具体目录职责和命名边界以仓库根的 `UNITY_DIRECTORY_STRUCTURE.md` 为准；项目特殊约束写进项目自有 instruction，不要改同步得到的 `eframe-*` 文件。
 
 ## Validation
 
 1. 校验生命周期是否成对：进入/退出、创建/销毁、订阅/退订。
 2. 校验命名、目录、资源路径、UI 层级和数据入口是否由对应 specialized skill 覆盖。
-3. 如果项目里仍有过渡目录，明确本次改动如何推进到目标结构。
+3. 如果项目里存在非标准目录，明确本次改动如何收敛到目标结构。
 4. 如果一个子任务需要超过几条具体实现规则，不要把规则复制到这里；改用对应 specialized skill 或 reference。
 5. 如果在框架仓库内发现本次功能改变了公共模板、冷启动流程或 AI 协作层，改用 maintainer skill 处理同步和发布检查。
 

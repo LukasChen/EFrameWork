@@ -21,7 +21,7 @@ Avoid accessing `EFrame.Current.*` from constructors that can run before initial
 | Register and start procedures | `EFrameProcedureComponent` | `packages/com.eframework.core/Runtime/Procedure/EFrameProcedureComponent.cs` | Startup flow should use framework-owned procedure switching. |
 | Pass one-shot transition data | `ProcedureEnterContext` | `packages/com.eframework.core/Runtime/Procedure/ProcedureEnterContext.cs` | Persistent data belongs in data tables, services, or events. |
 
-Avoid adding new procedures for simple page/popup changes that can live inside the current state.
+Avoid adding new procedures for simple page/popup changes that can live inside the active state.
 
 ## Assets And Resources
 
@@ -30,7 +30,7 @@ Avoid adding new procedures for simple page/popup changes that can live inside t
 | Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Current.Assets`. |
 | Procedure-owned preload scope | `IAssetPreloadScope` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use in `OnPreloadAsync(...)`; the scope releases on procedure leave. |
 | Load an asset with explicit ownership | `LoadAsync<T>(assetId)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Dispose the returned `AssetHandle<T>` at the owning lifecycle boundary. |
-| Instantiate by centralized id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Prefer `ResPath.Generated`, stable `ResPath`, or module path wrappers for `assetId`. |
+| Instantiate by generated id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use `ResPath.Generated` for managed resource `assetId` values. |
 | Reuse pooled prefabs | `GetFromPool(...)` / `RecycleToPool(...)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use for repeated runtime objects after preload. |
 
 Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and passing `AssetReference` through business runtime logic.
@@ -46,7 +46,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs should include binding/config data consumed by view wrappers. |
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to runtime scene cameras that should host the framework UI overlay stack. |
 
-Avoid hand-built persistent top-level Canvas/EventSystem objects and legacy direct `BindingViewBase` lifecycle driving.
+Avoid hand-built persistent top-level Canvas/EventSystem objects and direct `BindingViewBase` lifecycle driving.
 
 ## Data
 
@@ -85,7 +85,7 @@ Keep framework-owned audio config under `Assets/Resources/Audio`.
 | Full project initialization | `EFrameProjectInitializationWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Unity menu entry for cold-start/bootstrap tasks. |
 | Addressables groups and ResPath generation | `EFrameAddressablesBootstrapUtility` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBootstrapUtility.cs` | Owns managed resource group sync and `ResPath.Generated`. |
 | Managed resource report UI | `EFrameAddressablesReportWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesReportWindow.cs` | Use to select directories for generated ResPath entries and inspect issues. |
-| Build preflight | `EFrameAddressablesBuildPreprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBuildPreprocessor.cs` | Fails builds when managed Addressables or generated paths are stale. |
+| Build preflight | `EFrameAddressablesBuildPreprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBuildPreprocessor.cs` | Fails builds when managed Addressables or generated paths drift. |
 | Import/move/delete auto-sync | `EFrameAppResAddressablePostprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAppResAddressablePostprocessor.cs` | Keeps managed resource changes aligned with Addressables automation. |
 
 Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor APIs can make narrow serialized changes.
@@ -94,10 +94,10 @@ Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor AP
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Sync framework AI files into a project | `tools/Initialize-EFrameAI.ps1` | `tools/Initialize-EFrameAI.ps1` | Syncs `AGENTS.md`, `.github`, EFrame AI docs, and manifest hashes. |
-| Cold-start a project | `tools/Initialize-EFrameColdStart.ps1` | `tools/Initialize-EFrameColdStart.ps1` | Creates directories, AI workspace, updater, overlay, and bootstrap code. |
-| Generate project overlay | `tools/New-EFrameProjectAIOverlay.ps1` | `tools/New-EFrameProjectAIOverlay.ps1` | Creates `project-local.instructions.md`; project-specific rules belong there. |
-| Validate framework AI release | `tools/Test-EFrameAIRelease.ps1` | `tools/Test-EFrameAIRelease.ps1` | Checks manifest bumps, frontmatter, sync boundaries, and file hashes. |
-| Validate business project AI health | `tools/Test-EFrameAIProject.ps1` | `tools/Test-EFrameAIProject.ps1` | Checks synced file integrity, project overlay presence, and common runtime risks. |
+| Sync framework AI files into a project | `tools/Initialize-EFrameAI.ps1` | `tools/Initialize-EFrameAI.ps1` | Syncs selected AI client entries, shared EFrame AI docs, and manifest hashes. |
+| Cold-start a project | `tools/Initialize-EFrameColdStart.ps1` | `tools/Initialize-EFrameColdStart.ps1` | Creates directories, AI workspace status, updater, and bootstrap code. |
+| Optional project instruction template | `tools/New-EFrameProjectAIOverlay.ps1` | `tools/New-EFrameProjectAIOverlay.ps1` | Optional helper that creates a local project instruction file; project rules may live in any project-owned instruction outside EFrame managed blocks. |
+| Validate framework AI release | `tools/Test-EFrameAIRelease.ps1` | `tools/Test-EFrameAIRelease.ps1` | Checks manifest state, frontmatter, sync boundaries, and file hashes. |
+| Validate business project AI health | `tools/Test-EFrameAIProject.ps1` | `tools/Test-EFrameAIProject.ps1` | Checks synced file integrity, managed block presence, and common runtime risks. |
 
-Use `eframe-*` files for framework-managed synced guidance, `project-*` for business overlays, and `maintainer-*` only inside this framework repository.
+Use `-Clients codex`, `-Clients copilot`, `-Clients claude-code`, or `-Clients all` to choose AI platform entry points. Use `eframe-*` files for framework-managed synced guidance and `maintainer-*` only inside this framework repository.

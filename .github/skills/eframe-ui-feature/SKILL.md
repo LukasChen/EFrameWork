@@ -21,7 +21,7 @@ outputs:
   - prefab/resource path alignment
 forbiddenPatterns:
   - hand-built persistent runtime Canvas or EventSystem
-  - legacy UIControllerBase View facade usage
+  - UIControllerBase View facade usage
   - assetPath constructors in generated View wrappers
 ---
 
@@ -36,13 +36,13 @@ forbiddenPatterns:
 5. Put controller code in runtime structure. Use `OnViewCreated()` / `OnViewDestroyed()` for instance-level binding and release, and `OnViewOpened()` / `OnViewClosed()` for per-open refresh or pause behavior.
 6. Use `IUIService/QUI` and `UIViewHandle` semantics for create/open/close/cache/release. Do not directly drive `BindingViewBase` lifecycle from business code.
 7. Keep View wrappers thin and parameterless: cache generated binding/components in `OnBindingSet()`, keep reusable business state outside the View wrapper, and access runtime views from controllers through `TypedViewHandle.TypedView`.
-8. Use centralized resource paths through `ResPath` / `ResPath.Generated` / `AssetReference`; do not scatter prefab address strings.
+8. Use generated `ResPath.Generated` ids for UI prefabs; do not scatter prefab address strings or add handwritten path wrappers.
 
 ## Output Checks
 
 - Confirm the UI does not require a new `Procedure` unless it changes gameplay or scene-level state.
 - Confirm `QUI` SortingLayer bootstrap exists before relying on UI ordering.
 - Confirm every event subscription, button listener, async handle, and controller-owned resource has a matching cleanup path at the right lifecycle scope.
-- Confirm generated or hand-written Views do not rely on `assetPath` constructors or a legacy controller `View` facade.
+- Confirm generated or hand-written Views do not rely on `assetPath` constructors or a controller `View` facade.
 - Confirm any camera intended to host the framework UI overlay uses `EFrameSceneCamera` instead of per-frame polling or scene-specific UI camera stack code.
 - For larger UI feature work, read [ui-checklist](./references/ui-checklist.md).

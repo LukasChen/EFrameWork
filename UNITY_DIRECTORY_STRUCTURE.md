@@ -317,7 +317,7 @@ Assets/Modules/<Name>/
 - Module 自己的代码和资源尽量闭包在自己的目录里。
 - 只有跨模块共享的内容才回收到 `Assets/App/...`。
 - 如果模块还不成熟，也不要先扔到临时目录，优先在 `Assets/Modules/<Name>` 内演进。
-- 如果业务项目确实是多玩法合集，可以在项目 overlay 中把 `Modules` 进一步细化为 `MiniGames`，但框架层默认保持抽象命名。
+- 如果业务项目确实是多玩法合集，可以在项目自有 instruction 中把 `Modules` 进一步细化为 `MiniGames`，但框架层默认保持抽象命名。
 - 模块内资源可复用主应用的细分规则，例如 `Res/UI/Panels`、`Res/UI/Common`、`Res/SceneAssets/<SceneName>`、`Res/FX/Gameplay`。
 - 模块私有图片、材质、特效不要提前放入 `Assets/App/Res`；确认跨模块共享后再上移。
 - 模块私有 FX 以 `Assets/Modules/<Name>/Res/FX` 为入口，并按照 UI、Scene、Gameplay、Common 等复用范围继续细分。
@@ -379,7 +379,7 @@ EFrame 的资源自动化建立在严格目录规范之上：资源放入约定�
 - 窗口会标记 `Synced`、`Needs Sync`、`Stale` 项，并显示目录结构检查结果。
 - 导入、移动、删除托管目录资源时会自动同步；Player Build 前会执行同步与校验。
 
-目录规范和自动化必须一起维护：如果项目把资源放到约定目录之外，框架不会把它纳入自动 Addressables 管线；如果项目确实需要额外目录，应在项目 overlay 中声明差异，并补充等价的路径中心和同步规则。是否进入 `ResPath.Generated` 则由同步工具中的目录选择决定。
+目录规范和自动化必须一起维护：如果项目把资源放到约定目录之外，框架不会把它纳入自动 Addressables 管线；如果项目确实需要额外目录，应在项目自有 instruction 中声明差异，并补充等价的路径中心和同步规则。是否进入 `ResPath.Generated` 则由同步工具中的目录选择决定。
 
 ## 10. 禁止事项
 

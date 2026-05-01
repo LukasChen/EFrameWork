@@ -20,7 +20,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
         internal const string ProjectScenesRootPath = "Assets/Scenes";
         internal const string ModulesRootPath = "Assets/Modules";
         internal const string GeneratedResPathFilePath = "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs";
-        internal const string HandwrittenResPathFilePath = "Assets/App/Runtime/Common/ResPath.cs";
+        internal const string ResPathNamespaceAnchorFilePath = "Assets/App/Runtime/Common/ResPath.cs";
         internal const string ResPathSelectionSettingsFilePath = "Assets/Settings/EFrameAddressablesResPathSettings.json";
 
         internal const string AppSharedGroupName = "App Shared Group";
@@ -908,10 +908,10 @@ namespace EFrameWork.Editor.ProjectBootstrap
             }
 
             var directoryPath = NormalizeAssetPath(Path.GetDirectoryName(normalizedAssetPath));
-            return IsExactIncludedResPathDirectory(directoryPath);
+            return IsIncludedResPathDirectoryOrChild(directoryPath);
         }
 
-        private static bool IsExactIncludedResPathDirectory(string directoryPath)
+        private static bool IsIncludedResPathDirectoryOrChild(string directoryPath)
         {
             if (string.IsNullOrEmpty(directoryPath))
             {
@@ -921,6 +921,11 @@ namespace EFrameWork.Editor.ProjectBootstrap
             foreach (var includedDirectory in LoadResPathSelectionSettings().IncludedDirectories)
             {
                 if (string.Equals(directoryPath, includedDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (directoryPath.StartsWith(includedDirectory + "/", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -1444,10 +1449,10 @@ namespace EFrameWork.Editor.ProjectBootstrap
 
         private static string ResolveResPathNamespace()
         {
-            var handwrittenFilePath = GetProjectAbsolutePath(HandwrittenResPathFilePath);
-            if (File.Exists(handwrittenFilePath))
+            var namespaceAnchorFilePath = GetProjectAbsolutePath(ResPathNamespaceAnchorFilePath);
+            if (File.Exists(namespaceAnchorFilePath))
             {
-                var content = File.ReadAllText(handwrittenFilePath);
+                var content = File.ReadAllText(namespaceAnchorFilePath);
                 var match = Regex.Match(content, @"namespace\s+([A-Za-z0-9_\.]+)");
                 if (match.Success)
                 {

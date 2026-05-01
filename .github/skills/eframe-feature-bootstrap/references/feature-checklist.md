@@ -4,7 +4,7 @@
 
 - 这是新 `Procedure`、普通页面、弹窗还是独立 `MiniGame`？
 - 是否真的发生了状态切换、相机切换、场景根对象切换？
-- 是否只是当前流程里的一个 UI 子状态？
+- 是否只是所在流程里的一个 UI 子状态？
 
 ## 2. 目录映射
 
@@ -19,7 +19,7 @@
 - `ProcedureXxx`
 - `XxxViewController`
 - `XxxView.prefab`
-- `ResPath` 或等价路径中心类
+- `ResPath.Generated` 自动生成资源 id
 
 ## 4. 生命周期模板
 
@@ -45,5 +45,5 @@
 
 - 能否在不改启动场景业务内容的前提下接入
 - 是否存在成对清理
-- 是否保留了可迁移到标准目录的空间
+- 是否能收敛到标准目录
 - 是否避免在 bootstrap skill 中复制 specialized skill 的细节规则
