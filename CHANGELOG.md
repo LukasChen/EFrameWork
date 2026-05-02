@@ -6,6 +6,12 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [4.6.1] - 2026-05-02
+
+### Added
+
+- Added a Unity consumer fixture project and `tools/Test-EFrameConsumer.ps1` to validate package import, the real `Initialize-EFrameColdStart.ps1` bootstrap flow, asmdef references, and external `EFrame` API usage from a business-project shape.
+
 ## [0.6.0] - 2026-05-02
 
 ### Added

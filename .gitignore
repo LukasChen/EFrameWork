@@ -1,0 +1,14 @@
+test-fixtures/**/Library/
+test-fixtures/**/Logs/
+test-fixtures/**/Temp/
+test-fixtures/**/Obj/
+test-fixtures/**/UserSettings/
+test-fixtures/**/*.csproj
+test-fixtures/**/*.sln
+test-fixtures/**/*.slnx
+test-fixtures/**/*.pidb
+test-fixtures/**/*.booproj
+test-fixtures/**/*.svd
+test-fixtures/**/*.user
+test-fixtures/**/*.userprefs
+test-fixtures/**/TestResults/

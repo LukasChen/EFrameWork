@@ -4,6 +4,16 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [4.6.1] - 2026-05-02
+
+### Added
+
+- Added a repository-level Unity consumer fixture for validating package import, the real `Initialize-EFrameColdStart.ps1` bootstrap flow, asmdef references, and external `EFrame` API usage from a business-project shape.
+
+### Changed
+
+- Kept the static `EFrame` runtime entry type in `EFrame.Runtime` and added consumer-fixture coverage for the namespace/type collision that requires an explicit alias or a future entry API rename.
+
 ## [0.6.0] - 2026-05-02
 
 ### Added
