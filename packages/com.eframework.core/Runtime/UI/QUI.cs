@@ -1,6 +1,6 @@
-﻿using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.UI.Handles;
-using EFrameWork.Runtime.UI.Transitions;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.UI.Handles;
+using EFrame.Runtime.UI.Transitions;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using UnityEngine.InputSystem.UI;
 #endif
 using Object = UnityEngine.Object;
 
-namespace EFrameWork.Runtime.UI
+namespace EFrame.Runtime.UI
 {
     public enum UILayer
     {

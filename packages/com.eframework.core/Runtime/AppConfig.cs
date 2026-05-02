@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime
+namespace EFrame.Runtime
 {
     [CreateAssetMenu(fileName = "AppConfig")]
     public class AppConfig : ScriptableObject

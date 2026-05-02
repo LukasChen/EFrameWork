@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.9",
+    "version":  "0.4.10",
     "updatedAt":  "2026-05-02",
-    "notes":  "Simplify synced business AI contracts so root blocks, always-on rules, API lookup, and specialized skills keep clearer boundaries.",
+    "notes":  "Rename framework brand, namespaces, assemblies, templates, docs, and synced AI contracts to EFrame.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,30 +14,30 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "762882783e59794ae36909be68520914ec9035f70fb9d4f9d98819b7fc97f113"
+                      "sha256":  "c4b002f4ed6a55d9196d840e5353d4471ee3072c0bada5f5e1796747acd9c63a"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "d7867e42d724c28eea635b1066385d2bcd2976036ccad8349d8b182b76178b73"
+                      "sha256":  "8b58421fc7961aafe9dfee10782efcd9f99ea76453b11e1d16122c5468b9762d"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "ded9a67b00b7ff4b6ace9d931f854e4790a942468723d22af32c56d227808866"
+                      "sha256":  "901cff51078d5a7bd7b0e5ef988e7baf6fd0a64e20012f65b5bdce768fedcfce"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "a1a34d1db495dbc581c44caca841da40199938728c0c5a1e8e0e042129b89e0d"
+                      "sha256":  "a80fe58d3bad4fdec63b4e6006bb2753dcbcbb36271d34aa82a0e877778c3448"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "13edb21f2831709d41738671a162cb423439c07a475d13809a63551049770a85"
+                      "sha256":  "d5c46f4d883a60929b67da5c17bb15704f07542c534cda3be085e4abce51dd4d"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -53,7 +53,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "5de6197f41b68a3f5ef14f1afc9c960f51236b2b6df5caee731a279b07769c95"
+                      "sha256":  "850dec640eea2960b2bed7d70b38b8747d02cc5b66387886dc59fdcf0f6acfd0"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
@@ -73,11 +73,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
-                      "sha256":  "53ae7a7c5ee746b37bdaad4c126973ede5f70553913103a77cfcf23401aa3b83"
+                      "sha256":  "11f63acfeb5bf224586d580b1fd6cac2e80973b8e3c23183d39d42386ebe0e88"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "2951e5469ccfc6e8ea612517051c24ccffb2464304210b920bc8b7f8e8747a74"
+                      "sha256":  "9284790371e9196ccbe510d7cc96610e67889a1ad43e41648387105d746a7606"
                   }
               ]
 }

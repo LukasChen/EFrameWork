@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Audio
+namespace EFrame.Runtime.Audio
 {
     /// <summary>
     /// 音效事件配置资源

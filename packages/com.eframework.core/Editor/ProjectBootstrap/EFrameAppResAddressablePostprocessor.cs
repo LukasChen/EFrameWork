@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     internal sealed class EFrameAppResAddressablePostprocessor : AssetPostprocessor
     {

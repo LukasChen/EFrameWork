@@ -1,16 +1,16 @@
-using EFrameWork.Runtime.Event;
-using EFrameWork.Runtime.Utils;
+using EFrame.Runtime.Event;
+using EFrame.Runtime.Utils;
 using System;
 using System.Collections;
 using System.Reflection;
-using EFrameWork.Runtime.Asset;
+using EFrame.Runtime.Asset;
 using TMPro;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-namespace EFrameWork.Runtime.GMTools
+namespace EFrame.Runtime.GMTools
 {
     /// <summary>
     /// GM按钮

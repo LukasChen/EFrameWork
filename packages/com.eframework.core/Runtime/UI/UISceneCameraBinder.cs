@@ -1,11 +1,11 @@
-using EFrameWork.Runtime;
+using EFrame.Runtime;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-namespace EFrameWork.Runtime.UI
+namespace EFrame.Runtime.UI
 {
     internal sealed class UISceneCameraBinder : IDisposable
     {

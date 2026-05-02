@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace EFrameWork.Editor.Tools
+namespace EFrame.Editor.Tools
 {
     public static class EFrameDeveloperTools
     {

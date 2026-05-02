@@ -2,9 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrameWork.Editor.UI
+namespace EFrame.Editor.UI
 {
-    [CustomEditor(typeof(EFrameWork.Runtime.UI.Components.QScroller))]
+    [CustomEditor(typeof(EFrame.Runtime.UI.Components.QScroller))]
     public class QScrollerEditor : UnityEditor.UI.ScrollRectEditor
     {
         public override void OnInspectorGUI()

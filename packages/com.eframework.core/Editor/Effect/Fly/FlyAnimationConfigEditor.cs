@@ -1,9 +1,9 @@
-using EFrameWork.Runtime.Effect.Fly;
+using EFrame.Runtime.Effect.Fly;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
 
-namespace EFrameWork.Editor.Effect.Fly
+namespace EFrame.Editor.Effect.Fly
 {
     [CustomEditor(typeof(FlyAnimationConfig))]
     public sealed class FlyAnimationConfigEditor : UnityEditor.Editor

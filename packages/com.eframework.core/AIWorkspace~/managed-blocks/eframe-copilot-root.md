@@ -1,4 +1,4 @@
-EFrameWork framework baseline:
+EFrame framework baseline:
 
 - Follow the synced EFrame framework contract in `.github/instructions/eframe-instructions.md`.
 - Use `.github/eframe/EFRAME_AI_API_INDEX.md` to look up stable EFrame APIs before generating or refactoring framework code.

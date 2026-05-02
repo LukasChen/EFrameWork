@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using Newtonsoft.Json;
 
-namespace EFrameWork.Runtime.DataStorage
+namespace EFrame.Runtime.DataStorage
 {
     public class JsonFileStorage : IDataStorage
     {

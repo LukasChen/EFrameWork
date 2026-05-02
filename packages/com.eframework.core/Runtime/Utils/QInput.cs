@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     public static class QInput
     {

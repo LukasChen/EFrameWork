@@ -1,6 +1,6 @@
-using EFrameWork.Runtime.Event;
+using EFrame.Runtime.Event;
 
-namespace EFrameWork.Runtime.UI
+namespace EFrame.Runtime.UI
 {
     public struct ButtonClickEvent : IEvent
     {

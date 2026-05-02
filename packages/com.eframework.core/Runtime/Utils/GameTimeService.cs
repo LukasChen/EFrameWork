@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     /// <summary>
     /// 游戏时间服务 - 提供服务器时间同步和时间格式化功能

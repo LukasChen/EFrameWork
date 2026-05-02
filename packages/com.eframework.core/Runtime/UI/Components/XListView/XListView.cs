@@ -7,7 +7,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.Components.XListView
+namespace EFrame.Runtime.UI.Components.XListView
 {
     [RequireComponent(typeof(ScrollRect))]
     public class XListView : MonoBehaviour

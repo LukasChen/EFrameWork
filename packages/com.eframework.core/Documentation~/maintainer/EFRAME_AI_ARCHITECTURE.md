@@ -1,6 +1,6 @@
 # EFrame AI Architecture
 
-EFrameWork is maintained as a Unity framework plus a synchronized AI collaboration layer. The AI layer is part of the framework contract: it carries the coding rules, project structure rules, skills, and upgrade flow that let Copilot work inside EFrame projects without rediscovering the conventions every time.
+EFrame is maintained as a Unity framework plus a synchronized AI collaboration layer. The AI layer is part of the framework contract: it carries the coding rules, project structure rules, skills, and upgrade flow that let Copilot work inside EFrame projects without rediscovering the conventions every time.
 
 ## 1. Design Goal
 
@@ -110,12 +110,12 @@ Any framework change that alters this UI contract must update the same contract 
 
 ## 5. Unified Versioning Contract
 
-EFrameWork should be maintained as one product surface, not as a Unity framework plus a second AI product. The AI collaboration layer, bootstrap tools, and sync scripts are part of the framework release contract.
+EFrame should be maintained as one product surface, not as a Unity framework plus a second AI product. The AI collaboration layer, bootstrap tools, and sync scripts are part of the framework release contract.
 
-- EFrameWork release version: stored in `packages/com.eframework.core/package.json` and recorded in the root `CHANGELOG.md`.
+- EFrame release version: stored in `packages/com.eframework.core/package.json` and recorded in the root `CHANGELOG.md`.
 - AI workspace manifest version: stored in `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` only as a sync marker so business projects can detect framework-managed AI file drift.
 
-Think in terms of the EFrameWork release first. Bump the package version when publishing a framework/package release. Treat the manifest as a sync marker, not a separate product version.
+Think in terms of the EFrame release first. Bump the package version when publishing a framework/package release. Treat the manifest as a sync marker, not a separate product version.
 
 Manifest update rules are defined in `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
 

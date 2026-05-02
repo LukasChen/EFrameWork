@@ -26,11 +26,11 @@
 7. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `Initialize-EFrameAI.ps1 -Force` 都能正常运行。
 8. `Initialize-EFrameAI.ps1 -Force` 只同步框架托管项：`.github/instructions/eframe-*`、`.github/skills/eframe-*`、`.github/eframe/EFRAME_AI_API_INDEX.md`，以及 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 中的 EFrame managed block。
 9. `Initialize-EFrameAI.ps1 -StatusOnly` 能按 `-Clients` 报告托管项状态、managed block 接入情况、框架源已移除的 `eframe-*` 项，以及 manifest-tracked 文件或 block 的 hash 漂移。
-10. 如果这是正式 release，检查通过后必须提交 release 变更并创建与 `packages/com.eframework.core/package.json` 版本一致的 git tag，例如 `v0.2.2`；只有用户明确要求“只准备文件不提交”时才跳过。
+10. 如果这是正式 release，检查通过后先向维护者确认待提交范围、版本号、tag 和目标远端；确认后再提交 release 变更、创建与 `packages/com.eframework.core/package.json` 版本一致的 git tag，例如 `v0.2.2`，并按确认范围推送。
 
 说明：
 
-- 对外沟通时使用 EFrameWork 主版本号；manifest 版本只用于业务项目同步检测，不作为另一套产品版本号。
+- 对外沟通时使用 EFrame 主版本号；manifest 版本只用于业务项目同步检测，不作为另一套产品版本号。
 - Always-on 边界留在 instructions；多步骤生成、审查、发布、迁移流程放在 skills 或 skill references。
 
 ## 3. 按变更类型追加检查
@@ -84,3 +84,4 @@
 - 不要发布未递增 manifest 版本的同步层 AI 规则更新。
 - 不要修改框架代码、模板或工具后，遗漏配套 AI instructions、skills、manifest、文档和同步检查。
 - 不要把 `maintainer-*` instruction 或 skill 加进 AI 同步白名单。
+- 不要自行 commit、tag 或 push 新版本；必须先向维护者确认发布范围、版本号和目标远端。

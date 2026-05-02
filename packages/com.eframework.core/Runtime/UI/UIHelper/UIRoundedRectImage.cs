@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.UIHelper
+namespace EFrame.Runtime.UI.UIHelper
 {
     [RequireComponent(typeof(Image))]
     public sealed class UIRoundedRectImage : BaseMeshEffect

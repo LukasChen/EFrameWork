@@ -102,7 +102,7 @@ namespace $RootNamespace.Common
 "@
 
 $procedureLauncherContent = @"
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime.Procedure;
 using UnityEngine;
 
 namespace $RootNamespace.Procedure
@@ -126,9 +126,9 @@ namespace $RootNamespace.Procedure
 
 $procedureHomeContent = @"
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.Procedure;
 using $RootNamespace.Common;
 using $RootNamespace.Modules.SampleModule.Procedure;
 using $RootNamespace.UI.Controllers;
@@ -180,7 +180,7 @@ namespace $RootNamespace.Procedure
 "@
 
 $homeViewContent = @"
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -214,7 +214,7 @@ $homeViewControllerContent = @"
 using System;
 using $RootNamespace.Common;
 using $RootNamespace.UI.Views;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 
 namespace $RootNamespace.UI.Controllers
 {
@@ -284,8 +284,8 @@ Recommended next steps:
     $moduleProcedureContent = @"
 using Cysharp.Threading.Tasks;
 using $RootNamespace.Procedure;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.Procedure;
 using $RootNamespace.Common;
 using $moduleNamespace.UI.Controllers;
 using UnityEngine;
@@ -330,7 +330,7 @@ namespace $moduleNamespace.Procedure
 "@
 
     $moduleViewContent = @"
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -360,7 +360,7 @@ namespace $moduleNamespace.UI.Views
 
     $moduleControllerContent = @"
 using System;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using $RootNamespace.Common;
 using $moduleNamespace.UI.Views;
 

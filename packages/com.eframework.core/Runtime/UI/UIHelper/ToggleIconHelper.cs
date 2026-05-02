@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.UIHelper
+namespace EFrame.Runtime.UI.UIHelper
 {
     /// <summary>
     /// Helper component to manage toggle icon animations and states.

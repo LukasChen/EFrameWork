@@ -3,7 +3,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     internal static class EFrameDotweenBootstrapUtility
     {
@@ -39,7 +39,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             var settingsType = ResolveSettingsType();
             if (settingsType == null)
             {
-                message = "DOTween runtime assembly was not found. Install DOTween into the consumer project's Assets before using EFrameWork tween-enabled components.";
+                message = "DOTween runtime assembly was not found. Install DOTween into the consumer project's Assets before using EFrame tween-enabled components.";
                 return false;
             }
 
@@ -109,7 +109,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
 
         internal static string GetInstallationGuidance()
         {
-            return "EFrameWork uses DOTween directly. Install DOTween in the consumer project's Assets before using tween-enabled framework components. DOTween Utility Panel module setup should target that project-local installation, not a package copy.";
+            return "EFrame uses DOTween directly. Install DOTween in the consumer project's Assets before using tween-enabled framework components. DOTween Utility Panel module setup should target that project-local installation, not a package copy.";
         }
 
         private static void RunAutoBootstrap()

@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using EFrameWork.Runtime;
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime;
+using EFrame.Runtime.Procedure;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     public sealed class EFrameProjectInitializationWindow : EditorWindow
     {
@@ -20,10 +20,10 @@ namespace EFrameWork.Editor.ProjectBootstrap
         private const string StartUpScenePath = "Assets/Scenes/StartUp.unity";
         private const string StartUpGuidePath = "Assets/Scenes/StartUp_SETUP.md";
         private const string ModulesRootPath = "Assets/Modules";
-        private const string AutoPopupSessionKey = "EFrameWork.ProjectInitializationWindow.AutoPopupShown";
-        private const string NamespacePrefsKey = "EFrameWork.ProjectInitializationWindow.RootNamespace";
-        private const string ModuleNamePrefsKey = "EFrameWork.ProjectInitializationWindow.ModuleName";
-        private const string AiClientPrefsKey = "EFrameWork.ProjectInitializationWindow.AIClient";
+        private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
+        private const string NamespacePrefsKey = "EFrame.ProjectInitializationWindow.RootNamespace";
+        private const string ModuleNamePrefsKey = "EFrame.ProjectInitializationWindow.ModuleName";
+        private const string AiClientPrefsKey = "EFrame.ProjectInitializationWindow.AIClient";
 
         private string m_rootNamespace;
         private string m_moduleName;
@@ -567,7 +567,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return true;
             }
 
-            reason = "EFrame package AI tools were not found. Reimport or update the EFrameWork package.";
+            reason = "EFrame package AI tools were not found. Reimport or update the EFrame package.";
             return false;
         }
 
@@ -579,7 +579,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
             var packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{PackageName}");
             if (packageInfo == null || string.IsNullOrEmpty(packageInfo.resolvedPath))
             {
-                error = "Could not resolve the EFrameWork package path.";
+                error = "Could not resolve the EFrame package path.";
                 return false;
             }
 
@@ -662,8 +662,8 @@ Recommended next steps:
         private string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
             return $@"using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.Procedure;
 using {m_rootNamespace}.Common;
 using UnityEngine;
 
@@ -693,7 +693,7 @@ namespace {moduleNamespace}.Procedure
 
         private static string BuildModuleViewContent(string moduleName, string moduleNamespace)
         {
-            return $@"using EFrameWork.Runtime.UI;
+            return $@"using EFrame.Runtime.UI;
 using UnityEngine.UI;
 
 namespace {moduleNamespace}.UI.Views
@@ -724,7 +724,7 @@ namespace {moduleNamespace}.UI.Views
         private string BuildModuleControllerContent(string moduleName, string moduleNamespace)
         {
             return $@"using System;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using {m_rootNamespace}.Common;
 using {moduleNamespace}.UI.Views;
 

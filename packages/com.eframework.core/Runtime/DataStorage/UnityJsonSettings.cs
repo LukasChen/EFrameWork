@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.DataStorage
+namespace EFrame.Runtime.DataStorage
 {
     /// <summary>
     /// Shared Json.NET settings tuned for Unity projects to avoid self-referencing loops

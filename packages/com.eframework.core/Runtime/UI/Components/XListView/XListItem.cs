@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace EFrameWork.Runtime.UI.Components.XListView
+namespace EFrame.Runtime.UI.Components.XListView
 {
     public class XListItem : MonoBehaviour
     {

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.Audio;
-using EFrameWork.Runtime.Utils;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.Audio;
+using EFrame.Runtime.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.Effect.Fly
+namespace EFrame.Runtime.Effect.Fly
 {
     public readonly struct FlySequenceHandle
     {
@@ -787,7 +787,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.FlySoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.FlySoundPlayed) return;
 
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
 
             seq.FlySoundPlayed = true;
 
@@ -801,7 +801,7 @@ namespace EFrameWork.Runtime.Effect.Fly
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.ArriveSoundPlayed) return;
 
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
 
             seq.ArriveSoundPlayed = true;
 
@@ -812,7 +812,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.FlySoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.FlySoundAssetId);
         }
@@ -821,7 +821,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrameWork.Runtime.EFrame.Initialized || EFrameWork.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.ArriveSoundAssetId);
         }

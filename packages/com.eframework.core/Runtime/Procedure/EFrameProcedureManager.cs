@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.Asset;
+using EFrame.Runtime.Asset;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Procedure
+namespace EFrame.Runtime.Procedure
 {
     public sealed class EFrameProcedureManager
     {

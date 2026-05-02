@@ -1,7 +1,7 @@
 using DG.Tweening;
-using EFrameWork.Runtime.Asset;
-using EFrameWork.Runtime.UI;
-using EFrameWork.Runtime.UI.UIHelper;
+using EFrame.Runtime.Asset;
+using EFrame.Runtime.UI;
+using EFrame.Runtime.UI.UIHelper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     public class UIUtils
     {

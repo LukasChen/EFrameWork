@@ -1,12 +1,12 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Effect.IconBounce
+namespace EFrame.Runtime.Effect.IconBounce
 {
     /// <summary>
     /// 图标回弹效果配置（ScriptableObject）
     /// 用于配置金币到达时的回弹动画参数
     /// </summary>
-    [CreateAssetMenu(menuName = "EFrameWork/Effect/Icon Bounce Config", fileName = "IconBounceConfig")]
+    [CreateAssetMenu(menuName = "EFrame/Effect/Icon Bounce Config", fileName = "IconBounceConfig")]
     public sealed class IconBounceConfig : ScriptableObject
     {
         [Header("Bounce Settings")]

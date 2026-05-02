@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEditor;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     public static class EFrameSampleUIPrefabUtility
     {

@@ -1,6 +1,6 @@
-## EFrameWork Framework Rules
+## EFrame Framework Rules
 
-This project uses EFrameWork. Treat this block as the framework-supplied baseline; keep project-specific AI rules outside this managed block.
+This project uses EFrame. Treat this block as the framework-supplied baseline; keep project-specific AI rules outside this managed block.
 
 - Follow the synced EFrame framework contract in `.github/instructions/eframe-instructions.md`.
 - Use `.github/eframe/EFRAME_AI_API_INDEX.md` to look up stable EFrame APIs before generating or refactoring framework code.

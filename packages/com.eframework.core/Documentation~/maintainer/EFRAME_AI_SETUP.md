@@ -2,7 +2,7 @@
 
 这套配置把 EFrame 开发规范沉淀为可继承的 AI 工作区层。新项目引入框架并完成 Unity 冷启动后，可在编辑器窗口选择 Codex、GitHub Copilot 或 Claude Code 平台并同步对应 AI 契约。
 
-AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或同步流程时，同步维护配套 instructions、skills 和说明文档；发布与 manifest 边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
+AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或同步流程时，同步维护配套 instructions、skills 和说明文档；发布与 manifest 边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 
 架构边界和同步契约见 [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md)。
 
@@ -87,7 +87,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、
 
 ## 3. Unity 编辑器内初始化方式
 
-当项目通过本地 clone + `file:` path 方式引用 EFrameWork 包时，打开 Unity 后会自动弹出初始化窗口；也可以手动通过菜单打开：
+当项目通过本地 clone + `file:` path 方式引用 EFrame 包时，打开 Unity 后会自动弹出初始化窗口；也可以手动通过菜单打开：
 
 ```text
 EFrame Tools/项目初始化向导
@@ -253,11 +253,11 @@ Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude C
 
 版本号建议：
 
-- `packages/com.eframework.core/package.json`：EFrameWork 对外发布版本，遵循 SemVer，是维护和沟通时的主版本号。
+- `packages/com.eframework.core/package.json`：EFrame 对外发布版本，遵循 SemVer，是维护和沟通时的主版本号。
 - `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json`：内部同步标记，只用于判断业务项目中的框架托管 AI 文件状态，不作为另一套产品版本理解。
-- `CHANGELOG.md`：仓库级发布记录，是阅读版本变化的入口；Unity 代码、AI 规则、工具链和文档都记录在同一个 EFrameWork 发布历史里。
+- `CHANGELOG.md`：仓库级发布记录，是阅读版本变化的入口；Unity 代码、AI 规则、工具链和文档都记录在同一个 EFrame 发布历史里。
 
-维护时不要把 AI 能力当成额外产品线。更合适的理解是：EFrameWork 的一个版本同时包含运行时代码、编辑器工具、AI 协作规则、冷启动模板和同步工具。manifest 只是让业务项目知道“本地同步到哪一版框架 AI 能力”。
+维护时不要把 AI 能力当成额外产品线。更合适的理解是：EFrame 的一个版本同时包含运行时代码、编辑器工具、AI 协作规则、冷启动模板和同步工具。manifest 只是让业务项目知道“本地同步到哪一版框架 AI 能力”。
 
 更严格的发布与同步边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 

@@ -1,6 +1,6 @@
-# EFrameWork Copilot Entry
+# EFrame Copilot Entry
 
-本仓库是 EFrameWork 框架标准源。Copilot 在本仓库工作时，先按任务类型读取对应的 package 业务契约或维护者文档，不要在本入口文件里重复展开具体框架使用规则。
+本仓库是 EFrame 框架标准源。Copilot 在本仓库工作时，先按任务类型读取对应的 package 业务契约或维护者文档，不要在本入口文件里重复展开具体框架使用规则。
 
 ## 入口分流
 

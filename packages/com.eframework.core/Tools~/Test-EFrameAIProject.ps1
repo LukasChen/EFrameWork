@@ -81,8 +81,8 @@ function Get-ManagedBlockBody {
         return $null
     }
 
-    $beginMarker = "<!-- BEGIN EFRAMEWORK AI MANAGED BLOCK: $BlockId -->"
-    $endMarker = "<!-- END EFRAMEWORK AI MANAGED BLOCK: $BlockId -->"
+    $beginMarker = "<!-- BEGIN EFRAME AI MANAGED BLOCK: $BlockId -->"
+    $endMarker = "<!-- END EFRAME AI MANAGED BLOCK: $BlockId -->"
     $beginIndex = $Text.IndexOf($beginMarker, [System.StringComparison]::Ordinal)
     if ($beginIndex -lt 0) {
         return $null
@@ -133,7 +133,7 @@ else {
     }
 
     if (-not $targetManifest.files -or $targetManifest.files.Count -eq 0) {
-        $warnings.Add("Target manifest has no file hash entries. Re-sync from a newer EFrameWork framework checkout.")
+        $warnings.Add("Target manifest has no file hash entries. Re-sync from a newer EFrame framework checkout.")
     }
     else {
         foreach ($entry in $targetManifest.files) {

@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-namespace EFrameWork.Runtime.DataStorage
+namespace EFrame.Runtime.DataStorage
 {
     public abstract class DataTable<T> : IDataTable
     {

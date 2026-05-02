@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using System.IO;
-using EFrameWork.Runtime.Audio;
+using EFrame.Runtime.Audio;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     internal static class EFrameAudioBootstrapUtility
     {

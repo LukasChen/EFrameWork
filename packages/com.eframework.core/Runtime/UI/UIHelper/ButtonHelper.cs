@@ -1,12 +1,12 @@
 using DG.Tweening;
-using EFrameWork.Runtime.Audio;
-using EFrameWork.Runtime.Event;
+using EFrame.Runtime.Audio;
+using EFrame.Runtime.Event;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.UIHelper
+namespace EFrame.Runtime.UI.UIHelper
 {
     [RequireComponent(typeof(Button))]
     public class ButtonHelper : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler

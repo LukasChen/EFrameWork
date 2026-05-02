@@ -1,7 +1,7 @@
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using UnityEngine;
 
-namespace EFrameWork.Runtime
+namespace EFrame.Runtime
 {
     /// <summary>
     /// Marks a camera as an EFrame scene camera that can host the persistent UI camera stack.

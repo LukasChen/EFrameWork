@@ -1,4 +1,4 @@
-namespace EFrameWork.Runtime.DataStorage
+namespace EFrame.Runtime.DataStorage
 {
     public readonly struct DataStorageLoadContext
     {

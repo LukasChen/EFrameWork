@@ -1,9 +1,9 @@
 using DG.Tweening;
-using EFrameWork.Runtime;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime;
+using EFrame.Runtime.UI;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Effect
+namespace EFrame.Runtime.Effect
 {
     public static class CameraShakeFx
     {

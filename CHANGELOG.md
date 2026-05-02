@@ -1,10 +1,19 @@
 # Changelog
 
-All notable changes to EFrameWork are documented in this file.
+All notable changes to EFrame are documented in this file.
 
-EFrameWork uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrameWork release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
+EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
 ## [Unreleased]
+
+## [0.5.0] - 2026-05-02
+
+### Changed
+
+- Renamed the framework brand from its legacy name to EFrame across runtime, editor tooling, package metadata, generated templates, documentation, and AI workspace contracts.
+- Standardized runtime namespaces on `EFrame.Runtime` and editor namespaces on `EFrame.Editor`.
+- Standardized package assemblies on `EFrame` and `EFrame.Editor`.
+- Updated bootstrap scripts, UI binding templates, synced AI instructions, managed blocks, support docs, and generated HTML docs to use the EFrame naming contract.
 
 ## [0.4.6] - 2026-05-02
 
@@ -99,7 +108,7 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ### Added
 
-- Added a dedicated `EFrameWork.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
+- Added a dedicated `EFrame.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
 
 ### Changed
 
@@ -163,8 +172,8 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 - Added `LastSaveResult` to `DataTable` so save attempts can report whether they wrote, skipped because data was clean, or failed.
 - Moved QUI sorting layer setup into the project bootstrap flow so initialization can auto-create required UI sorting layers, and added runtime QUI warnings when layers are missing.
 - Reorganized editor tooling into `ProjectBootstrap`, `UI`, and `Tools` groups so UI-specific inspectors, bootstrap setup, and developer shortcuts no longer mix under one root.
-- Unified legacy UI component namespaces under `EFrameWork.Runtime.UI` so `QScroller`, `QTab`, UI animations, and helper components no longer expose mixed historical prefixes.
-- Unified `QUIBinding` generated access classes and shipped UI templates on `EFrameWork.Runtime.UI.Generated` so newly generated view access code matches the runtime UI namespace family.
+- Unified legacy UI component namespaces under `EFrame.Runtime.UI` so `QScroller`, `QTab`, UI animations, and helper components no longer expose mixed historical prefixes.
+- Unified `QUIBinding` generated access classes and shipped UI templates on `EFrame.Runtime.UI.Generated` so newly generated view access code matches the runtime UI namespace family.
 - Split runtime UI layout adaptors and reusable controls into `Layout` and `Components` namespace groups so the UI root chain stays distinct from fitters and widget-style utilities.
 - Moved `UIBuilder` and `EmptyRayCasterGraphic` out of the runtime UI root so helper/toolbox code and lightweight reusable components no longer sit beside the core QUI chain.
 - Normalized `XListView` folder and namespace casing so component subfolders now follow the same stable naming style as their exported types.
@@ -192,7 +201,7 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ### Added
 
-- Established EFrameWork as a lightweight Unity game framework with a synchronized AI collaboration layer.
+- Established EFrame as a lightweight Unity game framework with a synchronized AI collaboration layer.
 - Added framework-managed Copilot instructions, focused runtime/editor instructions, and EFrame workflow skills.
 - Added project cold-start tooling for standard directories, bootstrap code, AI workspace sync, project overlay, and project updater installation.
 - Added AI workspace sync preview with managed file, project overlay, stale item, and synced document reporting.

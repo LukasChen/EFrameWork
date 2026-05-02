@@ -1,6 +1,6 @@
 # EFrame AI API Index
 
-This index is a compact, AI-oriented map of stable EFrameWork APIs. Use it to choose the right framework entry point before generating or refactoring code. It is intentionally smaller than the full browsable docs and favors project-facing contracts over internal implementation details.
+This index is a compact, AI-oriented map of stable EFrame APIs. Use it to choose the right framework entry point before generating or refactoring code. It is intentionally smaller than the full browsable docs and favors project-facing contracts over internal implementation details.
 
 After AI sync, business projects receive this document at `.github/eframe/EFRAME_AI_API_INDEX.md`; synced AI entry blocks point there so project AI can consult it without guessing framework APIs.
 

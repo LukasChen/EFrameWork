@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Effect.IconBounce
+namespace EFrame.Runtime.Effect.IconBounce
 {
     /// <summary>
     /// 图标回弹效果组件

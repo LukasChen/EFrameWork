@@ -1,6 +1,6 @@
-﻿# EFrameWork Core
+# EFrame Core
 
-EFrameWork Core is a reusable Unity game framework package extracted from `CozyBloomUnity/Assets/EFrameWork`.
+EFrame Core is a reusable Unity game framework package extracted from `CozyBloomUnity/Assets/EFrame`.
 
 ## Contents
 
@@ -27,7 +27,7 @@ For the framework-level public API reference, see [../../API_REFERENCE.md](../..
 
 For the browsable HTML docs site, see [Documentation~/index.html](Documentation~/index.html).
 
-EFrameWork now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
+EFrame now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
 
 ```csharp
 EFrame.Current.UI.SetInteractive(false);
@@ -86,7 +86,7 @@ Use `EFrame.Current.Assets` as the runtime resource entry.
 Use Unity Package Manager with this Git repository, targeting this package path:
 
 ```text
-https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
+https://github.com/ethanhubin/EFrame.git?path=/packages/com.eframework.core
 ```
 
 ## DOTween Requirement
@@ -123,5 +123,5 @@ https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 Initial extraction source:
 
 ```text
-https://github.com/ethanhubin/CozyBloom/tree/main/CozyBloomUnity/Assets/EFrameWork
+https://github.com/ethanhubin/CozyBloom/tree/main/CozyBloomUnity/Assets/EFrame
 ```

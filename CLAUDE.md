@@ -1,6 +1,6 @@
-# EFrameWork Claude Code Entry
+# EFrame Claude Code Entry
 
-本仓库是 EFrameWork 框架标准源。Claude Code 在本仓库工作时，先按任务类型读取对应的 package 业务契约或维护者文档，不要在本入口文件里重复展开具体框架使用规则。
+本仓库是 EFrame 框架标准源。Claude Code 在本仓库工作时，先按任务类型读取对应的 package 业务契约或维护者文档，不要在本入口文件里重复展开具体框架使用规则。
 
 Codex 读取 `AGENTS.md`；GitHub Copilot 读取 `.github/copilot-instructions.md`；Claude Code 读取 `CLAUDE.md`。三份客户端入口应保持同一套分流和维护边界。
 

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     public class PriorityQueue<T>
     {

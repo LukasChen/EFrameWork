@@ -1,7 +1,7 @@
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using UnityEngine;
 
-namespace EFrameWork.Runtime
+namespace EFrame.Runtime
 {
     [CreateAssetMenu(fileName = "EFrameSettings", menuName = "EFrame/Settings")]
     public sealed class EFrameSettings : ScriptableObject

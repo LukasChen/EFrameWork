@@ -1,7 +1,7 @@
 using System;
 using Random = UnityEngine.Random;
 
-namespace EFrameWork.Runtime.Base.Attributes
+namespace EFrame.Runtime.Base.Attributes
 {
     [Serializable]
     public struct RangeFloat

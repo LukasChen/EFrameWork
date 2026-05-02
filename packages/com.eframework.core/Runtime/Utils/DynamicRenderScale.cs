@@ -1,8 +1,8 @@
-using EFrameWork.Runtime;
+using EFrame.Runtime;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace EFramework.Utils
+namespace EFrame.Runtime.Utils
 {
     public class DynamicRenderScale : MonoBehaviour
     {

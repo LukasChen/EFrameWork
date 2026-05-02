@@ -49,7 +49,7 @@ forbiddenPatterns:
 
 ## Procedure
 
-Use `EFrameWork.Runtime.Procedure.EFrameProcedure` for new procedures, preload Procedure-owned resources in `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`, and use `ChangeState<TProcedure>(payload)` for one-shot enter data; persistent state belongs in `Context.Data`, module services, or events.
+Use `EFrame.Runtime.Procedure.EFrameProcedure` for new procedures, preload Procedure-owned resources in `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`, and use `ChangeState<TProcedure>(payload)` for one-shot enter data; persistent state belongs in `Context.Data`, module services, or events.
 
 1. 先判定需求是否真的需要新 `Procedure`。
 2. 如果不涉及状态切换、场景生命周期或玩法根对象切换，优先落成所在流程内的 UI 行为。

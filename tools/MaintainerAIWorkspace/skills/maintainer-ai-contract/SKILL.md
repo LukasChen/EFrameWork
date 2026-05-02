@@ -1,6 +1,6 @@
 ---
 name: maintainer-ai-contract
-description: 'Route and maintain EFrameWork AI contracts. Use inside the framework repository when deciding whether a change belongs in synced instructions, synced skills, managed blocks, support docs, maintainer-only docs, or the AI release/sync toolchain.'
+description: 'Route and maintain EFrame AI contracts. Use inside the framework repository when deciding whether a change belongs in synced instructions, synced skills, managed blocks, support docs, maintainer-only docs, or the AI release/sync toolchain.'
 argument-hint: 'Describe the framework, AI contract, sync, or maintainer workflow change to route and maintain.'
 user-invocable: true
 capabilities:
@@ -23,6 +23,7 @@ forbiddenPatterns:
   - placing manifest or release maintenance in eframe-* skills
   - publishing synced AI files without manifest and release-check review
   - turning synced instructions into long workflow checklists
+  - committing, tagging, or pushing framework releases without maintainer confirmation
 ---
 
 # EFrame Maintainer AI Contract
@@ -55,7 +56,7 @@ forbiddenPatterns:
 2. 决定承载位置：长期边界优先 instruction，查询型内容优先 support-doc，常用多步骤流程优先 synced skill，维护流程优先 maintainer skill 或 maintainer doc。
 3. 保持 synced `eframe-*` skill 面向业务项目；不要把 manifest 版本递增、release checklist、同步脚本维护或框架内部维护步骤塞进去。
 4. 需要详细审查时，优先扩展 maintainer skill 或 reference，而不是扩大每次都会触发的 instruction 上下文。
-5. 进入发布或同步发布流程时，按 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 执行验证；release commit/tag 规则也以该清单为准。
+5. 进入发布或同步发布流程时，按 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 执行验证；release commit/tag/push 前必须先向维护者确认。
 
 ## Instruction Quality Checks
 
@@ -79,3 +80,4 @@ forbiddenPatterns:
 - 如果发现 `eframe-*` skill 混入 maintainer 事项，建议移到 `maintainer-*` skill。
 - 如果发现内容更适合 support-doc、managed block 或 maintainer doc，要直接指出替代落点。
 - 如果 release check 未通过，先列出阻塞项，再给出修复建议。
+- 如果需要 commit、tag 或 push 新版本，先说明待发布范围、版本号和目标远端，等待维护者确认后再执行。

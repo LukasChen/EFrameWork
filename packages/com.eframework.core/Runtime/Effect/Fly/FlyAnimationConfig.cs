@@ -1,8 +1,8 @@
 using System;
-using EFrameWork.Runtime.Audio;
+using EFrame.Runtime.Audio;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Effect.Fly
+namespace EFrame.Runtime.Effect.Fly
 {
     public enum FlyPathType
     {
@@ -22,7 +22,7 @@ namespace EFrameWork.Runtime.Effect.Fly
         PerItem = 2,
     }
 
-    [CreateAssetMenu(menuName = "EFrameWork/Fly/Fly Animation Config", fileName = "FlyAnimationConfig")]
+    [CreateAssetMenu(menuName = "EFrame/Fly/Fly Animation Config", fileName = "FlyAnimationConfig")]
     public sealed class FlyAnimationConfig : ScriptableObject
     {
         [Header("Asset")]

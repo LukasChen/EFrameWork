@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.Layout
+namespace EFrame.Runtime.UI.Layout
 {
     public enum ImageScaleFitMode
     {

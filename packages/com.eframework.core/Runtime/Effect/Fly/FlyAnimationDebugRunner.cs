@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Effect.Fly
+namespace EFrame.Runtime.Effect.Fly
 {
     /// <summary>
     /// 场景内快速调试用：挂到任意 GameObject，配置起点/终点/父节点后，一键播放。

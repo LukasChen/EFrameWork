@@ -1,6 +1,6 @@
-# EFrameWork UI Framework Guide
+# EFrame UI Framework Guide
 
-This document describes the current UI runtime structure in EFrameWork after the UI main chain was refactored to a handle-first model.
+This document describes the current UI runtime structure in EFrame after the UI main chain was refactored to a handle-first model.
 
 For the new browsable docs site, start from [Documentation~/index.html](../index.html) and then open [Documentation~/runtime/ui/index.html](../runtime/ui/index.html).
 
@@ -202,7 +202,7 @@ Typical view class:
 
 ```csharp
 using UnityEngine.UI;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 
 namespace Demo.UI.Views
 {
@@ -243,7 +243,7 @@ Typical page controller:
 using System;
 using Demo.Common;
 using Demo.UI.Views;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 
 namespace Demo.UI.Controllers
 {
@@ -332,7 +332,7 @@ Lifecycle hooks are split by scope:
 
 ```csharp
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 
 namespace Demo.UI.Controllers
 {
@@ -480,7 +480,7 @@ Avoid these patterns:
 ## 14. Minimal End-To-End Example
 
 ```csharp
-using EFrameWork.Runtime.Procedure;
+using EFrame.Runtime.Procedure;
 
 public sealed class LobbyProcedure : EFrameProcedure
 {

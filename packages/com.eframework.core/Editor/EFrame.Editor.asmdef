@@ -1,8 +1,8 @@
 {
-    "name": "EFrameWork.Editor",
+    "name": "EFrame.Editor",
     "rootNamespace": "",
     "references": [
-        "EFrameWork",
+        "EFrame",
         "UniTask",
         "Lofelt.NiceVibrations",
         "Unity.Addressables",

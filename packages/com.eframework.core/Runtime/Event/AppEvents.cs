@@ -1,4 +1,4 @@
-namespace EFrameWork.Runtime.Event
+namespace EFrame.Runtime.Event
 {
     /// <summary>
     /// 应用启动事件

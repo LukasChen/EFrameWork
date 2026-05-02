@@ -1,6 +1,6 @@
 using System;
 
-namespace EFrameWork.Runtime.DataStorage
+namespace EFrame.Runtime.DataStorage
 {
     public interface IDataService : IDisposable
     {

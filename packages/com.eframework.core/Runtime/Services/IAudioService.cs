@@ -2,7 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Audio
+namespace EFrame.Runtime.Audio
 {
     public interface IAudioService : IDisposable
     {

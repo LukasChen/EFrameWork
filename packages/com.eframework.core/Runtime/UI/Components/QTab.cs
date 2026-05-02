@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI.Components
+namespace EFrame.Runtime.UI.Components
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]

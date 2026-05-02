@@ -1,12 +1,12 @@
 #if UNITY_EDITOR
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.Audio;
+using EFrame.Runtime.Audio;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrameWork.Editor.Audio
+namespace EFrame.Editor.Audio
 {
     [CustomEditor(typeof(AudioClipAsset))]
     public class AudioClipAssetEditor : UnityEditor.Editor

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     public static class ListUtils
     {

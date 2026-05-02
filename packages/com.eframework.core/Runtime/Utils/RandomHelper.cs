@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Random = System.Random;
 
-namespace EFrameWork.Runtime.Utils
+namespace EFrame.Runtime.Utils
 {
     public static class RandomHelper
     {

@@ -1,7 +1,7 @@
-using EFrameWork.Runtime;
+using EFrame.Runtime;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Audio
+namespace EFrame.Runtime.Audio
 {
     public class AudioAssetComponent : MonoBehaviour
     {

@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 
 
-using EFrameWork.Runtime.Base.Attributes;
+using EFrame.Runtime.Base.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrameWork.Editor.PropertyDrawers
+namespace EFrame.Editor.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(RangeFloat))]
     public class RangeFloatDrawer : PropertyDrawer

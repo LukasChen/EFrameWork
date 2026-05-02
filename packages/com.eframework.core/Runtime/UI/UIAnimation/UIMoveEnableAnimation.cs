@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace EFrameWork.Runtime.UI.UIAnimation
+namespace EFrame.Runtime.UI.UIAnimation
 {
     [RequireComponent(typeof(RectTransform))]
     public class UIMoveEnableAnimation : MonoBehaviour

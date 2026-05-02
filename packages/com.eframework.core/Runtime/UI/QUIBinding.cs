@@ -1,11 +1,11 @@
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameWork.Runtime.UI
+namespace EFrame.Runtime.UI
 {
     /// <summary>
     /// View 配置 - 存储在 Prefab 上的默认配置
@@ -110,7 +110,7 @@ namespace EFrameWork.Runtime.UI
         /// </summary>
         public string AccessClassNamespace
         {
-            get => string.IsNullOrEmpty(m_accessClassNamespace) ? "EFrameWork.Runtime.UI.Generated" : m_accessClassNamespace;
+            get => string.IsNullOrEmpty(m_accessClassNamespace) ? "EFrame.Runtime.UI.Generated" : m_accessClassNamespace;
             set => m_accessClassNamespace = value;
         }
 

@@ -1,11 +1,11 @@
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime.Base.Attributes;
+using EFrame.Runtime.Base.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace EFrameWork.Runtime.Audio
+namespace EFrame.Runtime.Audio
 {
     [CreateAssetMenu(fileName = "AudioClipAsset", menuName = "EFrame/AudioClip Asset")]
     public class AudioClipAsset : ScriptableObject

@@ -1,8 +1,8 @@
 using UnityEditor;
 using UnityEngine;
-using EFrameWork.Runtime.Effect.IconBounce;
+using EFrame.Runtime.Effect.IconBounce;
 
-namespace EFrameWork.Editor.Effect.IconBounce
+namespace EFrame.Editor.Effect.IconBounce
 {
     [CustomEditor(typeof(IconBounceConfig))]
     public sealed class IconBounceConfigEditor : UnityEditor.Editor

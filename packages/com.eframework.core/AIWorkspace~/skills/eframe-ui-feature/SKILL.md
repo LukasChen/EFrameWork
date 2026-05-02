@@ -30,7 +30,7 @@ forbiddenPatterns:
 ## Workflow
 
 1. Decide the UI type before creating files: page, popup, tooltip, top-layer prompt, or existing Procedure UI state.
-2. Use framework naming: `XxxView.prefab`, `XxxViewController`, generated binding under `EFrameWork.Runtime.UI.Generated`.
+2. Use framework naming: `XxxView.prefab`, `XxxViewController`, generated binding under `EFrame.Runtime.UI.Generated`.
 3. Place the prefab in the matching resource convention, usually `Assets/App/Res/UI/...` or `Assets/Modules/<Name>/Res/UI/...`; if resource directory mapping, Addressables sync, or preload/release ownership is the main problem, delegate that part to `eframe-resource-flow`.
 4. Mount through `QUI` layers: main pages to `QuiPanel`, popups to `QuiPopUp`, hints to `QuiTooltip` or `QuiTop`.
 5. Put controller code in runtime structure. Use `OnViewCreated()` / `OnViewDestroyed()` for instance-level binding and release, and `OnViewOpened()` / `OnViewClosed()` for per-open refresh or pause behavior.

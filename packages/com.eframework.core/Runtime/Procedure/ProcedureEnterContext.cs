@@ -1,6 +1,6 @@
 using System;
 
-namespace EFrameWork.Runtime.Procedure
+namespace EFrame.Runtime.Procedure
 {
     public readonly struct ProcedureEnterContext
     {

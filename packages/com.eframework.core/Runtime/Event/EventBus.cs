@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace EFrameWork.Runtime.Event
+namespace EFrame.Runtime.Event
 {
     /// <summary>
     /// 事件标记接口，所有强类型事件 struct 都应实现此接口

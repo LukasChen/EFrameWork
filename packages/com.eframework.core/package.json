@@ -1,7 +1,7 @@
-﻿{
+{
   "name": "com.eframework.core",
-  "displayName": "EFrameWork Core",
-  "version": "0.4.6",
+  "displayName": "EFrame Core",
+  "version": "0.5.0",
   "unity": "6000.0",
   "description": "Reusable Unity game framework extracted from CozyBloom.",
   "keywords": [
@@ -22,8 +22,8 @@
   },
   "samples": [
     {
-      "displayName": "EFrameWork Samples",
-      "description": "Sample assets extracted with the initial EFrameWork package.",
+      "displayName": "EFrame Samples",
+      "description": "Sample assets extracted with the initial EFrame package.",
       "path": "Samples~"
     }
   ]

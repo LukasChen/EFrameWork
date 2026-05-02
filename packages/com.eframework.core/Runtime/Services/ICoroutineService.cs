@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace EFrameWork.Runtime
+namespace EFrame.Runtime
 {
     public interface ICoroutineService : IDisposable
     {

@@ -1,10 +1,10 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using EFrameWork.Runtime.UI;
+using EFrame.Runtime.UI;
 using UnityEditor;
 
-namespace EFrameWork.Editor.ProjectBootstrap
+namespace EFrame.Editor.ProjectBootstrap
 {
     internal static class EFrameUIBootstrapUtility
     {

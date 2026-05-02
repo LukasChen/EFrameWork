@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime.Base
+namespace EFrame.Runtime.Base
 {
     public class SingletonMono<T> : MonoBehaviour where T : SingletonMono<T>
     {

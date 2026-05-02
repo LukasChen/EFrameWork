@@ -1,6 +1,6 @@
-# EFrameWork Framework Rules
+# EFrame Framework Rules
 
-This project uses EFrameWork. Treat this block as the framework-supplied baseline; keep project-specific Claude Code rules outside this managed block.
+This project uses EFrame. Treat this block as the framework-supplied baseline; keep project-specific Claude Code rules outside this managed block.
 
 - Read `.github/instructions/eframe-instructions.md` for the synced EFrame framework contract.
 - Use `.github/eframe/EFRAME_AI_API_INDEX.md` to look up stable EFrame APIs before generating or refactoring framework code.

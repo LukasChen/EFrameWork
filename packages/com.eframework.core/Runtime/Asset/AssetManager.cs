@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using EFrameWork.Runtime;
+using EFrame.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 
-namespace EFrameWork.Runtime.Asset
+namespace EFrame.Runtime.Asset
 {
     /// <summary>
     /// 资源管理器

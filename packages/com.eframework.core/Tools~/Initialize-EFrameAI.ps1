@@ -28,8 +28,8 @@ $destinationManifestPath = Join-Path $destinationRoot $manifestName
 $aiDocumentNames = @()
 
 $validClients = @("codex", "copilot", "claude-code")
-$managedBlockBeginPrefix = "<!-- BEGIN EFRAMEWORK AI MANAGED BLOCK:"
-$managedBlockEndPrefix = "<!-- END EFRAMEWORK AI MANAGED BLOCK:"
+$managedBlockBeginPrefix = "<!-- BEGIN EFRAME AI MANAGED BLOCK:"
+$managedBlockEndPrefix = "<!-- END EFRAME AI MANAGED BLOCK:"
 $managedRootBlocks = @(
     [pscustomobject]@{
         Client = "codex"
@@ -396,7 +396,7 @@ function New-ProjectInstructionDocument {
         [string]$ManagedBlockText
     )
 
-    return "# $($BlockSpec.Title)`n`nThis file belongs to this project. Keep project-specific AI rules outside the EFrameWork managed block; EFrame sync only updates the marked block below.`n`n$ManagedBlockText"
+    return "# $($BlockSpec.Title)`n`nThis file belongs to this project. Keep project-specific AI rules outside the EFrame managed block; EFrame sync only updates the marked block below.`n`n$ManagedBlockText"
 }
 
 function Get-ManifestFileStatus {

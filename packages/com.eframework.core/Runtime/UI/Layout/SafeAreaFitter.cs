@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrameWork.Runtime.UI.Layout
+namespace EFrame.Runtime.UI.Layout
 {
     /// <summary>
     /// 安全区适配组件 - 将 UI 元素限制在安全区内

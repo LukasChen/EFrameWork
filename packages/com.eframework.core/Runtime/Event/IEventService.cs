@@ -1,6 +1,6 @@
 using System;
 
-namespace EFrameWork.Runtime.Event
+namespace EFrame.Runtime.Event
 {
     public interface IEventService
     {
