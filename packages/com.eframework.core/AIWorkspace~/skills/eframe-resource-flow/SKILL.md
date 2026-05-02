@@ -32,7 +32,7 @@ forbiddenPatterns:
 1. Put resources under a stable mapped directory, usually `Assets/App/Res/...`, `Assets/Scenes`, or `Assets/Modules/<Name>/Res/...`.
 2. Use `ResPath.Generated` for runtime resource ids. `AssetReference` may be used for editor authoring fields, but runtime business calls should receive generated asset ids instead of raw Addressables strings.
 3. For Procedure-owned hot paths, preload assets through `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`, then instantiate with `Context.Assets.Instantiate(...)` or `Context.Assets.GetFromPool(...)`.
-4. Use `EFrame.Current.Assets.LoadAsync(...)` or `InstantiateAsync(...)` only when a caller explicitly owns an async handle/instance lifecycle outside the Procedure preload path.
+4. In framework-aware code, prefer `Context.Assets.LoadAsync(...)` / `InstantiateAsync(...)`; use `EFrame.Current.Assets.*` only at startup, static entry points, or other non-injected call sites when a caller explicitly owns an async handle or instance lifecycle outside the Procedure preload path.
 5. Store and dispose returned handles according to the owner lifecycle: Procedure, controller, service, or spawned runtime object.
 6. Avoid `WaitForCompletion` and synchronous Addressables paths unless there is a documented reason.
 7. Keep framework-managed Audio Resources assets under `Assets/Resources/Audio` and route mixer/event-config paths through `AudioResourcePaths`.
@@ -40,7 +40,7 @@ forbiddenPatterns:
 9. Let the editor auto-sync managed resources after import, move, or delete; use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to choose ResPath source directory trees, inspect the managed resource report window, or force a repair/check.
 10. Expect player builds to run an EFrame Addressables preflight that syncs groups, validates generated addresses, and fails the build if selected `ResPath.Generated` entries or managed entries drift.
 11. When editor tooling changes generated paths or Addressables grouping, update the corresponding bootstrap/generation workflow rather than patching business code around it.
-12. For UI resources, align prefab names, controller names, and generated binding namespaces with the UI contract.
+12. For UI resources, keep prefab ids and directory placement aligned with the UI contract; detailed controller/view naming and UI lifecycle rules belong to `eframe-ui-feature`.
 
 ## Output Checks
 

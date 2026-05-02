@@ -30,12 +30,12 @@ forbiddenPatterns:
 
 1. Model persistent state in a serializable data class and expose behavior through a `DataTable<TData>` table.
 2. Give every table a stable, unique `StorageKey`. Never derive persistence identity from class name or namespace.
-3. Keep a public parameterless constructor and register through `EFrame.Current.Data.RegisterTable<T>()`.
-4. Read tables through `EFrame.Current.Data.GetTable<T>()`; do not create a second business singleton for the same state.
+3. Keep a public parameterless constructor and register through the framework data service, preferably `Context.Data.RegisterTable<T>()` inside framework-aware code and `EFrame.Current.Data.RegisterTable<T>()` only at startup or non-injected entry points.
+4. Read tables through the framework data service, preferably `Context.Data.GetTable<T>()` inside framework-aware code; do not create a second business singleton for the same state.
 5. Expose mutations through table properties or methods. Use `SetValue(...)`, `Mutate(...)`, or equivalent table-owned helpers so dirty state changes only when data really changes.
 6. If schema can change, declare `CurrentVersion` and implement `Migrate(data, fromVersion)`.
 7. Use `LastLoadResult` and `LastSaveResult` for UI prompts, telemetry, retries, and recovery decisions. Do not parse log messages or assume `Save()` always writes.
-8. Let the framework save on pause/quit by default; call `SaveAll()` or table-level `Save()` only at explicit business checkpoints.
+8. Let the framework save on pause/quit by default; call `Context.Data.SaveAll()` / `EFrame.Current.Data.SaveAll()` or table-level `Save()` only at explicit business checkpoints.
 
 ## Output Checks
 

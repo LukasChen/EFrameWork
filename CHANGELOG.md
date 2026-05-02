@@ -6,6 +6,14 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-05-02
+
+### Changed
+
+- Simplified the synced EFrame AI contract layering so managed root blocks stay as entry points, `eframe-instructions` stays focused on always-on rules, and `EFRAME_AI_API_INDEX` stays focused on business-facing API lookup.
+- Refined synced `eframe-*` skills so feature bootstrap, UI, data, resource, and audit workflows have clearer boundaries and consistently prefer injected `Context` over `EFrame.Current` in framework-aware code.
+- Tightened maintainer AI release and contract guidance so the release checklist and maintainer contract skill act as routing and validation docs instead of duplicating synced business rules.
+
 ## [0.4.4] - 2026-05-02
 
 ### Changed

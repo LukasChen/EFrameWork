@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.8",
+    "version":  "0.4.9",
     "updatedAt":  "2026-05-02",
-    "notes":  "Move AI-facing support docs under AIWorkspace and keep synced skills business-project scoped.",
+    "notes":  "Simplify synced business AI contracts so root blocks, always-on rules, API lookup, and specialized skills keep clearer boundaries.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,7 +14,7 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "a9a567427545a1f34d04deae09966f1560632c478ca5b1fbe94d704105203814"
+                      "sha256":  "762882783e59794ae36909be68520914ec9035f70fb9d4f9d98819b7fc97f113"
                   },
                   {
                       "path":  "AGENTS.md",
@@ -33,11 +33,11 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "5d7b3b7a917cd591b2780050de0a837cbcb4b04af9e9fcc08abaea5f69289585"
+                      "sha256":  "a1a34d1db495dbc581c44caca841da40199938728c0c5a1e8e0e042129b89e0d"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "4e344c8f2c184f720d5200ea50a7338ed73e6d8c0a4bc5f5189ecaa6121eb547"
+                      "sha256":  "13edb21f2831709d41738671a162cb423439c07a475d13809a63551049770a85"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -45,7 +45,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/SKILL.md",
-                      "sha256":  "088971f727488f099a2c0e637c7f43f4033be3e12a586aa7f4b5b2141cbdb015"
+                      "sha256":  "455c2ac76ddafdde7b21c371c548c3c63c5fec43d884dc8a5e2ee84bd1767d42"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
@@ -53,7 +53,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "a4ee8db7770353077f91f360c22c3faee3c83eb6ed5f69c6f43f95b4142d5062"
+                      "sha256":  "5de6197f41b68a3f5ef14f1afc9c960f51236b2b6df5caee731a279b07769c95"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
@@ -61,7 +61,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
-                      "sha256":  "518f84b6412077cc8fcd33b55a99fe0214adc7ff020946a546685309b23b06a6"
+                      "sha256":  "824677b160d239911ed111f54bfa88f0e934d5e165103401ad9bf4ed010a7879"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/references/resource-checklist.md",
@@ -69,7 +69,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/SKILL.md",
-                      "sha256":  "56054bda35c788b27f82d53639d42f88a2383ada44f91bed48fdfefcc7f0b3d1"
+                      "sha256":  "6f1ba2b2840c28775962036ae738cde6204690d668f9f06587071eb1118ea709"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
@@ -77,7 +77,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "a7f9acac0519329ce50deb5d813df605ed176e81a7c8ec20f2867115e28b895e"
+                      "sha256":  "2951e5469ccfc6e8ea612517051c24ccffb2464304210b920bc8b7f8e8747a74"
                   }
               ]
 }

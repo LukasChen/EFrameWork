@@ -4,6 +4,13 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-05-02
+
+### Changed
+
+- Simplified the synced package AI contract layering so managed root blocks stay as entry points, `eframe-instructions` stays focused on always-on rules, and `EFRAME_AI_API_INDEX` stays focused on business-facing API lookup.
+- Refined synced `eframe-*` skills so feature bootstrap, UI, data, resource, and audit workflows have clearer ownership boundaries and align runtime service examples around injected `Context` first.
+
 ## [0.4.4] - 2026-05-02
 
 ### Changed

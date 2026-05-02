@@ -37,7 +37,7 @@ forbiddenPatterns:
 
 ## Coordinator Flow
 
-1. Classify the request: `Procedure`, UI, data table, resource flow, editor/bootstrap, or a combined feature.
+1. Classify the request: `Procedure`, UI, data table, resource flow, or a combined feature.
 2. Decide whether to create new structure or extend existing structure; prefer the smallest feature boundary that preserves EFrame lifecycle rules.
 3. Delegate detailed work:
    - UI pages, popups, prefabs, controllers, bindings: use `eframe-ui-feature`.
@@ -45,6 +45,7 @@ forbiddenPatterns:
    - Addressables, `ResPath`, prefab/audio/scene resources, async handles: use `eframe-resource-flow`.
 4. Integrate the outputs so naming, directories, lifecycle cleanup, and resource paths agree across the feature.
 5. Validate the whole feature with `eframe-guideline-audit` when the implementation is complete.
+6. If the request is mainly about project initialization, editor bootstrap automation, framework release flow, or AI sync tooling, treat it as outside this business feature skill.
 
 ## Procedure
 

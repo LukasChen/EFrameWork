@@ -30,6 +30,7 @@ Avoid adding new procedures for simple page/popup changes that can live inside t
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
 | Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Current.Assets`. |
+| Use generated managed asset ids | `ResPath.Generated` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Use generated ids instead of handwritten Addressables strings in business runtime code. |
 | Procedure-owned preload scope | `IAssetPreloadScope` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use in `OnPreloadAsync(...)`; the scope releases on procedure leave. |
 | Load an asset with explicit ownership | `LoadAsync<T>(assetId)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Dispose the returned `AssetHandle<T>` at the owning lifecycle boundary. |
 | Instantiate by generated id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use `ResPath.Generated` for managed resource `assetId` values. |
@@ -43,6 +44,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | --- | --- | --- | --- |
 | UI service | `IUIService` / `QUI` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs` | Create/open/release UI through framework services. |
 | Controller base | `UIControllerBase<TView>` | `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Controllers own UI orchestration and access live views through `TypedViewHandle.TypedView`. |
+| Access the live typed view | `TypedViewHandle.TypedView` | `packages/com.eframework.core/Runtime/UI/Handles/TypedViewHandle.cs` | Prefer the typed handle view access point instead of facade shortcuts. |
 | View wrapper base | `BindingViewBase` | `packages/com.eframework.core/Runtime/UI/BindingViewBase.cs` | Generated/project views should stay thin and parameterless, using `SetBinding(...)` and `OnBindingSet()`. |
 | Runtime view handle | `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Handles open/close/cache/release state and interruption-safe transitions. |
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs should include binding/config data consumed by view wrappers. |
@@ -55,9 +57,11 @@ Avoid hand-built persistent top-level Canvas/EventSystem objects and direct `Bin
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
 | Data service | `IDataService` | `packages/com.eframework.core/Runtime/Services/IDataService.cs` | Register and retrieve tables through `Context.Data` / `EFrame.Current.Data`. |
+| Register a table type | `RegisterTable<T>()` | `packages/com.eframework.core/Runtime/Services/IDataService.cs` | Reuse existing registered tables instead of constructing ad-hoc table instances. |
 | Persistent table base | `DataTable<TData>` | `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Override `GetStorageKey()`, `GetDefaultData()`, and `Migrate(...)` when schema changes. |
 | Dirty-aware mutation | `SetValue(...)` / `Mutate(...)` | `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Expose table-owned methods/properties; do not mutate raw data from outside. |
 | Load/save diagnostics | `LastLoadResult` / `LastSaveResult` | `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Branch on structured status/reason codes, not log strings. |
+| Trigger explicit saves | `SaveAll()` / table `Save()` | `packages/com.eframework.core/Runtime/Services/IDataService.cs`, `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Use when the project needs persistence at explicit business checkpoints. |
 
 Avoid deriving persistence identity from class names or namespaces.
 
@@ -91,13 +95,3 @@ Keep framework-owned audio config under `Assets/Resources/Audio`.
 | Import/move/delete auto-sync | `EFrameAppResAddressablePostprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAppResAddressablePostprocessor.cs` | Keeps managed resource changes aligned with Addressables automation. |
 
 Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor APIs can make narrow serialized changes.
-
-## AI Workspace Tools
-
-| Need | Use | Source | Notes |
-| --- | --- | --- | --- |
-| Sync framework AI files into a project | `tools/Initialize-EFrameAI.ps1` | `tools/Initialize-EFrameAI.ps1` | Syncs selected AI client entries, `eframe-*` guidance, and manifest hashes. |
-| Cold-start a project | `tools/Initialize-EFrameColdStart.ps1` | `tools/Initialize-EFrameColdStart.ps1` | Creates directories, AI workspace status, updater, and bootstrap code. |
-| Validate business project AI health | `tools/Test-EFrameAIProject.ps1` | `tools/Test-EFrameAIProject.ps1` | Checks synced file integrity, managed block presence, and common runtime risks. |
-
-Use `-Clients codex`, `-Clients copilot`, `-Clients claude-code`, or `-Clients all` to choose AI platform entry points. Project-specific AI rules belong outside EFrame managed blocks and outside synced `eframe-*` files.

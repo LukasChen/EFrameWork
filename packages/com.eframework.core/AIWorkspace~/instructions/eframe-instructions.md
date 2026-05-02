@@ -16,34 +16,29 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 ## UI 主链
 
-- 创建、打开、关闭、缓存和释放 View 统一走 `IUIService` 与 `UIViewHandle` 语义；`QUI` 作为默认实现承载具体层级、缓存和绑定实例化，业务代码不要直接驱动 `BindingViewBase` 的生命周期。
-- `BindingViewBase` 只保留 binding wrapper、组件缓存初始化和底层生命周期原语；资源实例化、缓存命中、释放决策和 transition 策略属于宿主或 handle。
-- `UIControllerBase` 负责 UI 编排，不在构造函数中依赖业务数据或未初始化服务；显示 UI 前由框架上下文完成绑定。
-- `UIControllerBase<TView>` 的 `OnViewCreated()` / `OnViewDestroyed()` 是 View 实例级钩子；`OnViewOpened()` / `OnViewClosed()` 是每次打开关闭的钩子。缓存 UI 关闭到 `Closed` 状态时不要把实例级清理写进每次 hide 路径。
-- 新生成和新业务 View wrapper 保持无参构造，通过 `SetBinding()` / `OnBindingSet()` 接入生成的 `QUIBinding`，不要把可复用的业务状态塞进 View 缓存。
-- Controller 访问运行中 View 使用 `TypedViewHandle.TypedView`，不要使用 `UIControllerBase<TView>.View` facade；模板和业务 Controller 不依赖 `assetPath` View 构造。
-- UI transition 由宿主策略管理；自定义 transition 必须能处理中断/kill，避免已失效的 open/close 异步结果覆盖活跃 handle 状态。
+- 创建、打开、关闭、缓存和释放 View 统一走 `IUIService`、`UIControllerBase` 与 `UIViewHandle`；业务代码不要直接驱动 `BindingViewBase` 生命周期，也不要绕过 `QUI` 自己拼顶层 UI 宿主。
+- View wrapper 保持轻量、无参、可复用；不要把跨打开周期的业务状态塞进 View 实例缓存。
+- UI transition、缓存命中、资源实例化和释放决策由框架宿主或 handle 统一管理；不要在业务层自建一套并发状态机覆盖 EFrame 的 UI 生命周期。
 
 ## 资源路径与 Addressables
 
 - 运行时资源 id 应来自自动生成的 `ResPath.Generated`；不要在业务代码中手写 Addressables address 字符串或维护自定义路径中心类。`AssetReference` 可作为 Editor 配置字段，但进入运行时前应解析为 assetId。
-- Runtime 资源热路径应由所属 `Procedure` 预加载，随后通过 `Context.Assets.Instantiate(...)` 或 `Context.Assets.GetFromPool(...)` 实例化；`LoadAsync(...)` 和 `InstantiateAsync(...)` 用于调用方明确拥有异步 handle 的场景，fallback 同步加载只作为诊断路径。
+- Runtime 资源热路径应由所属 `Procedure` 预加载，再通过框架资源服务实例化或复用；不要在业务热路径散落自管 address、同步阻塞加载或脱离生命周期的临时 handle。
 - `Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的框架托管资源遵循 EFrame 目录契约。不要手动编辑它们的 Addressables group、address 或 managed label。
 - 新增、移动和删除的框架托管资源应由 EFrame editor automation 同步，并在 player build 前验证。业务代码应使用所选目录树生成的 `ResPath.Generated`，不要把 Addressables window 当作事实来源。
 
 ## 启动与运行时访问
 
 - 启动流程状态使用 EFrame 自有的 `EFrameProcedure` 和 `EFrameProcedureComponent`，不要绕过框架状态机手工驱动流程切换。
-- 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成，之后访问 `EFrame.Current.UI`、`EFrame.Current.Audio`、`EFrame.Current.Data` 等框架服务。
+- 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成；在 framework-aware 类型内部优先使用注入的 `Context`，只有启动、静态入口或非注入场景才使用 `EFrame.Current.*`。
 - `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 - 需要成为框架 UI overlay 场景渲染入口的运行时场景相机必须挂载 `EFrameSceneCamera`，由组件自动维护 Camera stack；不要在业务代码里轮询相机或手动维护 Camera stack。
 
 ## 事件与数据
 
-- 业务代码事件订阅优先使用 `EFrame.Current.Events.SubscribeScoped(...)` 并在 `OnLeave`、`OnDestroy` 或控制器释放时 `Dispose`；框架底层可直接使用 `EventBus`，但业务层应避免手写订阅/退订不成对。
-- 数据表必须有无参构造、稳定且唯一的 `StorageKey`，注册统一走 `EFrame.Current.Data.RegisterTable<T>()` 并复用已注册表。
-- 数据修改通过表暴露的属性或方法完成，并使用 `SetValue(...)` / `Mutate(...)` 这类入口标记 dirty；不要把底层 `Data` 当作外部可变入口。
-- 数据迁移、加载来源和保存结果优先使用表内 `CurrentVersion` / `Migrate(...)`、`LastLoadResult`、`LastSaveResult` 等结构化状态；不要让业务层解析日志文本或假设 `Save()` 一定写盘。
+- 业务代码事件订阅优先使用框架提供的 scoped 订阅语义，并在 `OnLeave`、`OnDestroy` 或控制器释放时完成清理；业务层应避免手写不成对的订阅/退订。
+- 数据表必须有无参构造、稳定且唯一的持久化 key，并统一通过框架数据服务注册与复用。
+- 数据修改通过表暴露的属性或方法完成，并通过表入口标记 dirty；不要把底层 `Data` 当作外部可变入口，也不要让业务层依赖日志文本判断加载或保存结果。
 - 框架层默认只在 pause/quit 触发保存；项目如果需要更细粒度保存，由业务在明确时机调用 `SaveAll()` 或表级 `Save()`。
 
 ## Editor 工具
