@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.2",
+    "version":  "0.4.7",
     "updatedAt":  "2026-05-02",
-    "notes":  "EFrameWork 0.4.2 AI workspace release.",
+    "notes":  "EFrameWork 0.4.7 AI workspace release.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -13,22 +13,27 @@
                       "path":  ".github/copilot-instructions.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
-                      "sourcePath":  ".github/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "0176f01f773dd7c1377f88c01c42ba28b2f69c38b1b2ab6922fa7ec07a6c80b0"
+                      "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
+                      "sha256":  "a9a567427545a1f34d04deae09966f1560632c478ca5b1fbe94d704105203814"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
-                      "sourcePath":  ".github/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "3272650441be7a687d39c206e8d28817d19538fc22534df761a761f97873c4da"
+                      "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
+                      "sha256":  "d7867e42d724c28eea635b1066385d2bcd2976036ccad8349d8b182b76178b73"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
-                      "sourcePath":  ".github/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "d1f815bedeba048d355e75cfe1c5c4010ff460936e4a1fdf1c0fbe3087967dbc"
+                      "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
+                      "sha256":  "ded9a67b00b7ff4b6ace9d931f854e4790a942468723d22af32c56d227808866"
+                  },
+                  {
+                      "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
+                      "sourcePath":  "Documentation~/EFRAME_AI_API_INDEX.md",
+                      "sha256":  "5d7b3b7a917cd591b2780050de0a837cbcb4b04af9e9fcc08abaea5f69289585"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
@@ -44,15 +49,15 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
-                      "sha256":  "f2f1a28c430e34155161acc93978cf54d1b1be1b5ecb261fa8d075bb0a892cf8"
+                      "sha256":  "625923104b96c9d9d85323149b01652dc0d417ce90157acb76b050101fddc4fd"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "1d50b43043fe3ee3a6c9d858c367fdc41d61eb3c56ca1afdac79496042200936"
+                      "sha256":  "2fb0b8d232f188c5abf78bc90eb2f2ab194d50fc508e535c1adb1a1f1199f3b5"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "1df69087568d15bbdf341882d125e0e177ddf48d5f8cce9fcdaa70385e40547b"
+                      "sha256":  "01de6a170aa57c6878ce154d27cfb7293bd3e8bb53b55606b05a8826c3fa31bb"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
@@ -73,22 +78,6 @@
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
                       "sha256":  "a7f9acac0519329ce50deb5d813df605ed176e81a7c8ec20f2867115e28b895e"
-                  },
-                  {
-                      "path":  "EFRAME_AI_API_INDEX.md",
-                      "sha256":  "c671b304f5024c6da8f51a7998d7dd218d170f83168d898732b3682b7d60ec74"
-                  },
-                  {
-                      "path":  "EFRAME_AI_ARCHITECTURE.md",
-                      "sha256":  "48c8bde16f9978f32880b563a6e4e438b7b71a37436d7d48aac7baf9ea55ecff"
-                  },
-                  {
-                      "path":  "EFRAME_AI_RELEASE_CHECKLIST.md",
-                      "sha256":  "d8be1b2f98130af39326a08216fae50297f92adb874927821d203661611ce146"
-                  },
-                  {
-                      "path":  "EFRAME_AI_SETUP.md",
-                      "sha256":  "968ef2c43d7419c706a79d53207ae88f5a7162e1f302965322f39f7a19d10e9d"
                   }
               ]
 }

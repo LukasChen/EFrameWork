@@ -9,11 +9,10 @@ The goal is to make every new EFrame project start with working Unity scaffoldin
 Cold-start and upgrade flows must keep these parts aligned:
 
 - Unity package code under `packages/com.eframework.core/`
-- Codex project entry managed block source under `.github/managed-blocks/`
-- Claude Code project entry managed block source under `.github/managed-blocks/`
-- Framework AI files under `.github/`
+- Synced AI workspace source under `packages/com.eframework.core/AIWorkspace~/`
+- System-required framework AI entry files such as `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`
 - Sync and bootstrap scripts under `tools/`
-- Directory, resource, and release docs at the repository root
+- User-facing docs under `packages/com.eframework.core/Documentation~/` and maintainer docs under `docs/maintainer/`
 
 When one part changes the expected project shape, the matching AI guidance must be reviewed in the same change set.
 
@@ -27,13 +26,17 @@ When one part changes the expected project shape, the matching AI guidance must 
 
 `.github/`
 
-- Provides the framework-managed AI collaboration layer.
-- `copilot-instructions.md` contains framework-repository Copilot rules.
+- Contains only files that must live under `.github` to work in the framework repository, such as `copilot-instructions.md`.
+- Is not the source directory for synced EFrame AI workspace files.
+
+`packages/com.eframework.core/AIWorkspace~/`
+
+- Provides the framework-managed AI collaboration source layer.
 - `managed-blocks/eframe-*.md` contains the EFrame blocks injected into project-owned AI entry files.
 - `instructions/eframe-instructions.md` contains the short, stable framework usage rules that are part of the synced business-project contract.
-- `skills/eframe-*` contains on-demand business-project workflows that are also synced into business projects.
+- `skills/eframe-*` contains on-demand business-project workflows that are synced into business projects.
 - `skills/maintainer-*` contains framework-repository-only workflows; these files are not part of the synced project contract because the sync scripts only manage `eframe-*` items.
-- `.github/eframe-ai.manifest.json` declares the synced AI layer version and file hashes for framework-managed AI files; no repo-root duplicate manifest should exist.
+- `eframe-ai.manifest.json` declares the synced AI layer version and file hashes for framework-managed AI files; business projects still receive this file at `.github/eframe-ai.manifest.json`.
 
 `AGENTS.md`
 
@@ -44,14 +47,15 @@ When one part changes the expected project shape, the matching AI guidance must 
 `CLAUDE.md`
 
 - Provides the framework repo-root Claude Code entry point.
-- Points Claude Code at the same shared EFrame API index, synced rules, skills, and naming boundaries instead of duplicating the full contract.
+- Points Claude Code at the same shared EFrame API index, synced workspace source, and naming boundaries instead of duplicating the full contract.
 - Is not copied wholesale into business projects. Business projects own their `CLAUDE.md`; EFrame sync only injects or updates the marked EFrame managed block.
 
-`EFRAME_AI_API_INDEX.md`
+`packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md`
 
 - Provides a compact AI-oriented map of stable Runtime, Editor bootstrap, and AI tooling APIs.
-- Is synced to business projects as a quick lookup layer before AI agents inspect implementation files.
-- Should describe stable project-facing entry points, not every internal implementation detail.
+- Is a user-facing reference for business-project AI and developers, not a release or manifest maintenance guide.
+- Is synced into business projects as `.github/eframe/EFRAME_AI_API_INDEX.md` so selected AI clients can read the API map from the project workspace.
+- Should favor stable project-facing entry points over internal implementation details.
 
 `tools/`
 
@@ -65,10 +69,12 @@ When one part changes the expected project shape, the matching AI guidance must 
 Business project `.github/`
 
 - Receives synced `eframe-*` files from the framework.
+- Receives `.github/eframe/EFRAME_AI_API_INDEX.md` as a framework-managed support document.
 - Owns root AI entry files and any local project rule files.
 - Must not manually fork framework-managed `eframe-*` files.
 - Receives EFrame managed blocks inside selected AI entry files; only text between the EFrame markers is framework-owned.
 - Does not receive framework maintainer-only `maintainer-*` skills.
+- Does not receive maintainer docs such as `EFRAME_AI_SETUP.md`, `EFRAME_AI_ARCHITECTURE.md`, or `EFRAME_AI_RELEASE_CHECKLIST.md`.
 
 ## 3. Required Sync Rule
 
@@ -81,7 +87,7 @@ Any change in the following areas must include an AI layer impact check:
 - Cold-start scripts, bootstrap code templates, sample modules, or editor initialization windows
 - Directory structure docs or release/setup docs
 
-If the change affects how Copilot, Codex, or Claude Code should generate, refactor, or audit EFrame projects, update the relevant `AGENTS.md`, `CLAUDE.md`, `.github` instruction, or skill in the same change set. Keep always-on boundaries in instructions; put multi-step workflows, audits, and detailed checklists in skills or skill references.
+If the change affects how Copilot, Codex, or Claude Code should generate, refactor, or audit EFrame projects, update the relevant `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or `packages/com.eframework.core/AIWorkspace~` instruction/skill in the same change set. Keep always-on boundaries in instructions; put multi-step workflows, audits, and detailed checklists in skills or skill references.
 
 ## 4. UI Runtime Contract
 
@@ -95,10 +101,10 @@ The UI runtime contract is handle-first:
 
 Any framework change that alters this UI contract must update the same contract surface in one change set:
 
-- `UI_FRAMEWORK_GUIDE.md`
-- `.github/instructions/eframe-instructions.md`
-- `.github/skills/eframe-ui-feature`
-- `.github/skills/eframe-guideline-audit`
+- `packages/com.eframework.core/Documentation~/UI_FRAMEWORK_GUIDE.md`
+- `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
+- `packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature`
+- `packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit`
 - bootstrap/editor template generators under `tools/` and `packages/com.eframework.core/Editor/`
 - root and package changelogs
 
@@ -107,7 +113,7 @@ Any framework change that alters this UI contract must update the same contract 
 EFrameWork should be maintained as one product surface, not as a Unity framework plus a second AI product. The AI collaboration layer, bootstrap tools, and sync scripts are part of the framework release contract.
 
 - EFrameWork release version: stored in `packages/com.eframework.core/package.json` and recorded in the root `CHANGELOG.md`.
-- AI workspace manifest version: stored in `.github/eframe-ai.manifest.json` only as a sync marker so business projects can detect framework-managed AI file drift.
+- AI workspace manifest version: stored in `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` only as a sync marker so business projects can detect framework-managed AI file drift.
 
 Think in terms of the EFrameWork release first. Bump the package version when publishing a framework/package release. Treat the manifest as a sync marker, not a separate product version.
 
@@ -121,7 +127,7 @@ Recommended release sequence:
 2. Update matching instructions and skills.
 3. Bump `packages/com.eframework.core/package.json` if this is a framework/package release.
 4. Update the root `CHANGELOG.md`; update `packages/com.eframework.core/CHANGELOG.md` if package code changed.
-5. Update `.github/eframe-ai.manifest.json` according to `EFRAME_AI_RELEASE_CHECKLIST.md`.
+5. Update `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` according to `EFRAME_AI_RELEASE_CHECKLIST.md`.
 6. Run `tools/Test-EFrameAIRelease.ps1`.
 7. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
 8. Verify cold-start or editor bootstrap paths affected by the change.

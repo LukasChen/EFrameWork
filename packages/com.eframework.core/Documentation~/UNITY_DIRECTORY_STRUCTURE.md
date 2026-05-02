@@ -343,7 +343,7 @@ ResPath 约束：
 
 - 业务代码优先使用 `ResPath.Generated.*` 常量访问“代码主动加载”的 Addressables 地址。
 - 手写 `ResPath.cs` 负责稳定 API，不承担整表手工维护。
-- 详细规范见 `RESPATH_CONVENTION.md`。
+- 详细规范见 [RESPATH_CONVENTION.md](RESPATH_CONVENTION.md)。
 
 ## 9. 自动 Addressables 与 ResPath
 

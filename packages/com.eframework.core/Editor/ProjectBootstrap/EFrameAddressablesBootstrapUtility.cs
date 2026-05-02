@@ -483,7 +483,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 }
 
                 report.MissingRequiredCount++;
-                report.Issues.Add(new DirectoryStructureIssue("Missing", folder, "Required by UNITY_DIRECTORY_STRUCTURE.md."));
+                report.Issues.Add(new DirectoryStructureIssue("Missing", folder, "Required by package Documentation~/UNITY_DIRECTORY_STRUCTURE.md."));
             }
 
             AddDirectoryRuleIssues(report);

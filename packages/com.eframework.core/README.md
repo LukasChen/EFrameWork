@@ -6,6 +6,9 @@ EFrameWork Core is a reusable Unity game framework package extracted from `CozyB
 
 - `Runtime/`: framework runtime modules such as UI, audio, data storage, events, effects, assets, and utility services.
 - `Editor/`: editor tooling for audio setup, UI binding, list/scroller helpers, and effect debug editors.
+- `AIWorkspace~/`: package-shipped AI rules, skills, managed blocks, and manifest used by EFrame AI sync.
+- `Documentation~/`: business-facing framework docs and the AI API index.
+- `Tools~/`: package-shipped PowerShell tools for AI sync, cold start, updater installation, and project health checks.
 - `Plugins/`: remaining bundled third-party dependencies that still ship with this package.
 - `Samples~/`: sample assets imported from the source project.
 
@@ -17,7 +20,11 @@ Bundled plugin versions:
 
 ## Runtime Access Model
 
-For the current UI runtime structure and handle-based usage model, see [../../UI_FRAMEWORK_GUIDE.md](../../UI_FRAMEWORK_GUIDE.md).
+For the current UI runtime structure and handle-based usage model, see [Documentation~/UI_FRAMEWORK_GUIDE.md](Documentation~/UI_FRAMEWORK_GUIDE.md).
+
+For the AI-oriented stable API map, see [Documentation~/EFRAME_AI_API_INDEX.md](Documentation~/EFRAME_AI_API_INDEX.md).
+
+To sync EFrame AI guidance into a consuming project, run `Tools~/Initialize-EFrameAI.ps1` from this package root or use `EFrame Tools/AI/Sync Workspace` inside Unity.
 
 For the framework-level public API reference, see [../../API_REFERENCE.md](../../API_REFERENCE.md).
 

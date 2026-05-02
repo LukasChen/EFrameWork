@@ -3,6 +3,7 @@
 This project uses EFrameWork. Treat this block as the framework-supplied baseline; keep project-specific AI rules outside this managed block.
 
 - Follow the synced EFrame framework contract in `.github/instructions/eframe-instructions.md`.
+- Use `.github/eframe/EFRAME_AI_API_INDEX.md` to look up stable EFrame APIs before generating or refactoring framework code.
 - For feature scaffolding, UI work, data tables, resource flow, or EFrame audits, read the matching `.github/skills/eframe-*/SKILL.md` before editing.
 - Use `EFrameProcedure` and `EFrameProcedureComponent` for state transitions, preload work, and lifecycle orchestration.
 - Route UI through `EFrame.Current.UI` / `IUIService`, `UIControllerBase`, `UIViewHandle`, and the default `QUI` service; do not hand-build persistent top-level runtime Canvas or EventSystem objects.

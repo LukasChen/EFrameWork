@@ -4,6 +4,22 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-05-02
+
+### Added
+
+- Added `AIWorkspace~`, `Documentation~`, and `Tools~` to the package so consuming projects receive AI sync sources, business-facing docs, and sync scripts with the Unity package.
+- Added package-distributed EFrame AI API index, UI guide, resource path convention, and Unity directory structure guide.
+
+### Changed
+
+- Updated the project initialization window and AI menu actions to run package-local `Tools~` scripts instead of requiring a local full framework repository clone.
+- Moved synced `eframe-*` instructions, skills, managed blocks, and manifest into the package AI workspace.
+
+### Fixed
+
+- Fixed package-only AI workspace sync so consuming projects receive `.github/eframe/EFRAME_AI_API_INDEX.md` from the installed package.
+
 ## [0.4.2] - 2026-05-02
 
 ### Added

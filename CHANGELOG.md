@@ -6,6 +6,24 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-05-02
+
+### Added
+
+- Added package-shipped `AIWorkspace~`, `Documentation~`, and `Tools~` folders so package-only business projects can sync EFrame AI guidance without access to the full framework repository.
+- Added package-distributed business AI documentation, including the stable API index, UI guide, resource path convention, and Unity directory structure guide.
+
+### Changed
+
+- Moved business-facing AI sync sources, `eframe-*` skills, managed blocks, and manifest out of repository `.github` and into `packages/com.eframework.core/AIWorkspace~`.
+- Moved maintainer-only AI workflow guidance to `tools/MaintainerAIWorkspace` and kept release/setup/architecture documentation under `docs/maintainer`.
+- Simplified `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md` into thin client entry indexes that point to package business contracts and maintainer docs.
+- Updated Unity AI sync menu integration to run package-shipped `Tools~` scripts from the installed package root.
+
+### Fixed
+
+- Fixed package-only AI sync so business projects receive `.github/eframe/EFRAME_AI_API_INDEX.md` and no longer depend on root-level framework docs.
+
 ## [0.4.2] - 2026-05-02
 
 ### Added

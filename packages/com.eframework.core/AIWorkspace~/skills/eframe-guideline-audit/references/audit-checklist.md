@@ -37,7 +37,7 @@
 
 ## AI 配置
 
-- 新规范是否同步到框架仓库 AI 入口或 `.github/managed-blocks/`
-- 是否需要新增或更新 `.github/instructions/eframe-instructions.md`
-- 是否需要新增或更新 `.github/skills/*`
+- 新规范是否同步到框架仓库 AI 入口或 `packages/com.eframework.core/AIWorkspace~/managed-blocks/`
+- 是否需要新增或更新 `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
+- 是否需要新增或更新 `packages/com.eframework.core/AIWorkspace~/skills/*`
 - 初始化脚本和接入文档是否可用

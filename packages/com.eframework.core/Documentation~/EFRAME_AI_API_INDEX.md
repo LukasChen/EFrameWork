@@ -2,6 +2,8 @@
 
 This index is a compact, AI-oriented map of stable EFrameWork APIs. Use it to choose the right framework entry point before generating or refactoring code. It is intentionally smaller than the full browsable docs and favors project-facing contracts over internal implementation details.
 
+After AI sync, business projects receive this document at `.github/eframe/EFRAME_AI_API_INDEX.md`; synced AI entry blocks point there so project AI can consult it without guessing framework APIs.
+
 ## Runtime Access
 
 | Need | Use | Source | Notes |
@@ -94,10 +96,8 @@ Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor AP
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Sync framework AI files into a project | `tools/Initialize-EFrameAI.ps1` | `tools/Initialize-EFrameAI.ps1` | Syncs selected AI client entries, shared EFrame AI docs, and manifest hashes. |
+| Sync framework AI files into a project | `tools/Initialize-EFrameAI.ps1` | `tools/Initialize-EFrameAI.ps1` | Syncs selected AI client entries, `eframe-*` guidance, and manifest hashes. |
 | Cold-start a project | `tools/Initialize-EFrameColdStart.ps1` | `tools/Initialize-EFrameColdStart.ps1` | Creates directories, AI workspace status, updater, and bootstrap code. |
-| Optional project instruction template | `tools/New-EFrameProjectAIOverlay.ps1` | `tools/New-EFrameProjectAIOverlay.ps1` | Optional helper that creates a local project instruction file; project rules may live in any project-owned instruction outside EFrame managed blocks. |
-| Validate framework AI release | `tools/Test-EFrameAIRelease.ps1` | `tools/Test-EFrameAIRelease.ps1` | Checks manifest state, frontmatter, sync boundaries, and file hashes. |
 | Validate business project AI health | `tools/Test-EFrameAIProject.ps1` | `tools/Test-EFrameAIProject.ps1` | Checks synced file integrity, managed block presence, and common runtime risks. |
 
-Use `-Clients codex`, `-Clients copilot`, `-Clients claude-code`, or `-Clients all` to choose AI platform entry points. Use `eframe-*` files for framework-managed synced guidance and `maintainer-*` only inside this framework repository.
+Use `-Clients codex`, `-Clients copilot`, `-Clients claude-code`, or `-Clients all` to choose AI platform entry points. Project-specific AI rules belong outside EFrame managed blocks and outside synced `eframe-*` files.

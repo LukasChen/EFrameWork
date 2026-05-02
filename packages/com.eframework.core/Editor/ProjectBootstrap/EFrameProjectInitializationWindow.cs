@@ -119,7 +119,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                     RunAiHealthCheck();
                 }
 
-                EditorGUILayout.HelpBox("These actions use the framework repo tools to check, sync, and validate the project AI workspace while preserving project-owned instruction text outside EFrame managed blocks.", MessageType.None);
+                EditorGUILayout.HelpBox("These actions use the EFrame package tools to check, sync, and validate the project AI workspace while preserving project-owned instruction text outside EFrame managed blocks.", MessageType.None);
             }
 
             if (!string.IsNullOrEmpty(m_statusMessage))
@@ -488,7 +488,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return false;
             }
 
-            var scriptPath = Path.Combine(frameworkRoot, "tools", scriptName);
+            var scriptPath = Path.Combine(frameworkRoot, "Tools~", scriptName);
             if (!File.Exists(scriptPath))
             {
                 SetStatus($"Tool script not found: {scriptPath}", true);
@@ -560,14 +560,14 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return false;
             }
 
-            var toolsPath = Path.Combine(frameworkRoot, "tools", "Initialize-EFrameAI.ps1");
+            var toolsPath = Path.Combine(frameworkRoot, "Tools~", "Initialize-EFrameAI.ps1");
             if (File.Exists(toolsPath))
             {
                 reason = string.Empty;
                 return true;
             }
 
-            reason = "Framework tools were not found. AI sync integration works when the project references a local cloned EFrameWork repo.";
+            reason = "EFrame package AI tools were not found. Reimport or update the EFrameWork package.";
             return false;
         }
 
@@ -583,17 +583,7 @@ namespace EFrameWork.Editor.ProjectBootstrap
                 return false;
             }
 
-            var packageRoot = packageInfo.resolvedPath;
-            var packagesDirectory = Directory.GetParent(packageRoot);
-            var repoRoot = packagesDirectory?.Parent;
-
-            if (repoRoot == null)
-            {
-                error = "Could not infer framework repo root from package path.";
-                return false;
-            }
-
-            frameworkRoot = repoRoot.FullName;
+            frameworkRoot = packageInfo.resolvedPath;
             return true;
         }
 
