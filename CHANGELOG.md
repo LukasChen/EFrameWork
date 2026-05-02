@@ -6,7 +6,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
-## [4.6.1] - 2026-05-02
+## [0.6.1] - 2026-05-02
 
 ### Added
 
