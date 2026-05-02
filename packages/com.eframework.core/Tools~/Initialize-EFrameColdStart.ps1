@@ -123,7 +123,6 @@ function Write-ColdStartSummary {
     Write-ColdStartStatus -Name "AI workspace" -State (Get-StateForPath ".github/eframe-ai.manifest.json" (-not $IncludeAIWorkspace)) -Detail ".github instructions, skills, and manifest"
     Write-ColdStartStatus -Name "Project updater" -State (Get-StateForPath "tools/Sync-EFrameAIFromFramework.ps1" ((-not $IncludeAIWorkspace) -or $SkipProjectUpdater)) -Detail "tools/Sync-EFrameAIFromFramework.ps1"
     Write-ColdStartStatus -Name "Bootstrap code" -State (Get-StateForPath "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs" $SkipBootstrapCode) -Detail "Generated ResPath, Procedure, Home UI, SampleModule, and StartUp_SETUP.md"
-    Write-ColdStartStatus -Name "Audio event config" -State (Get-StateForPath "Assets/Resources/Audio/AudioEventConfig.asset" $false) -Detail "Resources config loaded by AudioEventManager"
 
     Write-Host ""
     Write-Host "Next steps:"
@@ -157,50 +156,12 @@ function Write-ColdStartSummary {
     }
 }
 
-function New-AudioEventConfigAsset {
-    $relativeAssetPath = "Assets/Resources/Audio/AudioEventConfig.asset"
-    $assetPath = Join-Path $resolvedTargetRoot $relativeAssetPath
-
-    if (Test-Path $assetPath) {
-        Write-Host "Audio event config already exists: $assetPath"
-        return
-    }
-
-    $directory = Split-Path -Parent $assetPath
-    if (-not (Test-Path $directory)) {
-        New-Item -ItemType Directory -Path $directory -Force | Out-Null
-    }
-
-    $content = @"
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d1aba615367ca54fbb9f141bba21c7d, type: 3}
-  m_Name: AudioEventConfig
-  m_EditorClassIdentifier:
-  ConfigItems: []
-"@
-
-    Set-Content -Path $assetPath -Value $content -Encoding UTF8
-    Write-Host "Generated audio event config $assetPath"
-}
-
 if (-not $SkipDirectoryScaffold) {
 
     foreach ($relativeDirectory in $directories) {
         New-RequiredDirectory -Path (Join-Path $resolvedTargetRoot $relativeDirectory)
     }
 }
-
-New-AudioEventConfigAsset
 
 if ($IncludeAIWorkspace) {
     & (Join-Path $scriptRoot "Initialize-EFrameAI.ps1") -TargetRoot $resolvedTargetRoot -Clients $AIClients -Force:$Force

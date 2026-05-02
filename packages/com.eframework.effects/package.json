@@ -1,0 +1,21 @@
+{
+  "name": "com.eframework.effects",
+  "displayName": "EFrame Effects",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Optional EFrame extension package for reusable presentation effects such as fly animations, icon bounce, and camera shake.",
+  "keywords": [
+    "unity",
+    "eframework",
+    "effects",
+    "animation"
+  ],
+  "author": {
+    "name": "Ethan Hubin"
+  },
+  "dependencies": {
+    "com.eframework.core": "0.6.5",
+    "com.unity.addressables": "2.9.1",
+    "com.unity.ugui": "2.0.0"
+  }
+}

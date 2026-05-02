@@ -63,7 +63,7 @@
                         <ol>
                             <li>`EFrameComponent.Awake()` 确保有 `EFrameProcedureComponent`。</li>
                             <li>暂停流程组件，等待 `EFrame.Initialize(this)` 完成。</li>
-                            <li>创建 Asset、Coroutine、Data、Event、UI、Audio、Vibration 服务。</li>
+                            <li>创建 Asset、Coroutine、Data、Event、UI、Audio 服务。</li>
                             <li>组装成 `EFrameContext`，绑定到 `EFrame.Current`。</li>
                             <li>让 `EFrameComponent` 和运行时对象拿到 `Context`。</li>
                             <li>初始化完成后启用流程并广播启动事件。</li>

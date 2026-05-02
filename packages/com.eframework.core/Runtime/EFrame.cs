@@ -7,7 +7,6 @@ using EFramework.Runtime.DataStorage;
 using EFramework.Runtime.Event;
 using EFramework.Runtime.UI;
 using EFramework.Runtime.Utils;
-using EFramework.Runtime.Vibration;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -27,11 +26,9 @@ namespace EFramework.Runtime
         public static IAssetService Assets => RequireInitializedContext().Assets;
         public static IUIService UI => RequireInitializedContext().UI;
         public static IAudioService Audio => RequireInitializedContext().Audio;
-        public static IAudioEventService AudioEvents => RequireInitializedContext().AudioEvents;
         public static IDataService Data => RequireInitializedContext().Data;
         public static IEventService Events => RequireInitializedContext().Events;
         public static ICoroutineService Coroutine => RequireInitializedContext().Coroutine;
-        public static IVibrationService Vibration => RequireInitializedContext().Vibration;
         public static Camera SceneCamera => RequireInitializedContext().SceneCamera;
         public static Camera UICamera => RequireInitializedContext().UICamera;
 
@@ -73,15 +70,13 @@ namespace EFramework.Runtime
 
             DefaultFrameData defaultFrameData = null;
             AudioManager audioService = null;
-            AudioEventManager audioEventService = null;
-            QVibration vibrationService = null;
 
             yield return AssetManager.InitializeCoroutine();
             if (AssetManager.InitializeFailed)
             {
                 LastInitializationResult = EFrameInitializationResult.Failure("Addressables initialization failed.", EFrameInitializationStage.Assets);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
-                DisposeCreatedServices(audioEventService, audioService, uiService, assetService, dataService, coroutineService, eventService);
+                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService);
                 yield break;
             }
 
@@ -93,32 +88,27 @@ namespace EFramework.Runtime
             {
                 LastInitializationResult = EFrameInitializationResult.Failure("DefaultFrameData registration failed.", EFrameInitializationStage.Data);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
-                DisposeCreatedServices(audioEventService, audioService, uiService, assetService, dataService, coroutineService, eventService);
+                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService);
                 yield break;
             }
 
-            vibrationService = new QVibration(defaultFrameData.VibrationOn);
             audioService = new AudioManager(component);
             audioService.Initialize(defaultFrameData.MusicOn, defaultFrameData.SoundOn);
-            audioEventService = new AudioEventManager(component, audioService, vibrationService);
 
             context = new EFrameContext(
                 component,
                 assetService,
                 uiService,
                 audioService,
-                audioEventService,
                 dataService,
                 eventService,
-                coroutineService,
-                vibrationService);
+                coroutineService);
 
             Current = context;
             component.BindContext(context);
 
             var designSize = component.ResolvedDesignSize;
             uiService.Init(component.UICamera, designSize.x, designSize.y, component.ResolvedFitMode, component.ResolvedEnableScreenFitDebugLog);
-            audioEventService.Initialize();
 
             DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly);
             DOTween.SetTweensCapacity(500, 50);
@@ -139,7 +129,6 @@ namespace EFramework.Runtime
         }
 
         private static void DisposeCreatedServices(
-            AudioEventManager audioEventService,
             AudioManager audioService,
             QUI uiService,
             AssetManager assetService,
@@ -147,7 +136,6 @@ namespace EFramework.Runtime
             CoroutineManager coroutineService,
             EventService eventService)
         {
-            audioEventService?.Dispose();
             audioService?.Dispose();
             uiService?.Dispose();
             assetService?.Dispose();

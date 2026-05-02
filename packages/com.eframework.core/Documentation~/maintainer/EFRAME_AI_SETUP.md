@@ -109,7 +109,7 @@ EFrame Tools/项目初始化向导
 
 如果项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口可以创建启动场景；AI 同步按钮会提示在框架仓库根目录执行对应脚本。
 
-Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，`AudioEventConfig.asset` 由冷启动脚本生成，运行时通过 `AudioResourcePaths` 集中加载。
+Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，运行时通过 `AudioResourcePaths` 集中加载。
 
 资源新增、移动或删除后，`Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的托管资源会自动同步 Addressables 分组。菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 会打开托管资源窗口，用于选择哪些目录树生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。窗口也可查看 Addressables 与 `ResPath.Generated` 对应关系、目录规范问题，以及执行手动修复/验证。
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -62,6 +62,7 @@ namespace EFramework.Runtime.Asset
         bool InitializeFailed { get; }
         UniTask<bool> InitializeAsync();
         IAssetPreloadScope CreatePreloadScope();
+        T Load<T>(string assetId) where T : Object;
         UniTask<AssetHandle<T>> LoadAsync<T>(string assetId) where T : Object;
         UniTask<bool> PreloadAssetAsync<T>(string assetId) where T : Object;
         bool TryGetPreloadedAsset<T>(string assetId, out T asset) where T : Object;
@@ -71,6 +72,7 @@ namespace EFramework.Runtime.Asset
         GameObject GetFromPool(string assetId, Transform parent, Vector3 position, float recycleTime = 0f);
         GameObject GetFromPool(string assetId, Vector3 position, float recycleTime = 0f);
         void RecycleToPool(string assetId, GameObject gameObject);
+        void ReleaseInstantiatedObject(GameObject gameObject);
         void ReleasePathPool(string assetId);
         UniTask<InstanceHandle> InstantiateAsync(string assetId, Transform parent = null);
         UniTask<bool> IsValidPathAsync(string assetId);

@@ -45,9 +45,10 @@
                 <header class="page-header">
                     <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Effects</span></div>
                     <div class="eyebrow">Visual Effects</div>
-                    <h1>Effect 模块负责把常见表现逻辑做成可复用的运行时系统，而不是把动画细节散落在业务页面里。</h1>
-                    <p class="lead">当前这一层主要包括 `FlyAnimationSystem`、`IconBounceEffect` 和 `CameraShake`。它们分别覆盖物品飞行动画、图标回弹和相机抖动，目标是把表现封装成可配置、可复用、可维护的能力，而不是临时脚本堆叠。</p>
+                    <h1>Effects 已迁入可选 `com.eframework.effects` 扩展包。</h1>
+                    <p class="lead">`FlyAnimationSystem`、`IconBounceEffect` 和 `CameraShake` 不再属于 `com.eframework.core`。需要这些表现能力的项目应显式安装 `com.eframework.effects`，core 只保留稳定基础设施。</p>
                     <div class="meta-list">
+                        <div><dt>扩展包</dt><dd>`com.eframework.effects`</dd></div>
                         <div><dt>飞行系统</dt><dd>`FlyAnimationSystem`</dd></div>
                         <div><dt>回弹效果</dt><dd>`IconBounceEffect`</dd></div>
                         <div><dt>配置资产</dt><dd>`FlyAnimationConfig` / `IconBounceConfig`</dd></div>
@@ -193,7 +194,7 @@
                 <section class="section">
                     <div class="section-header"><div><div class="eyebrow">Other Effects</div><h2>其他表现能力</h2></div></div>
                     <div class="card-grid">
-                        <article class="feature-card"><h3>`CameraShake`</h3><p>框架层的相机抖动能力，适合把基础抖动参数抽离成稳定调用入口。</p></article>
+                        <article class="feature-card"><h3>`CameraShake`</h3><p>扩展包内的相机抖动能力，适合把基础抖动参数抽离成稳定调用入口。</p></article>
                         <article class="feature-card"><h3>Editor 配套</h3><p>`FlyAnimationConfigEditor`、`FlyAnimationDebugRunnerEditor`、`IconBounceConfigEditor`、`IconBounceEffectEditor` 为这些效果提供调试和预览入口。</p></article>
                         <article class="feature-card"><h3>资源与释放</h3><p>飞行动画系统和资源池、Audio、对象释放策略是联动的，不建议业务自己重复管理实例生命周期。</p></article>
                     </div>

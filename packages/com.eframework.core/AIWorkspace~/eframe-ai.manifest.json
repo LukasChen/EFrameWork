@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.17",
+    "version":  "0.4.20",
     "updatedAt":  "2026-05-02",
-    "notes":  "Add Unity Bee compile validation contract and tool guidance.",
+    "notes":  "Record Basic sample and Extension Showcase initialization entries.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,11 +33,11 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "9ecc2c5964cb332508e13fc5a2b4360638af2d680237f180852d566eb6811003"
+                      "sha256":  "d1b80e66d3a5112746ac19dcfe33a28fea98597f3f27d4b4426e0dbe9274997d"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "2e41ddef3ca21ac507ef12f6ef9957fa676ca6c6846203fe45b4998e881c0955"
+                      "sha256":  "c257f27326c5cf222616e66eef8ce5e683d84791292152f9cd1a87e3c8f16123"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

@@ -4,6 +4,28 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+### Added
+
+- Added a package-documented Basic sample/template as the minimal runnable initialization skeleton for `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, `SampleModule`, basic UI prefabs, audio setup, Addressables, and generated `ResPath`.
+- Added an optional Extension Showcase Project Module template with `ProcedureEFrameExtensionShowcaseEntry`, runtime showcase UI, extension demo registry entries, and initialization-window install/startup controls.
+
+### Changed
+
+- Updated the project initialization window with explicit Basic install, Extension Showcase install, Extension Showcase startup, and Basic startup restore actions.
+
+### Removed
+
+- Removed legacy `QList` and `XListView` list implementations.
+- Moved `QVirtualListView`, `QVirtualGridView`, and their adapter/pooling support out of core into the optional `com.eframework.ui.virtual-list` package.
+- Moved Unity Ingame Debug Console out of core into the optional `com.eframework.debug-console` package.
+- Moved reusable presentation effects out of core into the optional `com.eframework.effects` package, including fly animation, icon bounce, camera shake, and their editor tooling.
+- Moved GM tools out of core into the optional `com.eframework.gm-tools` package.
+- Moved UI helper/animation components and lightweight extra controls out of core into the optional `com.eframework.ui-extras` package, including `UIHelper`, `UIAnimation`, `QTab`, and `EmptyRayCasterGraphic`.
+- Normalized EFrame-owned extension APIs under `EFramework.Extensions.*` namespaces and added the root `tools/Test-EFrameExtensionUnityCompile.ps1` validation path for extension packages.
+- Documented DOTween and URP as core-standard dependencies, with DOTween Free intentionally kept as a project-installed plugin instead of an unresolved UPM dependency.
+- Removed NiceVibrations, `QVibration`, `IVibrationService`, and the `EFrame.Vibration` / `Context.Vibration` core entries.
+- Removed AudioEvents runtime/editor tooling from core, including `AudioEventManager`, audio event config assets, editor windows, and the `EFrame.AudioEvents` / `Context.AudioEvents` entries.
+
 ## [0.6.5] - 2026-05-02
 
 ### Added

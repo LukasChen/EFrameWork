@@ -11,7 +11,6 @@ namespace EFramework.Runtime.DataStorage
         public bool SoundOn;
         public float CurPlayTime; // 本次游戏时间(秒)
         public float TotalPlayTime; // 总游戏时间(秒)
-        public bool VibrationOn;
     }
 
     public class DefaultFrameData : DataTable<DefaultFrameDataModal>
@@ -23,12 +22,6 @@ namespace EFramework.Runtime.DataStorage
         protected override string GetStorageKey()
         {
             return TableStorageKey;
-        }
-
-        public bool VibrationOn
-        {
-            get => Data.VibrationOn;
-            set => SetValue(ref m_data.VibrationOn, value);
         }
 
         public bool MusicOn
@@ -74,8 +67,7 @@ namespace EFramework.Runtime.DataStorage
                 RegisterDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 RegisterVersion = Application.version,
                 SoundOn = true,
-                TotalPlayTime = 0f,
-                VibrationOn = true
+                TotalPlayTime = 0f
             };
         }
 

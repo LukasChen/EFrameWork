@@ -151,7 +151,6 @@ function Invoke-EFrameColdStart {
         "Assets/App/Runtime/Procedure/ProcedureHome.cs",
         "Assets/App/Runtime/UI/Views/HomeView.cs",
         "Assets/App/Runtime/UI/Controllers/HomeViewController.cs",
-        "Assets/Resources/Audio/AudioEventConfig.asset",
         "Assets/Scenes/StartUp_SETUP.md"
     )
 

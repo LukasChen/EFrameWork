@@ -150,7 +150,7 @@
                         <article class="article-card">
                             <div class="eyebrow">Runtime</div>
                             <h3><a href="runtime/audio/index.html">Runtime / Audio</a></h3>
-                            <p>讲音频池、Mixer、Music/SFX 分工、AudioEvent 和运行期兜底行为。</p>
+                            <p>讲音频池、Mixer、Music/SFX 分工和运行期兜底行为。</p>
                             <ul>
                                 <li>音量控制</li>
                                 <li>Crossfade</li>
@@ -160,11 +160,21 @@
                         <article class="article-card">
                             <div class="eyebrow">Runtime</div>
                             <h3><a href="runtime/effects/index.html">Runtime / Effects</a></h3>
-                            <p>把飞行动画、图标回弹和相机抖动整理成统一表现能力，而不是分散在业务脚本里。</p>
+                            <p>飞行动画、图标回弹和相机抖动已迁入可选 `com.eframework.effects` 扩展包。</p>
                             <ul>
                                 <li>FlyAnimationSystem</li>
                                 <li>IconBounceEffect</li>
                                 <li>表现资源与释放策略</li>
+                            </ul>
+                        </article>
+                        <article class="article-card">
+                            <div class="eyebrow">Extension</div>
+                            <h3>UI Extras</h3>
+                            <p>`QTab`、`EmptyRayCasterGraphic`、`UIHelper` 和 `UIAnimation` 已迁入可选 `com.eframework.ui-extras` 扩展包。</p>
+                            <ul>
+                                <li>辅助 UI 控件</li>
+                                <li>TextMeshPro 曲线文本 helper</li>
+                                <li>复用型 UI 动画组件</li>
                             </ul>
                         </article>
                         <article class="article-card">
@@ -190,10 +200,10 @@
                         <article class="article-card">
                             <div class="eyebrow">Editor</div>
                             <h3><a href="editor/audio-tools/index.html">Editor / Audio Tools</a></h3>
-                            <p>围绕音频事件编辑器、配置资产和预览流程整理音频 authoring 工作流。</p>
+                            <p>围绕 `AudioClipAsset` 和基础音频资源整理音频 authoring 工作流。</p>
                             <ul>
-                                <li>AudioEventEditorWindow</li>
-                                <li>IEvent 映射配置</li>
+                                <li>AudioClipAssetEditor</li>
+                                <li>基础音频资源</li>
                                 <li>AudioClipAsset 工具</li>
                             </ul>
                         </article>
@@ -293,7 +303,11 @@
                         </div>
                         <div class="module-row">
                             <strong>Effect 与 Editor 子模块</strong>
-                            <p>新增 Runtime/Effects、Editor/UI Tools、Editor/Audio Tools，让表现层和编辑器工作流不再被 Bootstrap 页吞掉。</p>
+                            <p>Runtime/Effects 现在记录可选 `com.eframework.effects` 扩展包，core 文档只保留入口说明。</p>
+                        </div>
+                        <div class="module-row">
+                            <strong>UI Extras 扩展包</strong>
+                            <p>UI helper、动画组件和轻量 extra controls 已迁入可选 `com.eframework.ui-extras`，core UI 文档只保留主链路与 `QScroller`。</p>
                         </div>
                         <div class="module-row">
                             <strong>示例路径</strong>

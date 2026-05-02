@@ -1,0 +1,19 @@
+{
+    "name": "EFrame.Effects",
+    "rootNamespace": "",
+    "references": [
+        "EFrame",
+        "UniTask",
+        "DOTween.Modules",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

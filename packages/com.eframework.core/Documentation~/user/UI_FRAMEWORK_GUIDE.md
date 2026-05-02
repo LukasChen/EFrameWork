@@ -115,10 +115,11 @@ Current runtime UI folders under `packages/com.eframework.core/Runtime/UI/`:
 - `UIControllerBase.cs`: controller and popup controller base types
 - `Handles/`: runtime handle abstractions
 - `Transitions/`: host-owned default transition abstractions
-- `Components/`: reusable UI controls such as `QScroller`, `QList`, `QTab`
+- `Components/`: reusable core UI controls such as `QScroller`
 - `Layout/`: screen fitting and safe-area utilities
-- `UIHelper/`: helper/toolbox code
-- `UIAnimation/`: reusable animation components
+- `Transitions/`: host-owned transition abstractions and built-in transitions
+
+`QTab`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation` live in the optional `com.eframework.ui-extras` package under `EFramework.Extensions.UI.Extras.*`. `QVirtualListView` and `QVirtualGridView` live in the optional `com.eframework.ui.virtual-list` package under `EFramework.Extensions.UI.VirtualList`.
 
 ## 3. Recommended Flow
 

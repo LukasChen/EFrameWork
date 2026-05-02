@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using EFramework.Runtime;
 using System;
 using System.Collections;
@@ -142,6 +142,11 @@ namespace EFramework.Runtime.Asset
             return new AssetHandle<T>(handle);
         }
 
+        public T Load<T>(string assetId) where T : Object
+        {
+            return LoadAsset<T>(assetId);
+        }
+
         internal async UniTask<AssetHandle<T>> LoadAsync<T>(AssetReferenceT<T> reference) where T : Object
         {
             if (reference == null)
@@ -165,7 +170,6 @@ namespace EFramework.Runtime.Asset
 
             return new AssetHandle<T>(handle);
         }
-
         public IAssetPreloadScope CreatePreloadScope()
         {
             return new AssetPreloadScope(this);
@@ -1353,6 +1357,11 @@ namespace EFramework.Runtime.Asset
         {
             ReleaseAllPathPools();
             ReleaseAllPools();
+        }
+
+        public void ReleaseInstantiatedObject(GameObject gameObject)
+        {
+            ReleasePooledInstance(gameObject);
         }
 
         private static void ReleasePooledInstance(GameObject go)

@@ -4,7 +4,6 @@ using EFramework.Runtime.Audio;
 using EFramework.Runtime.DataStorage;
 using EFramework.Runtime.Event;
 using EFramework.Runtime.UI;
-using EFramework.Runtime.Vibration;
 using UnityEngine;
 
 namespace EFramework.Runtime
@@ -18,32 +17,26 @@ namespace EFramework.Runtime
             IAssetService assets,
             IUIService ui,
             IAudioService audio,
-            IAudioEventService audioEvents,
             IDataService data,
             IEventService events,
-            ICoroutineService coroutine,
-            IVibrationService vibration)
+            ICoroutineService coroutine)
         {
             Component = component;
             Assets = assets;
             UI = ui;
             Audio = audio;
-            AudioEvents = audioEvents;
             Data = data;
             Events = events;
             Coroutine = coroutine;
-            Vibration = vibration;
         }
 
         public EFrameComponent Component { get; }
         public IAssetService Assets { get; }
         public IUIService UI { get; }
         public IAudioService Audio { get; }
-        public IAudioEventService AudioEvents { get; }
         public IDataService Data { get; }
         public IEventService Events { get; }
         public ICoroutineService Coroutine { get; }
-        public IVibrationService Vibration { get; }
 
         public Camera SceneCamera => Component != null ? Component.SceneCamera : null;
         public Camera UICamera => Component != null ? Component.UICamera : null;
@@ -68,7 +61,6 @@ namespace EFramework.Runtime
             if (m_disposed) return;
             m_disposed = true;
 
-            AudioEvents?.Dispose();
             Audio?.Dispose();
             UI?.Dispose();
             Assets?.Dispose();

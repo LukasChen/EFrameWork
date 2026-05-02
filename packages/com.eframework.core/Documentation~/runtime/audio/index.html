@@ -44,11 +44,10 @@
                 <header class="page-header">
                     <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Audio</span></div>
                     <div class="eyebrow">Audio Runtime</div>
-                    <h1>Audio 模块负责的不是单次播放，而是框架级的音频路由、池化和事件驱动控制。</h1>
-                    <p class="lead">`AudioManager` 统一处理 Music、SFX、Mixer 音量控制和基础池化；`AudioEventManager` 负责配置驱动的事件式播放；`QVibration` 作为音频事件链的一部分，补齐触觉反馈。</p>
+                    <h1>Audio 模块负责框架级的基础播放、音频路由、池化和音量控制。</h1>
+                    <p class="lead">`AudioManager` 统一处理 Music、SFX、Mixer 音量控制、`AudioClipAsset` 加载、基础池化、防抖和音乐 crossfade。</p>
                     <div class="meta-list">
                         <div><dt>播放服务</dt><dd>`IAudioService` / `AudioManager`</dd></div>
-                        <div><dt>事件服务</dt><dd>`IAudioEventService` / `AudioEventManager`</dd></div>
                         <div><dt>资源约定</dt><dd>`AudioResourcePaths` + Resources 资产</dd></div>
                     </div>
                 </header>

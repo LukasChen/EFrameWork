@@ -33,9 +33,4 @@ namespace EFramework.Runtime.Audio
         void StopAllSfx();
     }
 
-    public interface IAudioEventService : IDisposable
-    {
-        bool IsInitialized { get; }
-        void Initialize();
-    }
 }

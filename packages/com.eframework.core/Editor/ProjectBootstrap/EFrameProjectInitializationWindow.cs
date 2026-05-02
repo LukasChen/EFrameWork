@@ -7,6 +7,8 @@ using EFramework.Runtime;
 using EFramework.Runtime.Procedure;
 using EFramework.Runtime.UI;
 using UnityEditor;
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,9 +24,26 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string StartUpScenePath = "Assets/Scenes/StartUp.unity";
         private const string StartUpGuidePath = "Assets/Scenes/StartUp_SETUP.md";
         private const string ModulesRootPath = "Assets/Modules";
+        private const string ExtensionShowcaseTargetPath = "Assets/Modules/EFrameExtensionShowcase";
+        private const string ExtensionShowcaseTemplatePath = "Packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase";
+        private const string BasicStartupProcedureName = "GameApp.Procedure.ProcedureLauncher";
+        private const string ExtensionShowcaseStartupProcedureName = "GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
         private const string ModuleNamePrefsKey = "EFrame.ProjectInitializationWindow.ModuleName";
         private const string AiClientPrefsKey = "EFrame.ProjectInitializationWindow.AIClient";
+
+        private static readonly string[] ExtensionPackageNames =
+        {
+            "com.eframework.ui.virtual-list",
+            "com.eframework.ui-extras",
+            "com.eframework.effects",
+            "com.eframework.gm-tools",
+            "com.eframework.debug-console"
+        };
+
+        private static readonly Queue<(string packageName, string packageSpec)> PendingPackageAdds = new();
+        private static AddRequest s_packageAddRequest;
+        private static string s_currentPackageName;
 
         private string m_moduleName;
         private AIClientSelection m_aiClientSelection;
@@ -62,7 +81,7 @@ namespace EFramework.Editor.ProjectBootstrap
             {
                 EditorGUILayout.LabelField("Project", ProjectRootPath);
                 EditorGUILayout.LabelField("Framework Root", TryGetFrameworkRoot(out var frameworkRoot, out var rootError) ? frameworkRoot : rootError);
-                EditorGUILayout.HelpBox("Use Full Initialize Project for the standard bootstrap flow. Use Import Initial Templates only when you want to re-copy the built-in sample UI templates.", MessageType.None);
+                EditorGUILayout.HelpBox("Use Full Initialize Project for the standard bootstrap flow. Use the Basic template action when you only need to import the minimal runnable skeleton.", MessageType.None);
             }
 
             if (!EFrameDotweenBootstrapUtility.IsDotweenInstalled() || !EFrameDotweenBootstrapUtility.IsDotweenSetupReady())
@@ -80,12 +99,44 @@ namespace EFramework.Editor.ProjectBootstrap
                     RunFullInitialization();
                 }
 
-                if (GUILayout.Button("Import Initial Templates"))
+                if (GUILayout.Button("Install Basic Sample / Import Basic Template"))
+                {
+                    ImportBasicTemplate();
+                }
+
+                if (GUILayout.Button("Import Initial UI Templates"))
                 {
                     ImportInitialTemplates();
                 }
 
-                EditorGUILayout.HelpBox("Full Initialize Project runs the standard bootstrap chain. Import Initial Templates only re-copies the built-in Home and SampleModule UI templates into Assets.", MessageType.None);
+                EditorGUILayout.HelpBox("Full Initialize Project runs the standard bootstrap chain. Basic Template imports the current minimal runnable skeleton. Initial UI Templates only re-copy the built-in Home and SampleModule prefabs into Assets.", MessageType.None);
+            }
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Samples And Optional Modules", EditorStyles.boldLabel);
+
+                if (GUILayout.Button("Install Extension Showcase Module"))
+                {
+                    InstallExtensionShowcaseModule();
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Set Extension Showcase As Startup"))
+                    {
+                        SetExtensionShowcaseAsStartup();
+                    }
+
+                    if (GUILayout.Button("Restore Basic Startup"))
+                    {
+                        RestoreBasicStartup();
+                    }
+                }
+
+                EditorGUILayout.HelpBox("Extension Showcase installs to Assets/Modules/EFrameExtensionShowcase, starts a local file: package add for available sibling extension packages, and can switch the StartUp scene procedure entrance.", MessageType.None);
             }
 
             EditorGUILayout.Space();
@@ -204,7 +255,7 @@ namespace EFramework.Editor.ProjectBootstrap
             var procedureComponent = bootObject.GetComponent<EFrameProcedureComponent>();
             var eframeComponent = bootObject.GetComponent<EFrameComponent>();
 
-            ConfigureProcedureComponent(procedureComponent);
+            ConfigureProcedureComponent(procedureComponent, false, BasicStartupProcedureName);
             ConfigureEFrameComponent(eframeComponent, procedureComponent, camera);
 
             EnsureStartUpSceneInBuildSettings(StartUpScenePath);
@@ -220,21 +271,33 @@ namespace EFramework.Editor.ProjectBootstrap
             AssetDatabase.Refresh();
         }
 
-        private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent)
+        private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent, bool includeExtensionShowcase, string entranceProcedureTypeName)
         {
             var procedureObject = new SerializedObject(procedureComponent);
             var availableProcedures = procedureObject.FindProperty("m_availableProcedureTypeNames");
             var entranceProcedure = procedureObject.FindProperty("m_entranceProcedureTypeName");
 
-            var launcher = $"{AppNamespace}.Procedure.ProcedureLauncher";
-            var home = $"{AppNamespace}.Procedure.ProcedureHome";
-            var sampleModule = $"{AppNamespace}.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry";
+            var procedureTypeNames = new List<string>
+            {
+                $"{AppNamespace}.Procedure.ProcedureLauncher",
+                $"{AppNamespace}.Procedure.ProcedureHome",
+                $"{AppNamespace}.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry"
+            };
 
-            availableProcedures.arraySize = 3;
-            availableProcedures.GetArrayElementAtIndex(0).stringValue = launcher;
-            availableProcedures.GetArrayElementAtIndex(1).stringValue = home;
-            availableProcedures.GetArrayElementAtIndex(2).stringValue = sampleModule;
-            entranceProcedure.stringValue = launcher;
+            if (includeExtensionShowcase)
+            {
+                procedureTypeNames.Add(ExtensionShowcaseStartupProcedureName);
+            }
+
+            availableProcedures.arraySize = procedureTypeNames.Count;
+            for (var index = 0; index < procedureTypeNames.Count; index++)
+            {
+                availableProcedures.GetArrayElementAtIndex(index).stringValue = procedureTypeNames[index];
+            }
+
+            entranceProcedure.stringValue = string.IsNullOrWhiteSpace(entranceProcedureTypeName)
+                ? BasicStartupProcedureName
+                : entranceProcedureTypeName;
 
             procedureObject.ApplyModifiedPropertiesWithoutUndo();
         }
@@ -342,6 +405,71 @@ namespace EFramework.Editor.ProjectBootstrap
             EnsureSampleUIPrefabs();
         }
 
+        private void ImportBasicTemplate()
+        {
+            if (!RunToolScript("Initialize-EFrameBootstrapCode.ps1", $"-TargetRoot \"{ProjectRootPath}\""))
+            {
+                return;
+            }
+
+            if (!EnsureUISortingLayers())
+            {
+                return;
+            }
+
+            if (!EnsureSampleUIPrefabs())
+            {
+                return;
+            }
+
+            if (!EnsureAudioSetup())
+            {
+                return;
+            }
+
+            if (!EnsureProjectAddressablesGroups())
+            {
+                return;
+            }
+
+            SyncAddressablesAfterAssetChanges("Imported Basic sample/template.");
+        }
+
+        private void InstallExtensionShowcaseModule()
+        {
+            TryInstallLocalExtensionPackages(out var packageMessage);
+            if (!CopyExtensionShowcaseTemplate(out var copyMessage))
+            {
+                SetStatus(copyMessage, true);
+                return;
+            }
+
+            AssetDatabase.Refresh();
+            var syncSucceeded = SyncAddressablesAfterAssetChanges(copyMessage);
+            if (!syncSucceeded)
+            {
+                return;
+            }
+
+            SetStatus($"{copyMessage} {packageMessage}".Trim(), false);
+        }
+
+        private void SetExtensionShowcaseAsStartup()
+        {
+            if (!AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath))
+            {
+                SetStatus($"Extension Showcase module is not installed at {ExtensionShowcaseTargetPath}.", true);
+                return;
+            }
+
+            ConfigureStartUpProcedure(ExtensionShowcaseStartupProcedureName, true);
+        }
+
+        private void RestoreBasicStartup()
+        {
+            ConfigureStartUpProcedure(BasicStartupProcedureName, false);
+        }
+
         [MenuItem("EFrame Tools/AI/Check Sync Status", false, 40)]
         private static void MenuRunAiSyncStatus()
         {
@@ -436,6 +564,225 @@ namespace EFramework.Editor.ProjectBootstrap
                 AIClientSelection.ClaudeCode => "Claude Code",
                 _ => "Codex, GitHub Copilot, and Claude Code"
             };
+        }
+
+        private bool CopyExtensionShowcaseTemplate(out string message)
+        {
+            if (AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath) || Directory.Exists(Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath)))
+            {
+                message = $"Extension Showcase module already exists at {ExtensionShowcaseTargetPath}.";
+                return true;
+            }
+
+            var sourceFullPath = AssetPathToFullPath(ExtensionShowcaseTemplatePath);
+            if (!Directory.Exists(sourceFullPath))
+            {
+                message = $"Extension Showcase template was not found: {ExtensionShowcaseTemplatePath}.";
+                return false;
+            }
+
+            var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
+            CopyDirectory(sourceFullPath, targetFullPath);
+            message = $"Installed Extension Showcase module at {ExtensionShowcaseTargetPath}.";
+            return true;
+        }
+
+        private static string AssetPathToFullPath(string assetPath)
+        {
+            if (assetPath.StartsWith("Packages/", StringComparison.Ordinal))
+            {
+                var relativePath = assetPath.Substring("Packages/".Length);
+                var separatorIndex = relativePath.IndexOf('/');
+                if (separatorIndex > 0)
+                {
+                    var packageName = relativePath.Substring(0, separatorIndex);
+                    var packageInfo = UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{packageName}");
+                    if (packageInfo != null && !string.IsNullOrEmpty(packageInfo.resolvedPath))
+                    {
+                        var packageRelativePath = relativePath.Substring(separatorIndex + 1).Replace('/', Path.DirectorySeparatorChar);
+                        return Path.Combine(packageInfo.resolvedPath, packageRelativePath);
+                    }
+                }
+            }
+
+            return Path.Combine(ProjectRootPath, assetPath.Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        private static void CopyDirectory(string sourceDirectory, string targetDirectory)
+        {
+            Directory.CreateDirectory(targetDirectory);
+
+            foreach (var sourceFile in Directory.GetFiles(sourceDirectory))
+            {
+                if (sourceFile.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var fileName = Path.GetFileName(sourceFile);
+                if (fileName.EndsWith(".cs.txt", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileName = fileName.Substring(0, fileName.Length - ".txt".Length);
+                }
+
+                var targetFile = Path.Combine(targetDirectory, fileName);
+                File.Copy(sourceFile, targetFile, false);
+            }
+
+            foreach (var sourceChildDirectory in Directory.GetDirectories(sourceDirectory))
+            {
+                var targetChildDirectory = Path.Combine(targetDirectory, Path.GetFileName(sourceChildDirectory));
+                CopyDirectory(sourceChildDirectory, targetChildDirectory);
+            }
+        }
+
+        private bool TryInstallLocalExtensionPackages(out string message)
+        {
+            if (!TryGetFrameworkRoot(out var frameworkRoot, out var error))
+            {
+                message = $"{error} Extension packages were not installed automatically.";
+                return false;
+            }
+
+            var packageParent = Directory.GetParent(frameworkRoot)?.FullName;
+            if (string.IsNullOrEmpty(packageParent))
+            {
+                message = "Could not resolve the package parent directory. Install extension packages manually if needed.";
+                return false;
+            }
+
+            var started = 0;
+            var missing = new List<string>();
+            foreach (var packageName in ExtensionPackageNames)
+            {
+                if (UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{packageName}") != null)
+                {
+                    continue;
+                }
+
+                var siblingPath = Path.Combine(packageParent, packageName);
+                if (!Directory.Exists(siblingPath))
+                {
+                    missing.Add(packageName);
+                    continue;
+                }
+
+                EnqueuePackageAdd(packageName, $"file:{siblingPath.Replace('\\', '/')}");
+                started++;
+            }
+
+            if (started > 0)
+            {
+                StartPackageInstallQueue();
+            }
+
+            message = BuildExtensionPackageInstallMessage(started, missing);
+            return started > 0;
+        }
+
+        private static string BuildExtensionPackageInstallMessage(int started, List<string> missing)
+        {
+            var parts = new List<string>();
+            if (started > 0)
+            {
+                parts.Add($"Started installing {started} local extension package(s).");
+            }
+            else
+            {
+                parts.Add("No local extension package install was started.");
+            }
+
+            if (missing.Count > 0)
+            {
+                parts.Add($"Missing sibling packages: {string.Join(", ", missing)}. Install them manually from git or UPM if this is not a local framework checkout.");
+            }
+
+            return string.Join(" ", parts);
+        }
+
+        private static void EnqueuePackageAdd(string packageName, string packageSpec)
+        {
+            PendingPackageAdds.Enqueue((packageName, packageSpec));
+        }
+
+        private static void StartPackageInstallQueue()
+        {
+            EditorApplication.update -= ProcessPackageInstallQueue;
+            EditorApplication.update += ProcessPackageInstallQueue;
+            ProcessPackageInstallQueue();
+        }
+
+        private static void ProcessPackageInstallQueue()
+        {
+            if (s_packageAddRequest != null)
+            {
+                if (!s_packageAddRequest.IsCompleted)
+                {
+                    return;
+                }
+
+                if (s_packageAddRequest.Status == StatusCode.Success)
+                {
+                    Debug.Log($"[EFrame] Installed extension package: {s_currentPackageName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[EFrame] Failed to install extension package {s_currentPackageName}: {s_packageAddRequest.Error?.message}");
+                }
+
+                s_packageAddRequest = null;
+                s_currentPackageName = string.Empty;
+            }
+
+            if (PendingPackageAdds.Count == 0)
+            {
+                EditorApplication.update -= ProcessPackageInstallQueue;
+                AssetDatabase.Refresh();
+                return;
+            }
+
+            var next = PendingPackageAdds.Dequeue();
+            s_currentPackageName = next.packageName;
+            Debug.Log($"[EFrame] Installing extension package {next.packageName} from {next.packageSpec}");
+            s_packageAddRequest = Client.Add(next.packageSpec);
+        }
+
+        private void ConfigureStartUpProcedure(string entranceProcedureTypeName, bool includeExtensionShowcase)
+        {
+            if (!File.Exists(Path.Combine(ProjectRootPath, StartUpScenePath)))
+            {
+                SetStatus($"StartUp scene was not found at {StartUpScenePath}. Run Full Initialize Project or Install Basic Sample first.", true);
+                return;
+            }
+
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return;
+            }
+
+            var scene = EditorSceneManager.OpenScene(StartUpScenePath, OpenSceneMode.Single);
+            if (!scene.IsValid())
+            {
+                SetStatus($"Failed to open StartUp scene: {StartUpScenePath}.", true);
+                return;
+            }
+
+            var procedureComponent = UnityEngine.Object.FindFirstObjectByType<EFrameProcedureComponent>();
+            if (procedureComponent == null)
+            {
+                SetStatus("StartUp scene does not contain an EFrameProcedureComponent on the Boot object.", true);
+                return;
+            }
+
+            ConfigureProcedureComponent(procedureComponent, includeExtensionShowcase, entranceProcedureTypeName);
+            EditorSceneManager.MarkSceneDirty(scene);
+            if (!EditorSceneManager.SaveScene(scene))
+            {
+                SetStatus($"Failed to save StartUp scene after setting {entranceProcedureTypeName}.", true);
+                return;
+            }
+
+            SetStatus($"Set StartUp entrance procedure to {entranceProcedureTypeName}.", false);
         }
 
         private void CreateModuleScaffold()

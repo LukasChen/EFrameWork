@@ -22,9 +22,14 @@
   },
   "samples": [
     {
-      "displayName": "EFrame Samples",
-      "description": "Sample assets extracted with the initial EFrame package.",
-      "path": "Samples~"
+      "displayName": "Basic Project Skeleton",
+      "description": "Minimal runnable EFrame startup skeleton documented for the initialization window.",
+      "path": "Samples~/Basic"
+    },
+    {
+      "displayName": "Extension Showcase Module",
+      "description": "Optional project module reference for EFrame extension demos.",
+      "path": "Samples~/ExtensionShowcaseModule"
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+    "name": "EFrame.UI.Extras",
+    "rootNamespace": "",
+    "references": [
+        "EFrame",
+        "DOTween.Modules",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

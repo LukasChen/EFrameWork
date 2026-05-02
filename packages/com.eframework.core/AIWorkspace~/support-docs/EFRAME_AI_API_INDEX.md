@@ -10,7 +10,7 @@ After AI sync, business projects receive this document at `.github/eframe/EFRAME
 | --- | --- | --- | --- |
 | Access initialized framework services | `EFrame.UI`, `EFrame.Assets`, `EFrame.Data`, `EFrame.Events`, `EFrame.Audio` | `packages/com.eframework.core/Runtime/EFrame.cs` | Only use after `EFrame.Initialize(...)` succeeds. Framework base classes receive `Context` automatically. |
 | Read the full initialized service bundle | `EFrame.Current` | `packages/com.eframework.core/Runtime/EFrame.cs` | Use when a caller needs the whole `EFrameContext` instead of one common service shortcut. |
-| Read service bundle from injected code | `EFrameContext` | `packages/com.eframework.core/Runtime/EFrameContext.cs` | Provides `Assets`, `UI`, `Audio`, `AudioEvents`, `Data`, `Events`, `Coroutine`, `Vibration`, cameras, and FPS. |
+| Read service bundle from injected code | `EFrameContext` | `packages/com.eframework.core/Runtime/EFrameContext.cs` | Provides `Assets`, `UI`, `Audio`, `Data`, `Events`, `Coroutine`, cameras, and FPS. |
 | Receive context in behaviours/views/controllers | `IEFrameContextAware.BindContext(...)` | `packages/com.eframework.core/Runtime/EFrameBehaviour.cs` | Prefer injected `Context` inside framework-aware types instead of repeated global lookup. |
 
 Avoid accessing `EFrame.*` service shortcuts from constructors that can run before initialization.
@@ -49,6 +49,8 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs include binding/config data such as default layer, cache, and animation root. |
 | Advanced/internal UI host | `IUIService` / `QUI`, `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs`, `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Use directly only for framework internals, advanced UI managers, navigation stack work, or debugging lifecycle state. |
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to runtime scene cameras that should host the framework UI overlay stack. |
+| Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Provides `QTab`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation`; these are no longer core APIs. |
+| Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Provides pooled virtual list/grid controls under `EFramework.Extensions.UI.VirtualList`. |
 
 Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal business View wrappers, direct `BindingViewBase` lifecycle driving, and direct business `UIViewHandle` ownership.
 
@@ -74,24 +76,33 @@ Avoid deriving persistence identity from class names or namespaces.
 
 Avoid unpaired manual subscribe/unsubscribe when a scoped subscription is available.
 
-## Audio And Vibration
+## Audio
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Audio service | `IAudioService` / `AudioManager` | `packages/com.eframework.core/Runtime/Audio/AudioManager.cs` | Use through `Context.Audio` or `EFrame.Audio`; project setup creates mixer resources. |
-| Audio events | `IAudioEventService` / `AudioEventManager` | `packages/com.eframework.core/Runtime/Audio/AudioEventManager.cs` | Routes configured audio event playback and vibration integration; access through `Context.AudioEvents` or `EFrame.AudioEvents`. |
-| Vibration service | `IVibrationService` | `packages/com.eframework.core/Runtime/Vibration/QVibration.cs` | Use through `Context.Vibration` or `EFrame.Vibration`. |
+| Audio service | `IAudioService` / `AudioManager` | `packages/com.eframework.core/Runtime/Audio/AudioManager.cs` | Use through `Context.Audio` or `EFrame.Audio`; supports Music/SFX playback, mixer volume controls, `AudioClipAsset`, SFX pooling, debouncing, and music crossfade. |
 
-Keep framework-owned audio config under `Assets/Resources/Audio`.
+Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 
 ## Editor Bootstrap
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
 | Full project initialization | `EFrameProjectInitializationWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Unity menu entry for cold-start/bootstrap tasks. |
+| Install minimal runnable startup skeleton | `Install Basic Sample / Import Basic Template` | `packages/com.eframework.core/Editor/Templates/Basic`, `packages/com.eframework.core/Samples~/Basic` | Basic is the core-owned minimal project skeleton and must not depend on optional extension packages. |
+| Install optional extension demos | `Install Extension Showcase Module` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Copies to `Assets/Modules/EFrameExtensionShowcase`, tries local sibling `file:` extension package installs, and can set `ProcedureEFrameExtensionShowcaseEntry` as StartUp entrance. |
+| Restore minimal startup flow | `Restore Basic Startup` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Sets the StartUp scene `EFrameProcedureComponent` entrance back to `GameApp.Procedure.ProcedureLauncher`. |
 | Addressables groups and ResPath generation | `EFrameAddressablesBootstrapUtility` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBootstrapUtility.cs` | Owns managed resource group sync and `ResPath.Generated`. |
 | Managed resource report UI | `EFrameAddressablesReportWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesReportWindow.cs` | Use to select directories for generated ResPath entries and inspect issues. |
 | Build preflight | `EFrameAddressablesBuildPreprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBuildPreprocessor.cs` | Fails builds when managed Addressables or generated paths drift. |
 | Import/move/delete auto-sync | `EFrameAppResAddressablePostprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAppResAddressablePostprocessor.cs` | Keeps managed resource changes aligned with Addressables automation. |
 
 Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor APIs can make narrow serialized changes.
+
+## Samples And Optional Modules
+
+| Need | Use | Source | Notes |
+| --- | --- | --- | --- |
+| Minimal new-project baseline | Basic | `packages/com.eframework.core/Samples~/Basic`, `packages/com.eframework.core/Editor/Templates/Basic` | Use the initialization window instead of manually copying sample folders. |
+| Extension demo launcher | `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Optional Project Module; does not belong in core runtime and should remain isolated under `Assets/Modules/EFrameExtensionShowcase`. |
+| Future full game demo | Separate repository | n/a | Do not implement a complete Simple Game Demo inside `com.eframework.core`. |

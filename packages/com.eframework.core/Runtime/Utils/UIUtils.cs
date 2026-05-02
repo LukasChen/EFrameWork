@@ -1,7 +1,6 @@
 using DG.Tweening;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.UI;
-using EFramework.Runtime.UI.UIHelper;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -6,6 +6,25 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+### Added
+
+- Added the Core Basic sample/template as the maintained minimal runnable initialization skeleton.
+- Added the optional Extension Showcase Project Module template and initialization-window controls to install it, auto-start it, or restore Basic startup.
+
+### Changed
+
+- Split pooled virtual UI list and grid controls into the optional `com.eframework.ui.virtual-list` package.
+- Split Unity Ingame Debug Console into the optional `com.eframework.debug-console` package.
+- Split reusable presentation effects into the optional `com.eframework.effects` package.
+- Split GM tools into the optional `com.eframework.gm-tools` package.
+- Split UI helper/animation components and extra controls into the optional `com.eframework.ui-extras` package.
+- Normalized EFrame-owned extension APIs under `EFramework.Extensions.*` namespaces and added `tools/Test-EFrameExtensionUnityCompile.ps1` for extension package compile validation.
+- Documented DOTween and URP as core-standard dependencies, with DOTween Free intentionally kept as a project-installed plugin instead of an unresolved UPM dependency.
+
+### Removed
+
+- Removed legacy `QList` / `XListView`, NiceVibrations/Vibration integration, and AudioEvents runtime/editor tooling from EFrame Core.
+
 ## [0.6.5] - 2026-05-02
 
 ### Added

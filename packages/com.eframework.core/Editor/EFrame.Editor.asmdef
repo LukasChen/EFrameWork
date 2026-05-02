@@ -4,7 +4,6 @@
     "references": [
         "EFrame",
         "UniTask",
-        "Lofelt.NiceVibrations",
         "Unity.Addressables",
         "Unity.TextMeshPro",
         "Unity.Addressables.Editor"

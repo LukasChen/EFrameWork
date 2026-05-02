@@ -1,0 +1,19 @@
+﻿{
+    "name": "EFrame.GMTools",
+    "rootNamespace": "",
+    "references": [
+        "EFrame",
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

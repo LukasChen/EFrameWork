@@ -323,6 +323,14 @@ Assets/Modules/<Name>/
 - 模块私有图片、材质、特效不要提前放入 `Assets/App/Res`；确认跨模块共享后再上移。
 - 模块私有 FX 以 `Assets/Modules/<Name>/Res/FX` 为入口，并按照 UI、Scene、Gameplay、Common 等复用范围继续细分。
 
+### EFrame Extension Showcase
+
+`Assets/Modules/EFrameExtensionShowcase/` 是框架提供的可选扩展示例模块安装位置。它通过 `EFrame Tools/项目初始化向导` 安装，不侵入 `Assets/App` 的 Basic 启动结构。
+
+Showcase 模块可以被设置为 StartUp 入口，用于集中查看 UI Virtual List、UI Extras、Effects、GMTools、Debug Console 等扩展演示入口；需要恢复最小 Basic 启动时，通过初始化向导执行 `Restore Basic Startup`。
+
+详细安装方式见 [SAMPLES_AND_INITIALIZATION.md](SAMPLES_AND_INITIALIZATION.md)。
+
 ## 8. Addressables 目录与分组建议
 
 为了支持按需加载，目录规划应至少体现“启动常驻内容”和“模块私有内容”的边界。
@@ -388,6 +396,7 @@ EFrame 的资源自动化建立在严格目录规范之上：资源放入约定�
 - 不要把 Editor 代码混入 Runtime 目录。
 - 不要把 UI 预制体、音频、配置资源散写到多个随机目录。
 - 不要把生成代码写进手写业务目录。
+- 不要把完整 Simple Game Demo 放进 core package；该方向后续作为独立仓库处理。
 ## 11. 迁移原则
 
 - 如果项目仍处于过渡结构，新增功能优先收敛到上述标准目录。
