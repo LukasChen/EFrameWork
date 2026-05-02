@@ -8,11 +8,12 @@ After AI sync, business projects receive this document at `.github/eframe/EFRAME
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Access initialized framework services | `EFrame.Current` | `packages/com.eframework.core/Runtime/EFrame.cs` | Only use after `EFrame.Initialize(...)` succeeds. Framework base classes receive `Context` automatically. |
+| Access initialized framework services | `EFrame.UI`, `EFrame.Assets`, `EFrame.Data`, `EFrame.Events`, `EFrame.Audio` | `packages/com.eframework.core/Runtime/EFrame.cs` | Only use after `EFrame.Initialize(...)` succeeds. Framework base classes receive `Context` automatically. |
+| Read the full initialized service bundle | `EFrame.Current` | `packages/com.eframework.core/Runtime/EFrame.cs` | Use when a caller needs the whole `EFrameContext` instead of one common service shortcut. |
 | Read service bundle from injected code | `EFrameContext` | `packages/com.eframework.core/Runtime/EFrameContext.cs` | Provides `Assets`, `UI`, `Audio`, `AudioEvents`, `Data`, `Events`, `Coroutine`, `Vibration`, cameras, and FPS. |
 | Receive context in behaviours/views/controllers | `IEFrameContextAware.BindContext(...)` | `packages/com.eframework.core/Runtime/EFrameBehaviour.cs` | Prefer injected `Context` inside framework-aware types instead of repeated global lookup. |
 
-Avoid accessing `EFrame.Current.*` from constructors that can run before initialization.
+Avoid accessing `EFrame.*` service shortcuts from constructors that can run before initialization.
 
 ## Startup And Procedure
 
@@ -29,7 +30,7 @@ Avoid adding new procedures for simple page/popup changes that can live inside t
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Current.Assets`. |
+| Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Assets`. |
 | Use generated managed asset ids | `ResPath.Generated` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Use generated ids instead of handwritten Addressables strings in business runtime code. |
 | Procedure-owned preload scope | `IAssetPreloadScope` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use in `OnPreloadAsync(...)`; the scope releases on procedure leave. |
 | Load an asset with explicit ownership | `LoadAsync<T>(assetId)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Dispose the returned `AssetHandle<T>` at the owning lifecycle boundary. |
@@ -42,7 +43,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| UI service | `IUIService` / `QUI` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs` | Create/open/release UI through framework services. |
+| UI service | `IUIService` / `QUI` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs` | Create/open/release UI through `Context.UI` or `EFrame.UI`. |
 | Controller base | `UIControllerBase<TView>` | `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Controllers own UI orchestration and access live views through `TypedViewHandle.TypedView`. |
 | Access the live typed view | `TypedViewHandle.TypedView` | `packages/com.eframework.core/Runtime/UI/Handles/TypedViewHandle.cs` | Prefer the typed handle view access point instead of facade shortcuts. |
 | View wrapper base | `BindingViewBase` | `packages/com.eframework.core/Runtime/UI/BindingViewBase.cs` | Generated/project views should stay thin and parameterless, using `SetBinding(...)` and `OnBindingSet()`. |
@@ -56,7 +57,7 @@ Avoid hand-built persistent top-level Canvas/EventSystem objects and direct `Bin
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Data service | `IDataService` | `packages/com.eframework.core/Runtime/Services/IDataService.cs` | Register and retrieve tables through `Context.Data` / `EFrame.Current.Data`. |
+| Data service | `IDataService` | `packages/com.eframework.core/Runtime/Services/IDataService.cs` | Register and retrieve tables through `Context.Data` / `EFrame.Data`. |
 | Register a table type | `RegisterTable<T>()` | `packages/com.eframework.core/Runtime/Services/IDataService.cs` | Reuse existing registered tables instead of constructing ad-hoc table instances. |
 | Persistent table base | `DataTable<TData>` | `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Override `GetStorageKey()`, `GetDefaultData()`, and `Migrate(...)` when schema changes. |
 | Dirty-aware mutation | `SetValue(...)` / `Mutate(...)` | `packages/com.eframework.core/Runtime/DataStorage/DataTable.cs` | Expose table-owned methods/properties; do not mutate raw data from outside. |
@@ -69,8 +70,8 @@ Avoid deriving persistence identity from class names or namespaces.
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Scoped event subscription | `Context.Events.SubscribeScoped<T>(...)` | `packages/com.eframework.core/Runtime/Event/IEventService.cs` | Store and dispose subscriptions at leave/destroy/controller cleanup boundaries. |
-| Dispatch framework/project events | `Context.Events.Dispatch(evt)` | `packages/com.eframework.core/Runtime/Event/IEventService.cs` | Events are value types implementing `IEvent`. |
+| Scoped event subscription | `Context.Events.SubscribeScoped<T>(...)` / `EFrame.Events.SubscribeScoped<T>(...)` | `packages/com.eframework.core/Runtime/Event/IEventService.cs` | Store and dispose subscriptions at leave/destroy/controller cleanup boundaries. |
+| Dispatch framework/project events | `Context.Events.Dispatch(evt)` / `EFrame.Events.Dispatch(evt)` | `packages/com.eframework.core/Runtime/Event/IEventService.cs` | Events are value types implementing `IEvent`. |
 
 Avoid unpaired manual subscribe/unsubscribe when a scoped subscription is available.
 
@@ -78,9 +79,9 @@ Avoid unpaired manual subscribe/unsubscribe when a scoped subscription is availa
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Audio service | `IAudioService` / `AudioManager` | `packages/com.eframework.core/Runtime/Audio/AudioManager.cs` | Use through `Context.Audio`; project setup creates mixer resources. |
-| Audio events | `IAudioEventService` / `AudioEventManager` | `packages/com.eframework.core/Runtime/Audio/AudioEventManager.cs` | Routes configured audio event playback and vibration integration. |
-| Vibration service | `IVibrationService` | `packages/com.eframework.core/Runtime/Vibration/QVibration.cs` | Use through `Context.Vibration`. |
+| Audio service | `IAudioService` / `AudioManager` | `packages/com.eframework.core/Runtime/Audio/AudioManager.cs` | Use through `Context.Audio` or `EFrame.Audio`; project setup creates mixer resources. |
+| Audio events | `IAudioEventService` / `AudioEventManager` | `packages/com.eframework.core/Runtime/Audio/AudioEventManager.cs` | Routes configured audio event playback and vibration integration; access through `Context.AudioEvents` or `EFrame.AudioEvents`. |
+| Vibration service | `IVibrationService` | `packages/com.eframework.core/Runtime/Vibration/QVibration.cs` | Use through `Context.Vibration` or `EFrame.Vibration`. |
 
 Keep framework-owned audio config under `Assets/Resources/Audio`.
 

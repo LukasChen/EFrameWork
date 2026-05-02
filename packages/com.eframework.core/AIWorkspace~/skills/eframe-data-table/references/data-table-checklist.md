@@ -6,7 +6,7 @@
 - `DataTable<TData>` table wrapper
 - Parameterless constructor
 - Stable `StorageKey`
-- Registration through `EFrame.Current.Data.RegisterTable<T>()`
+- Registration through `EFrame.Data.RegisterTable<T>()`
 
 ## Mutation Rules
 

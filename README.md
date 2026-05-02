@@ -120,13 +120,13 @@ EFrame treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Mod
 
 ## Runtime Access
 
-Runtime services are accessed through `EFrame.Current`, which returns the active `EFrameContext`.
+Runtime services are accessed through lightweight `EFrame.*` shortcuts. `EFrame.Current` still returns the active `EFrameContext` when the full service bundle is needed.
 
 ```csharp
-EFrame.Current.UI
-EFrame.Current.Audio
-EFrame.Current.Data
-EFrame.Current.Assets
+EFrame.UI
+EFrame.Audio
+EFrame.Data
+EFrame.Assets
 ```
 
-Framework base classes receive `Context` automatically. Prefer `Context.UI`/`Context.Audio` inside views and controllers, and use `EFrame.Current` only at outer Unity entry points.
+Framework base classes receive `Context` automatically. Prefer `Context.UI`/`Context.Audio` inside framework-aware views and controllers, and use `EFrame.UI`/`EFrame.Audio` at startup, static entry points, or other non-injected call sites.

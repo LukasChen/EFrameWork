@@ -57,7 +57,7 @@ It is responsible for:
 Access it through:
 
 ```csharp
-var ui = EFrame.Current.UI;
+var ui = EFrame.UI;
 ```
 
 ### `BindingViewBase`
@@ -412,26 +412,26 @@ Interpretation:
 Push a handle:
 
 ```csharp
-var handle = EFrame.Current.UI.CreateViewHandle<HomeView>(DemoResPath.MainView, UILayer.QuiPanel);
-EFrame.Current.UI.PushView(handle, UILayer.QuiPanel);
+var handle = EFrame.UI.CreateViewHandle<HomeView>(DemoResPath.MainView, UILayer.QuiPanel);
+EFrame.UI.PushView(handle, UILayer.QuiPanel);
 ```
 
 Pop current:
 
 ```csharp
-EFrame.Current.UI.PopView();
+EFrame.UI.PopView();
 ```
 
 Pop all:
 
 ```csharp
-EFrame.Current.UI.PopAll();
+EFrame.UI.PopAll();
 ```
 
 Read stack top:
 
 ```csharp
-var topHandle = EFrame.Current.UI.TopView;
+var topHandle = EFrame.UI.TopView;
 var topView = topHandle?.View;
 ```
 

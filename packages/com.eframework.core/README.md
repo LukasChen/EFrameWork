@@ -27,12 +27,12 @@ For the framework-level public API reference, see [../../API_REFERENCE.md](../..
 
 For the browsable HTML docs site, see [Documentation~/index.html](Documentation~/index.html).
 
-EFrame now uses `EFrame.Current` as the only static runtime entry. The static class is only an entry point; services are owned by `EFrameContext`.
+EFrame exposes lightweight static shortcuts for common runtime services. `EFrame.Current` still returns the active `EFrameContext` when the full service bundle is needed.
 
 ```csharp
-EFrame.Current.UI.SetInteractive(false);
-EFrame.Current.Audio.PlaySfx(clickClip);
-var playerData = EFrame.Current.Data.GetTable<PlayerDataTable>();
+EFrame.UI.SetInteractive(false);
+EFrame.Audio.PlaySfx(clickClip);
+var playerData = EFrame.Data.GetTable<PlayerDataTable>();
 ```
 
 Framework-created views, controllers, and `EFrameBehaviour` components receive the active context automatically:
@@ -65,7 +65,7 @@ Use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to open the man
 New resource service APIs are asynchronous and return explicit handles:
 
 ```csharp
-var handle = await EFrame.Current.Assets.LoadAsync<GameObject>("UI/HomeView");
+var handle = await EFrame.Assets.LoadAsync<GameObject>("UI/HomeView");
 try
 {
     var prefab = handle.Asset;
@@ -75,11 +75,11 @@ finally
     handle.Dispose();
 }
 
-var instance = await EFrame.Current.Assets.InstantiateAsync("Effects/CoinFly", parent);
+var instance = await EFrame.Assets.InstantiateAsync("Effects/CoinFly", parent);
 instance.Dispose();
 ```
 
-Use `EFrame.Current.Assets` as the runtime resource entry.
+Use `EFrame.Assets` as the runtime resource entry outside framework-aware types.
 
 ## Install
 

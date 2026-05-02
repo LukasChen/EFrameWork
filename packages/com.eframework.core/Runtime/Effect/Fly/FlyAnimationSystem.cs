@@ -787,7 +787,7 @@ namespace EFrame.Runtime.Effect.Fly
             if (cfg.FlySoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.FlySoundPlayed) return;
 
-            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Initialized || EFrame.Current?.Audio == null) return;
 
             seq.FlySoundPlayed = true;
 
@@ -801,7 +801,7 @@ namespace EFrame.Runtime.Effect.Fly
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.OncePerSequence) return;
             if (seq.ArriveSoundPlayed) return;
 
-            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Initialized || EFrame.Current?.Audio == null) return;
 
             seq.ArriveSoundPlayed = true;
 
@@ -812,7 +812,7 @@ namespace EFrame.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.FlySoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Initialized || EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.FlySoundAssetId);
         }
@@ -821,7 +821,7 @@ namespace EFrame.Runtime.Effect.Fly
         {
             if (cfg == null) return;
             if (cfg.ArriveSoundMode != FlyAudioPlayMode.PerItem) return;
-            if (!EFrame.Runtime.EFrame.Initialized || EFrame.Runtime.EFrame.Current?.Audio == null) return;
+            if (!EFrame.Initialized || EFrame.Current?.Audio == null) return;
 
             TryPlayAudio(cfg.ArriveSoundAssetId);
         }

@@ -4,6 +4,14 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+### Added
+
+- Added lightweight `EFrame.UI`, `EFrame.Assets`, `EFrame.Data`, `EFrame.Events`, `EFrame.Audio`, and related runtime shortcuts while keeping `EFrame.Current` as the full context entry.
+
+### Changed
+
+- Updated package AI guidance and user docs to prefer the lighter `EFrame.*` runtime service shortcuts outside framework-aware injected `Context` code.
+
 ## [0.5.0] - 2026-05-02
 
 ### Changed

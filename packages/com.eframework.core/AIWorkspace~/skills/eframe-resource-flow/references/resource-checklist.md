@@ -21,7 +21,7 @@
 - Use `ResPath.Generated` for runtime resource ids
 - Do not add handwritten resource path constants for managed resources
 - Use `AssetReference` when inspector-authored references are more appropriate
-- Load through `EFrame.Current.Assets`
+- Load through `EFrame.Assets`
 
 ## Release
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using EFrame.Runtime.Asset;
@@ -23,6 +24,16 @@ namespace EFrame.Runtime
         public static bool Initialized => Current != null && LastInitializationResult.Succeeded;
         public static float SampleDuration = 1f;
         public static float FPS => s_averageFPS;
+        public static IAssetService Assets => RequireInitializedContext().Assets;
+        public static IUIService UI => RequireInitializedContext().UI;
+        public static IAudioService Audio => RequireInitializedContext().Audio;
+        public static IAudioEventService AudioEvents => RequireInitializedContext().AudioEvents;
+        public static IDataService Data => RequireInitializedContext().Data;
+        public static IEventService Events => RequireInitializedContext().Events;
+        public static ICoroutineService Coroutine => RequireInitializedContext().Coroutine;
+        public static IVibrationService Vibration => RequireInitializedContext().Vibration;
+        public static Camera SceneCamera => RequireInitializedContext().SceneCamera;
+        public static Camera UICamera => RequireInitializedContext().UICamera;
 
         public static bool IsLtsDev
         {
@@ -115,6 +126,16 @@ namespace EFrame.Runtime
             LastInitializationResult = EFrameInitializationResult.Success();
             Debug.Log("[EFrame] Initialize completed.");
             yield return null;
+        }
+
+        private static EFrameContext RequireInitializedContext()
+        {
+            if (!Initialized)
+            {
+                throw new InvalidOperationException("EFrame.Initialize(...) must complete successfully before accessing framework services.");
+            }
+
+            return Current;
         }
 
         private static void DisposeCreatedServices(

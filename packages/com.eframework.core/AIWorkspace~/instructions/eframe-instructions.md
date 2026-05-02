@@ -10,7 +10,7 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 ## UI 契约
 - `Procedure` 只负责状态切换、进入/退出编排和生命周期清理；页面、弹窗、提示层切换优先作为现有流程内的 UI 行为，不滥增新 `Procedure`。
-- UI 应通过 `EFrame.Current.UI` / `IUIService`、`UIControllerBase` 与 `UIViewHandle` 管理；`QUI` 是默认 UI 服务实现和层级宿主，不要在场景里手工堆常驻顶层 Canvas、EventSystem 或绕过框架的 UI 生命周期入口。
+- UI 应通过 `EFrame.UI` / `IUIService`、`UIControllerBase` 与 `UIViewHandle` 管理；`QUI` 是默认 UI 服务实现和层级宿主，不要在场景里手工堆常驻顶层 Canvas、EventSystem 或绕过框架的 UI 生命周期入口。
 - Runtime UI 组件、适配器、动画、helper 和生成绑定代码统一落在 `EFrame.Runtime.UI` 及其稳定子命名空间，例如 `Components`、`Layout`、`UIHelper`、`Generated`。
 - 命名保持框架约定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`，组件目录、类名和命名空间大小写一致。
 
@@ -30,7 +30,7 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 ## 启动与运行时访问
 
 - 启动流程状态使用 EFrame 自有的 `EFrameProcedure` 和 `EFrameProcedureComponent`，不要绕过框架状态机手工驱动流程切换。
-- 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成；在 framework-aware 类型内部优先使用注入的 `Context`，只有启动、静态入口或非注入场景才使用 `EFrame.Current.*`。
+- 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成；在 framework-aware 类型内部优先使用注入的 `Context`，只有启动、静态入口或非注入场景才使用 `EFrame.UI`、`EFrame.Assets`、`EFrame.Data` 等静态快捷入口。
 - `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 - 需要成为框架 UI overlay 场景渲染入口的运行时场景相机必须挂载 `EFrameSceneCamera`，由组件自动维护 Camera stack；不要在业务代码里轮询相机或手动维护 Camera stack。
 

@@ -6,6 +6,14 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+### Added
+
+- Added lightweight `EFrame.UI`, `EFrame.Assets`, `EFrame.Data`, `EFrame.Events`, `EFrame.Audio`, and related runtime shortcuts while keeping `EFrame.Current` as the full context entry.
+
+### Changed
+
+- Updated synced AI guidance and user docs to prefer the lighter `EFrame.*` runtime service shortcuts outside framework-aware injected `Context` code.
+
 ## [0.5.0] - 2026-05-02
 
 ### Changed

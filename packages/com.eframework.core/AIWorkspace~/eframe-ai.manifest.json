@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.10",
+    "version":  "0.4.11",
     "updatedAt":  "2026-05-02",
-    "notes":  "Rename framework brand, namespaces, assemblies, templates, docs, and synced AI contracts to EFrame.",
+    "notes":  "Prefer lightweight EFrame runtime service shortcuts while preserving EFrame.Current as the full context entry.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,38 +14,38 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "c4b002f4ed6a55d9196d840e5353d4471ee3072c0bada5f5e1796747acd9c63a"
+                      "sha256":  "aa61e4d2ec88547d846eaaba573a3fd4546db0cead932a432fa45da569b5215b"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "8b58421fc7961aafe9dfee10782efcd9f99ea76453b11e1d16122c5468b9762d"
+                      "sha256":  "003084a216248745649335b716af24d04beaae8c775e3f353bc96171a9f7b8bb"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "901cff51078d5a7bd7b0e5ef988e7baf6fd0a64e20012f65b5bdce768fedcfce"
+                      "sha256":  "5051445064a61e2e18715ff377445f47b5ced07b5389ff2be2f893553053bfd4"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "a80fe58d3bad4fdec63b4e6006bb2753dcbcbb36271d34aa82a0e877778c3448"
+                      "sha256":  "54b6827d20ed926deda349d855f3fb37bbe544e61d5263f30fe98849aab60214"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "d5c46f4d883a60929b67da5c17bb15704f07542c534cda3be085e4abce51dd4d"
+                      "sha256":  "56a358194e270bd3ce0b882d57c51df8aa046c2f6f86a38edbc1f5898e694029"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
-                      "sha256":  "49259ae80eb2d0bd292af41e55a4c8d2d184c6cd1594c537babfa81ec911b91e"
+                      "sha256":  "94c0cd6794e0e5439815e6979ee1d88b66eb548a096413b20ab79cb2f637648b"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/SKILL.md",
-                      "sha256":  "455c2ac76ddafdde7b21c371c548c3c63c5fec43d884dc8a5e2ee84bd1767d42"
+                      "sha256":  "466d8339057238fd438896faede61f850687138de0ea98c4ecbd46bd5e953faf"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
@@ -65,11 +65,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/references/resource-checklist.md",
-                      "sha256":  "6fac5e940a170c1ca1974a9b7ff98072ecba898aa37d29040e058ad4c82c162d"
+                      "sha256":  "d78149479f7f0ebc537b5279631f19731dbb8d25c3222e61e3e474ed52d76048"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/SKILL.md",
-                      "sha256":  "6f1ba2b2840c28775962036ae738cde6204690d668f9f06587071eb1118ea709"
+                      "sha256":  "c9ec739d2601e8ea24d99c88a4f28b6980332055cd50c1f1f3e6bd8ef33ee3f5"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",

@@ -16,7 +16,7 @@ namespace EFrame.Runtime.Utils
     {
         public static Transform GetUILayer(UILayer layer)
         {
-            return EFrame.Current.UI.UILayer(layer);
+            return EFrame.UI.UILayer(layer);
         }
 
 
@@ -119,7 +119,7 @@ namespace EFrame.Runtime.Utils
         {
             var screenPoint = sceneCamera.WorldToScreenPoint(worldPosition);
             Vector3 uiWorldPosition = Vector3.zero;
-            RectTransformUtility.ScreenPointToWorldPointInRectangle(parentUI, screenPoint, EFrame.Current.UICamera, out uiWorldPosition);
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(parentUI, screenPoint, EFrame.UICamera, out uiWorldPosition);
             return uiWorldPosition;
         }
 
@@ -133,18 +133,18 @@ namespace EFrame.Runtime.Utils
         {
             if (uiRoot == null)
             {
-                uiRoot = EFrame.Current.UI.UILayer(UILayer.QuiPanel) as RectTransform;
+                uiRoot = EFrame.UI.UILayer(UILayer.QuiPanel) as RectTransform;
             }
 
             // 将世界坐标转换为屏幕坐标
-            Vector3 screenPoint = EFrame.Current.SceneCamera.WorldToScreenPoint(worldScenePosition);
+            Vector3 screenPoint = EFrame.SceneCamera.WorldToScreenPoint(worldScenePosition);
 
             // 将屏幕坐标转换为UI本地坐标
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 uiRoot,
                 screenPoint,
-                EFrame.Current.UICamera,
+                EFrame.UICamera,
                 out localPoint
             );
 
@@ -161,18 +161,18 @@ namespace EFrame.Runtime.Utils
         {
             if (uiRoot == null)
             {
-                uiRoot = EFrame.Current.UI.UILayer(UILayer.QuiPanel) as RectTransform;
+                uiRoot = EFrame.UI.UILayer(UILayer.QuiPanel) as RectTransform;
             }
 
             // 将世界坐标转换为屏幕坐标
-            Vector3 screenPoint = EFrame.Current.SceneCamera.WorldToScreenPoint(worldScenePosition);
+            Vector3 screenPoint = EFrame.SceneCamera.WorldToScreenPoint(worldScenePosition);
 
             // 将屏幕坐标转换为UI世界坐标
             Vector3 worldUIPosition;
             RectTransformUtility.ScreenPointToWorldPointInRectangle(
                 uiRoot,
                 screenPoint,
-                EFrame.Current.UICamera,
+                EFrame.UICamera,
                 out worldUIPosition
             );
 
@@ -181,8 +181,8 @@ namespace EFrame.Runtime.Utils
 
         public static Vector3 UIToScenePosition(Vector3 uiPosition, float zOffset = 0)
         {
-            var screenPoint = EFrame.Current.UICamera.WorldToScreenPoint(uiPosition);
-            var worldPosition = EFrame.Current.SceneCamera.ScreenToWorldPoint(screenPoint);
+            var screenPoint = EFrame.UICamera.WorldToScreenPoint(uiPosition);
+            var worldPosition = EFrame.SceneCamera.ScreenToWorldPoint(screenPoint);
             worldPosition.z = zOffset;
             return worldPosition;
         }
@@ -239,7 +239,7 @@ namespace EFrame.Runtime.Utils
         /// <param name="outClickAction"></param>
         public static void OutClickDetector(Button button, Action outClickAction)
         {
-            EFrame.Current.Coroutine.StartCoroutine(OutClickDetectorCoroutine(button, outClickAction));
+            EFrame.Coroutine.StartCoroutine(OutClickDetectorCoroutine(button, outClickAction));
         }
 
         private static IEnumerator OutClickDetectorCoroutine(Button button, Action outClickAction)
@@ -253,7 +253,7 @@ namespace EFrame.Runtime.Utils
                 if (button == null || !button.gameObject.activeInHierarchy) yield break;
                 if (QInput.GetPrimaryPointerDown() && QInput.TryGetPrimaryPointerPosition(out var pointerPosition))
                 {
-                    bool inside = RectTransformUtility.RectangleContainsScreenPoint(rectTransform, pointerPosition, EFrame.Current.UICamera);
+                    bool inside = RectTransformUtility.RectangleContainsScreenPoint(rectTransform, pointerPosition, EFrame.UICamera);
                     if (!inside)
                     {
                         outClickAction?.Invoke();
