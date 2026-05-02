@@ -4,8 +4,7 @@ param(
     [string]$LogPath,
     [string]$TestResultsPath,
     [string[]]$TestPlatforms = @("EditMode"),
-    [switch]$SkipColdStart,
-    [string]$RootNamespace = "EFrameConsumerFixture"
+    [switch]$SkipColdStart
 )
 
 $ErrorActionPreference = "Stop"
@@ -144,10 +143,9 @@ function Invoke-EFrameColdStart {
     }
 
     Write-Host "Running EFrame cold start: $coldStartScript"
-    & $coldStartScript -TargetRoot $projectFullPath -RootNamespace $RootNamespace -Force
+    & $coldStartScript -TargetRoot $projectFullPath -Force
 
     $requiredPaths = @(
-        "Assets/App/Runtime/Common/ResPath.cs",
         "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs",
         "Assets/App/Runtime/Procedure/ProcedureLauncher.cs",
         "Assets/App/Runtime/Procedure/ProcedureHome.cs",

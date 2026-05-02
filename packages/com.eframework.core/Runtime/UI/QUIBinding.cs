@@ -70,6 +70,8 @@ namespace EFramework.Runtime.UI
 
     public class QUIBinding : MonoBehaviour
     {
+        public const string GeneratedAccessClassNamespace = "EFramework.Generated.UI";
+
         [SerializeField]
         [HideInInspector]
         private List<ComponentBindingItem> m_bindingItems = new List<ComponentBindingItem>();
@@ -80,6 +82,7 @@ namespace EFramework.Runtime.UI
 
         [SerializeField]
         [HideInInspector]
+        // Kept only so old prefabs deserialize cleanly; generated namespaces are fixed.
         private string m_accessClassNamespace = "";
 
         [Header("View 配置")]
@@ -106,12 +109,12 @@ namespace EFramework.Runtime.UI
         }
 
         /// <summary>
-        /// 获取或设置访问类命名空间
+        /// 获取固定的生成访问类命名空间
         /// </summary>
         public string AccessClassNamespace
         {
-            get => string.IsNullOrEmpty(m_accessClassNamespace) ? "EFramework.Runtime.UI.Generated" : m_accessClassNamespace;
-            set => m_accessClassNamespace = value;
+            get => GeneratedAccessClassNamespace;
+            set => m_accessClassNamespace = string.Empty;
         }
 
         /// <summary>

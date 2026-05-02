@@ -94,7 +94,8 @@ Assets/
 
 - 固定生成代码目录。
 - 生成物不要散落到业务手写目录。
-- Addressables 自动生成的 `ResPath.Generated.cs` 建议放在 `Assets/App/Runtime/Generated/Res/`。
+- Addressables 自动生成的 `ResPath.Generated.cs` 固定放在 `Assets/App/Runtime/Generated/Res/`，命名空间为 `EFramework.Generated`。
+- App 级 UI binding 生成代码放在 `Assets/App/Runtime/Generated/UI/`；模块 UI binding 生成代码放在 `Assets/Modules/<Name>/Runtime/Generated/UI/`。
 
 `Assets/App/Runtime/Procedure`
 
@@ -367,9 +368,9 @@ EFrame 的资源自动化建立在严格目录规范之上：资源放入约定�
 
 生成物：
 
-- `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` 由 Addressables 同步工具按“已选择的 ResPath 目录”生成，不要手动编辑。
-- `Assets/App/Runtime/Common/ResPath.cs` 保留为手写稳定入口和动态辅助方法，不承担逐条资源清单维护。
-- 业务代码优先使用 `ResPath.Generated.*`、稳定 `ResPath` 包装或 inspector-authored `AssetReference`，不要散写裸 Addressables 字符串。
+- `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` 由 Addressables 同步工具按“已选择的 ResPath 目录”生成，不要手动编辑，命名空间固定为 `EFramework.Generated`。
+- UI binding 生成物按 prefab 归属落在 `Assets/App/Runtime/Generated/UI/` 或 `Assets/Modules/<Name>/Runtime/Generated/UI/`，命名空间固定为 `EFramework.Generated.UI`。
+- 业务代码优先使用 `ResPath.Generated.*` 或 inspector-authored `AssetReference`，不要散写裸 Addressables 字符串。
 - `ResPath.Generated` 是代码加载入口清单，不是完整资源总账。只被 prefab、材质、配置或其他 asset 引用的依赖资源可以继续由 Addressables 作为依赖收集，不必生成 ResPath 常量。
 
 编辑器工具：

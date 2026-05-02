@@ -10,17 +10,12 @@
 
 ## 2. 分层
 
-`Assets/App/Runtime/Common/ResPath.cs`
-
-- 手写入口层。
-- 负责稳定 API、动态拼装辅助方法、少量通用别名。
-- 允许被业务代码长期依赖，不应频繁破坏签名。
-
 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`
 
 - 编辑器自动生成层。
 - 由 Addressables 分组和地址扫描生成。
 - 不手工修改；如果需要变化，应改 Addressables 配置或生成规则。
+- 命名空间固定为 `EFramework.Generated`，初始化时不需要填写项目 Root Namespace。
 
 ## 3. 使用顺序
 
@@ -28,7 +23,7 @@
 
 1. 编辑器可直接拖拽绑定的静态依赖，优先使用 `AssetReference`。
 2. 代码显式加载或实例化的动态资源，优先使用 `ResPath.Generated.*` 常量。
-3. 需要根据业务参数动态组合地址时，使用手写 `ResPath` 的辅助方法。
+3. 需要根据业务参数动态组合地址时，在业务代码中提供项目自有辅助方法，但底层仍应返回 EFrame 规范地址。
 4. 不要在业务代码中直接调用 `AssetManager.LoadAsset("...")` 或 `AssetManager.Instantiate("...")` 并写裸字符串。
 
 ## 4. 地址规范
@@ -63,7 +58,6 @@ Addressables 地址由目录规则推导，约束如下：
 
 ## 5. 代码风格
 
-- 手写 `ResPath.cs` 使用 `partial`，给生成层预留合并入口。
 - 生成代码统一挂在 `ResPath.Generated` 下，避免和手写 API 混在一起。
 - 模块内部若需要本地别名，可以提供模块级 `XxxResPath`，但底层地址仍应对齐框架规范。
 
@@ -78,9 +72,6 @@ var sharedFireballFxPath = ResPath.Generated.FX.Gameplay.Skill.Fireball.Fireball
 var moduleFireballFxPath = ResPath.Generated.Modules.Battle.Res.FX.Skill.Fireball.Fireball;
 var startupScenePath = ResPath.Generated.Scenes.StartUp;
 var shopMainView = ResPath.Generated.Modules.Shop.Res.UI.Panels.ShopMain.ShopMainView;
-
-var dynamicPopup = ResPath.App.UI.Popup("RewardPopup");
-var moduleScene = ResPath.Modules.Scene("Shop", "ShopMain");
 ```
 
 ## 7. 禁止事项

@@ -6,6 +6,14 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-05-02
+
+### Changed
+
+- Removed the project Root Namespace prompt from initialization and fixed generated code namespaces for `ResPath.Generated` and UI binding output.
+- Moved generated UI binding output under EFrame runtime generated directories for App and module-owned UI.
+- Aligned business-facing UI guidance around generated View access classes, `UIControllerBase<TGeneratedView>`, and the new `CurrentView` controller shortcut instead of exposing `UIViewHandle` as a normal usage concept.
+
 ## [0.6.2] - 2026-05-02
 
 ### Changed

@@ -93,7 +93,7 @@
                             <li>从组件树选择需要暴露的 Button、Text、Image 等组件。</li>
                             <li>点击 `Generate Class` 生成访问类，这个类继承 `BindingViewBase`，并在 `OnBindingSet()` 里缓存组件引用。</li>
                             <li>让业务 View wrapper 直接使用这份生成类，或者以相同模式手写一个轻量 View wrapper。</li>
-                            <li>在 `UIControllerBase<TView>` 中通过 `TypedViewHandle.TypedView` 消费这些引用。</li>
+                            <li>在 `UIControllerBase<TView>` 中通过 `CurrentView` 消费这些引用。</li>
                         </ol>
                     </div>
                     <div class="panel section">
@@ -122,14 +122,14 @@
     protected override void OnViewCreated()
     {
         base.OnViewCreated();
-        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+        AddButtonClickListener(CurrentView.StartButton, OnStartClicked);
     }
 
     private void OnStartClicked()
     {
     }
 }</code></pre>
-                        <p>关键点是：Controller 访问实时实例时应始终走 `TypedViewHandle.TypedView`，不要回退到已经被移除的 `controller.View` 习惯。</p>
+                        <p>关键点是：Controller 访问实时实例时应始终走 `CurrentView`，不要回退到已经被移除的 `controller.View` 习惯。</p>
                     </div>
                 </section>
 

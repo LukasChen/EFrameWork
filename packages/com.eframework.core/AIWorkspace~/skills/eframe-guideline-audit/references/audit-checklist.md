@@ -20,7 +20,7 @@
 - `UIController` 是否负责绑定、刷新、销毁，而不是承担全部业务逻辑
 - `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`
 - View 是否保持无参构造并通过 `OnBindingSet()` 接入 `QUIBinding`
-- Controller 是否通过 `TypedViewHandle.TypedView` 访问 View，而不是使用 `View` facade
+- Controller 是否通过 `CurrentView` 访问生成 View，而不是直接保存/驱动 `UIViewHandle` 或回退到旧 `View` facade
 - 自定义 transition 是否能处理中断，避免已失效 open/close 异步结果覆盖活跃状态
 
 ## 目录与命名

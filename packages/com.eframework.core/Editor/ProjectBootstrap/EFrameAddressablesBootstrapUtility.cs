@@ -20,8 +20,8 @@ namespace EFramework.Editor.ProjectBootstrap
         internal const string ProjectScenesRootPath = "Assets/Scenes";
         internal const string ModulesRootPath = "Assets/Modules";
         internal const string GeneratedResPathFilePath = "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs";
-        internal const string ResPathNamespaceAnchorFilePath = "Assets/App/Runtime/Common/ResPath.cs";
         internal const string ResPathSelectionSettingsFilePath = "Assets/Settings/EFrameAddressablesResPathSettings.json";
+        internal const string GeneratedResPathNamespace = "EFramework.Generated";
 
         internal const string AppSharedGroupName = "App Shared Group";
         internal const string AppBootstrapGroupName = "App Bootstrap Group";
@@ -179,7 +179,7 @@ namespace EFramework.Editor.ProjectBootstrap
                 return false;
             }
 
-            var expectedResPathContent = BuildGeneratedResPathContent(ResolveResPathNamespace(), entries);
+            var expectedResPathContent = BuildGeneratedResPathContent(GeneratedResPathNamespace, entries);
             if (!string.Equals(File.ReadAllText(generatedResPath), expectedResPathContent, StringComparison.Ordinal))
             {
                 message = $"{GeneratedResPathFilePath} is stale.";
@@ -1298,7 +1298,7 @@ namespace EFramework.Editor.ProjectBootstrap
                 EnsureFolderExists("Assets/App/Runtime/Generated");
                 EnsureFolderExists("Assets/App/Runtime/Generated/Res");
 
-                var fileContent = BuildGeneratedResPathContent(ResolveResPathNamespace(), entries);
+                var fileContent = BuildGeneratedResPathContent(GeneratedResPathNamespace, entries);
                 File.WriteAllText(GetProjectAbsolutePath(GeneratedResPathFilePath), fileContent, new UTF8Encoding(false));
                 AssetDatabase.ImportAsset(GeneratedResPathFilePath, ImportAssetOptions.ForceUpdate);
                 AssetDatabase.SaveAssets();
@@ -1445,39 +1445,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
             usedMemberNames.Add(candidate);
             return candidate;
-        }
-
-        private static string ResolveResPathNamespace()
-        {
-            var namespaceAnchorFilePath = GetProjectAbsolutePath(ResPathNamespaceAnchorFilePath);
-            if (File.Exists(namespaceAnchorFilePath))
-            {
-                var content = File.ReadAllText(namespaceAnchorFilePath);
-                var match = Regex.Match(content, @"namespace\s+([A-Za-z0-9_\.]+)");
-                if (match.Success)
-                {
-                    return match.Groups[1].Value;
-                }
-            }
-
-            var projectName = Directory.GetParent(Application.dataPath)?.Name ?? "GameApp";
-            return $"{ToNamespaceSegment(projectName)}.Common";
-        }
-
-        private static string ToNamespaceSegment(string rawValue)
-        {
-            var sanitized = Regex.Replace(rawValue ?? string.Empty, "[^A-Za-z0-9_]", string.Empty);
-            if (string.IsNullOrEmpty(sanitized))
-            {
-                return "GameApp";
-            }
-
-            if (!char.IsLetter(sanitized[0]) && sanitized[0] != '_')
-            {
-                sanitized = $"_{sanitized}";
-            }
-
-            return sanitized;
         }
 
         private static string ToCodeIdentifier(string rawSegment)

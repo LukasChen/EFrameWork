@@ -1,9 +1,9 @@
 ﻿using System;
-using EFrameConsumerFixture.Common;
-using EFrameConsumerFixture.UI.Views;
+using EFramework.Generated;
+using GameApp.UI.Views;
 using EFramework.Runtime.UI;
 
-namespace EFrameConsumerFixture.UI.Controllers
+namespace GameApp.UI.Controllers
 {
     public sealed class HomeViewController : UIControllerBase<HomeView>
     {
@@ -14,7 +14,7 @@ namespace EFrameConsumerFixture.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(TypedViewHandle.TypedView.ModuleTestButton, OnModuleTestButtonClick);
+            AddButtonClickListener(CurrentView.ModuleTestButton, OnModuleTestButtonClick);
         }
 
         protected override void OnViewDestroyed()

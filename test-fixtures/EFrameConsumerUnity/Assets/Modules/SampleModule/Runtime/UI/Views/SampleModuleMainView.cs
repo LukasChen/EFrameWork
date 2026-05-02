@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameConsumerFixture.Modules.SampleModule.UI.Views
+namespace GameApp.Modules.SampleModule.UI.Views
 {
     public sealed class SampleModuleMainView : BindingViewBase
     {

@@ -95,7 +95,7 @@ The UI runtime contract is handle-first:
 
 - Runtime UI lifecycle flows through `IUIService/QUI` and `UIViewHandle<TView>`.
 - View wrappers stay thin, use parameterless construction, and receive prefab state through `SetBinding()` / `OnBindingSet()`.
-- Controllers access live views through `TypedViewHandle.TypedView`; generated code does not use `UIControllerBase<TView>.View`.
+- Controllers access live views through `CurrentView`; generated code does not use the old `UIControllerBase<TView>.View` facade.
 - Controller lifecycle hooks are split by scope: `OnViewCreated()` / `OnViewDestroyed()` are instance-level, while `OnViewOpened()` / `OnViewClosed()` are per-open/per-close.
 - Host-owned transitions must tolerate interruption so old open/close completions cannot overwrite the active handle state.
 

@@ -31,7 +31,7 @@ Avoid adding new procedures for simple page/popup changes that can live inside t
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
 | Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Assets`. |
-| Use generated managed asset ids | `ResPath.Generated` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Use generated ids instead of handwritten Addressables strings in business runtime code. |
+| Use generated managed asset ids | `ResPath.Generated` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Namespace is fixed to `EFramework.Generated`; use generated ids instead of handwritten Addressables strings in business runtime code. |
 | Procedure-owned preload scope | `IAssetPreloadScope` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use in `OnPreloadAsync(...)`; the scope releases on procedure leave. |
 | Load an asset with explicit ownership | `LoadAsync<T>(assetId)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Dispose the returned `AssetHandle<T>` at the owning lifecycle boundary. |
 | Instantiate by generated id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use `ResPath.Generated` for managed resource `assetId` values. |
@@ -43,15 +43,14 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| UI service | `IUIService` / `QUI` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs` | Create/open/release UI through `Context.UI` or `EFrame.UI`. |
-| Controller base | `UIControllerBase<TView>` | `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Controllers own UI orchestration and access live views through `TypedViewHandle.TypedView`. |
-| Access the live typed view | `TypedViewHandle.TypedView` | `packages/com.eframework.core/Runtime/UI/Handles/TypedViewHandle.cs` | Prefer the typed handle view access point instead of facade shortcuts. |
-| View wrapper base | `BindingViewBase` | `packages/com.eframework.core/Runtime/UI/BindingViewBase.cs` | Generated/project views should stay thin and parameterless, using `SetBinding(...)` and `OnBindingSet()`. |
-| Runtime view handle | `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Handles open/close/cache/release state and interruption-safe transitions. |
-| Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs should include binding/config data consumed by view wrappers. |
+| Business UI entry | `EFrame.UI`, `UIControllerBase<TGeneratedView>` | `packages/com.eframework.core/Runtime/EFrame.cs`, `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Business code should write controllers and call `Show()` / `Hide()`; do not directly own service or handle objects. |
+| Access the live generated view | `CurrentView` | `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Use inside controllers to reach the generated binding view without touching `UIViewHandle`. |
+| Generated View access class | UI Binding generated class under `EFramework.Generated.UI` | `packages/com.eframework.core/Editor/UI/UIAutoBindingEditor.cs`, `packages/com.eframework.core/Runtime/UI/BindingViewBase.cs` | Generated from prefab `QUIBinding`; normal business UI should not hand-write View wrappers. |
+| Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs include binding/config data such as default layer, cache, and animation root. |
+| Advanced/internal UI host | `IUIService` / `QUI`, `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs`, `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Use directly only for framework internals, advanced UI managers, navigation stack work, or debugging lifecycle state. |
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to runtime scene cameras that should host the framework UI overlay stack. |
 
-Avoid hand-built persistent top-level Canvas/EventSystem objects and direct `BindingViewBase` lifecycle driving.
+Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal business View wrappers, direct `BindingViewBase` lifecycle driving, and direct business `UIViewHandle` ownership.
 
 ## Data
 

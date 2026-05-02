@@ -1,8 +1,10 @@
 # EFrame UI Framework Guide
 
-This document describes the current UI runtime structure in EFrame after the UI main chain was refactored to a handle-first model.
+This document describes the current UI runtime structure in EFrame after the UI main chain was refactored to a handle-first model. It is mainly useful for framework maintenance, debugging, and advanced extensions.
 
 For the new browsable docs site, start from [Documentation~/index.html](../index.html) and then open [Documentation~/runtime/ui/index.html](../runtime/ui/index.html).
+
+For normal business UI usage, prefer the simpler end-to-end sample in [UI_USAGE_EXAMPLE.md](UI_USAGE_EXAMPLE.md): create prefab binding, generate the View access class, then write `UIControllerBase<TGeneratedView>`.
 
 The key rule is simple: runtime UI lifecycle now flows through `QUI` + `UIViewHandle`, not through direct `BindingViewBase.Open/Close` calls.
 
@@ -256,8 +258,8 @@ namespace Demo.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(TypedViewHandle.TypedView.BackButton, OnBackButtonClick);
-            AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartButtonClick);
+            AddButtonClickListener(CurrentView.BackButton, OnBackButtonClick);
+            AddButtonClickListener(CurrentView.StartButton, OnStartButtonClick);
         }
 
         protected override void OnViewOpened()
@@ -287,7 +289,7 @@ namespace Demo.UI.Controllers
 
 Key point:
 
-- access the live instance through `TypedViewHandle.TypedView`
+- access the live instance through `CurrentView`
 - do not expect `controller.View`
 
 ## 8. Showing And Hiding UI
@@ -349,8 +351,8 @@ namespace Demo.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(TypedViewHandle.TypedView.CancelButton, () => CloseWithResult(ConfirmResult.Cancel));
-            AddButtonClickListener(TypedViewHandle.TypedView.ConfirmButton, () => CloseWithResult(ConfirmResult.Confirm));
+            AddButtonClickListener(CurrentView.CancelButton, () => CloseWithResult(ConfirmResult.Cancel));
+            AddButtonClickListener(CurrentView.ConfirmButton, () => CloseWithResult(ConfirmResult.Confirm));
         }
     }
 }

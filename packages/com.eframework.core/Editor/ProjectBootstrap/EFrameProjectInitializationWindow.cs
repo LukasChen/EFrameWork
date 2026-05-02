@@ -17,15 +17,14 @@ namespace EFramework.Editor.ProjectBootstrap
     {
         private const string WindowTitle = "EFrame Project Init";
         private const string PackageName = "com.eframework.core";
+        private const string AppNamespace = "GameApp";
         private const string StartUpScenePath = "Assets/Scenes/StartUp.unity";
         private const string StartUpGuidePath = "Assets/Scenes/StartUp_SETUP.md";
         private const string ModulesRootPath = "Assets/Modules";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
-        private const string NamespacePrefsKey = "EFrame.ProjectInitializationWindow.RootNamespace";
         private const string ModuleNamePrefsKey = "EFrame.ProjectInitializationWindow.ModuleName";
         private const string AiClientPrefsKey = "EFrame.ProjectInitializationWindow.AIClient";
 
-        private string m_rootNamespace;
         private string m_moduleName;
         private AIClientSelection m_aiClientSelection;
         private string m_statusMessage;
@@ -70,12 +69,6 @@ namespace EFramework.Editor.ProjectBootstrap
                 EditorGUILayout.Space();
                 EditorGUILayout.HelpBox(EFrameDotweenBootstrapUtility.GetInstallationGuidance(), MessageType.Info);
             }
-
-            EditorGUILayout.Space();
-
-            m_rootNamespace = EditorGUILayout.TextField("Root Namespace", m_rootNamespace);
-
-            EditorGUILayout.Space();
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
@@ -131,20 +124,17 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void InitializeState()
         {
-            m_rootNamespace = EditorPrefs.GetString(NamespacePrefsKey, GetDefaultNamespace());
             m_moduleName = EditorPrefs.GetString(ModuleNamePrefsKey, string.Empty);
             m_aiClientSelection = (AIClientSelection)EditorPrefs.GetInt(AiClientPrefsKey, (int)AIClientSelection.All);
         }
 
         private static string ProjectRootPath => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
 
-        private static string ProjectName => new DirectoryInfo(ProjectRootPath).Name;
-
         private void RunFullInitialization()
         {
             if (IsAiSyncAvailable(out _, out _))
             {
-                if (!RunToolScript("Initialize-EFrameColdStart.ps1", $"-TargetRoot \"{ProjectRootPath}\" -RootNamespace \"{m_rootNamespace}\" -Force"))
+                if (!RunToolScript("Initialize-EFrameColdStart.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Force"))
                 {
                     return;
                 }
@@ -184,8 +174,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void CreateOrRefreshStartUpScene()
         {
-            EditorPrefs.SetString(NamespacePrefsKey, m_rootNamespace);
-
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 return;
@@ -210,7 +198,7 @@ namespace EFramework.Editor.ProjectBootstrap
             var procedureComponent = bootObject.GetComponent<EFrameProcedureComponent>();
             var eframeComponent = bootObject.GetComponent<EFrameComponent>();
 
-            ConfigureProcedureComponent(procedureComponent, m_rootNamespace);
+            ConfigureProcedureComponent(procedureComponent);
             ConfigureEFrameComponent(eframeComponent, procedureComponent, camera);
 
             EnsureStartUpSceneInBuildSettings(StartUpScenePath);
@@ -226,15 +214,15 @@ namespace EFramework.Editor.ProjectBootstrap
             AssetDatabase.Refresh();
         }
 
-        private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent, string rootNamespace)
+        private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent)
         {
             var procedureObject = new SerializedObject(procedureComponent);
             var availableProcedures = procedureObject.FindProperty("m_availableProcedureTypeNames");
             var entranceProcedure = procedureObject.FindProperty("m_entranceProcedureTypeName");
 
-            var launcher = $"{rootNamespace}.Procedure.ProcedureLauncher";
-            var home = $"{rootNamespace}.Procedure.ProcedureHome";
-            var sampleModule = $"{rootNamespace}.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry";
+            var launcher = $"{AppNamespace}.Procedure.ProcedureLauncher";
+            var home = $"{AppNamespace}.Procedure.ProcedureHome";
+            var sampleModule = $"{AppNamespace}.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry";
 
             availableProcedures.arraySize = 3;
             availableProcedures.GetArrayElementAtIndex(0).stringValue = launcher;
@@ -587,12 +575,6 @@ namespace EFramework.Editor.ProjectBootstrap
             return true;
         }
 
-        private static string GetDefaultNamespace()
-        {
-            var candidate = ProjectName.Replace(" ", string.Empty).Replace("-", string.Empty);
-            return string.IsNullOrWhiteSpace(candidate) ? "GameApp" : candidate;
-        }
-
         private static string SanitizeIdentifier(string rawValue)
         {
             if (string.IsNullOrWhiteSpace(rawValue))
@@ -614,7 +596,7 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void CreateModuleScaffoldFiles(string moduleName)
         {
-            var moduleNamespace = $"{m_rootNamespace}.Modules.{moduleName}";
+            var moduleNamespace = $"{AppNamespace}.Modules.{moduleName}";
             var moduleRoot = Path.Combine(ProjectRootPath, "Assets", "Modules", moduleName);
 
             WriteScaffoldFile(Path.Combine(moduleRoot, "README.md"), BuildModuleGuideContent(moduleName));
@@ -662,9 +644,9 @@ Recommended next steps:
         private string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
             return $@"using Cysharp.Threading.Tasks;
+using EFramework.Generated;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.Procedure;
-using {m_rootNamespace}.Common;
 using UnityEngine;
 
 namespace {moduleNamespace}.Procedure
@@ -724,8 +706,8 @@ namespace {moduleNamespace}.UI.Views
         private string BuildModuleControllerContent(string moduleName, string moduleNamespace)
         {
             return $@"using System;
+using EFramework.Generated;
 using EFramework.Runtime.UI;
-using {m_rootNamespace}.Common;
 using {moduleNamespace}.UI.Views;
 
 namespace {moduleNamespace}.UI.Controllers
@@ -739,7 +721,7 @@ namespace {moduleNamespace}.UI.Controllers
         protected override void OnViewCreated()
         {{
             base.OnViewCreated();
-            AddButtonClickListener(TypedViewHandle.TypedView.BackButton, OnBackButtonClick);
+            AddButtonClickListener(CurrentView.BackButton, OnBackButtonClick);
         }}
 
         protected override void OnViewDestroyed()

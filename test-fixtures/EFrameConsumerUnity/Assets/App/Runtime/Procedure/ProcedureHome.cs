@@ -1,13 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
+using EFramework.Generated;
 using EFramework.Runtime;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.Procedure;
-using EFrameConsumerFixture.Common;
-using EFrameConsumerFixture.Modules.SampleModule.Procedure;
-using EFrameConsumerFixture.UI.Controllers;
+using GameApp.Modules.SampleModule.Procedure;
+using GameApp.UI.Controllers;
 using UnityEngine;
 
-namespace EFrameConsumerFixture.Procedure
+namespace GameApp.Procedure
 {
     public sealed class ProcedureHome : EFrameProcedure
     {

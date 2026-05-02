@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.13",
+    "version":  "0.4.15",
     "updatedAt":  "2026-05-02",
-    "notes":  "Rename synced framework namespace examples to EFramework while keeping the EFrame runtime entry type.",
+    "notes":  "Align business UI guidance around generated View access classes and controller-first usage.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -21,23 +21,23 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "003084a216248745649335b716af24d04beaae8c775e3f353bc96171a9f7b8bb"
+                      "sha256":  "100ea98c71d33b901db4b6850b3edff4710b89683490c273f1d9664146da7a5a"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "5051445064a61e2e18715ff377445f47b5ced07b5389ff2be2f893553053bfd4"
+                      "sha256":  "dbdc306ac61d123b9547266d21420f49444aafe37bfa72e9074a9f60caab2540"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "54b6827d20ed926deda349d855f3fb37bbe544e61d5263f30fe98849aab60214"
+                      "sha256":  "9ecc2c5964cb332508e13fc5a2b4360638af2d680237f180852d566eb6811003"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "353a50528fc7759b7974c5c25b0f34603be278ae8615aa20f4dc34c8200c7b27"
+                      "sha256":  "70879d64d8bd3d3ef5868273a8be12c43cee94f4154b4fce014da9b97d9a65e3"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -57,7 +57,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "a75799b4d5e2b81874367be988a67de71449a8da10cb84c282e0988292baa9dd"
+                      "sha256":  "1da0a2ccdaa2c80b09b7a6f065d5525cf9ff1d3533204f5cf1a07ccd174635a8"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
@@ -73,11 +73,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
-                      "sha256":  "82c1f12887d20085c0e74ca8ed32f051c87cda385d217e639aa6e9d23da37332"
+                      "sha256":  "003f4654ed6290f7fb43996e0d1c122c34cfc8e7729f04350bf32dd88e86d0fe"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "2378ef224e7b99c4abfacc11a0c7726fa55c002c95da79f1c68e34721f337a70"
+                      "sha256":  "942fa843f2384b36e4f60109d73e25018d15dccb002bbe2c83552a22ece306a2"
                   }
               ]
 }

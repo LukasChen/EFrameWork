@@ -1,9 +1,9 @@
 ﻿using System;
+using EFramework.Generated;
 using EFramework.Runtime.UI;
-using EFrameConsumerFixture.Common;
-using EFrameConsumerFixture.Modules.SampleModule.UI.Views;
+using GameApp.Modules.SampleModule.UI.Views;
 
-namespace EFrameConsumerFixture.Modules.SampleModule.UI.Controllers
+namespace GameApp.Modules.SampleModule.UI.Controllers
 {
     public sealed class SampleModuleMainViewController : UIControllerBase<SampleModuleMainView>
     {
@@ -14,7 +14,7 @@ namespace EFrameConsumerFixture.Modules.SampleModule.UI.Controllers
         protected override void OnViewCreated()
         {
             base.OnViewCreated();
-            AddButtonClickListener(TypedViewHandle.TypedView.BackButton, OnBackButtonClick);
+            AddButtonClickListener(CurrentView.BackButton, OnBackButtonClick);
         }
 
         protected override void OnViewDestroyed()

@@ -77,7 +77,7 @@
     protected override void OnViewCreated()
     {
         base.OnViewCreated();
-        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+        AddButtonClickListener(CurrentView.StartButton, OnStartClicked);
     }
 
     protected override void OnViewOpened()

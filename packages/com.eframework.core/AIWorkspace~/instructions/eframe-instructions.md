@@ -10,14 +10,16 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 ## UI 契约
 - `Procedure` 只负责状态切换、进入/退出编排和生命周期清理；页面、弹窗、提示层切换优先作为现有流程内的 UI 行为，不滥增新 `Procedure`。
-- UI 应通过 `EFrame.UI` / `IUIService`、`UIControllerBase` 与 `UIViewHandle` 管理；`QUI` 是默认 UI 服务实现和层级宿主，不要在场景里手工堆常驻顶层 Canvas、EventSystem 或绕过框架的 UI 生命周期入口。
-- Runtime UI 组件、适配器、动画、helper 和生成绑定代码统一落在 `EFramework.Runtime.UI` 及其稳定子命名空间，例如 `Components`、`Layout`、`UIHelper`、`Generated`。
+- 业务 UI 推荐入口只暴露一条路径：通过 `EFrame.UI` 和 `UIControllerBase<TGeneratedView>` 管理页面、弹窗和提示；`QUI`、`IUIService`、`UIViewHandle` 是框架内部或进阶扩展概念，不作为普通业务代码的直接入口。
+- View 访问类由 UI Binding 工具生成，继承 `BindingViewBase`，默认命名空间为 `EFramework.Generated.UI`；业务使用者不手写 View wrapper。
+- Controller 内访问生成 View 时使用 `CurrentView`；不要让业务逻辑直接保存或驱动 `UIViewHandle`。
+- Runtime UI 组件、适配器、动画、helper 统一落在 `EFramework.Runtime.UI` 及其稳定子命名空间，例如 `Components`、`Layout`、`UIHelper`；业务生成绑定代码使用工具生成的 `EFramework.Generated.UI`。
 - 命名保持框架约定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`，组件目录、类名和命名空间大小写一致。
 
 ## UI 主链
 
-- 创建、打开、关闭、缓存和释放 View 统一走 `IUIService`、`UIControllerBase` 与 `UIViewHandle`；业务代码不要直接驱动 `BindingViewBase` 生命周期，也不要绕过 `QUI` 自己拼顶层 UI 宿主。
-- View wrapper 保持轻量、无参、可复用；不要把跨打开周期的业务状态塞进 View 实例缓存。
+- 业务代码创建、打开、关闭页面时优先写 Controller，并调用 `Show()` / `ShowAsync()` / `Hide()` / `HideAsync()`；不要直接创建 View、Binding 或 Handle。
+- 生成 View 只做 prefab 组件访问；不要把跨打开周期的业务状态塞进 View 实例缓存。
 - UI transition、缓存命中、资源实例化和释放决策由框架宿主或 handle 统一管理；不要在业务层自建一套并发状态机覆盖 EFrame 的 UI 生命周期。
 
 ## 资源路径与 Addressables
@@ -31,7 +33,7 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 - 启动流程状态使用 EFrame 自有的 `EFrameProcedure` 和 `EFrameProcedureComponent`，不要绕过框架状态机手工驱动流程切换。
 - 修改启动链路时必须保证 `EFrame.Initialize(...)` 先完成；在 framework-aware 类型内部优先使用注入的 `Context`，只有启动、静态入口或非注入场景才使用 `EFrame.UI`、`EFrame.Assets`、`EFrame.Data` 等静态快捷入口。
-- `QUI` 依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
+- 框架 UI 宿主依赖的 Unity SortingLayer 配置要由项目初始化链路补齐；运行时如果缺失层级，应保留明确校验和修复提示，不要静默回落。
 - 需要成为框架 UI overlay 场景渲染入口的运行时场景相机必须挂载 `EFrameSceneCamera`，由组件自动维护 Camera stack；不要在业务代码里轮询相机或手动维护 Camera stack。
 
 ## 事件与数据
@@ -48,9 +50,9 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 - 工具脚本先显式校验前置条件，例如目标目录、已有资源、覆盖意图和必需配置；失败时给出可修复的错误信息。
 - 修改 prefab、scene object 或 `.asset` 时使用 Unity Editor 正规路径，例如 `Undo`、`PrefabUtility`、`EditorUtility.SetDirty`、`AssetDatabase.SaveAssets/Refresh`；不要用不透明的文本替换制造 Unity 序列化噪音。
 - UI 预制体、场景对象或绑定代码必须与运行时命名对齐：`XxxView.prefab`、`XxxViewController`、`ProcedureXxx`。
-- UI 基础配置（例如默认 `IUIService` 实现 `QUI` 依赖的 SortingLayer）优先进入 `ProjectBootstrap` 初始化链路；目录按职责分层到 `Editor/UI`、`Editor/ProjectBootstrap`、`Editor/Tools`。
+- UI 基础配置（例如框架 UI 宿主依赖的 SortingLayer）优先进入 `ProjectBootstrap` 初始化链路；目录按职责分层到 `Editor/UI`、`Editor/ProjectBootstrap`、`Editor/Tools`。
 
 ## 框架契约边界
 
 - 不要直接修改同步得到的 `eframe-*` 文件来表达项目私有差异。
-- 如果项目需要偏离本契约，优先在本地 instruction 说明差异边界，并保持 `EFrame.Initialize(...)`、`QUI/UIController`、`ResPath.Generated`、Addressables 和数据表持久化入口可被框架工具识别。
+- 如果项目需要偏离本契约，优先在本地 instruction 说明差异边界，并保持 `EFrame.Initialize(...)`、`EFrame.UI/UIController`、`ResPath.Generated`、Addressables 和数据表持久化入口可被框架工具识别。

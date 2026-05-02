@@ -1,7 +1,7 @@
 ﻿using EFramework.Runtime.Procedure;
 using UnityEngine;
 
-namespace EFrameConsumerFixture.Procedure
+namespace GameApp.Procedure
 {
     public sealed class ProcedureLauncher : EFrameProcedure
     {

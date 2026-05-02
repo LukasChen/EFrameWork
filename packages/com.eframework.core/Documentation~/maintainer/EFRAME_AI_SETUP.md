@@ -57,12 +57,12 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 如果你只想补最小启动代码骨架，可以单独执行：
 
 ```powershell
-.\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject" -RootNamespace "YourGame"
+.\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject"
 ```
 
 它会生成：
 
-- `Assets/App/Runtime/Common/ResPath.cs`（仅作为 namespace anchor；资源常量由 `ResPath.Generated` 生成）
+- `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`（资源常量生成物，命名空间固定为 `EFramework.Generated`）
 - `Assets/App/Runtime/Procedure/ProcedureLauncher.cs`
 - `Assets/App/Runtime/Procedure/ProcedureHome.cs`
 - `Assets/App/Runtime/UI/Views/HomeView.cs`
@@ -81,7 +81,7 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 
 这两个 prefab 都带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它们。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这些 prefab。
 
-生成的 View wrapper 采用 handle-first UI 契约：View 保持无参构造，通过 `OnBindingSet()` 缓存 `QUIBinding` 组件引用；Controller 通过 `TypedViewHandle.TypedView` 访问运行中 View，并按 `OnViewCreated()` / `OnViewDestroyed()` 管理实例级绑定，按 `OnViewOpened()` / `OnViewClosed()` 管理每次打开关闭的刷新或暂停逻辑。
+生成的 View 访问类采用工具生成模式：View 保持无参构造，通过 `OnBindingSet()` 缓存 `QUIBinding` 组件引用；Controller 通过 `CurrentView` 访问运行中 View，并按 `OnViewCreated()` / `OnViewDestroyed()` 管理实例级绑定，按 `OnViewOpened()` / `OnViewClosed()` 管理每次打开关闭的刷新或暂停逻辑。
 
 初始化窗口会立即重跑目录分组同步，并按 ResPath 目录选择生成 `ResPath.Generated.cs`；复制出的 UI prefab 会进入地址管理，托管目录里的导入、移动和删除由编辑器自动同步。
 

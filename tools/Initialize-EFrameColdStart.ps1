@@ -7,8 +7,7 @@ param(
     [switch]$SkipProjectOverlay,
     [switch]$SkipProjectUpdater,
     [switch]$SkipDirectoryScaffold,
-    [switch]$SkipBootstrapCode,
-    [string]$RootNamespace
+    [switch]$SkipBootstrapCode
 )
 
 if (-not $TargetRoot) {
@@ -123,7 +122,7 @@ function Write-ColdStartSummary {
     Write-ColdStartStatus -Name "Directory scaffold" -State $directoryState -Detail "$($directories.Count) standard directories under Assets/ and tools/"
     Write-ColdStartStatus -Name "AI workspace" -State (Get-StateForPath ".github/eframe-ai.manifest.json" (-not $IncludeAIWorkspace)) -Detail ".github instructions, skills, and manifest"
     Write-ColdStartStatus -Name "Project updater" -State (Get-StateForPath "tools/Sync-EFrameAIFromFramework.ps1" ((-not $IncludeAIWorkspace) -or $SkipProjectUpdater)) -Detail "tools/Sync-EFrameAIFromFramework.ps1"
-    Write-ColdStartStatus -Name "Bootstrap code" -State (Get-StateForPath "Assets/App/Runtime/Common/ResPath.cs" $SkipBootstrapCode) -Detail "ResPath, Procedure, Home UI, SampleModule, and StartUp_SETUP.md"
+    Write-ColdStartStatus -Name "Bootstrap code" -State (Get-StateForPath "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs" $SkipBootstrapCode) -Detail "Generated ResPath, Procedure, Home UI, SampleModule, and StartUp_SETUP.md"
     Write-ColdStartStatus -Name "Audio event config" -State (Get-StateForPath "Assets/Resources/Audio/AudioEventConfig.asset" $false) -Detail "Resources config loaded by AudioEventManager"
 
     Write-Host ""
@@ -215,7 +214,7 @@ if ($IncludeAIWorkspace -and -not $SkipProjectUpdater) {
 }
 
 if (-not $SkipBootstrapCode) {
-    & (Join-Path $scriptRoot "Initialize-EFrameBootstrapCode.ps1") -TargetRoot $resolvedTargetRoot -RootNamespace $RootNamespace -Force:$Force
+    & (Join-Path $scriptRoot "Initialize-EFrameBootstrapCode.ps1") -TargetRoot $resolvedTargetRoot -Force:$Force
 }
 
 Write-Host "EFrame cold start complete for $resolvedTargetRoot"

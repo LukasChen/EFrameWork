@@ -2,7 +2,7 @@
 // Initial bootstrap constants. Regenerate from EFrame Tools/Addressables/Sync Groups And Generate ResPath after managed resources are synced.
 // </auto-generated>
 
-namespace EFrameConsumerFixture.Common
+namespace EFramework.Generated
 {
     public static partial class ResPath
     {

@@ -102,20 +102,20 @@
     protected override void OnViewCreated()
     {
         base.OnViewCreated();
-        AddButtonClickListener(TypedViewHandle.TypedView.StartButton, OnStartClicked);
+        AddButtonClickListener(CurrentView.StartButton, OnStartClicked);
     }
 
     protected override void OnViewOpened()
     {
         base.OnViewOpened();
-        TypedViewHandle.TypedView.RefreshComponents();
+        CurrentView.RefreshComponents();
     }
 
     private void OnStartClicked()
     {
     }
 }</code></pre>
-                        <p>这里的关键不是继承本身，而是职责切分：Controller 只用 `TypedViewHandle.TypedView` 读写当前活着的 View，不自己承担实例化和释放规则。</p>
+                        <p>这里的关键不是继承本身，而是职责切分：Controller 只用 `CurrentView` 读写当前活着的 View，不自己承担实例化和释放规则。</p>
                     </div>
                  </section>
             </div>

@@ -1,8 +1,9 @@
-﻿using EFramework.Runtime.UI;
+﻿using EFramework.Generated;
+using EFramework.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrameConsumerFixture.UI.Views
+namespace GameApp.UI.Views
 {
     public sealed class HomeView : BindingViewBase
     {
@@ -23,6 +24,6 @@ namespace EFrameConsumerFixture.UI.Views
             ModuleTestButton = Binding == null ? null : Binding.transform.Find("Panel/ModuleTestButton")?.GetComponent<Button>();
         }
 
-        public static string DefaultAssetPath => EFrameConsumerFixture.Common.ResPath.Generated.UI.Panels.Home.HomeView;
+        public static string DefaultAssetPath => ResPath.Generated.UI.Panels.Home.HomeView;
     }
 }

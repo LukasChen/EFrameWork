@@ -14,7 +14,8 @@ namespace EFramework.Editor.UI
     [CustomEditor(typeof(QUIBinding))]
     public class UIAutoBindingEditor : UnityEditor.Editor
     {
-        public const string ClassPath = "Assets/Scripts/Generated/UI";
+        private const string AppGeneratedUIPath = "Assets/App/Runtime/Generated/UI";
+        private const string ModulesRootPath = "Assets/Modules";
         private QUIBinding m_target;
         private Vector2 m_scrollPosition;
         private Vector2 m_treeScrollPosition;
@@ -790,12 +791,14 @@ namespace EFramework.Editor.UI
 
             string code = GenerateAccessClassCode();
 
-            if (!Directory.Exists(ClassPath))
+            var classPath = ResolveGeneratedClassPath();
+            var className = ResolveGeneratedClassName();
+            if (!Directory.Exists(classPath))
             {
-                Directory.CreateDirectory(ClassPath);
+                Directory.CreateDirectory(classPath);
             }
 
-            string filePath = Path.Combine(ClassPath, $"{m_target.AccessClassName}.cs");
+            string filePath = Path.Combine(classPath, $"{className}.Generated.cs");
 
             // 保存文件（不刷新AssetDatabase避免焦点跳转）
             File.WriteAllText(filePath, code, Encoding.UTF8);
@@ -807,9 +810,58 @@ namespace EFramework.Editor.UI
             EditorUtility.DisplayDialog("生成成功", $"独立访问类已生成到: {filePath}\n\n包含 {bindingItems.Count} 个组件的直接引用。", "确定");
         }
 
+        private string ResolveGeneratedClassPath()
+        {
+            var assetPath = AssetDatabase.GetAssetPath(m_target.gameObject).Replace('\\', '/');
+            if (TryResolveModuleName(assetPath, out var moduleName))
+            {
+                return $"{ModulesRootPath}/{moduleName}/Runtime/Generated/UI";
+            }
+
+            return AppGeneratedUIPath;
+        }
+
+        private string ResolveGeneratedClassName()
+        {
+            var className = SanitizePropertyName(m_target.AccessClassName);
+            var assetPath = AssetDatabase.GetAssetPath(m_target.gameObject).Replace('\\', '/');
+            if (TryResolveModuleName(assetPath, out var moduleName))
+            {
+                var modulePrefix = SanitizePropertyName(moduleName);
+                if (!className.StartsWith(modulePrefix, StringComparison.OrdinalIgnoreCase) &&
+                    !className.StartsWith($"v_{modulePrefix}", StringComparison.OrdinalIgnoreCase))
+                {
+                    className = className.StartsWith("v_", StringComparison.OrdinalIgnoreCase)
+                        ? $"v_{modulePrefix}_{className.Substring(2)}"
+                        : $"{modulePrefix}_{className}";
+                }
+            }
+
+            return className;
+        }
+
+        private static bool TryResolveModuleName(string assetPath, out string moduleName)
+        {
+            moduleName = string.Empty;
+            if (!assetPath.StartsWith(ModulesRootPath + "/", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var segments = assetPath.Split('/');
+            if (segments.Length < 3 || string.IsNullOrWhiteSpace(segments[2]))
+            {
+                return false;
+            }
+
+            moduleName = segments[2];
+            return true;
+        }
+
         private string GenerateAccessClassCode()
         {
             var bindingItems = m_target.BindingItems;
+            var className = ResolveGeneratedClassName();
             var sb = new StringBuilder();
 
             // 添加文件头注释
@@ -854,7 +906,7 @@ namespace EFramework.Editor.UI
             sb.AppendLine($"    /// {m_target.gameObject.name} 的独立组件访问类");
             sb.AppendLine($"    /// 继承自 BindingViewBase，提供标准的UI绑定功能");
             sb.AppendLine($"    /// </summary>");
-            sb.AppendLine($"    public class {m_target.AccessClassName} : BindingViewBase");
+            sb.AppendLine($"    public class {className} : BindingViewBase");
             sb.AppendLine("    {");
 
 
@@ -867,7 +919,7 @@ namespace EFramework.Editor.UI
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 无参构造函数，运行时由 QUI 创建后注入 Binding");
             sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public " + m_target.AccessClassName + "() : base()");
+            sb.AppendLine("        public " + className + "() : base()");
             sb.AppendLine("        {");
             sb.AppendLine("        }");
             sb.AppendLine();
@@ -876,7 +928,7 @@ namespace EFramework.Editor.UI
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 使用已有 QUIBinding 构造访问类");
             sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public " + m_target.AccessClassName + "(QUIBinding binding) : base(binding)");
+            sb.AppendLine("        public " + className + "(QUIBinding binding) : base(binding)");
             sb.AppendLine("        {");
             sb.AppendLine("            InitializeFromBinding();");
             sb.AppendLine("        }");
@@ -897,12 +949,12 @@ namespace EFramework.Editor.UI
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 从已有 QUIBinding 创建并初始化实例");
             sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public static " + m_target.AccessClassName + " Create(QUIBinding binding)");
+            sb.AppendLine("        public static " + className + " Create(QUIBinding binding)");
             sb.AppendLine("        {");
             sb.AppendLine("            if (binding == null)");
             sb.AppendLine("                throw new System.ArgumentNullException(nameof(binding));");
             sb.AppendLine();
-            sb.AppendLine("            return new " + m_target.AccessClassName + "(binding);");
+            sb.AppendLine("            return new " + className + "(binding);");
             sb.AppendLine("        }");
             sb.AppendLine();
 
@@ -910,7 +962,7 @@ namespace EFramework.Editor.UI
             sb.AppendLine("        /// <summary>");
             sb.AppendLine("        /// 从GameObject查找QUIBinding并创建实例");
             sb.AppendLine("        /// </summary>");
-            sb.AppendLine("        public static " + m_target.AccessClassName + " CreateFromGameObject(GameObject gameObject)");
+            sb.AppendLine("        public static " + className + " CreateFromGameObject(GameObject gameObject)");
             sb.AppendLine("        {");
             sb.AppendLine("            if (gameObject == null)");
             sb.AppendLine("                throw new System.ArgumentNullException(nameof(gameObject));");

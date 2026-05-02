@@ -396,6 +396,11 @@ namespace EFramework.Runtime.UI
         public UIViewHandle<TView> TypedViewHandle => m_viewHandle;
 
         /// <summary>
+        /// 当前生成 View 实例，供业务 Controller 访问绑定组件。
+        /// </summary>
+        protected TView CurrentView => m_viewHandle?.TypedView;
+
+        /// <summary>
         /// 是否正在显示
         /// </summary>
         public override bool IsShowing => m_viewHandle != null && m_viewHandle.IsShowing;

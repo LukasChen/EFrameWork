@@ -2,13 +2,11 @@
 
 Create a startup scene named StartUp.unity under Assets/Scenes and keep the root structure minimal:
 
-`	ext
-StartUp
-|- Boot
-|  |- EFrameProcedureComponent
-|  |- EFrameComponent
-|- Main Camera
-`
+    StartUp
+    |- Boot
+    |  |- EFrameProcedureComponent
+    |  |- EFrameComponent
+    |- Main Camera
 
 Required setup:
 
@@ -16,15 +14,14 @@ Required setup:
 2. Assign the same EFrameProcedureComponent instance to EFrameComponent.m_procedureComponent
 3. Set Main Camera and UI camera references on EFrameComponent
 4. Register these procedures in EFrameProcedureComponent:
-    - $RootNamespace.Procedure.ProcedureLauncher
-    - $RootNamespace.Procedure.ProcedureHome
-    - $RootNamespace.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry
-5. Set the entrance procedure type name to $RootNamespace.Procedure.ProcedureLauncher
+    - GameApp.Procedure.ProcedureLauncher
+    - GameApp.Procedure.ProcedureHome
+    - GameApp.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry
+5. Set the entrance procedure type name to GameApp.Procedure.ProcedureLauncher
 6. In Unity Editor, run Copy Sample UI Prefab Templates once so HomeView and SampleModuleMainView prefabs exist.
 
 Generated placeholder code:
 
-- Assets/App/Runtime/Common/ResPath.cs (namespace anchor; generated resource constants live in ResPath.Generated)
 - Assets/App/Runtime/Generated/Res/ResPath.Generated.cs (generated after Addressables groups are ready)
 - Assets/App/Runtime/Procedure/ProcedureLauncher.cs
 - Assets/App/Runtime/Procedure/ProcedureHome.cs
