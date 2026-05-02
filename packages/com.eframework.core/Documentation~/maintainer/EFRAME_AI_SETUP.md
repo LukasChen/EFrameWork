@@ -2,7 +2,7 @@
 
 这套配置把 EFrame 开发规范沉淀为可继承的 AI 工作区层。新项目引入框架并完成 Unity 冷启动后，可在编辑器窗口选择 Codex、GitHub Copilot 或 Claude Code 平台并同步对应 AI 契约。
 
-AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或同步流程时，同步维护配套 instructions、skills 和说明文档；发布与 manifest 边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
+AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或同步流程时，同步维护配套 instructions、skills 和说明文档；发布与 manifest 边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 
 架构边界和同步契约见 [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md)。
 
@@ -20,14 +20,16 @@ AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table`：用于持久化数据表、dirty、迁移、保存/加载结果工作流
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow`：用于资源目录、Addressables、ResPath 和异步句柄释放工作流
 - `tools/MaintainerAIWorkspace/skills/maintainer-*`：仅框架仓库维护用，不同步到业务项目
-- `packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md`：业务 AI 和开发者快速查询稳定框架 API 的索引，同步到业务项目 `.github/eframe/EFRAME_AI_API_INDEX.md`
-- `docs/maintainer/EFRAME_AI_ARCHITECTURE.md`、`docs/maintainer/EFRAME_AI_SETUP.md`、`docs/maintainer/EFRAME_AI_RELEASE_CHECKLIST.md`：框架仓库维护文档，不同步到业务项目
+- `packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md`：业务 AI 查询稳定框架 API 的同步源，落到业务项目 `.github/eframe/EFRAME_AI_API_INDEX.md`
+- `packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md`、`packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md`：给框架维护者看的文档，不同步到业务项目
+- `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`：给框架维护 AI 生效的发布、manifest 和同步边界契约，不进入 package，也不同步到业务项目
+- `packages/com.eframework.core/Documentation~/user/`：给业务开发者看的使用文档，属于人读文档，不作为 AI 同步契约源
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
 - `tools/Initialize-EFrameBootstrapCode.ps1`：生成最小启动场景/Procedure 占位代码
-- `packages/com.eframework.core/Documentation~/RESPATH_CONVENTION.md`：资源地址中心类与自动生成规则说明
-- `docs/maintainer/EFRAME_AI_ARCHITECTURE.md`：AI 协作层架构、命名边界和同步契约
+- `packages/com.eframework.core/Documentation~/user/RESPATH_CONVENTION.md`：资源地址中心类与自动生成规则说明
+- `packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md`：AI 协作层架构、命名边界和同步契约
 - `Packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`：Unity 编辑器初始化窗口
 
 ## 2. 新项目初始化方式
@@ -41,7 +43,7 @@ AI 工作区层是 EFrameWork 的一级框架能力。修改 Runtime、Editor、
 它会一次性完成：
 
 - 创建推荐目录骨架
-- 目录骨架内容以 `packages/com.eframework.core/Documentation~/UNITY_DIRECTORY_STRUCTURE.md` 为基准
+- 目录骨架内容以 `packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
 
 冷启动默认不自动同步 AI 契约。脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、项目 updater 和 bootstrap code 的状态；AI 相关项默认显示 `SKIP`，由 Unity 初始化窗口或 `EFrame Tools/AI` 菜单选择平台后同步。状态含义：
@@ -135,7 +137,7 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 
 执行后，目标项目会得到所选平台需要的 EFrame AI 接入内容。所有平台都会收到共享的 `.github/instructions/eframe-*`、`.github/skills/eframe-*` 和 `.github/eframe/EFRAME_AI_API_INDEX.md`；Codex 使用项目自己的 `AGENTS.md` 中的 EFrame managed block，GitHub Copilot 使用项目自己的 `.github/copilot-instructions.md` 中的 EFrame managed block，Claude Code 使用项目自己的 `CLAUDE.md` 中的 EFrame managed block。
 
-同步过程不会复制维护者文档 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md` 和 `EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录。业务项目接收的是所选平台需要的 EFrame managed block、`.github/instructions/eframe-*`、`.github/skills/eframe-*`、`.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json`。
+同步过程不会复制人读维护文档 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`，也不会复制维护 AI 契约 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录。业务项目接收的是所选平台需要的 EFrame managed block、`.github/instructions/eframe-*`、`.github/skills/eframe-*`、`.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json`。
 
 ## 5. 框架同步方式
 
@@ -225,7 +227,7 @@ Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude C
 - Runtime 或 Editor 重构改变推荐写法、生成模板或项目落盘结构
 - 冷启动、AI 同步、项目 updater 或初始化窗口行为调整
 
-普通开发中，上述内容只需要维护对应规则、脚本和文档；发布与 manifest 规则见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
+普通开发中，上述内容只需要维护对应规则、脚本和文档；发布与 manifest 规则见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 
 维护原则：instructions 只放短、稳定、始终需要生效的边界规则；多步骤生成、审查、发布和迁移流程放进 skills 或 skill references。同步到业务项目的流程放 `eframe-*` skill，框架仓库维护流程放 `maintainer-*` skill。
 
@@ -236,7 +238,7 @@ Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude C
 1. 先更新规范源文档。
 2. 维护 `AGENTS.md`、`.github/copilot-instructions.md`、`packages/com.eframework.core/AIWorkspace~/managed-blocks/` 和对应 `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md` / `SKILL.md`。
 3. 如果这是框架/包版本发布，更新 `packages/com.eframework.core/package.json` 的 `version`，并维护根目录 [CHANGELOG.md](../../CHANGELOG.md)。如果 package 代码有变化，也同步维护 `packages/com.eframework.core/CHANGELOG.md`。
-4. 按 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md) 处理 manifest 版本与 hash。
+4. 按 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md) 处理 manifest 版本与 hash。
 5. 按 release checklist 执行发布检查脚本：
 
 ```powershell
@@ -257,10 +259,10 @@ Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude C
 
 维护时不要把 AI 能力当成额外产品线。更合适的理解是：EFrameWork 的一个版本同时包含运行时代码、编辑器工具、AI 协作规则、冷启动模板和同步工具。manifest 只是让业务项目知道“本地同步到哪一版框架 AI 能力”。
 
-更严格的发布与同步边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](EFRAME_AI_RELEASE_CHECKLIST.md)。
+更严格的发布与同步边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 
-附：基础 Unity 目录结构规范见 [UNITY_DIRECTORY_STRUCTURE.md](../../packages/com.eframework.core/Documentation~/UNITY_DIRECTORY_STRUCTURE.md)。
+附：基础 Unity 目录结构规范见 [UNITY_DIRECTORY_STRUCTURE.md](../user/UNITY_DIRECTORY_STRUCTURE.md)。
 
-资源地址中心与自动生成规范见 [RESPATH_CONVENTION.md](../../packages/com.eframework.core/Documentation~/RESPATH_CONVENTION.md)。
+资源地址中心与自动生成规范见 [RESPATH_CONVENTION.md](../user/RESPATH_CONVENTION.md)。
 
 补充约定：实际 `.unity` 场景文件优先放在 `Assets/Scenes` 或 `Assets/Modules/<Name>/Scenes`；`Assets/App/Res/SceneAssets` 用于场景依赖资源，不直接放场景文件本体。

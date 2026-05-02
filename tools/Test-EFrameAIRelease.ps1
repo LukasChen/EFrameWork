@@ -6,7 +6,7 @@ $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $frameworkRoot = (Resolve-Path (Join-Path $scriptRoot "..")).Path
 $packageRoot = "packages/com.eframework.core"
 $aiWorkspaceRoot = "$packageRoot/AIWorkspace~"
-$packageDocumentationRoot = "$packageRoot/Documentation~"
+$aiSupportDocsRoot = "$aiWorkspaceRoot/support-docs"
 $manifestPath = "$aiWorkspaceRoot/eframe-ai.manifest.json"
 
 function Get-ManifestVersion {
@@ -151,7 +151,7 @@ function Get-ExpectedManifestFilePaths {
         $paths.Add(".github/copilot-instructions.md")
     }
 
-    if (Test-Path "$packageDocumentationRoot/EFRAME_AI_API_INDEX.md") {
+    if (Test-Path "$aiSupportDocsRoot/EFRAME_AI_API_INDEX.md") {
         $paths.Add(".github/eframe/EFRAME_AI_API_INDEX.md")
     }
 
@@ -261,9 +261,10 @@ try {
         "^packages/com\.eframework\.core/AIWorkspace~/managed-blocks/eframe-.*\.md$",
         "^packages/com\.eframework\.core/AIWorkspace~/instructions/eframe-.*\.md$",
         "^packages/com\.eframework\.core/AIWorkspace~/skills/eframe-.*",
+        "^packages/com\.eframework\.core/AIWorkspace~/support-docs/.*\.md$",
         "^packages/com\.eframework\.core/AIWorkspace~/eframe-ai\.manifest\.json$",
-        "^packages/com\.eframework\.core/Documentation~/.*\.md$",
         "^packages/com\.eframework\.core/Tools~/.*\.ps1$",
+        "^tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST\.md$",
         "^tools/MaintainerAIWorkspace/skills/maintainer-.*",
         "^tools/Initialize-EFrameAI\.ps1$",
         "^tools/New-EFrameProjectAIOverlay\.ps1$",
@@ -274,7 +275,7 @@ try {
         "^tools/Test-EFrameAIRelease\.ps1$",
         "^packages/com\.eframework\.core/Editor/EFrameProjectInitializationWindow\.cs$",
         "^README\.md$",
-        "^docs/maintainer/.*\.md$"
+        "^packages/com\.eframework\.core/Documentation~/.*"
     )
 
     $aiImpactChanges = @($changedPaths | Where-Object {

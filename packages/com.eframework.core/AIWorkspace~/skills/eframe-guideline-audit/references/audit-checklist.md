@@ -37,7 +37,7 @@
 
 ## AI 配置
 
-- 新规范是否同步到框架仓库 AI 入口或 `packages/com.eframework.core/AIWorkspace~/managed-blocks/`
-- 是否需要新增或更新 `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
-- 是否需要新增或更新 `packages/com.eframework.core/AIWorkspace~/skills/*`
-- 初始化脚本和接入文档是否可用
+- 业务项目是否保留 EFrame managed block，不复制整份框架规则到项目自有 instruction
+- 是否存在手改同步得到的 `.github/instructions/eframe-*` 或 `.github/skills/eframe-*`
+- `.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json` 是否存在
+- 初始化脚本和接入说明是否可用

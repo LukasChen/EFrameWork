@@ -43,7 +43,6 @@ forbiddenPatterns:
    - UI pages, popups, prefabs, controllers, bindings: use `eframe-ui-feature`.
    - Persistent gameplay/settings/progress data: use `eframe-data-table`.
    - Addressables, `ResPath`, prefab/audio/scene resources, async handles: use `eframe-resource-flow`.
-   - Framework AI/release/sync/template maintenance: use `maintainer-ai-contract`.
 4. Integrate the outputs so naming, directories, lifecycle cleanup, and resource paths agree across the feature.
 5. Validate the whole feature with `eframe-guideline-audit` when the implementation is complete.
 
@@ -68,6 +67,6 @@ Use `EFrameWork.Runtime.Procedure.EFrameProcedure` for new procedures, preload P
 2. 校验命名、目录、资源路径、UI 层级和数据入口是否由对应 specialized skill 覆盖。
 3. 如果项目里存在非标准目录，明确本次改动如何收敛到目标结构。
 4. 如果一个子任务需要超过几条具体实现规则，不要把规则复制到这里；改用对应 specialized skill 或 reference。
-5. 如果在框架仓库内发现本次功能改变了公共模板、冷启动流程或 AI 协作层，改用 maintainer skill 处理同步和发布检查。
+5. 如果在框架仓库内发现本次功能改变了公共模板、冷启动流程或 AI 协作层，说明它超出业务功能 bootstrap 范围。
 
 需要更细的骨架和核对项时，加载 [feature checklist](./references/feature-checklist.md)。

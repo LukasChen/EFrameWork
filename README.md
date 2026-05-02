@@ -2,7 +2,7 @@
 
 EFrameWork is a lightweight Unity game framework with a synchronized AI collaboration layer. It provides runtime/editor code, project bootstrap tools, AI instructions, skills, and update workflows so new Unity projects can start with both framework conventions and AI coding guidance in one step.
 
-In this repository, the AI layer is a first-class framework feature, not an optional documentation bundle. Business-facing AI rules, docs, and sync tools ship inside `packages/com.eframework.core/`; maintainer-only docs and release checks stay outside the package. When EFrame runtime, editor tooling, bootstrap templates, directory rules, resource conventions, or startup flow change, the matching package AI workspace, package docs, client entry files, sync scripts, and maintainer docs must be reviewed together.
+In this repository, the AI layer is a first-class framework feature, not an optional documentation bundle. AI contracts, sync tools, and human-facing docs ship inside `packages/com.eframework.core/`; AI-facing contracts live under `AIWorkspace~`, while human docs live under `Documentation~`. When EFrame runtime, editor tooling, bootstrap templates, directory rules, resource conventions, or startup flow change, the matching package AI workspace, client entry files, sync scripts, and human docs must be reviewed together.
 
 ## Framework Layers
 
@@ -13,15 +13,15 @@ In this repository, the AI layer is a first-class framework feature, not an opti
 - `packages/com.eframework.core/Tools~/`: package-shipped project cold-start and AI sync toolchain for importing, updating, and extending the framework AI layer in business projects.
 - `tools/`: maintainer-side wrappers and release checks used while developing this repository; business projects should rely on package-shipped `Tools~/` when package-only installed.
 
-See [docs/maintainer/EFRAME_AI_ARCHITECTURE.md](docs/maintainer/EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
+See [packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md) for the AI layer contract and maintenance rules.
 
-For the current handle-first UI runtime structure and usage examples, see [packages/com.eframework.core/Documentation~/UI_FRAMEWORK_GUIDE.md](packages/com.eframework.core/Documentation~/UI_FRAMEWORK_GUIDE.md).
+For the current handle-first UI runtime structure and usage examples, see [packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md](packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md).
 
-For a compact AI-oriented map of stable framework APIs and tool entry points, see [packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md](packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md).
+For human-facing docs, see [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~). AI-facing sync support docs live under `packages/com.eframework.core/AIWorkspace~/support-docs/`.
 
-For a framework-level API catalog covering runtime and editor public surfaces, see [docs/api/index.html](docs/api/index.html).
+For a framework-level API catalog covering runtime and editor public surfaces, see [packages/com.eframework.core/Documentation~/api/index.html](packages/com.eframework.core/Documentation~/api/index.html).
 
-For the new browsable HTML docs site skeleton, open [docs/index.html](docs/index.html).
+For the new browsable HTML docs site skeleton, open [packages/com.eframework.core/Documentation~/index.html](packages/com.eframework.core/Documentation~/index.html).
 
 ## Versioning
 
@@ -38,13 +38,13 @@ Use semantic versioning for EFrameWork releases. Before `1.0.0`, minor versions 
 
 Unity projects that adopt EFrameWork should receive both the Unity framework structure and the synced AI workspace layer.
 
-- Framework repo AI entry files are `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`; they are thin indexes that point to package business contracts and maintainer docs.
+- Framework repo AI entry files are `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`; they are thin indexes that point to package AI contracts and human docs.
 - Business-project AI sync source lives in `packages/com.eframework.core/AIWorkspace~/`; package-only consumers receive the same syncable `eframe-*` rules and manifest.
 - Synced business-project rules and workflows use the `eframe-*` prefix; synced support docs are explicitly declared in the manifest; framework-repository maintenance rules and workflows live under `tools/MaintainerAIWorkspace/` and are not synced to projects.
 - High-value synced skills cover feature bootstrap, guideline audit, UI features, data tables, and resource flows.
 - Package-shipped sync and installer scripts live under `packages/com.eframework.core/Tools~/`; root `tools/` keeps maintainer wrappers for this repository.
-- Setup and upgrade flow is documented in [docs/maintainer/EFRAME_AI_SETUP.md](docs/maintainer/EFRAME_AI_SETUP.md)
-- AI release and manifest rules are documented in [docs/maintainer/EFRAME_AI_RELEASE_CHECKLIST.md](docs/maintainer/EFRAME_AI_RELEASE_CHECKLIST.md)
+- Setup and upgrade flow is documented in [packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md)
+- AI release and manifest rules are documented in [tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md](tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)
 
 To sync the framework AI layer into a project root:
 

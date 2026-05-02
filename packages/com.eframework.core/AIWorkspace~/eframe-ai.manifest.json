@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.7",
+    "version":  "0.4.8",
     "updatedAt":  "2026-05-02",
-    "notes":  "EFrameWork 0.4.7 AI workspace release.",
+    "notes":  "Move AI-facing support docs under AIWorkspace and keep synced skills business-project scoped.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -32,7 +32,7 @@
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
-                      "sourcePath":  "Documentation~/EFRAME_AI_API_INDEX.md",
+                      "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
                       "sha256":  "5d7b3b7a917cd591b2780050de0a837cbcb4b04af9e9fcc08abaea5f69289585"
                   },
                   {
@@ -49,19 +49,19 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
-                      "sha256":  "625923104b96c9d9d85323149b01652dc0d417ce90157acb76b050101fddc4fd"
+                      "sha256":  "5788eeaa396837075a32c47faa3df5252cb62ab02a315942925283f95d6a3e1d"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "2fb0b8d232f188c5abf78bc90eb2f2ab194d50fc508e535c1adb1a1f1199f3b5"
+                      "sha256":  "a4ee8db7770353077f91f360c22c3faee3c83eb6ed5f69c6f43f95b4142d5062"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "01de6a170aa57c6878ce154d27cfb7293bd3e8bb53b55606b05a8826c3fa31bb"
+                      "sha256":  "a75799b4d5e2b81874367be988a67de71449a8da10cb84c282e0988292baa9dd"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
-                      "sha256":  "5b432ad716962cf34e8bbddda121f7c839fe78a560fee8db5a62d2ff17e2e3a0"
+                      "sha256":  "518f84b6412077cc8fcd33b55a99fe0214adc7ff020946a546685309b23b06a6"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/references/resource-checklist.md",

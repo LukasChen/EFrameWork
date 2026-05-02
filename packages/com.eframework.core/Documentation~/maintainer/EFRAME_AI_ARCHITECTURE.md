@@ -12,7 +12,7 @@ Cold-start and upgrade flows must keep these parts aligned:
 - Synced AI workspace source under `packages/com.eframework.core/AIWorkspace~/`
 - System-required framework AI entry files such as `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`
 - Sync and bootstrap scripts under `tools/`
-- User-facing docs under `packages/com.eframework.core/Documentation~/` and maintainer docs under `docs/maintainer/`
+- Human-facing docs under `packages/com.eframework.core/Documentation~/`
 
 When one part changes the expected project shape, the matching AI guidance must be reviewed in the same change set.
 
@@ -35,8 +35,8 @@ When one part changes the expected project shape, the matching AI guidance must 
 - `managed-blocks/eframe-*.md` contains the EFrame blocks injected into project-owned AI entry files.
 - `instructions/eframe-instructions.md` contains the short, stable framework usage rules that are part of the synced business-project contract.
 - `skills/eframe-*` contains on-demand business-project workflows that are synced into business projects.
-- `skills/maintainer-*` contains framework-repository-only workflows; these files are not part of the synced project contract because the sync scripts only manage `eframe-*` items.
 - `eframe-ai.manifest.json` declares the synced AI layer version and file hashes for framework-managed AI files; business projects still receive this file at `.github/eframe-ai.manifest.json`.
+- `support-docs/` contains AI-facing support documents that must sync to business projects but should not live under human documentation directories.
 
 `AGENTS.md`
 
@@ -50,10 +50,10 @@ When one part changes the expected project shape, the matching AI guidance must 
 - Points Claude Code at the same shared EFrame API index, synced workspace source, and naming boundaries instead of duplicating the full contract.
 - Is not copied wholesale into business projects. Business projects own their `CLAUDE.md`; EFrame sync only injects or updates the marked EFrame managed block.
 
-`packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md`
+`packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md`
 
 - Provides a compact AI-oriented map of stable Runtime, Editor bootstrap, and AI tooling APIs.
-- Is a user-facing reference for business-project AI and developers, not a release or manifest maintenance guide.
+- Is an AI-facing support document for business-project AI, not a release or manifest maintenance guide.
 - Is synced into business projects as `.github/eframe/EFRAME_AI_API_INDEX.md` so selected AI clients can read the API map from the project workspace.
 - Should favor stable project-facing entry points over internal implementation details.
 
@@ -74,7 +74,7 @@ Business project `.github/`
 - Must not manually fork framework-managed `eframe-*` files.
 - Receives EFrame managed blocks inside selected AI entry files; only text between the EFrame markers is framework-owned.
 - Does not receive framework maintainer-only `maintainer-*` skills.
-- Does not receive maintainer docs such as `EFRAME_AI_SETUP.md`, `EFRAME_AI_ARCHITECTURE.md`, or `EFRAME_AI_RELEASE_CHECKLIST.md`.
+- Does not receive package human docs or maintainer AI workspace files such as `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
 
 ## 3. Required Sync Rule
 
@@ -101,7 +101,7 @@ The UI runtime contract is handle-first:
 
 Any framework change that alters this UI contract must update the same contract surface in one change set:
 
-- `packages/com.eframework.core/Documentation~/UI_FRAMEWORK_GUIDE.md`
+- `packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md`
 - `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit`
@@ -117,7 +117,7 @@ EFrameWork should be maintained as one product surface, not as a Unity framework
 
 Think in terms of the EFrameWork release first. Bump the package version when publishing a framework/package release. Treat the manifest as a sync marker, not a separate product version.
 
-Manifest update rules are defined in `EFRAME_AI_RELEASE_CHECKLIST.md`.
+Manifest update rules are defined in `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
 
 The manifest version is the broad signal business projects use to detect AI layer drift. Manifest file hashes provide a narrower integrity check for local edits, missing files, or partial syncs.
 
@@ -127,7 +127,7 @@ Recommended release sequence:
 2. Update matching instructions and skills.
 3. Bump `packages/com.eframework.core/package.json` if this is a framework/package release.
 4. Update the root `CHANGELOG.md`; update `packages/com.eframework.core/CHANGELOG.md` if package code changed.
-5. Update `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` according to `EFRAME_AI_RELEASE_CHECKLIST.md`.
+5. Update `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` according to `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
 6. Run `tools/Test-EFrameAIRelease.ps1`.
 7. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
 8. Verify cold-start or editor bootstrap paths affected by the change.

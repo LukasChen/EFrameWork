@@ -39,7 +39,7 @@
 - UI 子任务是否已交给 `eframe-ui-feature`
 - 数据表子任务是否已交给 `eframe-data-table`
 - 资源/Addressables 子任务是否已交给 `eframe-resource-flow`
-- 框架维护或 AI 发布子任务是否已交给 `maintainer-ai-contract`
+- 框架源码、同步工具或 AI 发布事项是否已标记为超出业务功能范围
 
 ## 6. 验证
 

@@ -1,7 +1,7 @@
 ﻿{
   "name": "com.eframework.core",
   "displayName": "EFrameWork Core",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "unity": "6000.0",
   "description": "Reusable Unity game framework extracted from CozyBloom.",
   "keywords": [

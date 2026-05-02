@@ -47,7 +47,7 @@ forbiddenPatterns:
 2. 保持 instructions 短而稳定；把任务流程、审查清单和细节核对项放进 skill 或 skill reference。
 3. 保持 synced `eframe-*` skill 面向业务项目；不要把 manifest 版本递增、release checklist、同步脚本维护或框架内部维护步骤塞进去。
 4. 需要详细审查时，优先扩展 maintainer skill 或 reference，而不是扩大每次都会触发的 instruction 上下文。
-5. manifest、release check、commit 和 tag 要求以 `docs/maintainer/EFRAME_AI_RELEASE_CHECKLIST.md` 为准。
+5. manifest、release check、commit 和 tag 要求以 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 为准。
 6. 进入发布或同步发布流程时，按 release checklist 执行验证。
 7. Release handling must include git commit and tag: after version, changelog, manifest, and release checks are ready, commit the release changes and create a version tag matching `packages/com.eframework.core/package.json`, such as `v0.2.2`. Only skip commit/tag when the user explicitly asks to prepare release files only.
 

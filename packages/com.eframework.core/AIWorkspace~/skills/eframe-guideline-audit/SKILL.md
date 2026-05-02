@@ -12,14 +12,12 @@ owns:
   - EFrame guideline compliance review
   - runtime lifecycle risk detection
   - business-project AI contract drift triage
-delegatesTo:
-  - maintainer-ai-contract
 outputs:
   - prioritized guideline findings
   - missing validation risks
-  - maintainer-skill handoff when scope is framework AI release
+  - business-project contract drift summary
 forbiddenPatterns:
-  - mixing maintainer-only release checks into business project audit conclusions
+  - mixing framework release checks into business project audit conclusions
   - treating logs as data/load/save contract
   - approving unmanaged Addressables edits under managed resource directories
 ---
@@ -53,15 +51,11 @@ forbiddenPatterns:
 15. 检查 `QUIBinding` 默认访问类命名空间与模板 prefab 是否保持一致，生成代码应落在 `EFrameWork.Runtime.UI.Generated`。
 16. 检查业务代码是否绕过 `IUIService/QUI` 与 `UIViewHandle` 语义直接驱动 `BindingViewBase` 生命周期，或使用 `assetPath` View 构造函数 / `View` facade。
 
-## AI Layer Audit
-
-如果审查对象是 EFrameWork 框架仓库自身，并且变更涉及 `.github`、skills、manifest、冷启动、同步脚本、模板或 release 文档，改用 maintainer skill 做 AI 层审查；不要把框架维护检查混入业务项目审查结论。
-
 ## Output Expectations
 
 - 先给出高风险问题和潜在回归点。
 - 明确指出违反的是哪一类边界：启动场景、`Procedure`、UI、目录、命名、资源路径或 AI 配置同步。
-- 如果发现问题属于框架维护而不是业务项目使用，明确建议切换到 maintainer skill。
+- 如果发现问题属于框架源码、发布或同步工具调整，说明它超出业务项目审查范围。
 - 如果没有问题，也要说明剩余风险，例如缺少验证、存在非标准目录、缺少模板沉淀等。
 
 详细核查项见 [audit checklist](./references/audit-checklist.md)。

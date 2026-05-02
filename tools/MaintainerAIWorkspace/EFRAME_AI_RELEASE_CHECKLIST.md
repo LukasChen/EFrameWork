@@ -15,6 +15,7 @@
 - `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-*`
 - `packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-*.md`
+- `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`
 - `tools/MaintainerAIWorkspace/skills/maintainer-*`
 - `AGENTS.md`
 
@@ -28,6 +29,7 @@
 - `AGENTS.md`
 - `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-*`
+- `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`
 - `tools/MaintainerAIWorkspace/skills/maintainer-*`
 - `tools/Initialize-EFrameAI.ps1`
 - `tools/Test-EFrameAIRelease.ps1`
@@ -38,16 +40,17 @@
 - `tools/Test-EFrameAIProject.ps1`
 - `packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`
 - `README.md`
-- `packages/com.eframework.core/Documentation~/EFRAME_AI_API_INDEX.md`
-- `docs/maintainer/EFRAME_AI_ARCHITECTURE.md`
-- `docs/maintainer/EFRAME_AI_SETUP.md`
-- `packages/com.eframework.core/Documentation~/UNITY_DIRECTORY_STRUCTURE.md`
-- `packages/com.eframework.core/Documentation~/RESPATH_CONVENTION.md`
+- `packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md`
+- `packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md`
+- `packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md`
+- `packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md`
+- `packages/com.eframework.core/Documentation~/user/RESPATH_CONVENTION.md`
+- `packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md`
 
 发布前必须确认：
 
 1. 如果这是框架/包发布，`packages/com.eframework.core/package.json` 的 `version` 已递增或确认保持原版本。
-2. 根目录 [CHANGELOG.md](CHANGELOG.md) 已记录本次仓库级变化；如果 package 代码有变化，`packages/com.eframework.core/CHANGELOG.md` 已同步记录。
+2. 根目录 [CHANGELOG.md](../../CHANGELOG.md) 已记录本次仓库级变化；如果 package 代码有变化，`packages/com.eframework.core/CHANGELOG.md` 已同步记录。
 3. 如果同步到业务项目的 AI 规则、同步脚本或冷启动工具变化，`packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` 的 `version` 已递增；仅修改框架根目录维护文档不要求递增 manifest。
 4. 对外沟通时使用 EFrameWork 主版本号；manifest 只作为业务项目同步检测标记，不作为另一套产品版本发布。
 5. 新增或更新的 instruction / skills 命名符合边界：同步业务项目用 `eframe-*`，框架维护专用用 `maintainer-*`，业务项目入口只通过 managed block 接入。
@@ -68,10 +71,10 @@
 20. 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
 21. 初始化窗口或 Addressables 同步流程能按 ResPath 目录选择生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
 22. 托管资源目录导入、移动、删除后会自动同步 Addressables，且 Player Build 前会执行同步与校验；如果 `ResPath.Generated` 在构建前被刷新，构建应中止并提示等待 Unity 重新编译。
-23. [EFRAME_AI_SETUP.md](EFRAME_AI_SETUP.md) 中的命令示例和流程说明准确。
-24. [EFRAME_AI_ARCHITECTURE.md](EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约准确。
+23. [EFRAME_AI_SETUP.md](../../packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md) 中的命令示例和流程说明准确。
+24. [EFRAME_AI_ARCHITECTURE.md](../../packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约准确。
 25. Runtime/Editor/模板重构如改变推荐写法，对应 instruction 和 skill 已同步维护。
-26. UI 主链路调整时，确认 `packages/com.eframework.core/Documentation~/UI_FRAMEWORK_GUIDE.md`、`eframe-instructions`、`eframe-ui-feature`、`eframe-guideline-audit`、bootstrap 脚本和编辑器初始化模板都保持同一套 `QUI` / `UIViewHandle` / `UIControllerBase` 契约。
+26. UI 主链路调整时，确认 `packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md`、`eframe-instructions`、`eframe-ui-feature`、`eframe-guideline-audit`、bootstrap 脚本和编辑器初始化模板都保持同一套 `QUI` / `UIViewHandle` / `UIControllerBase` 契约。
 27. Always-on 边界保留在 instructions；多步骤生成、审查、发布、迁移流程放在 skills 或 skill references。
 28. 新增 `eframe-*` skill 时，确认它是业务项目常用 workflow，而不是 maintainer-only 发布/同步流程。
 29. `eframe-feature-bootstrap` 应保持总控职责；UI、数据表、资源细节应委派给对应 specialized skill，避免重复规则。

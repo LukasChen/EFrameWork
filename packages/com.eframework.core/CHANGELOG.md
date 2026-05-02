@@ -4,11 +4,22 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-05-02
+
+### Changed
+
+- Moved AI-facing API support content under `AIWorkspace~/support-docs/` and removed the package documentation surface.
+- Kept human-facing usage and maintenance documents in package `Documentation~` instead of treating them as AI sync contract sources; maintainer AI release rules live outside the package in `tools/MaintainerAIWorkspace`.
+
+### Fixed
+
+- Updated the Addressables bootstrap directory-structure warning to reference `Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md` after the docs move.
+
 ## [0.4.3] - 2026-05-02
 
 ### Added
 
-- Added `AIWorkspace~`, `Documentation~`, and `Tools~` to the package so consuming projects receive AI sync sources, business-facing docs, and sync scripts with the Unity package.
+- Added `AIWorkspace~` and `Tools~` to the package so consuming projects receive AI sync sources and sync scripts with the Unity package.
 - Added package-distributed EFrame AI API index, UI guide, resource path convention, and Unity directory structure guide.
 
 ### Changed
@@ -148,10 +159,10 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 - Removed the legacy `UIControllerBase<TView>.View` facade and updated generated controller templates to use `TypedViewHandle` explicitly.
 - Reduced `BindingViewBase` lifecycle entrypoints to internal-only APIs so runtime open/close flows now route through `UIViewHandle` only.
 - Reorganized the framework runtime instruction file into layer- and concern-based sections so UI, startup, resource, and persistence rules are easier to maintain.
-- Split AI guidance by sync boundary so synced `eframe-*` files stay business-project-facing while framework-only maintenance notes and workflows live under non-synced `maintainer-*` instructions/skills.
+- Split AI guidance by sync boundary so synced `eframe-*` files stay business-project-facing while framework-internal release and sync workflows stay outside the package AI contract.
 - Applied the same sync-boundary cleanup to the editor instruction layer so only stable business-project editor rules remain in synced `eframe-editor.instructions`.
-- Clarified AI instruction-vs-skill ownership so business-project workflows remain in synced `eframe-*` skills while framework-only release and sync maintenance lives in `maintainer-*` skills.
-- Strengthened AI release checks with frontmatter validation, manifest version-increase validation, synced instruction length warnings, and maintainer sync-boundary checks.
+- Clarified AI instruction-vs-skill ownership so business-project workflows remain in synced `eframe-*` skills while framework-only release and sync workflows stay outside the package AI contract.
+- Strengthened AI release checks with frontmatter validation, manifest version-increase validation, synced instruction length warnings, and sync-boundary checks.
 - Added focused business-project skills for EFrame UI features, persistent data tables, and resource/Addressables flows.
 - Returned event debug type queries as snapshots so external enumeration is not affected by later subscription changes.
 - Removed data storage sample/test classes from the runtime assembly surface.
