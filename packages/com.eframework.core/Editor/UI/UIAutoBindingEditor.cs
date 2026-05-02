@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Text;
+using EFramework.Runtime.UI.Transitions;
 
 namespace EFramework.Editor.UI
 {
@@ -16,6 +17,39 @@ namespace EFramework.Editor.UI
     {
         private const string AppGeneratedUIPath = "Assets/App/Runtime/Generated/UI";
         private const string ModulesRootPath = "Assets/Modules";
+        private static readonly HashSet<string> s_csharpKeywords = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked",
+            "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else",
+            "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for",
+            "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal", "is",
+            "lock", "long", "namespace", "new", "null", "object", "operator", "out", "override",
+            "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte",
+            "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch",
+            "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe",
+            "ushort", "using", "virtual", "void", "volatile", "while"
+        };
+        private static readonly HashSet<string> s_bindingNameStopWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Root", "Content", "Container", "Group", "Layout", "Node", "Wrapper", "Holder",
+            "Area", "Panel", "Window", "View"
+        };
+        private static readonly Dictionary<string, string> s_bindingNameAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Btn", "Button" },
+            { "Txt", "Text" },
+            { "Tmp", "Text" },
+            { "Img", "Image" },
+            { "Bg", "Background" },
+            { "Tog", "Toggle" },
+            { "ScrollView", "Scroll" },
+            { "ScrollRect", "Scroll" }
+        };
+        private static readonly HashSet<string> s_bindingNameRootSuffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Panel", "Window", "View", "Page", "Popup"
+        };
+
         private QUIBinding m_target;
         private Vector2 m_scrollPosition;
         private Vector2 m_treeScrollPosition;
@@ -50,8 +84,7 @@ namespace EFramework.Editor.UI
 
             if (GUI.changed)
             {
-                EditorUtility.SetDirty(m_target);
-                serializedObject.ApplyModifiedProperties();
+                MarkBindingDataDirty();
             }
         }
 
@@ -95,23 +128,223 @@ namespace EFramework.Editor.UI
                 if (animRootProp != null)
                     DrawAnimationRootPopup(animRootProp);
 
-                // AnimationDuration
-                var durationProp = m_viewConfigProperty.FindPropertyRelative("AnimationDuration");
-                if (durationProp != null)
+                var openTransitionProp = m_viewConfigProperty.FindPropertyRelative("OpenTransition");
+                var closeTransitionProp = m_viewConfigProperty.FindPropertyRelative("CloseTransition");
+                if (openTransitionProp != null && closeTransitionProp != null)
                 {
-                    EditorGUILayout.PropertyField(durationProp, new GUIContent("动画时长", "开关动画的持续时间（秒）"));
-
-                    // 确保动画时长在合理范围内
-                    if (durationProp.floatValue < 0)
-                        durationProp.floatValue = 0;
-                    if (durationProp.floatValue > 2f)
-                        durationProp.floatValue = 2f;
+                    MigrateLegacyTransitionConfigIfNeeded(openTransitionProp, closeTransitionProp);
+                    DrawTransitionConfig(openTransitionProp, "打开动画");
+                    DrawTransitionConfig(closeTransitionProp, "关闭动画");
+                }
+                else
+                {
+                    DrawLegacyTransitionConfig();
                 }
 
                 EditorGUI.indentLevel--;
             }
 
             EditorGUILayout.EndVertical();
+        }
+
+        private void MigrateLegacyTransitionConfigIfNeeded(SerializedProperty openTransitionProp, SerializedProperty closeTransitionProp)
+        {
+            if (HasSerializedTransitionValue(openTransitionProp) || HasSerializedTransitionValue(closeTransitionProp))
+            {
+                return;
+            }
+
+            var legacyTypeProp = m_viewConfigProperty.FindPropertyRelative("TransitionTypeName");
+            var legacyDurationProp = m_viewConfigProperty.FindPropertyRelative("AnimationDuration");
+            var legacyTypeName = legacyTypeProp?.stringValue ?? string.Empty;
+            var legacyDuration = legacyDurationProp?.floatValue ?? 0f;
+            if (string.IsNullOrEmpty(legacyTypeName) && legacyDuration <= 0f)
+            {
+                return;
+            }
+
+            SetTransitionConfig(openTransitionProp, legacyTypeName, legacyDuration);
+            SetTransitionConfig(closeTransitionProp, legacyTypeName, legacyDuration);
+            MarkBindingDataDirty();
+        }
+
+        private static bool HasSerializedTransitionValue(SerializedProperty transitionProp)
+        {
+            var transitionTypeProp = transitionProp.FindPropertyRelative("TransitionTypeName");
+            var durationProp = transitionProp.FindPropertyRelative("Duration");
+            return !string.IsNullOrEmpty(transitionTypeProp?.stringValue) || (durationProp?.floatValue ?? 0f) > 0f;
+        }
+
+        private static void SetTransitionConfig(SerializedProperty transitionProp, string transitionTypeName, float duration)
+        {
+            var transitionTypeProp = transitionProp.FindPropertyRelative("TransitionTypeName");
+            var durationProp = transitionProp.FindPropertyRelative("Duration");
+            if (transitionTypeProp != null)
+            {
+                transitionTypeProp.stringValue = transitionTypeName;
+            }
+
+            if (durationProp != null)
+            {
+                durationProp.floatValue = duration > 0f ? duration : ViewTransitionConfig.DefaultDuration;
+            }
+        }
+
+        private void DrawTransitionConfig(SerializedProperty transitionProp, string label)
+        {
+            var transitionTypeProp = transitionProp.FindPropertyRelative("TransitionTypeName");
+            var durationProp = transitionProp.FindPropertyRelative("Duration");
+            if (transitionTypeProp == null || durationProp == null)
+            {
+                return;
+            }
+
+            EditorGUILayout.Space(3);
+            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            DrawTransitionTypePopup(transitionTypeProp, new GUIContent("类型", "选择实现 IUIViewTransition 的动画类型，可在业务代码中自定义扩展"));
+            EditorGUILayout.PropertyField(durationProp, new GUIContent("时长", "动画时长（秒），0 表示使用动画默认时长"));
+            ClampTransitionDuration(durationProp);
+            EditorGUI.indentLevel--;
+        }
+
+        private void DrawLegacyTransitionConfig()
+        {
+            var transitionTypeProp = m_viewConfigProperty.FindPropertyRelative("TransitionTypeName");
+            if (transitionTypeProp != null)
+            {
+                DrawTransitionTypePopup(transitionTypeProp, new GUIContent("动画类型", "选择实现 IUIViewTransition 的动画类型，可在业务代码中自定义扩展"));
+            }
+
+            var durationProp = m_viewConfigProperty.FindPropertyRelative("AnimationDuration");
+            if (durationProp != null)
+            {
+                EditorGUILayout.PropertyField(durationProp, new GUIContent("动画时长", "开关动画的持续时间（秒）"));
+                ClampTransitionDuration(durationProp);
+            }
+        }
+
+        private static void ClampTransitionDuration(SerializedProperty durationProp)
+        {
+            if (durationProp.floatValue < 0)
+            {
+                durationProp.floatValue = 0;
+            }
+
+            if (durationProp.floatValue > 2f)
+            {
+                durationProp.floatValue = 2f;
+            }
+        }
+
+        private void DrawTransitionTypePopup(SerializedProperty transitionTypeProp, GUIContent label)
+        {
+            var transitionTypes = TypeCache.GetTypesDerivedFrom<IUIViewTransition>()
+                .Where(type => !type.IsAbstract && !typeof(MonoBehaviour).IsAssignableFrom(type) && type.GetConstructor(Type.EmptyTypes) != null)
+                .OrderBy(type => type.Name)
+                .ToList();
+
+            var options = new List<string>();
+            var values = new List<string>();
+
+            options.Add("Default (ScaleFade)");
+            values.Add(string.Empty);
+
+            foreach (var type in transitionTypes)
+            {
+                options.Add(FormatTransitionName(type));
+                values.Add(GetTransitionId(type));
+            }
+
+            int currentIndex = 0;
+            var currentValue = transitionTypeProp.stringValue;
+            if (!string.IsNullOrEmpty(currentValue))
+            {
+                var foundIndex = values.FindIndex(value => IsTransitionValueMatch(value, currentValue, transitionTypes));
+                if (foundIndex >= 0)
+                {
+                    currentIndex = foundIndex;
+                }
+                else
+                {
+                    options.Add($"⚠ {currentValue} (未找到)");
+                    values.Add(currentValue);
+                    currentIndex = options.Count - 1;
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            int newIndex = EditorGUILayout.Popup(
+                label,
+                currentIndex,
+                options.ToArray()
+            );
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                transitionTypeProp.stringValue = values[newIndex];
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        private static string FormatTransitionName(Type type)
+        {
+            var name = type.Name;
+            const string suffix = "ViewTransition";
+            if (name.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                name = name.Substring(0, name.Length - suffix.Length);
+            }
+
+            return $"{name} ({type.Namespace})";
+        }
+
+        private static string GetTransitionId(Type type)
+        {
+            if (type == typeof(ScaleFadeViewTransition))
+            {
+                return ScaleFadeViewTransition.Id;
+            }
+
+            if (type == typeof(NoneViewTransition))
+            {
+                return NoneViewTransition.Id;
+            }
+
+            return type.FullName;
+        }
+
+        private static bool IsTransitionValueMatch(string optionValue, string currentValue, List<Type> transitionTypes)
+        {
+            if (optionValue == currentValue)
+            {
+                return true;
+            }
+
+            var optionType = ResolveTransitionType(optionValue, transitionTypes);
+            if (optionType == null)
+            {
+                return false;
+            }
+
+            return currentValue == optionType.FullName
+                || currentValue == optionType.AssemblyQualifiedName
+                || currentValue.StartsWith(optionType.FullName + ",", StringComparison.Ordinal);
+        }
+
+        private static Type ResolveTransitionType(string value, List<Type> transitionTypes)
+        {
+            if (value == ScaleFadeViewTransition.Id)
+            {
+                return typeof(ScaleFadeViewTransition);
+            }
+
+            if (value == NoneViewTransition.Id)
+            {
+                return typeof(NoneViewTransition);
+            }
+
+            return transitionTypes.FirstOrDefault(type => type.FullName == value || type.AssemblyQualifiedName == value);
         }
 
         private void DrawAnimationRootPopup(SerializedProperty animRootProp)
@@ -202,6 +435,7 @@ namespace EFramework.Editor.UI
             {
                 if (EditorUtility.DisplayDialog("清空确认", "确定要清空所有绑定吗？", "确定", "取消"))
                 {
+                    Undo.RecordObject(m_target, "Clear UI Bindings");
                     m_target.ClearAllBindings();
                     SaveCurrentData();
                 }
@@ -210,7 +444,9 @@ namespace EFramework.Editor.UI
             // 验证绑定按钮
             if (GUILayout.Button("Validate", GUILayout.Width(60), GUILayout.Height(25)))
             {
+                Undo.RecordObject(m_target, "Validate UI Bindings");
                 m_target.ValidateBindings();
+                MarkBindingDataDirty();
                 Debug.Log("绑定验证完成");
             }
 
@@ -299,6 +535,7 @@ namespace EFramework.Editor.UI
             {
                 if (EditorUtility.DisplayDialog("清空确认", "确定要清空所有绑定吗？", "确定", "取消"))
                 {
+                    Undo.RecordObject(m_target, "Clear UI Bindings");
                     m_target.ClearAllBindings();
                     SaveCurrentData();
                 }
@@ -349,7 +586,9 @@ namespace EFramework.Editor.UI
             var newBindingName = EditorGUILayout.TextField(item.BindingName, EditorStyles.textField);
             if (EditorGUI.EndChangeCheck())
             {
-                item.BindingName = newBindingName;
+                Undo.RecordObject(m_target, "Rename UI Binding");
+                item.BindingName = MakeUniqueBindingName(newBindingName, item);
+                MarkBindingDataDirty();
             }
 
             // 组件信息 - 增加GameObject名称
@@ -379,8 +618,9 @@ namespace EFramework.Editor.UI
             GUI.backgroundColor = Color.red;
             if (GUILayout.Button("×", GUILayout.Width(30), GUILayout.Height(20)))
             {
+                Undo.RecordObject(m_target, "Remove UI Binding");
                 m_target.BindingItems.RemoveAt(index);
-                SaveCurrentData();
+                MarkBindingDataDirty();
             }
             GUI.backgroundColor = Color.white;
 
@@ -612,7 +852,9 @@ namespace EFramework.Editor.UI
             var bindingItem = m_target.BindingItems.FirstOrDefault(item => item.Component == component);
             if (bindingItem != null)
             {
+                Undo.RecordObject(m_target, "Remove UI Binding");
                 m_target.RemoveBinding(bindingItem.BindingName);
+                MarkBindingDataDirty();
                 Debug.Log($"取消绑定: {bindingItem.BindingName} -> {component.GetType().Name}");
             }
         }
@@ -694,56 +936,315 @@ namespace EFramework.Editor.UI
 
         private void AddBinding(GameObject gameObject, Component component)
         {
-            var objName = gameObject.name;
-            var typeName = component.GetType().Name;
-            if (typeName == "TextMeshProUGUI")
-            {
-                typeName = "Text";
-            }
-
-            string bindingName = $"{objName}_{typeName}";
-
-            if (typeName.IndexOf("Text") != -1 && (objName.IndexOf("Text") != -1 || objName.IndexOf("Label") != -1) || objName.IndexOf("Title") != -1)
-            {
-                bindingName = $"{objName}";
-            }
-
-            if (typeName.IndexOf("Button") != -1 && objName.IndexOf("Button") != -1)
-            {
-                bindingName = $"{objName}";
-            }
-
-            if (typeName.IndexOf("Image") != -1 && (objName.IndexOf("Image") != -1 || objName.IndexOf("Icon") != -1 || objName.IndexOf("Img") != -1 || objName.IndexOf("Bg") != -1 || objName.IndexOf("Background") != -1 || objName.IndexOf("Bg") != -1))
-            {
-                bindingName = $"{objName}";
-            }
-
-            if (typeName.IndexOf("Slider") != -1 && objName.IndexOf("Slider") != -1)
-            {
-                bindingName = $"{objName}";
-            }
-
-            if (typeName.IndexOf("Toggle") != -1 && objName.IndexOf("Toggle") != -1)
-            {
-                bindingName = $"{objName}";
-            }
-
-            if (typeName.IndexOf("RectTransform") != -1)
-            {
-                bindingName = $"{objName}";
-            }
-
-            // 确保绑定名称唯一
-            int counter = 1;
-            string originalName = bindingName;
-            while (m_target.HasBinding(bindingName))
-            {
-                bindingName = $"{originalName}_{counter}";
-                counter++;
-            }
-
+            Undo.RecordObject(m_target, "Add UI Binding");
+            string bindingName = CreateUniqueDefaultBindingName(gameObject, component);
             m_target.AddBinding(bindingName, component, gameObject.name);
+            MarkBindingDataDirty();
             Debug.Log($"添加绑定: {bindingName} -> {component.GetType().Name}");
+        }
+
+        private string CreateUniqueDefaultBindingName(GameObject gameObject, Component component)
+        {
+            var usedNames = new HashSet<string>(
+                m_target.BindingItems.Select(item => item.BindingName),
+                StringComparer.Ordinal);
+
+            foreach (var candidate in CreateDefaultBindingNameCandidates(gameObject, component))
+            {
+                var bindingName = ToValidIdentifier(candidate, "Binding");
+                if (!usedNames.Contains(bindingName))
+                {
+                    return bindingName;
+                }
+            }
+
+            return MakeUniqueIdentifier(CreateDefaultBindingName(gameObject, component), usedNames);
+        }
+
+        private IEnumerable<string> CreateDefaultBindingNameCandidates(GameObject gameObject, Component component)
+        {
+            var componentSuffix = GetBindingComponentSuffix(component);
+            var pathParts = GetBindingPathNameParts(gameObject.transform, componentSuffix);
+            if (pathParts.Count == 0)
+            {
+                pathParts.Add(CreateBindingNamePart(gameObject.name, true, componentSuffix));
+            }
+
+            var emitted = new HashSet<string>(StringComparer.Ordinal);
+            int leafIndex = pathParts.Count - 1;
+            int maxAncestorCount = Math.Min(3, leafIndex);
+
+            for (int ancestorCount = 0; ancestorCount <= maxAncestorCount; ancestorCount++)
+            {
+                int startIndex = leafIndex - ancestorCount;
+                var selectedParts = TrimRedundantPathParts(pathParts.Skip(startIndex).ToList());
+                var candidate = AppendComponentSuffixIfNeeded(JoinIdentifierParts(selectedParts), componentSuffix);
+                if (!string.IsNullOrEmpty(candidate) && emitted.Add(candidate))
+                {
+                    yield return candidate;
+                }
+            }
+
+            if (pathParts.Count > maxAncestorCount + 1)
+            {
+                var fullPathCandidate = AppendComponentSuffixIfNeeded(JoinIdentifierParts(TrimRedundantPathParts(pathParts)), componentSuffix);
+                if (!string.IsNullOrEmpty(fullPathCandidate) && emitted.Add(fullPathCandidate))
+                {
+                    yield return fullPathCandidate;
+                }
+            }
+        }
+
+        private List<string> GetBindingPathNameParts(Transform targetTransform, string componentSuffix)
+        {
+            var stack = new Stack<Transform>();
+            var current = targetTransform;
+            var root = m_target != null ? m_target.transform : null;
+
+            while (current != null && current != root)
+            {
+                stack.Push(current);
+                current = current.parent;
+            }
+
+            var result = new List<string>();
+            while (stack.Count > 0)
+            {
+                var transform = stack.Pop();
+                bool isLeaf = stack.Count == 0;
+                var part = CreateBindingNamePart(transform.name, isLeaf, componentSuffix);
+                if (!string.IsNullOrEmpty(part))
+                {
+                    result.Add(part);
+                }
+            }
+
+            return result;
+        }
+
+        private static string CreateBindingNamePart(string rawName, bool isLeaf, string componentSuffix)
+        {
+            var words = SplitNameWords(rawName)
+                .Select(NormalizeBindingNameWord)
+                .Where(word => !string.IsNullOrEmpty(word))
+                .ToList();
+
+            if (words.Count > 1 && s_bindingNameRootSuffixes.Contains(words[words.Count - 1]))
+            {
+                words.RemoveAt(words.Count - 1);
+            }
+
+            if (isLeaf)
+            {
+                RemoveLeadingComponentAlias(words, componentSuffix);
+            }
+            else
+            {
+                words.RemoveAll(word => s_bindingNameStopWords.Contains(word));
+            }
+
+            if (words.Count == 0)
+            {
+                return isLeaf ? ToValidIdentifier(rawName, "Node") : string.Empty;
+            }
+
+            return JoinIdentifierParts(words);
+        }
+
+        private static IEnumerable<string> SplitNameWords(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                yield break;
+            }
+
+            var word = new StringBuilder();
+            for (int i = 0; i < name.Length; i++)
+            {
+                char current = name[i];
+                if (!char.IsLetterOrDigit(current))
+                {
+                    if (word.Length > 0)
+                    {
+                        yield return word.ToString();
+                        word.Length = 0;
+                    }
+                    continue;
+                }
+
+                if (word.Length > 0)
+                {
+                    char previous = word[word.Length - 1];
+                    bool nextIsLower = i + 1 < name.Length && char.IsLower(name[i + 1]);
+                    if ((char.IsLower(previous) && char.IsUpper(current)) ||
+                        (char.IsUpper(previous) && char.IsUpper(current) && nextIsLower) ||
+                        (char.IsDigit(previous) != char.IsDigit(current)))
+                    {
+                        yield return word.ToString();
+                        word.Length = 0;
+                    }
+                }
+
+                word.Append(current);
+            }
+
+            if (word.Length > 0)
+            {
+                yield return word.ToString();
+            }
+        }
+
+        private static string NormalizeBindingNameWord(string word)
+        {
+            if (s_bindingNameAliases.TryGetValue(word, out var alias))
+            {
+                return alias;
+            }
+
+            if (word.Length <= 2 && word.All(char.IsUpper))
+            {
+                return word;
+            }
+
+            return char.ToUpperInvariant(word[0]) + word.Substring(1);
+        }
+
+        private static void RemoveLeadingComponentAlias(List<string> words, string componentSuffix)
+        {
+            if (words.Count <= 1 || string.IsNullOrEmpty(componentSuffix))
+            {
+                return;
+            }
+
+            var firstWord = words[0];
+            if (NameContainsSemanticSuffix(firstWord, componentSuffix) ||
+                string.Equals(firstWord, componentSuffix, StringComparison.OrdinalIgnoreCase))
+            {
+                words.RemoveAt(0);
+            }
+        }
+
+        private static List<string> TrimRedundantPathParts(List<string> parts)
+        {
+            var result = new List<string>();
+            foreach (var part in parts)
+            {
+                if (string.IsNullOrEmpty(part))
+                {
+                    continue;
+                }
+
+                if (result.Count > 0)
+                {
+                    var previous = result[result.Count - 1];
+                    if (part.StartsWith(previous, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result.RemoveAt(result.Count - 1);
+                    }
+                }
+
+                result.Add(part);
+            }
+
+            return result;
+        }
+
+        private static string JoinIdentifierParts(IEnumerable<string> parts)
+        {
+            return string.Join("_", parts.Where(part => !string.IsNullOrEmpty(part)));
+        }
+
+        private static string AppendComponentSuffixIfNeeded(string objectName, string componentSuffix)
+        {
+            if (string.IsNullOrEmpty(componentSuffix) || NameContainsSemanticSuffix(objectName, componentSuffix))
+            {
+                return objectName;
+            }
+
+            return string.IsNullOrEmpty(objectName) ? componentSuffix : $"{objectName}{componentSuffix}";
+        }
+
+        private string CreateDefaultBindingName(GameObject gameObject, Component component)
+        {
+            return ToValidIdentifier(CreateDefaultBindingNameCandidates(gameObject, component).FirstOrDefault(), "Binding");
+        }
+
+        private static string GetBindingComponentSuffix(Component component)
+        {
+            switch (component)
+            {
+                case RectTransform _:
+                    return string.Empty;
+                case TextMeshProUGUI _:
+                case Text _:
+                case InputField _:
+                    return "Text";
+                case Button _:
+                    return "Button";
+                case Image _:
+                    return "Image";
+                case Slider _:
+                    return "Slider";
+                case Toggle _:
+                    return "Toggle";
+                case ScrollRect _:
+                    return "Scroll";
+                case CanvasGroup _:
+                    return "CanvasGroup";
+                default:
+                    return ToValidIdentifier(component.GetType().Name, "Component");
+            }
+        }
+
+        private static bool NameContainsSemanticSuffix(string identifier, string suffix)
+        {
+            if (string.IsNullOrEmpty(identifier) || string.IsNullOrEmpty(suffix))
+            {
+                return false;
+            }
+
+            var lowerName = identifier.ToLowerInvariant();
+            var lowerSuffix = suffix.ToLowerInvariant();
+            if (lowerName.EndsWith(lowerSuffix, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            if (suffix == "Text")
+            {
+                return lowerName.EndsWith("label", StringComparison.Ordinal)
+                    || lowerName.EndsWith("txt", StringComparison.Ordinal)
+                    || lowerName.EndsWith("title", StringComparison.Ordinal)
+                    || lowerName.EndsWith("desc", StringComparison.Ordinal)
+                    || lowerName.EndsWith("description", StringComparison.Ordinal);
+            }
+
+            if (suffix == "Button")
+            {
+                return lowerName.EndsWith("btn", StringComparison.Ordinal);
+            }
+
+            if (suffix == "Image")
+            {
+                return lowerName.EndsWith("icon", StringComparison.Ordinal)
+                    || lowerName.EndsWith("img", StringComparison.Ordinal)
+                    || lowerName.EndsWith("bg", StringComparison.Ordinal)
+                    || lowerName.EndsWith("background", StringComparison.Ordinal);
+            }
+
+            if (suffix == "Scroll")
+            {
+                return lowerName.EndsWith("scroll", StringComparison.Ordinal)
+                    || lowerName.EndsWith("scrollview", StringComparison.Ordinal)
+                    || lowerName.EndsWith("list", StringComparison.Ordinal);
+            }
+
+            if (suffix == "Toggle")
+            {
+                return lowerName.EndsWith("tog", StringComparison.Ordinal);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -751,36 +1252,35 @@ namespace EFramework.Editor.UI
         /// </summary>
         private void SaveCurrentData()
         {
-            // 确保序列化对象是最新的
-            serializedObject.ApplyModifiedProperties();
+            MarkBindingDataDirty();
+            AssetDatabase.SaveAssets();
+            Debug.Log($"已自动保存 QUIBinding 数据: {m_target.gameObject.name} ({m_target.BindingItems.Count} 个绑定项)");
+        }
 
-            // 标记目标对象已修改
+        private void MarkBindingDataDirty()
+        {
+            serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(m_target);
 
-            // 如果目标对象是预制体，也标记预制体已修改
             if (PrefabUtility.IsPartOfPrefabInstance(m_target))
             {
                 PrefabUtility.RecordPrefabInstancePropertyModifications(m_target);
             }
 
-            // 保存当前场景
-            if (!Application.isPlaying)
+            var scene = m_target.gameObject.scene;
+            if (!Application.isPlaying && scene.IsValid())
             {
-                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(m_target.gameObject.scene);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
             }
-
-            // 强制保存资源
-            AssetDatabase.SaveAssets();
-
-            Debug.Log($"已自动保存 QUIBinding 数据: {m_target.gameObject.name} ({m_target.BindingItems.Count} 个绑定项)");
         }
 
 
 
         private void GenerateAccessClass()
         {
-            var bindingItems = m_target.BindingItems;
-            if (bindingItems.Count == 0)
+            NormalizeBindingNames();
+            var codeItems = BuildGeneratedCodeItems();
+            if (codeItems.Count == 0)
             {
                 EditorUtility.DisplayDialog("生成失败", "没有绑定项！请先添加组件绑定。", "确定");
                 return;
@@ -807,7 +1307,7 @@ namespace EFramework.Editor.UI
             AssetDatabase.ImportAsset(filePath, ImportAssetOptions.DontDownloadFromCacheServer);
 
             Debug.Log($"访问类已生成: {filePath}");
-            EditorUtility.DisplayDialog("生成成功", $"独立访问类已生成到: {filePath}\n\n包含 {bindingItems.Count} 个组件的直接引用。", "确定");
+            EditorUtility.DisplayDialog("生成成功", $"独立访问类已生成到: {filePath}\n\n包含 {codeItems.Count} 个组件的直接引用。", "确定");
         }
 
         private string ResolveGeneratedClassPath()
@@ -860,14 +1360,14 @@ namespace EFramework.Editor.UI
 
         private string GenerateAccessClassCode()
         {
-            var bindingItems = m_target.BindingItems;
+            var codeItems = BuildGeneratedCodeItems();
             var className = ResolveGeneratedClassName();
             var sb = new StringBuilder();
 
             // 添加文件头注释
             sb.AppendLine("// 自动生成的独立访问类，请勿手动修改");
             sb.AppendLine($"// 生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            sb.AppendLine($"// 组件数量: {bindingItems.Count}");
+            sb.AppendLine($"// 组件数量: {codeItems.Count}");
             sb.AppendLine($"// 源QUIBinding: {m_target.gameObject.name}");
             sb.AppendLine();
 
@@ -882,11 +1382,11 @@ namespace EFramework.Editor.UI
             };
 
             // 根据组件类型添加额外的using
-            foreach (var item in bindingItems)
+            foreach (var codeItem in codeItems)
             {
-                if (item.Component != null)
+                if (codeItem.Item.Component != null)
                 {
-                    var type = item.Component.GetType();
+                    var type = codeItem.Item.Component.GetType();
                     if (!string.IsNullOrEmpty(type.Namespace))
                     {
                         usings.Add(type.Namespace);
@@ -980,13 +1480,9 @@ namespace EFramework.Editor.UI
             // 生成字段声明
             sb.AppendLine("        #region Component Fields");
             sb.AppendLine();
-            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            foreach (var codeItem in codeItems.OrderBy(i => i.Item.BindingName))
             {
-                if (item.Component == null) continue;
-                var typeName = item.ComponentTypeName;
-                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
-
-                sb.AppendLine($"        private {typeName} {fieldName};");
+                sb.AppendLine($"        private {codeItem.TypeName} {codeItem.FieldName};");
             }
             sb.AppendLine();
             sb.AppendLine("        #endregion");
@@ -995,24 +1491,19 @@ namespace EFramework.Editor.UI
             // 生成属性
             sb.AppendLine("        #region Component Properties");
             sb.AppendLine();
-            var componentGroups = bindingItems
-                .Where(item => item.Component != null)
-                .GroupBy(item => item.ComponentTypeName)
+            var componentGroups = codeItems
+                .GroupBy(item => item.Item.ComponentTypeName)
                 .OrderBy(g => g.Key);
 
             foreach (var group in componentGroups)
             {
                 sb.AppendLine($"        // {group.Key} Components");
-                foreach (var item in group.OrderBy(i => i.BindingName))
+                foreach (var codeItem in group.OrderBy(i => i.Item.BindingName))
                 {
-                    var propertyName = SanitizePropertyName(item.BindingName);
-                    var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
-                    var typeName = item.ComponentTypeName;
-
                     sb.AppendLine($"        /// <summary>");
-                    sb.AppendLine($"        /// {item.DisplayName} - {typeName}");
+                    sb.AppendLine($"        /// {codeItem.Item.DisplayName} - {codeItem.Item.ComponentTypeName}");
                     sb.AppendLine($"        /// </summary>");
-                    sb.AppendLine($"        public {typeName} {propertyName} => {fieldName};");
+                    sb.AppendLine($"        public {codeItem.TypeName} {codeItem.PropertyName} => {codeItem.FieldName};");
                     sb.AppendLine();
                 }
             }
@@ -1034,15 +1525,11 @@ namespace EFramework.Editor.UI
             sb.AppendLine("            }");
             sb.AppendLine();
 
-            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            foreach (var codeItem in codeItems.OrderBy(i => i.Item.BindingName))
             {
-                if (item.Component == null) continue;
-                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
-                var typeName = item.ComponentTypeName;
-
-                sb.AppendLine($"            {fieldName} = Binding.GetComponent<{typeName}>(\"{item.BindingName}\");");
-                sb.AppendLine($"            if ({fieldName} == null)");
-                sb.AppendLine($"                UnityEngine.Debug.LogWarning($\"Component '{item.BindingName}' of type {typeName} not found in binding.\");");
+                sb.AppendLine($"            {codeItem.FieldName} = Binding.GetComponent<{codeItem.TypeName}>(\"{codeItem.Item.BindingName}\");");
+                sb.AppendLine($"            if ({codeItem.FieldName} == null)");
+                sb.AppendLine($"                UnityEngine.Debug.LogWarning($\"Component '{codeItem.Item.BindingName}' of type {codeItem.Item.ComponentTypeName} not found in binding.\");");
             }
             sb.AppendLine("        }");
             sb.AppendLine();
@@ -1067,11 +1554,9 @@ namespace EFramework.Editor.UI
             sb.AppendLine("            if (!base.ValidateReferences()) return false;");
             sb.AppendLine();
             sb.AppendLine("            bool allValid = true;");
-            foreach (var item in bindingItems.OrderBy(i => i.BindingName))
+            foreach (var codeItem in codeItems.OrderBy(i => i.Item.BindingName))
             {
-                if (item.Component == null) continue;
-                var fieldName = $"m_{SanitizeFieldName(item.BindingName)}";
-                sb.AppendLine($"            if ({fieldName} == null) {{ UnityEngine.Debug.LogError(\"Missing reference: {item.BindingName}\"); allValid = false; }}");
+                sb.AppendLine($"            if ({codeItem.FieldName} == null) {{ UnityEngine.Debug.LogError(\"Missing reference: {codeItem.Item.BindingName}\"); allValid = false; }}");
             }
             sb.AppendLine("            return allValid;");
             sb.AppendLine("        }");
@@ -1085,16 +1570,116 @@ namespace EFramework.Editor.UI
             return sb.ToString();
         }
 
-        private string SanitizeFieldName(string name)
+        private sealed class GeneratedBindingCodeItem
         {
-            return SanitizePropertyName(name).ToLowerInvariant();
+            public ComponentBindingItem Item;
+            public string TypeName;
+            public string FieldName;
+            public string PropertyName;
         }
-        private string SanitizePropertyName(string name)
+
+        private List<GeneratedBindingCodeItem> BuildGeneratedCodeItems()
+        {
+            var result = new List<GeneratedBindingCodeItem>();
+            var propertyNames = new HashSet<string>(StringComparer.Ordinal);
+            var fieldNames = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (var item in m_target.BindingItems.Where(item => item.Component != null).OrderBy(item => item.BindingName))
+            {
+                var propertyName = MakeUniqueIdentifier(ToValidIdentifier(item.BindingName, "Binding"), propertyNames);
+                var fieldName = MakeUniqueIdentifier("m_" + LowerFirst(propertyName), fieldNames);
+                result.Add(new GeneratedBindingCodeItem
+                {
+                    Item = item,
+                    TypeName = GetSourceTypeName(item.Component.GetType()),
+                    FieldName = fieldName,
+                    PropertyName = propertyName
+                });
+            }
+
+            return result;
+        }
+
+        private void NormalizeBindingNames()
+        {
+            var usedNames = new HashSet<string>(StringComparer.Ordinal);
+            var changed = false;
+
+            foreach (var item in m_target.BindingItems)
+            {
+                var normalized = MakeUniqueIdentifier(ToValidIdentifier(item.BindingName, "Binding"), usedNames);
+                if (item.BindingName != normalized)
+                {
+                    item.BindingName = normalized;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                MarkBindingDataDirty();
+            }
+        }
+
+        private string MakeUniqueBindingName(string rawName, ComponentBindingItem ignoredItem = null)
+        {
+            var usedNames = new HashSet<string>(
+                m_target.BindingItems
+                    .Where(item => item != ignoredItem)
+                    .Select(item => item.BindingName),
+                StringComparer.Ordinal);
+
+            return MakeUniqueIdentifier(ToValidIdentifier(rawName, "Binding"), usedNames);
+        }
+
+        private static string MakeUniqueIdentifier(string baseName, HashSet<string> usedNames)
+        {
+            var uniqueName = baseName;
+            var counter = 1;
+            while (usedNames.Contains(uniqueName))
+            {
+                uniqueName = $"{baseName}_{counter}";
+                counter++;
+            }
+
+            usedNames.Add(uniqueName);
+            return uniqueName;
+        }
+
+        private static string GetSourceTypeName(Type type)
+        {
+            if (type == null)
+            {
+                return "global::UnityEngine.Component";
+            }
+
+            var fullName = type.FullName ?? type.Name;
+            if (!type.IsGenericType)
+            {
+                return "global::" + fullName.Replace('+', '.');
+            }
+
+            var tickIndex = fullName.IndexOf('`');
+            var genericTypeName = tickIndex >= 0 ? fullName.Substring(0, tickIndex) : fullName;
+            var genericArguments = string.Join(", ", type.GetGenericArguments().Select(GetSourceTypeName));
+            return $"global::{genericTypeName.Replace('+', '.')}<{genericArguments}>";
+        }
+
+        private static string LowerFirst(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return char.ToLowerInvariant(value[0]) + value.Substring(1);
+        }
+
+        private static string ToValidIdentifier(string name, string fallback)
         {
             if (string.IsNullOrEmpty(name))
-                return "Unknown";
+                return fallback;
 
-            // 移除无效字符并确保以字母开头
             var sanitized = new StringBuilder();
             bool firstChar = true;
 
@@ -1113,11 +1698,18 @@ namespace EFramework.Editor.UI
 
             var result = sanitized.ToString();
 
-            // 确保不为空且以字母开头
             if (string.IsNullOrEmpty(result) || !char.IsLetter(result[0]))
-                result = "Component_" + result;
+                result = fallback + "_" + result;
+
+            if (s_csharpKeywords.Contains(result))
+                result += "_";
 
             return result;
+        }
+
+        private string SanitizePropertyName(string name)
+        {
+            return ToValidIdentifier(name, "Unknown");
         }
     }
 }

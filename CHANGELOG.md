@@ -6,6 +6,25 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.6.5] - 2026-05-02
+
+### Added
+
+- Added configurable UI view transitions, including separate open and close transition settings, built-in `None` transitions, and Inspector selection for custom `IUIViewTransition` implementations.
+- Added automatic UI screen-fit refresh handling for resolution and safe-area changes.
+
+### Changed
+
+- Updated `QUI` screen adaptation so foreground UI and world-space background layers can be refreshed consistently, including an automatic fit mode and scene-camera background rebinding.
+- Improved generated UI binding names by deriving concise unique names from node path context and component semantics.
+- Hardened `UIControllerBase` lifecycle initialization, async show/hide ordering, popup completion, and button listener registration defaults.
+- Improved full-screen and safe-area fitters so cached or inactive UI can reapply layout safely when re-enabled.
+
+### Fixed
+
+- Fixed UI view creation cleanup when generated view construction fails.
+- Fixed Addressables bootstrap and managed resource postprocessing edge cases for project initialization flows.
+
 ## [0.6.4] - 2026-05-02
 
 ### Added

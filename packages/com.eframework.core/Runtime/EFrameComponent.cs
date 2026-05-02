@@ -28,7 +28,7 @@ namespace EFramework.Runtime
         [Tooltip("设计分辨率")]
         [SerializeField] public Vector2Int DesignSize = new(1080, 1920);
         [Tooltip("屏幕适配模式")]
-        [SerializeField] public ScreenFitMode FitMode = ScreenFitMode.FitWidth;
+        [SerializeField] public ScreenFitMode FitMode = ScreenFitMode.Auto;
 
         public EFrameSettings Settings => m_settings;
         public Vector2Int ResolvedDesignSize => m_settings != null ? m_settings.DesignSize : DesignSize;

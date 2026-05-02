@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace EFramework.Runtime.UI.Transitions
 {
-    internal sealed class ScaleFadeViewTransition : IUIViewTransition
+    public sealed class ScaleFadeViewTransition : IUIViewTransition
     {
-        private const float DefaultDuration = 0.25f;
+        public const string Id = "ScaleFade";
 
         public UniTask PlayOpenAsync(BindingViewBase view)
         {
@@ -16,7 +16,7 @@ namespace EFramework.Runtime.UI.Transitions
                 return UniTask.CompletedTask;
             }
 
-            float duration = GetDuration(view);
+            float duration = GetDuration(view, true);
 
             Kill(view);
             animRoot.localScale = Vector3.one * 0.8f;
@@ -45,7 +45,7 @@ namespace EFramework.Runtime.UI.Transitions
                 return UniTask.CompletedTask;
             }
 
-            float duration = GetDuration(view);
+            float duration = GetDuration(view, false);
 
             Kill(view);
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
@@ -95,10 +95,10 @@ namespace EFramework.Runtime.UI.Transitions
             return completionSource.Task;
         }
 
-        private static float GetDuration(BindingViewBase view)
+        private static float GetDuration(BindingViewBase view, bool opening)
         {
-            float duration = view?.Config.AnimationDuration ?? DefaultDuration;
-            return duration > 0f ? duration : DefaultDuration;
+            float duration = view?.Config.GetTransitionDuration(opening) ?? ViewTransitionConfig.DefaultDuration;
+            return duration > 0f ? duration : ViewTransitionConfig.DefaultDuration;
         }
     }
 }

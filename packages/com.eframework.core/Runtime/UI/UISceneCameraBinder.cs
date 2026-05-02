@@ -10,14 +10,16 @@ namespace EFramework.Runtime.UI
     internal sealed class UISceneCameraBinder : IDisposable
     {
         private readonly Camera m_uiCamera;
+        private readonly Action<Camera> m_onBoundCameraChanged;
         private readonly Dictionary<EFrameSceneCamera, int> m_sceneCameras = new();
         private int m_nextOrder;
         private Camera m_boundBaseCamera;
         private bool m_disposed;
 
-        public UISceneCameraBinder(Camera uiCamera)
+        public UISceneCameraBinder(Camera uiCamera, Action<Camera> onBoundCameraChanged = null)
         {
             m_uiCamera = uiCamera;
+            m_onBoundCameraChanged = onBoundCameraChanged;
         }
 
         public void Initialize()
@@ -131,11 +133,13 @@ namespace EFramework.Runtime.UI
                 {
                     UpdateContextSceneCamera(null);
                 }
+                m_onBoundCameraChanged?.Invoke(null);
                 return;
             }
 
             BindToBaseCamera(m_boundBaseCamera);
             UpdateContextSceneCamera(m_boundBaseCamera);
+            m_onBoundCameraChanged?.Invoke(m_boundBaseCamera);
         }
 
         private Camera ResolveBestCamera()
@@ -186,12 +190,12 @@ namespace EFramework.Runtime.UI
                 && camera.gameObject.activeInHierarchy;
         }
 
-            private static bool IsSceneRuntimeObject(Component component)
-            {
-                return component != null
+        private static bool IsSceneRuntimeObject(Component component)
+        {
+            return component != null
                 && component.gameObject.scene.IsValid()
                 && component.gameObject.activeInHierarchy;
-            }
+        }
 
         private static bool IsBetter(EFrameSceneCamera candidate, int candidateOrder, EFrameSceneCamera current, int currentOrder)
         {

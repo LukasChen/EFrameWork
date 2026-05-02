@@ -1,12 +1,37 @@
-using EFramework.Runtime.UI;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace EFramework.Runtime.UI
 {
+    /// <summary>
+    /// View 动画配置。
+    /// </summary>
+    [System.Serializable]
+    public struct ViewTransitionConfig
+    {
+        public const float DefaultDuration = 0.25f;
+
+        [Tooltip("动画类型（留空则使用框架默认动画）")]
+        public string TransitionTypeName;
+
+        [Tooltip("动画时长（秒，0 表示使用动画默认时长）")]
+        public float Duration;
+
+        public ViewTransitionConfig(string transitionTypeName = "", float duration = DefaultDuration)
+        {
+            TransitionTypeName = transitionTypeName;
+            Duration = duration;
+        }
+
+        public bool HasExplicitValue()
+        {
+            return !string.IsNullOrWhiteSpace(TransitionTypeName) || Duration > 0f;
+        }
+
+        public static ViewTransitionConfig Default => new ViewTransitionConfig();
+    }
+
     /// <summary>
     /// View 配置 - 存储在 Prefab 上的默认配置
     /// </summary>
@@ -25,19 +50,62 @@ namespace EFramework.Runtime.UI
         [Tooltip("动画根节点名称（留空则不播放动画，常用：Window、Root、Content）")]
         public string AnimationRootName;
 
+        [Tooltip("打开动画")]
+        public ViewTransitionConfig OpenTransition;
+
+        [Tooltip("关闭动画")]
+        public ViewTransitionConfig CloseTransition;
+
+        [SerializeField]
+        [HideInInspector]
+        [Tooltip("动画类型（留空则使用框架默认动画）")]
+        public string TransitionTypeName;
+
+        [SerializeField]
+        [HideInInspector]
         [Tooltip("动画时长")]
         public float AnimationDuration;
 
-        public ViewConfig(UILayer layer = UILayer.QuiPanel, bool isViewRoot = false, bool cache = false, string animRoot = "", float animDuration = 0.25f)
+        public ViewConfig(UILayer layer = UILayer.QuiPanel, bool isViewRoot = false, bool cache = false, string animRoot = "", float animDuration = 0.25f, string transitionTypeName = "")
         {
             DefaultLayer = layer;
             IsViewRoot = isViewRoot;
             UsingCache = cache;
             AnimationRootName = animRoot;
+            TransitionTypeName = transitionTypeName;
             AnimationDuration = animDuration;
+            OpenTransition = new ViewTransitionConfig(transitionTypeName, animDuration);
+            CloseTransition = new ViewTransitionConfig(transitionTypeName, animDuration);
         }
 
-        public static ViewConfig Default => new ViewConfig(UILayer.QuiPanel,  false, false, "", 0.25f);
+        public string GetTransitionTypeName(bool opening)
+        {
+            var transition = opening ? OpenTransition : CloseTransition;
+            if (transition.HasExplicitValue())
+            {
+                return transition.TransitionTypeName;
+            }
+
+            return TransitionTypeName;
+        }
+
+        public float GetTransitionDuration(bool opening)
+        {
+            var transition = opening ? OpenTransition : CloseTransition;
+            if (transition.Duration > 0f)
+            {
+                return transition.Duration;
+            }
+
+            if (AnimationDuration > 0f)
+            {
+                return AnimationDuration;
+            }
+
+            return ViewTransitionConfig.DefaultDuration;
+        }
+
+        public static ViewConfig Default => new ViewConfig(UILayer.QuiPanel, false, false, "", 0.25f);
     }
 
     /// <summary>

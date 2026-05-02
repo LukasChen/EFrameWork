@@ -246,6 +246,11 @@ namespace EFramework.Editor.ProjectBootstrap
 
         internal static bool SyncImportedAssets(IEnumerable<string> assetPaths, out string message)
         {
+            if (AreImportedManagedAssetsCurrent(assetPaths, out message))
+            {
+                return true;
+            }
+
             return SyncProjectAddressablesAndGenerateResPath(out message);
         }
 
@@ -759,6 +764,71 @@ namespace EFramework.Editor.ProjectBootstrap
 
             entry = new GeneratedAddressEntry(binding.GroupName, binding.Address, assetPath);
             return true;
+        }
+
+        private static bool AreImportedManagedAssetsCurrent(IEnumerable<string> assetPaths, out string message)
+        {
+            message = string.Empty;
+            if (assetPaths == null)
+            {
+                return false;
+            }
+
+            var settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
+            if (settings == null)
+            {
+                message = "Addressables settings are missing.";
+                return false;
+            }
+
+            var checkedCount = 0;
+            foreach (var assetPath in assetPaths)
+            {
+                if (!IsManagedAssetPath(assetPath))
+                {
+                    continue;
+                }
+
+                if (!TryCollectGeneratedAddressEntry(assetPath, out var generatedEntry))
+                {
+                    continue;
+                }
+
+                checkedCount++;
+                if (!IsGeneratedEntrySynced(settings, generatedEntry))
+                {
+                    message = $"{assetPath} is not current in EFrame managed Addressables.";
+                    return false;
+                }
+            }
+
+            if (!IsGeneratedResPathCurrent(out var resPathMessage))
+            {
+                message = resPathMessage;
+                return false;
+            }
+
+            message = checkedCount > 0
+                ? $"Imported managed assets already current. Entries checked: {checkedCount}. {resPathMessage}"
+                : $"No imported managed Addressables entries require sync. {resPathMessage}";
+            return true;
+        }
+
+        private static bool IsGeneratedEntrySynced(AddressableAssetSettings settings, GeneratedAddressEntry generatedEntry)
+        {
+            var guid = AssetDatabase.AssetPathToGUID(generatedEntry.AssetPath);
+            if (string.IsNullOrEmpty(guid))
+            {
+                return false;
+            }
+
+            var entry = settings.FindAssetEntry(guid);
+            var expectedGroup = settings.FindGroup(generatedEntry.GroupName);
+            return entry != null
+                && expectedGroup != null
+                && entry.parentGroup == expectedGroup
+                && string.Equals(entry.address, generatedEntry.Address, StringComparison.Ordinal)
+                && HasLabel(entry, ManagedLabel);
         }
 
         private static AddressableAssetGroup EnsureGroup(AddressableAssetSettings settings, string groupName, IDictionary<string, AddressableAssetGroup> groupCache)
@@ -1299,7 +1369,14 @@ namespace EFramework.Editor.ProjectBootstrap
                 EnsureFolderExists("Assets/App/Runtime/Generated/Res");
 
                 var fileContent = BuildGeneratedResPathContent(GeneratedResPathNamespace, entries);
-                File.WriteAllText(GetProjectAbsolutePath(GeneratedResPathFilePath), fileContent, new UTF8Encoding(false));
+                var generatedResPath = GetProjectAbsolutePath(GeneratedResPathFilePath);
+                if (File.Exists(generatedResPath) && string.Equals(File.ReadAllText(generatedResPath), fileContent, StringComparison.Ordinal))
+                {
+                    message = $"{GeneratedResPathFilePath} is current.";
+                    return true;
+                }
+
+                File.WriteAllText(generatedResPath, fileContent, new UTF8Encoding(false));
                 AssetDatabase.ImportAsset(GeneratedResPathFilePath, ImportAssetOptions.ForceUpdate);
                 AssetDatabase.SaveAssets();
                 message = $"Generated ResPath code at {GeneratedResPathFilePath}.";

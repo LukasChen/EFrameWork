@@ -19,6 +19,7 @@ namespace EFramework.Runtime.UI
         int DesignHeight { get; }
         RectTransform UILayer(UILayer layer);
         void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode, bool enableScreenFitDebugLog = false);
+        void RefreshScreenFit();
         QUIBinding CreateBinding(string assetPath, UILayer? layer = null);
         TView CreateView<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase;
         UIViewHandle<TView> CreateViewHandle<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase;

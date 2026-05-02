@@ -20,10 +20,21 @@ namespace EFramework.Runtime.UI.Layout
         public bool FitBottom = true;
 
         private RectTransform m_rectTransform;
+        private bool m_hasInitialRect;
+        private Vector2 m_initialAnchorMin;
+        private Vector2 m_initialAnchorMax;
+        private Vector2 m_initialOffsetMin;
+        private Vector2 m_initialOffsetMax;
 
         private void Awake()
         {
-            m_rectTransform = GetComponent<RectTransform>();
+            CacheComponents();
+            CaptureInitialRectIfNeeded();
+        }
+
+        private void OnEnable()
+        {
+            ApplyFullScreen();
         }
 
         private void Start()
@@ -36,10 +47,15 @@ namespace EFramework.Runtime.UI.Layout
         /// </summary>
         public void ApplyFullScreen()
         {
+            CacheComponents();
+            if (m_rectTransform == null) return;
             if (EFrame.Current?.UI == null) return;
+
+            CaptureInitialRectIfNeeded();
 
             var ui = EFrame.Current.UI;
             float scaleFactor = ui.ScaleFactor;
+            if (scaleFactor <= 0f) return;
 
             // 计算各边需要扩展的距离（转换为设计坐标系）
             float leftExpand = FitLeft ? ui.ScreenFitRect.xMin / scaleFactor : 0;
@@ -47,11 +63,11 @@ namespace EFramework.Runtime.UI.Layout
             float bottomExpand = FitBottom ? ui.ScreenFitRect.yMin / scaleFactor : 0;
             float topExpand = FitTop ? (Screen.height - ui.ScreenFitRect.yMax) / scaleFactor : 0;
 
-            // 保存原始锚点和偏移
-            Vector2 anchorMin = m_rectTransform.anchorMin;
-            Vector2 anchorMax = m_rectTransform.anchorMax;
-            Vector2 offsetMin = m_rectTransform.offsetMin;
-            Vector2 offsetMax = m_rectTransform.offsetMax;
+            // 从初始布局重算，避免方向开关变化后残留旧偏移。
+            Vector2 anchorMin = m_initialAnchorMin;
+            Vector2 anchorMax = m_initialAnchorMax;
+            Vector2 offsetMin = m_initialOffsetMin;
+            Vector2 offsetMax = m_initialOffsetMax;
 
             // 向左扩展
             if (FitLeft)
@@ -85,6 +101,28 @@ namespace EFramework.Runtime.UI.Layout
             m_rectTransform.anchorMax = anchorMax;
             m_rectTransform.offsetMin = offsetMin;
             m_rectTransform.offsetMax = offsetMax;
+        }
+
+        private void CacheComponents()
+        {
+            if (m_rectTransform == null)
+            {
+                m_rectTransform = GetComponent<RectTransform>();
+            }
+        }
+
+        private void CaptureInitialRectIfNeeded()
+        {
+            if (m_hasInitialRect || m_rectTransform == null)
+            {
+                return;
+            }
+
+            m_initialAnchorMin = m_rectTransform.anchorMin;
+            m_initialAnchorMax = m_rectTransform.anchorMax;
+            m_initialOffsetMin = m_rectTransform.offsetMin;
+            m_initialOffsetMax = m_rectTransform.offsetMax;
+            m_hasInitialRect = true;
         }
     }
 }

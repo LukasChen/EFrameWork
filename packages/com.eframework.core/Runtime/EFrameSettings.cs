@@ -8,7 +8,7 @@ namespace EFramework.Runtime
     {
         [Header("Screen Fit")]
         public Vector2Int DesignSize = new(1080, 1920);
-        public ScreenFitMode FitMode = ScreenFitMode.FitWidth;
+        public ScreenFitMode FitMode = ScreenFitMode.Auto;
         public bool EnableScreenFitDebugLog;
     }
 }

@@ -1,12 +1,11 @@
 using EFramework.Runtime.Asset;
+using EFramework.Runtime.UI.Layout;
 using EFramework.Runtime.UI.Handles;
 using EFramework.Runtime.UI.Transitions;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
@@ -34,11 +33,15 @@ namespace EFramework.Runtime.UI
         /// <summary>
         /// 按高度适配（宽度可能裁剪或留黑边）- 适合竖屏游戏
         /// </summary>
-        FitHeight,
+        FitHeight = 0,
         /// <summary>
         /// 按宽度适配（高度可能裁剪或留黑边）- 适合横屏游戏
         /// </summary>
-        FitWidth
+        FitWidth = 1,
+        /// <summary>
+        /// 自动适配：宽屏按高度适配，窄长屏按宽度适配
+        /// </summary>
+        Auto = 2
     }
 
     public sealed class QUI : IUIService
@@ -46,11 +49,13 @@ namespace EFramework.Runtime.UI
         private const string DefaultLayerName = "Default";
         private const string UiLayerName = "UI";
         private readonly IUIViewTransition m_defaultTransition = new ScaleFadeViewTransition();
+        private readonly Dictionary<string, IUIViewTransition> m_transitionCache = new();
 
         public EventSystem EventSystem;
         private Dictionary<UILayer, RectTransform> m_uiLayerNodeTable;
         public RectTransform Root { get; private set; }
         public Canvas RootCanvas;
+        private CanvasScaler m_rootCanvasScaler;
         public Camera UICamera { get; private set; }
         public IUIViewTransition DefaultTransition => m_defaultTransition;
         public Rect ScreenFitRect { get; private set; }
@@ -60,6 +65,11 @@ namespace EFramework.Runtime.UI
         public int DesignHeight { get; private set; }
         public bool EnableScreenFitDebugLog { get; private set; }
         private UISceneCameraBinder m_sceneCameraBinder;
+        private GameObject m_backgroundCanvasObject;
+        private RectTransform m_backgroundCanvasRect;
+        private RectTransform m_backgroundNode;
+        private Canvas m_backgroundCanvas;
+        private Camera m_backgroundCamera;
 
         #region 屏幕适配信息
 
@@ -67,6 +77,11 @@ namespace EFramework.Runtime.UI
         /// 当前适配模式
         /// </summary>
         public ScreenFitMode FitMode { get; private set; }
+
+        /// <summary>
+        /// 当前实际使用的适配模式。Auto 会根据屏幕宽高比解析为 FitHeight 或 FitWidth。
+        /// </summary>
+        public ScreenFitMode EffectiveFitMode { get; private set; }
 
         /// <summary>
         /// 设计宽高比
@@ -306,8 +321,23 @@ namespace EFramework.Runtime.UI
             return m_uiLayerNodeTable[uILayerType];
         }
 
-        public void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode = ScreenFitMode.FitHeight, bool enableScreenFitDebugLog = false)
+        public void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode = ScreenFitMode.Auto, bool enableScreenFitDebugLog = false)
         {
+            if (uiCamera == null)
+            {
+                throw new ArgumentNullException(nameof(uiCamera));
+            }
+
+            if (designWidth <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(designWidth), designWidth, "Design width must be greater than zero.");
+            }
+
+            if (designHeight <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(designHeight), designHeight, "Design height must be greater than zero.");
+            }
+
             UICamera = uiCamera;
             DesignWidth = designWidth;
             DesignHeight = designHeight;
@@ -315,7 +345,7 @@ namespace EFramework.Runtime.UI
             EnableScreenFitDebugLog = enableScreenFitDebugLog;
 
             ValidateSortingLayers();
-            m_sceneCameraBinder = new UISceneCameraBinder(UICamera);
+            m_sceneCameraBinder = new UISceneCameraBinder(UICamera, OnSceneCameraChanged);
             m_sceneCameraBinder.Initialize();
 
             GameObject rootObject = new("UIRoot");
@@ -334,11 +364,12 @@ namespace EFramework.Runtime.UI
             // 计算屏幕适配
             CalculateScreenFit();
 
-            CanvasScaler canvasScaler = rootObject.AddComponent<CanvasScaler>();
-            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            canvasScaler.scaleFactor = ScaleFactor;
-            canvasScaler.referencePixelsPerUnit = 100;
+            m_rootCanvasScaler = rootObject.AddComponent<CanvasScaler>();
+            m_rootCanvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            m_rootCanvasScaler.scaleFactor = ScaleFactor;
+            m_rootCanvasScaler.referencePixelsPerUnit = 100;
             CreateUILayers();
+            rootObject.AddComponent<UIScreenFitWatcher>().Initialize(this);
         }
 
         private static void AddInputModule(GameObject rootObject)
@@ -352,7 +383,7 @@ namespace EFramework.Runtime.UI
 
         /// <summary>
         /// 计算屏幕适配参数
-        /// 策略：
+        /// Auto 策略：
         /// - 宽屏（屏幕比设计宽）：按高度适配，UILayer 固定设计尺寸居中，两侧留空
         /// - 长屏（屏幕比设计窄长）：按宽度适配，UILayer 全屏铺满
         /// </summary>
@@ -382,10 +413,11 @@ namespace EFramework.Runtime.UI
 
             float screenAspect = screenW / screenH;
             float designAspect = DesignAspect;
+            EffectiveFitMode = ResolveEffectiveFitMode(screenAspect, designAspect);
 
-            if (screenAspect >= designAspect)
+            if (EffectiveFitMode == ScreenFitMode.FitHeight)
             {
-                // 宽屏：按高度适配，保证设计高度完整显示，两侧留空
+                // 按高度适配，保证设计高度完整显示，宽度可能留空或裁剪
                 ScaleFactor = screenH / DesignHeight;
 
                 float fitWidth = DesignWidth * ScaleFactor;
@@ -397,22 +429,40 @@ namespace EFramework.Runtime.UI
             }
             else
             {
-                // 长屏：按宽度适配，保证设计宽度完整显示；高度扩展铺满全屏
+                // 按宽度适配，保证设计宽度完整显示，高度可能扩展或裁剪
                 ScaleFactor = screenW / DesignWidth;
-
-                ScreenFitRect = new Rect(0f, 0f, screenW, screenH);
 
                 WidthDelta = 0f;
                 HeightDelta = (screenH / ScaleFactor) - DesignHeight;
+
+                if (HeightDelta >= 0f)
+                {
+                    ScreenFitRect = new Rect(0f, 0f, screenW, screenH);
+                }
+                else
+                {
+                    float fitHeight = DesignHeight * ScaleFactor;
+                    ScreenFitRect = new Rect(0f, (screenH - fitHeight) * 0.5f, screenW, fitHeight);
+                }
             }
 
             ScaleFitFactor = ScreenFitRect.width / Screen.width;
 
             if (EnableScreenFitDebugLog)
             {
-                Debug.Log($"FitMode: {FitMode}, ScreenFitRect: {ScreenFitRect}, ScaleFactor: {ScaleFactor}");
+                Debug.Log($"FitMode: {FitMode}, EffectiveFitMode: {EffectiveFitMode}, ScreenFitRect: {ScreenFitRect}, ScaleFactor: {ScaleFactor}");
                 Debug.Log($"IsWideScreen: {IsWideScreen}, IsTallScreen: {IsTallScreen}, WidthDelta: {WidthDelta}, HeightDelta: {HeightDelta}");
             }
+        }
+
+        private ScreenFitMode ResolveEffectiveFitMode(float screenAspect, float designAspect)
+        {
+            if (FitMode != ScreenFitMode.Auto)
+            {
+                return FitMode;
+            }
+
+            return screenAspect >= designAspect ? ScreenFitMode.FitHeight : ScreenFitMode.FitWidth;
         }
 
         private static void ValidateSortingLayers()
@@ -484,108 +534,165 @@ namespace EFramework.Runtime.UI
                 layerCanvas.overrideSorting = true;
                 layerCanvas.sortingLayerName = layer;
 
-                // 根据屏幕类型设置 UILayer 尺寸
-                layerNode.pivot = new Vector2(0.5f, 0.5f);
-                layerNode.anchoredPosition = Vector2.zero;
-
-                if (IsWideScreen)
-                {
-                    // 宽屏：UILayer 固定为设计尺寸，居中显示
-                    layerNode.anchorMin = new Vector2(0.5f, 0.5f);
-                    layerNode.anchorMax = new Vector2(0.5f, 0.5f);
-                    layerNode.sizeDelta = new Vector2(DesignWidth, DesignHeight);
-                }
-                else
-                {
-                    // 长屏：UILayer 全屏铺满（宽度为设计宽度，高度扩展）
-                    layerNode.anchorMin = new Vector2(0.5f, 0.5f);
-                    layerNode.anchorMax = new Vector2(0.5f, 0.5f);
-                    // 高度扩展为实际屏幕高度（设计坐标系下）
-                    float actualHeight = DesignHeight + HeightDelta;
-                    layerNode.sizeDelta = new Vector2(DesignWidth, actualHeight);
-                }
+                ApplyUILayerLayout(layerNode);
 
                 m_uiLayerNodeTable.Add(layerType, layerNode);
             }
         }
 
+        private void ApplyUILayerLayout(RectTransform layerNode)
+        {
+            layerNode.anchorMin = new Vector2(0.5f, 0.5f);
+            layerNode.anchorMax = new Vector2(0.5f, 0.5f);
+            layerNode.pivot = new Vector2(0.5f, 0.5f);
+            layerNode.anchoredPosition = Vector2.zero;
+
+            var width = DesignWidth + Mathf.Max(0f, WidthDelta);
+            var height = DesignHeight + Mathf.Max(0f, HeightDelta);
+            layerNode.sizeDelta = new Vector2(width, height);
+        }
+
         private void CreateWorldBackgroundUINode()
         {
-            var bgCamera = EFrame.Current?.SceneCamera;
-            if (bgCamera == null) bgCamera = UICamera;
+            var bgCamera = ResolveBackgroundCamera();
 
-            float cameraDistance = 20f;
-
-            // 计算相机在该距离下的视野尺寸
-            float heightAtDistance = 2f * cameraDistance * Mathf.Tan(bgCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-            float widthAtDistance = heightAtDistance * bgCamera.aspect;
-
-            // ========== 第一层：Canvas（完全覆盖相机视野）==========
+            // QuiBackground 是挂在场景相机下的 WorldSpace Canvas，用于实现“背景在场景下、常规 UI 在场景上”的两相机 UI 分层。
             string canvasName = "BackgroundCanvas";
-            GameObject canvasObject = new(canvasName);
-            canvasObject.layer = LayerMask.NameToLayer(DefaultLayerName);
+            m_backgroundCanvasObject = new GameObject(canvasName);
+            m_backgroundCanvasObject.layer = LayerMask.NameToLayer(DefaultLayerName);
 
-            RectTransform canvasRect = canvasObject.AddComponent<RectTransform>();
-            Canvas canvas = canvasObject.AddComponent<Canvas>();
-            canvas.sortingOrder = -100;
-            canvasObject.AddComponent<GraphicRaycaster>();
-            canvas.vertexColorAlwaysGammaSpace = true;
+            m_backgroundCanvasRect = m_backgroundCanvasObject.AddComponent<RectTransform>();
+            m_backgroundCanvas = m_backgroundCanvasObject.AddComponent<Canvas>();
+            m_backgroundCanvas.renderMode = RenderMode.WorldSpace;
+            m_backgroundCanvas.sortingOrder = -100;
+            m_backgroundCanvasObject.AddComponent<GraphicRaycaster>();
+            m_backgroundCanvas.vertexColorAlwaysGammaSpace = true;
 
-            // Canvas 尺寸设为相机视野尺寸（世界单位）
-            canvasRect.anchorMin = new Vector2(0.5f, 0.5f);
-            canvasRect.anchorMax = new Vector2(0.5f, 0.5f);
-            canvasRect.pivot = new Vector2(0.5f, 0.5f);
-            canvasRect.sizeDelta = new Vector2(widthAtDistance, heightAtDistance);
-            canvasRect.anchoredPosition = Vector2.zero;
-            canvasRect.localScale = Vector3.one;
-
-            // 放置到相机下
-            canvasObject.transform.SetParent(bgCamera.transform, false);
-            Vector3 canvasPos = bgCamera.transform.position + bgCamera.transform.forward * cameraDistance;
-            canvasObject.transform.position = canvasPos;
-
-            // ========== 第二层：BackgroundLayer（屏幕比例适配）==========
             string layerName = UI.UILayer.QuiBackground.ToString();
             GameObject layerObject = new(layerName);
             layerObject.layer = LayerMask.NameToLayer(DefaultLayerName);
 
-            RectTransform bgNode = layerObject.AddComponent<RectTransform>();
-            bgNode.SetParent(canvasRect, false);
+            m_backgroundNode = layerObject.AddComponent<RectTransform>();
+            m_backgroundNode.SetParent(m_backgroundCanvasRect, false);
+            ApplyWorldBackgroundLayout(bgCamera);
 
-            // 计算 Canvas 内的缩放因子（将设计坐标系映射到世界坐标系）
-            // Canvas 宽度 = widthAtDistance（世界单位），设计宽度 = DesignWidth
-            float canvasScaleFactor;
-            if (IsWideScreen)
-            {
-                // 宽屏：按高度适配
-                canvasScaleFactor = heightAtDistance / DesignHeight;
-            }
-            else
-            {
-                // 长屏：按宽度适配
-                canvasScaleFactor = widthAtDistance / DesignWidth;
-            }
+            m_uiLayerNodeTable.Add(UI.UILayer.QuiBackground, m_backgroundNode);
+        }
 
-            // BackgroundLayer 尺寸设置（设计坐标系）
-            bgNode.anchorMin = new Vector2(0.5f, 0.5f);
-            bgNode.anchorMax = new Vector2(0.5f, 0.5f);
-            bgNode.pivot = new Vector2(0.5f, 0.5f);
-            bgNode.anchoredPosition = Vector2.zero;
-            bgNode.localScale = new Vector3(canvasScaleFactor, canvasScaleFactor, 1);
+        private Camera ResolveBackgroundCamera()
+        {
+            return EFrame.Current?.SceneCamera != null ? EFrame.Current.SceneCamera : UICamera;
+        }
 
-            if (IsWideScreen)
+        private void OnSceneCameraChanged(Camera sceneCamera)
+        {
+            if (m_backgroundCanvasObject == null)
             {
-                // 宽屏：固定设计尺寸，居中显示
-                bgNode.sizeDelta = new Vector2(DesignWidth, DesignHeight);
-            }
-            else
-            {
-                // 长屏：宽度为设计宽度，高度扩展
-                float actualHeight = DesignHeight + HeightDelta;
-                bgNode.sizeDelta = new Vector2(DesignWidth, actualHeight);
+                return;
             }
 
-            m_uiLayerNodeTable.Add(UI.UILayer.QuiBackground, bgNode);
+            ApplyWorldBackgroundLayout(sceneCamera != null ? sceneCamera : UICamera);
+        }
+
+        private void ApplyWorldBackgroundLayout(Camera bgCamera)
+        {
+            if (bgCamera == null || m_backgroundCanvasRect == null || m_backgroundCanvas == null || m_backgroundNode == null)
+            {
+                return;
+            }
+
+            const float cameraDistance = 20f;
+            m_backgroundCamera = bgCamera;
+            m_backgroundCanvas.worldCamera = m_backgroundCamera;
+
+            var canvasSize = CalculateCameraViewSize(m_backgroundCamera, cameraDistance);
+
+            m_backgroundCanvasRect.SetParent(m_backgroundCamera.transform, false);
+            m_backgroundCanvasRect.anchorMin = new Vector2(0.5f, 0.5f);
+            m_backgroundCanvasRect.anchorMax = new Vector2(0.5f, 0.5f);
+            m_backgroundCanvasRect.pivot = new Vector2(0.5f, 0.5f);
+            m_backgroundCanvasRect.sizeDelta = canvasSize;
+            m_backgroundCanvasRect.anchoredPosition = Vector2.zero;
+            m_backgroundCanvasRect.localPosition = Vector3.forward * cameraDistance;
+            m_backgroundCanvasRect.localRotation = Quaternion.identity;
+            m_backgroundCanvasRect.localScale = Vector3.one;
+
+            var canvasScaleFactor = EffectiveFitMode == ScreenFitMode.FitHeight
+                ? canvasSize.y / DesignHeight
+                : canvasSize.x / DesignWidth;
+
+            ApplyUILayerLayout(m_backgroundNode);
+            m_backgroundNode.localScale = new Vector3(canvasScaleFactor, canvasScaleFactor, 1);
+        }
+
+        private static Vector2 CalculateCameraViewSize(Camera camera, float distance)
+        {
+            if (camera.orthographic)
+            {
+                var height = camera.orthographicSize * 2f;
+                return new Vector2(height * camera.aspect, height);
+            }
+
+            var heightAtDistance = 2f * distance * Mathf.Tan(camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            return new Vector2(heightAtDistance * camera.aspect, heightAtDistance);
+        }
+
+        public void RefreshScreenFit()
+        {
+            CalculateScreenFit();
+
+            if (m_rootCanvasScaler != null)
+            {
+                m_rootCanvasScaler.scaleFactor = ScaleFactor;
+            }
+
+            if (m_uiLayerNodeTable != null)
+            {
+                foreach (var pair in m_uiLayerNodeTable)
+                {
+                    if (pair.Key == UI.UILayer.QuiBackground)
+                    {
+                        continue;
+                    }
+
+                    if (pair.Value != null)
+                    {
+                        ApplyUILayerLayout(pair.Value);
+                    }
+                }
+            }
+
+            ApplyWorldBackgroundLayout(m_backgroundCamera != null ? m_backgroundCamera : ResolveBackgroundCamera());
+            RefreshLayoutFitters();
+        }
+
+        private void RefreshLayoutFitters()
+        {
+            if (Root != null)
+            {
+                foreach (var fitter in Root.GetComponentsInChildren<SafeAreaFitter>(true))
+                {
+                    fitter.ApplySafeArea();
+                }
+
+                foreach (var fitter in Root.GetComponentsInChildren<FullScreenFitter>(true))
+                {
+                    fitter.ApplyFullScreen();
+                }
+            }
+
+            if (m_backgroundCanvasObject != null)
+            {
+                foreach (var fitter in m_backgroundCanvasObject.GetComponentsInChildren<SafeAreaFitter>(true))
+                {
+                    fitter.ApplySafeArea();
+                }
+
+                foreach (var fitter in m_backgroundCanvasObject.GetComponentsInChildren<FullScreenFitter>(true))
+                {
+                    fitter.ApplyFullScreen();
+                }
+            }
         }
 
         public void SetInteractive(bool isInteractive)
@@ -602,9 +709,21 @@ namespace EFramework.Runtime.UI
                 Object.Destroy(Root.gameObject);
             }
 
+            if (m_backgroundCanvasObject != null)
+            {
+                Object.Destroy(m_backgroundCanvasObject);
+            }
+
             m_uiLayerNodeTable?.Clear();
+            m_transitionCache.Clear();
             m_sceneCameraBinder?.Dispose();
             m_sceneCameraBinder = null;
+            m_backgroundCanvasObject = null;
+            m_backgroundCanvasRect = null;
+            m_backgroundNode = null;
+            m_backgroundCanvas = null;
+            m_backgroundCamera = null;
+            m_rootCanvasScaler = null;
             Root = null;
             RootCanvas = null;
             UICamera = null;
@@ -623,6 +742,11 @@ namespace EFramework.Runtime.UI
             var cached = TakeBindingFromCache(assetPath);
             if (cached != null)
             {
+                if (layer.HasValue)
+                {
+                    cached.transform.SetParent(UILayer(layer.Value), false);
+                }
+
                 return cached;
             }
 
@@ -654,16 +778,22 @@ namespace EFramework.Runtime.UI
         public TView CreateView<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase
         {
             var binding = CreateBinding(assetPath, layer);
+            try
+            {
+                if (Activator.CreateInstance(typeof(TView)) is not TView view)
+                {
+                    throw new InvalidOperationException($"Failed to create UI view instance for type {typeof(TView).FullName}.");
+                }
 
-            if (Activator.CreateInstance(typeof(TView)) is not TView view)
+                view.BindContext(EFrame.Current);
+                view.SetBinding(binding, assetPath);
+                return view;
+            }
+            catch
             {
                 ReleaseBinding(assetPath, binding, false);
-                throw new InvalidOperationException($"Failed to create UI view instance for type {typeof(TView).FullName}.");
+                throw;
             }
-
-            view.BindContext(EFrame.Current);
-            view.SetBinding(binding, assetPath);
-            return view;
         }
 
         public UIViewHandle<TView> CreateViewHandle<TView>(string assetPath, UILayer? layer = null) where TView : BindingViewBase
@@ -690,17 +820,90 @@ namespace EFramework.Runtime.UI
 
         public UniTask PlayOpenTransitionAsync(BindingViewBase view)
         {
-            return m_defaultTransition.PlayOpenAsync(view);
+            return ResolveTransition(view, true).PlayOpenAsync(view);
         }
 
         public UniTask PlayCloseTransitionAsync(BindingViewBase view)
         {
-            return m_defaultTransition.PlayCloseAsync(view);
+            return ResolveTransition(view, false).PlayCloseAsync(view);
         }
 
         public void KillTransition(BindingViewBase view)
         {
-            m_defaultTransition.Kill(view);
+            var openTransition = ResolveTransition(view, true);
+            var closeTransition = ResolveTransition(view, false);
+
+            openTransition.Kill(view);
+            if (!ReferenceEquals(openTransition, closeTransition))
+            {
+                closeTransition.Kill(view);
+            }
+        }
+
+        private IUIViewTransition ResolveTransition(BindingViewBase view, bool opening)
+        {
+            var transitionTypeName = view?.Config.GetTransitionTypeName(opening);
+            if (string.IsNullOrWhiteSpace(transitionTypeName))
+            {
+                return m_defaultTransition;
+            }
+
+            if (m_transitionCache.TryGetValue(transitionTypeName, out var cachedTransition))
+            {
+                return cachedTransition;
+            }
+
+            var transition = CreateTransition(transitionTypeName);
+            m_transitionCache[transitionTypeName] = transition;
+            return transition;
+        }
+
+        private IUIViewTransition CreateTransition(string transitionTypeName)
+        {
+            if (transitionTypeName == ScaleFadeViewTransition.Id)
+            {
+                return m_defaultTransition;
+            }
+
+            if (transitionTypeName == NoneViewTransition.Id)
+            {
+                return new NoneViewTransition();
+            }
+
+            var transitionType = Type.GetType(transitionTypeName);
+            if (transitionType == null)
+            {
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    transitionType = assembly.GetType(transitionTypeName);
+                    if (transitionType != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (transitionType == null || transitionType.IsAbstract || typeof(MonoBehaviour).IsAssignableFrom(transitionType) || !typeof(IUIViewTransition).IsAssignableFrom(transitionType))
+            {
+                Debug.LogWarning($"QUI: View transition '{transitionTypeName}' is unavailable. Falling back to default transition.");
+                return m_defaultTransition;
+            }
+
+            if (transitionType.GetConstructor(Type.EmptyTypes) == null)
+            {
+                Debug.LogWarning($"QUI: View transition '{transitionTypeName}' must have a public parameterless constructor. Falling back to default transition.");
+                return m_defaultTransition;
+            }
+
+            try
+            {
+                return Activator.CreateInstance(transitionType) as IUIViewTransition ?? m_defaultTransition;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"QUI: Failed to create view transition '{transitionTypeName}'. Falling back to default transition. {ex}");
+                return m_defaultTransition;
+            }
         }
 
         public void OpenBindingView(BindingViewBase bindingViewBase, UILayer uiLayerType = UI.UILayer.QuiPanel)
@@ -721,7 +924,46 @@ namespace EFramework.Runtime.UI
         public void RefreshSceneCameraBindings()
         {
             m_sceneCameraBinder?.Refresh();
+            ApplyWorldBackgroundLayout(ResolveBackgroundCamera());
         }
+
         #endregion
+    }
+
+    public sealed class UIScreenFitWatcher : MonoBehaviour
+    {
+        private QUI m_ui;
+        private int m_lastWidth;
+        private int m_lastHeight;
+        private Rect m_lastSafeArea;
+
+        public void Initialize(QUI ui)
+        {
+            m_ui = ui;
+            CacheState();
+        }
+
+        private void Update()
+        {
+            if (m_ui == null)
+            {
+                return;
+            }
+
+            if (Screen.width == m_lastWidth && Screen.height == m_lastHeight && Screen.safeArea == m_lastSafeArea)
+            {
+                return;
+            }
+
+            CacheState();
+            m_ui.RefreshScreenFit();
+        }
+
+        private void CacheState()
+        {
+            m_lastWidth = Screen.width;
+            m_lastHeight = Screen.height;
+            m_lastSafeArea = Screen.safeArea;
+        }
     }
 }

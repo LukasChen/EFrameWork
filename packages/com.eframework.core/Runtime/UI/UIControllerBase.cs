@@ -37,17 +37,16 @@ namespace EFramework.Runtime.UI
         {
             m_completionSource = new UniTaskCompletionSource();
 
-            // 注册关闭回调
             m_controller.OnClosed += OnControllerClosed;
-
-            // 显示 UI（传入可空层级，优先使用配置）
-            await m_controller.ShowAsync(m_layer);
-
-            // 等待关闭
-            await m_completionSource.Task;
-
-            // 清理
-            m_controller.OnClosed -= OnControllerClosed;
+            try
+            {
+                await m_controller.ShowAsync(m_layer);
+                await m_completionSource.Task;
+            }
+            finally
+            {
+                m_controller.OnClosed -= OnControllerClosed;
+            }
         }
 
         private void OnControllerClosed()
@@ -69,6 +68,7 @@ namespace EFramework.Runtime.UI
         private static readonly object s_lock = new();
 
         private bool m_disposed = false;
+        private bool m_initialized = false;
         protected EFrameContext Context { get; private set; }
 
         /// <summary>
@@ -161,14 +161,13 @@ namespace EFramework.Runtime.UI
 
         protected UIControllerBase()
         {
-            BindContext(EFrame.Current);
             RegisterInstance();
-            OnInit();
         }
 
         public void BindContext(EFrameContext context)
         {
             if (context == null) return;
+            if (ReferenceEquals(Context, context)) return;
             Context = context;
             OnContextBound(context);
         }
@@ -185,7 +184,19 @@ namespace EFramework.Runtime.UI
                 throw new InvalidOperationException($"{GetType().Name} requires EFrame.Initialize() to complete before showing UI.");
             }
 
+            EnsureInitialized();
             return Context;
+        }
+
+        private void EnsureInitialized()
+        {
+            if (m_initialized)
+            {
+                return;
+            }
+
+            m_initialized = true;
+            OnInit();
         }
 
         protected virtual void OnContextBound(EFrameContext context)
@@ -255,7 +266,7 @@ namespace EFramework.Runtime.UI
         /// <param name="button">按钮组件</param>
         /// <param name="action">点击事件回调</param>
         /// <param name="removeOldListeners">是否移除旧的监听器</param>
-        protected void AddButtonClickListener(Button button, UnityEngine.Events.UnityAction action, bool removeOldListeners = true)
+        protected void AddButtonClickListener(Button button, UnityEngine.Events.UnityAction action, bool removeOldListeners = false)
         {
             if (IsNull(button)) return;
             if (removeOldListeners)
@@ -384,6 +395,7 @@ namespace EFramework.Runtime.UI
     public abstract class UIControllerBase<TView> : UIControllerBase where TView : BindingViewBase
     {
         private UIViewHandle<TView> m_viewHandle;
+        private int m_controllerOperationVersion;
 
         /// <summary>
         /// 非泛型 View Handle
@@ -427,6 +439,7 @@ namespace EFramework.Runtime.UI
         public override void Show(UILayer? layer = null)
         {
             RequireContext();
+            m_controllerOperationVersion++;
 
             if (m_viewHandle == null || !m_viewHandle.IsAlive)
             {
@@ -450,6 +463,7 @@ namespace EFramework.Runtime.UI
         public override async UniTask ShowAsync(UILayer? layer = null)
         {
             RequireContext();
+            int operationVersion = ++m_controllerOperationVersion;
 
             if (m_viewHandle == null || !m_viewHandle.IsAlive)
             {
@@ -457,10 +471,16 @@ namespace EFramework.Runtime.UI
                 OnViewCreated();
             }
 
-            bool wasShowing = m_viewHandle.IsShowing;
-            await m_viewHandle.OpenAsync(layer);
+            var handle = m_viewHandle;
+            bool wasShowing = handle.IsShowing;
+            await handle.OpenAsync(layer);
 
-            if (!wasShowing && m_viewHandle.IsShowing)
+            if (operationVersion != m_controllerOperationVersion || !ReferenceEquals(m_viewHandle, handle))
+            {
+                return;
+            }
+
+            if (!wasShowing && handle.IsShowing)
             {
                 OnViewOpened();
             }
@@ -471,10 +491,14 @@ namespace EFramework.Runtime.UI
         /// </summary>
         public override void Hide()
         {
+            m_controllerOperationVersion++;
+            var didClose = false;
+
             if (m_viewHandle != null && m_viewHandle.IsAlive)
             {
                 bool wasShowing = m_viewHandle.IsShowing;
                 bool willRelease = !m_viewHandle.UsingCache;
+                didClose = wasShowing;
 
                 if (wasShowing)
                 {
@@ -493,7 +517,11 @@ namespace EFramework.Runtime.UI
                     m_viewHandle = null;
                 }
             }
-            InvokeOnClosed();
+
+            if (didClose)
+            {
+                InvokeOnClosed();
+            }
         }
 
         /// <summary>
@@ -501,10 +529,15 @@ namespace EFramework.Runtime.UI
         /// </summary>
         public override async UniTask HideAsync()
         {
-            if (m_viewHandle != null && m_viewHandle.IsAlive)
+            int operationVersion = ++m_controllerOperationVersion;
+            var handle = m_viewHandle;
+            var didClose = false;
+
+            if (handle != null && handle.IsAlive)
             {
-                bool wasShowing = m_viewHandle.IsShowing;
-                bool willRelease = !m_viewHandle.UsingCache;
+                bool wasShowing = handle.IsShowing;
+                bool willRelease = !handle.UsingCache;
+                didClose = wasShowing;
 
                 if (wasShowing)
                 {
@@ -516,14 +549,23 @@ namespace EFramework.Runtime.UI
                     OnViewDestroyed();
                 }
 
-                await m_viewHandle.CloseAsync();
+                await handle.CloseAsync();
 
-                if (m_viewHandle.IsReleased)
+                if (operationVersion != m_controllerOperationVersion || !ReferenceEquals(m_viewHandle, handle))
+                {
+                    return;
+                }
+
+                if (handle.IsReleased)
                 {
                     m_viewHandle = null;
                 }
             }
-            InvokeOnClosed();
+
+            if (didClose)
+            {
+                InvokeOnClosed();
+            }
         }
 
         /// <summary>
@@ -556,6 +598,7 @@ namespace EFramework.Runtime.UI
 
         protected override void Dispose(bool disposing)
         {
+            m_controllerOperationVersion++;
             if (disposing && m_viewHandle != null)
             {
                 bool wasShowing = m_viewHandle.IsShowing;
@@ -592,6 +635,8 @@ namespace EFramework.Runtime.UI
     public abstract class UIPopupController<TView, TResult> : UIControllerBase<TView> where TView : BindingViewBase
     {
         private UniTaskCompletionSource<TResult> m_completionSource;
+        private bool m_waitingForResult;
+        private bool m_hasResult;
 
         /// <summary>
         /// 当前结果（在 CloseWithResult 后有效）
@@ -610,14 +655,28 @@ namespace EFramework.Runtime.UI
         /// <returns>用户操作结果</returns>
         public async UniTask<TResult> ShowAndWaitAsync(UILayer? layer = null)
         {
+            if (m_waitingForResult)
+            {
+                throw new InvalidOperationException($"{GetType().Name} is already waiting for a popup result.");
+            }
+
+            m_waitingForResult = true;
+            m_hasResult = false;
             m_completionSource = new UniTaskCompletionSource<TResult>();
 
-            await ShowAsync(layer);
+            try
+            {
+                await ShowAsync(layer);
 
-            // 等待用户操作
-            var result = await m_completionSource.Task;
-
-            return result;
+                // 等待用户操作
+                var result = await m_completionSource.Task;
+                return result;
+            }
+            finally
+            {
+                m_waitingForResult = false;
+                m_completionSource = null;
+            }
         }
 
         /// <summary>
@@ -628,6 +687,7 @@ namespace EFramework.Runtime.UI
         protected void CloseWithResult(TResult result)
         {
             Result = result;
+            m_hasResult = true;
             OnBeforeClose?.Invoke();
             Hide();
             m_completionSource?.TrySetResult(result);
@@ -639,9 +699,30 @@ namespace EFramework.Runtime.UI
         protected async UniTask CloseWithResultAsync(TResult result)
         {
             Result = result;
+            m_hasResult = true;
             OnBeforeClose?.Invoke();
             await HideAsync();
             m_completionSource?.TrySetResult(result);
+        }
+
+        protected override void OnViewClosed()
+        {
+            base.OnViewClosed();
+            if (m_waitingForResult && !m_hasResult)
+            {
+                Result = default;
+                m_completionSource?.TrySetResult(Result);
+            }
+        }
+
+        protected override void OnViewDestroyed()
+        {
+            base.OnViewDestroyed();
+            if (m_waitingForResult && !m_hasResult)
+            {
+                Result = default;
+                m_completionSource?.TrySetResult(Result);
+            }
         }
     }
 }

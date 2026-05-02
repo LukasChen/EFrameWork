@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using EFramework.Runtime;
 using EFramework.Runtime.Procedure;
+using EFramework.Runtime.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -249,7 +250,7 @@ namespace EFramework.Editor.ProjectBootstrap
             designSize.FindPropertyRelative("x").intValue = 1080;
             designSize.FindPropertyRelative("y").intValue = 1920;
 
-            eframeObject.FindProperty("FitMode").enumValueIndex = 1;
+            eframeObject.FindProperty("FitMode").enumValueIndex = (int)ScreenFitMode.Auto;
             eframeObject.ApplyModifiedPropertiesWithoutUndo();
         }
 

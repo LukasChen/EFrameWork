@@ -73,7 +73,7 @@ namespace EFramework.Runtime.UI.Layout
             Debug.Log($"SafeArea(px): {Screen.safeArea}, insets(px) L={Screen.safeArea.xMin:F0} R={(Screen.width - Screen.safeArea.xMax):F0} B={Screen.safeArea.yMin:F0} T={(Screen.height - Screen.safeArea.yMax):F0}");
 
             Debug.Log($"Design: {ui.DesignWidth}x{ui.DesignHeight}, designAspect={ui.DesignAspect:F4}");
-            Debug.Log($"UI: ScreenAspect={ui.ScreenAspect:F4}, IsWideScreen={ui.IsWideScreen}, IsTallScreen={ui.IsTallScreen}");
+            Debug.Log($"UI: ScreenAspect={ui.ScreenAspect:F4}, IsWideScreen={ui.IsWideScreen}, IsTallScreen={ui.IsTallScreen}, FitMode={ui.FitMode}, EffectiveFitMode={ui.EffectiveFitMode}");
             Debug.Log($"UI: ScaleFactor={ui.ScaleFactor:F6}, ScreenFitRect(px)={ui.ScreenFitRect}, ScaleFitFactor={ui.ScaleFitFactor:F6}");
             Debug.Log($"UI: WidthDelta(design)={ui.WidthDelta:F3}, HeightDelta(design)={ui.HeightDelta:F3}");
 
@@ -105,29 +105,27 @@ namespace EFramework.Runtime.UI.Layout
             float designW = ui.DesignWidth;
             float designH = ui.DesignHeight;
 
-            // 基础：ScreenFitRect 总应在屏幕内
-            ok &= AssertInRange(ui.ScreenFitRect.xMin, 0f - 1f, screenW + 1f, "ScreenFitRect.xMin");
-            ok &= AssertInRange(ui.ScreenFitRect.xMax, 0f - 1f, screenW + 1f, "ScreenFitRect.xMax");
-            ok &= AssertInRange(ui.ScreenFitRect.yMin, 0f - 1f, screenH + 1f, "ScreenFitRect.yMin");
-            ok &= AssertInRange(ui.ScreenFitRect.yMax, 0f - 1f, screenH + 1f, "ScreenFitRect.yMax");
-
-            if (ui.IsWideScreen)
+            if (ui.EffectiveFitMode == ScreenFitMode.FitHeight)
             {
-                // 宽屏：按高度适配
-                ok &= AssertNear(ui.ScreenFitRect.height, screenH, "Wide: ScreenFitRect.height == Screen.height");
-                ok &= AssertNear(ui.ScaleFactor, screenH / designH, "Wide: ScaleFactor == ScreenH/DesignH");
-                ok &= AssertNear(ui.ScreenFitRect.width, designW * ui.ScaleFactor, "Wide: ScreenFitRect.width == DesignW*ScaleFactor");
-                ok &= AssertNear(ui.HeightDelta, 0f, "Wide: HeightDelta == 0");
-                ok &= AssertInRange(ui.WidthDelta, 0f - Epsilon, 100000f, "Wide: WidthDelta >= 0");
+                ok &= AssertNear(ui.ScreenFitRect.height, screenH, "FitHeight: ScreenFitRect.height == Screen.height");
+                ok &= AssertNear(ui.ScaleFactor, screenH / designH, "FitHeight: ScaleFactor == ScreenH/DesignH");
+                ok &= AssertNear(ui.ScreenFitRect.width, designW * ui.ScaleFactor, "FitHeight: ScreenFitRect.width == DesignW*ScaleFactor");
+                ok &= AssertNear(ui.HeightDelta, 0f, "FitHeight: HeightDelta == 0");
             }
             else
             {
-                // 长屏：按宽度适配
-                ok &= AssertNear(ui.ScreenFitRect.width, screenW, "Tall: ScreenFitRect.width == Screen.width");
-                ok &= AssertNear(ui.ScreenFitRect.height, screenH, "Tall: ScreenFitRect.height == Screen.height");
-                ok &= AssertNear(ui.ScaleFactor, screenW / designW, "Tall: ScaleFactor == ScreenW/DesignW");
-                ok &= AssertNear(ui.WidthDelta, 0f, "Tall: WidthDelta == 0");
-                ok &= AssertInRange(ui.HeightDelta, 0f - Epsilon, 100000f, "Tall: HeightDelta >= 0");
+                ok &= AssertNear(ui.ScreenFitRect.width, screenW, "FitWidth: ScreenFitRect.width == Screen.width");
+                ok &= AssertNear(ui.ScaleFactor, screenW / designW, "FitWidth: ScaleFactor == ScreenW/DesignW");
+                ok &= AssertNear(ui.WidthDelta, 0f, "FitWidth: WidthDelta == 0");
+
+                if (ui.HeightDelta >= 0f)
+                {
+                    ok &= AssertNear(ui.ScreenFitRect.height, screenH, "FitWidth expanded: ScreenFitRect.height == Screen.height");
+                }
+                else
+                {
+                    ok &= AssertNear(ui.ScreenFitRect.height, designH * ui.ScaleFactor, "FitWidth cropped: ScreenFitRect.height == DesignH*ScaleFactor");
+                }
             }
 
             Debug.Log(ok ? "[ScreenFitDebug] Validate: OK" : "[ScreenFitDebug] Validate: FAILED (see logs above)");
