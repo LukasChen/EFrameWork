@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
+using EFramework.Runtime.Tween;
 using UnityEngine;
 
 namespace EFramework.Runtime.UI.Transitions
@@ -21,20 +21,34 @@ namespace EFramework.Runtime.UI.Transitions
             Kill(view);
             animRoot.localScale = Vector3.one * 0.8f;
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-            Sequence sequence = DOTween.Sequence().SetTarget(animRoot);
+            var scaleTween = EFrameTween.Vector3(
+                animRoot.localScale,
+                Vector3.one,
+                duration,
+                value => animRoot.localScale = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.OutBack,
+                    Target = animRoot
+                });
+
             if (canvasGroup != null)
             {
                 canvasGroup.alpha = 0f;
-                sequence
-                    .Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack).SetTarget(animRoot))
-                    .Join(canvasGroup.DOFade(1f, duration));
-            }
-            else
-            {
-                sequence.Join(animRoot.DOScale(1f, duration).SetEase(Ease.OutBack).SetTarget(animRoot));
+                var fadeTween = EFrameTween.Float(
+                    canvasGroup.alpha,
+                    1f,
+                    duration,
+                    value => canvasGroup.alpha = value,
+                    new EFrameTweenOptions
+                    {
+                        Ease = EFrameEase.Linear,
+                        Target = canvasGroup
+                    });
+                return UniTask.WhenAll(scaleTween.ToUniTask(), fadeTween.ToUniTask());
             }
 
-            return AwaitTweenAsync(sequence);
+            return scaleTween.ToUniTask();
         }
 
         public UniTask PlayCloseAsync(BindingViewBase view)
@@ -49,19 +63,33 @@ namespace EFramework.Runtime.UI.Transitions
 
             Kill(view);
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
-            Sequence sequence = DOTween.Sequence().SetTarget(animRoot);
+            var scaleTween = EFrameTween.Vector3(
+                animRoot.localScale,
+                Vector3.one * 0.8f,
+                duration,
+                value => animRoot.localScale = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.InBack,
+                    Target = animRoot
+                });
+
             if (canvasGroup != null)
             {
-                sequence
-                    .Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack).SetTarget(animRoot))
-                    .Join(canvasGroup.DOFade(0f, duration));
-            }
-            else
-            {
-                sequence.Join(animRoot.DOScale(0.8f, duration).SetEase(Ease.InBack).SetTarget(animRoot));
+                var fadeTween = EFrameTween.Float(
+                    canvasGroup.alpha,
+                    0f,
+                    duration,
+                    value => canvasGroup.alpha = value,
+                    new EFrameTweenOptions
+                    {
+                        Ease = EFrameEase.Linear,
+                        Target = canvasGroup
+                    });
+                return UniTask.WhenAll(scaleTween.ToUniTask(), fadeTween.ToUniTask());
             }
 
-            return AwaitTweenAsync(sequence);
+            return scaleTween.ToUniTask();
         }
 
         public void Kill(BindingViewBase view)
@@ -72,27 +100,12 @@ namespace EFramework.Runtime.UI.Transitions
                 return;
             }
 
-            animRoot.DOKill(false);
+            EFrameTween.Kill(animRoot);
             var canvasGroup = animRoot.GetComponent<CanvasGroup>();
             if (canvasGroup != null)
             {
-                canvasGroup.DOKill(false);
+                EFrameTween.Kill(canvasGroup);
             }
-        }
-
-        private static UniTask AwaitTweenAsync(Tween tween)
-        {
-            if (tween == null || !tween.IsActive())
-            {
-                return UniTask.CompletedTask;
-            }
-
-            var completionSource = new UniTaskCompletionSource();
-
-            tween.OnComplete(() => completionSource.TrySetResult());
-            tween.OnKill(() => completionSource.TrySetResult());
-
-            return completionSource.Task;
         }
 
         private static float GetDuration(BindingViewBase view, bool opening)

@@ -27,7 +27,7 @@ The **Extension Showcase** is an optional Project Module installed to `Assets/Mo
 
 The Simple Game Demo direction is intentionally outside this core repository and should be handled later as a separate git repository.
 
-Unity package dependencies include Addressables, UGUI, Input System, Universal RP, and Unity Newtonsoft.Json. TextMeshPro functionality is supplied through UGUI. DOTween and URP are core-standard runtime dependencies; URP is declared through UPM, while DOTween Free is resolved as a project-installed plugin because it is not a Unity registry dependency.
+Unity package dependencies include Addressables, UGUI, Input System, Universal RP, and Unity Newtonsoft.Json. TextMeshPro functionality is supplied through UGUI. Core includes a lightweight fallback tween backend, while DOTween is an optional project-installed adapter target because DOTween Free is not a Unity registry dependency.
 
 Complex UI widgets, UI helper/animation components, presentation effects, GM/debug tools, event-driven audio authoring, haptics adapters, and third-party integrations should live in optional extension packages. Virtual list/grid controls are provided by `com.eframework.ui.virtual-list`, helper UI controls by `com.eframework.ui-extras`, presentation effects by `com.eframework.effects`, GM tools by `com.eframework.gm-tools`, and the runtime debug console by `com.eframework.debug-console`.
 
@@ -109,14 +109,18 @@ Use Unity Package Manager with this Git repository, targeting this package path:
 https://github.com/ethanhubin/EFrame.git?path=/packages/com.eframework.core
 ```
 
-## DOTween Requirement
+## Tween Backend And DOTween Adapter
 
-`com.eframework.core` uses DOTween directly in runtime code. DOTween is a standard EFrame dependency, but DOTween Free should be installed into the consuming project's `Assets` rather than declared in `package.json` unless the project has a resolvable UPM/scoped-registry DOTween package configured.
+`com.eframework.core` uses `EFrameTween` for framework-owned runtime transitions, scroll movement, and audio fades. The default backend is a package-owned fallback implementation, so Basic projects run without DOTween.
 
-- This package does not bundle DOTween, DOTweenPro, or DemiLib anymore
+DOTween remains supported as an optional adapter:
+
+- This package does not bundle DOTween, DOTweenPro, or DemiLib
 - Do not add an unresolvable DOTween package name to `dependencies`; Unity package dependencies must resolve through the Unity registry, a configured scoped registry, or an explicit package source in the consuming project
 - Keep DOTween as a normal project plugin under `Assets`
-- Use `EFrame Tools/项目初始化向导` to create or open `Assets/Resources/DOTweenSettings.asset`
+- Use `EFrame Tools/项目初始化向导` -> `Tween Backend` to detect DOTween and enable the adapter
+- Enabling the adapter adds the `EFRAME_USE_DOTWEEN` scripting define and initializes `Assets/Resources/DOTweenSettings.asset` when DOTween is present
+- Disable the adapter before removing DOTween from a project
 - Do not expect DOTween Utility Panel module management to work against a package-local copy
 
 ## URP Requirement

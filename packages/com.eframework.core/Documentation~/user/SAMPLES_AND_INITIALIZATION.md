@@ -35,7 +35,7 @@ Basic creates or prepares:
 - `Assets/Modules/SampleModule/...`
 - Addressables groups and generated `ResPath`
 - UI sorting layers
-- basic audio resources and DOTween settings
+- basic audio resources and fallback tween backend readiness
 
 The package sample under `Samples~/Basic` is documentation for package users. The initializer uses the machine template under `Editor/Templates/Basic` plus the existing UI prefab templates under `Editor/Templates/UI`.
 

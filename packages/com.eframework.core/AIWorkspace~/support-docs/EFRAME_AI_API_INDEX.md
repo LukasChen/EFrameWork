@@ -54,6 +54,17 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 
 Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal business View wrappers, direct `BindingViewBase` lifecycle driving, and direct business `UIViewHandle` ownership.
 
+## Tween
+
+| Need | Use | Source | Notes |
+| --- | --- | --- | --- |
+| Framework-owned simple tweens | `EFrameTween` | `packages/com.eframework.core/Runtime/Tween/EFrameTween.cs` | Use for core/runtime fades, movement, colors, delays, and target-based kill operations. Basic projects use the fallback backend by default. |
+| Configure a tween | `EFrameTweenOptions` | `packages/com.eframework.core/Runtime/Tween/EFrameTweenOptions.cs` | Supports target binding, update mode, ease, ignore-time-scale, and completion callbacks. |
+| Track or cancel a tween | `IEFrameTweenHandle` | `packages/com.eframework.core/Runtime/Tween/IEFrameTweenHandle.cs` | Call `Kill()` or await `ToUniTask()` at the owning lifecycle boundary. |
+| Optional DOTween backend | `EFRAME_USE_DOTWEEN` + initialization-window `Tween Backend` controls | `packages/com.eframework.core/Runtime/Tween/Dotween`, `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameDotweenBootstrapUtility.cs` | DOTween is not a core dependency. Enable this adapter only after DOTween is installed in the project; disable it before removing DOTween. |
+
+Avoid referencing `DG.Tweening` directly from core-owned runtime code unless it is inside the optional DOTween adapter assembly.
+
 ## Data
 
 | Need | Use | Source | Notes |

@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using EFramework.Runtime.Asset;
+using EFramework.Runtime.Tween;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -109,7 +109,7 @@ namespace EFramework.Runtime.Audio
             // 停止所有音乐动画
             foreach (var audioSource in m_musicAudioSourceCache ?? Enumerable.Empty<AudioSource>())
             {
-                audioSource.DOKill();
+                EFrameTween.Kill(audioSource);
             }
 
             // 清理音频池
@@ -412,7 +412,7 @@ namespace EFramework.Runtime.Audio
         private static void KillSfxTweens(AudioSource audioSource)
         {
             if (audioSource == null) return;
-            audioSource.DOKill();
+            EFrameTween.Kill(audioSource);
         }
 
         public void StopAllSfx()
@@ -452,7 +452,7 @@ namespace EFramework.Runtime.Audio
             AudioSource musicAudioSource = m_currentMusicSource;
             if (musicAudioSource != null && musicAudioSource.clip != null)
             {
-                musicAudioSource.DOKill();
+                EFrameTween.Kill(musicAudioSource);
                 musicAudioSource.volume = EffectiveMusicSourceVolume;
                 musicAudioSource.UnPause();
                 if (!musicAudioSource.isPlaying)
@@ -492,19 +492,20 @@ namespace EFramework.Runtime.Audio
             // 停止当前正在播放的音乐
             if (m_currentMusicSource.isPlaying)
             {
-                m_currentMusicSource.DOKill();
+                var currentSource = m_currentMusicSource;
+                EFrameTween.Kill(currentSource);
                 if (fade)
-                    m_currentMusicSource.DOFade(0, fadeDuration).OnComplete(m_currentMusicSource.Stop);
+                    FadeAudioSource(currentSource, 0f, fadeDuration, currentSource.Stop);
                 else
-                    m_currentMusicSource.Stop();
+                    currentSource.Stop();
             }
             else
             {
-                m_currentMusicSource.DOKill();
+                EFrameTween.Kill(m_currentMusicSource);
             }
 
             // 准备下一个音乐源
-            m_nextMusicSource.DOKill();
+            EFrameTween.Kill(m_nextMusicSource);
             m_nextMusicSource.Stop();
             m_nextMusicSource.clip = audio;
             m_nextMusicSource.loop = loop;
@@ -515,7 +516,7 @@ namespace EFramework.Runtime.Audio
                 {
                     m_nextMusicSource.volume = 0;
                     m_nextMusicSource.Play();
-                    m_nextMusicSource.DOFade(EffectiveMusicSourceVolume, fadeDuration);
+                    FadeAudioSource(m_nextMusicSource, EffectiveMusicSourceVolume, fadeDuration);
                 }
                 else
                 {
@@ -541,9 +542,12 @@ namespace EFramework.Runtime.Audio
             {
                 if (audioSource.clip != null && audioSource.isPlaying)
                 {
-                    audioSource.DOKill();
+                    EFrameTween.Kill(audioSource);
                     if (fade)
-                        audioSource.DOFade(0, K_fadeDuration).OnComplete(audioSource.Stop);
+                    {
+                        var source = audioSource;
+                        FadeAudioSource(source, 0f, K_fadeDuration, source.Stop);
+                    }
                     else
                         audioSource.Stop();
                 }
@@ -593,14 +597,16 @@ namespace EFramework.Runtime.Audio
                 audioSource.volume = 0;
                 audioSource.Play();
 
-                // 使用 DOTween 自定义曲线淡入
-                DOTween.To(
-                    () => 0f,
-                    t => audioSource.volume = fadeInCurve.Evaluate(t) * targetVolume,
+                EFrameTween.Float(
+                    0f,
                     1f,
-                    fadeInDuration
-                ).SetEase(Ease.Linear)
-                 .SetTarget(audioSource);
+                    fadeInDuration,
+                    value => audioSource.volume = fadeInCurve.Evaluate(value) * targetVolume,
+                    new EFrameTweenOptions
+                    {
+                        Ease = EFrameEase.Linear,
+                        Target = audioSource
+                    });
             }
             else
             {
@@ -614,21 +620,30 @@ namespace EFramework.Runtime.Audio
                 float fadeOutStartTime = audioClip.length - fadeOutDuration;
                 if (fadeOutStartTime > 0)
                 {
-                    DOVirtual.DelayedCall(fadeOutStartTime, () =>
-                    {
-                        if (audioSource != null && audioSource.isPlaying && audioSource.clip == audioClip)
+                    EFrameTween.Delay(
+                        fadeOutStartTime,
+                        () =>
                         {
-                            float startVolume = audioSource.volume;
-                            DOTween.To(
-                                () => 0f,
-                                t => audioSource.volume = fadeOutCurve.Evaluate(t) * startVolume,
-                                1f,
-                                fadeOutDuration
-                            ).SetEase(Ease.Linear)
-                             .SetTarget(audioSource)
-                             .OnComplete(() => audioSource.Stop());
-                        }
-                    }).SetTarget(audioSource);
+                            if (audioSource != null && audioSource.isPlaying && audioSource.clip == audioClip)
+                            {
+                                float startVolume = audioSource.volume;
+                                EFrameTween.Float(
+                                    0f,
+                                    1f,
+                                    fadeOutDuration,
+                                    value => audioSource.volume = fadeOutCurve.Evaluate(value) * startVolume,
+                                    new EFrameTweenOptions
+                                    {
+                                        Ease = EFrameEase.Linear,
+                                        Target = audioSource,
+                                        OnComplete = audioSource.Stop
+                                    });
+                            }
+                        },
+                        new EFrameTweenOptions
+                        {
+                            Target = audioSource
+                        });
                 }
             }
 
@@ -649,26 +664,48 @@ namespace EFramework.Runtime.Audio
                 float startVolume = audioSource.volume;
                 if (fadeOutCurve != null)
                 {
-                    DOTween.To(
-                        () => 0f,
-                        t => audioSource.volume = fadeOutCurve.Evaluate(t) * startVolume,
+                    EFrameTween.Float(
+                        0f,
                         1f,
-                        fadeOutDuration
-                    ).SetEase(Ease.Linear)
-                     .SetTarget(audioSource)
-                     .OnComplete(() => audioSource.Stop());
+                        fadeOutDuration,
+                        value => audioSource.volume = fadeOutCurve.Evaluate(value) * startVolume,
+                        new EFrameTweenOptions
+                        {
+                            Ease = EFrameEase.Linear,
+                            Target = audioSource,
+                            OnComplete = audioSource.Stop
+                        });
                 }
                 else
                 {
-                    audioSource.DOFade(0, fadeOutDuration)
-                        .SetTarget(audioSource)
-                        .OnComplete(() => audioSource.Stop());
+                    FadeAudioSource(audioSource, 0f, fadeOutDuration, audioSource.Stop);
                 }
             }
             else
             {
                 audioSource.Stop();
             }
+        }
+
+        private static void FadeAudioSource(AudioSource audioSource, float targetVolume, float duration, System.Action onComplete = null)
+        {
+            if (audioSource == null)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            EFrameTween.Float(
+                audioSource.volume,
+                targetVolume,
+                duration,
+                value => audioSource.volume = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.Linear,
+                    Target = audioSource,
+                    OnComplete = onComplete
+                });
         }
 
         #endregion

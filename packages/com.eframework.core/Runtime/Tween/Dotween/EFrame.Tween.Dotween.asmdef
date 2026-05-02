@@ -1,6 +1,8 @@
 {
-    "name": "UniTask.DOTween",
+    "name": "EFrame.Tween.Dotween",
+    "rootNamespace": "",
     "references": [
+        "EFrame",
         "UniTask",
         "DOTween.Modules"
     ],
@@ -13,12 +15,6 @@
     "defineConstraints": [
         "EFRAME_USE_DOTWEEN"
     ],
-    "versionDefines": [
-        {
-            "name": "com.demigiant.dotween",
-            "expression": "",
-            "define": "UNITASK_DOTWEEN_SUPPORT"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

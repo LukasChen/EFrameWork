@@ -1,5 +1,5 @@
-using DG.Tweening;
 using EFramework.Runtime.Asset;
+using EFramework.Runtime.Tween;
 using EFramework.Runtime.UI;
 using System;
 using System.Collections;
@@ -263,40 +263,48 @@ namespace EFramework.Runtime.Utils
             }
         }
 
-        public static void FadeInAll(Transform view, float duration = 0.3f, TweenCallback onComplete = null)
+        public static void FadeInAll(Transform view, float duration = 0.3f, Action onComplete = null)
         {
             view.TryGetComponent<CanvasGroup>(out var canvasGroup);
             if (canvasGroup == null)
             {
                 canvasGroup = view.gameObject.AddComponent<CanvasGroup>();
-                canvasGroup.DOFade(1, duration).OnComplete(() =>
-                {
-                    onComplete?.Invoke();
-                });
-            }
-            else
-            {
-                canvasGroup.DOFade(1, duration).OnComplete(onComplete);
             }
 
+            EFrameTween.Kill(canvasGroup);
+            EFrameTween.Float(
+                canvasGroup.alpha,
+                1f,
+                duration,
+                value => canvasGroup.alpha = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.Linear,
+                    Target = canvasGroup,
+                    OnComplete = onComplete
+                });
         }
 
-        public static void FadeOutAll(Transform view, float duration = 0.3f, TweenCallback onComplete = null)
+        public static void FadeOutAll(Transform view, float duration = 0.3f, Action onComplete = null)
         {
             view.TryGetComponent<CanvasGroup>(out var canvasGroup);
             if (canvasGroup == null)
             {
                 canvasGroup = view.gameObject.AddComponent<CanvasGroup>();
-                canvasGroup.DOFade(0, duration).OnComplete(() =>
-                {
-                    onComplete?.Invoke();
-                });
-            }
-            else
-            {
-                canvasGroup.DOFade(0, duration).OnComplete(onComplete);
             }
 
+            EFrameTween.Kill(canvasGroup);
+            EFrameTween.Float(
+                canvasGroup.alpha,
+                0f,
+                duration,
+                value => canvasGroup.alpha = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.Linear,
+                    Target = canvasGroup,
+                    OnComplete = onComplete
+                });
         }
 
 

@@ -102,13 +102,16 @@ EFrame treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Mod
 - Use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to open the managed resource report window, choose ResPath source directories, inspect Addressables-to-ResPath mappings, review directory convention issues, or run a manual repair/check.
 - Runtime code should use `ResPath.Generated` instead of raw Addressables strings or handwritten resource path wrappers. `AssetReference` remains appropriate for inspector-authored editor fields, but runtime business calls should receive generated asset ids.
 
-## DOTween Dependency
+## Tween Backend
 
-`com.eframework.core` uses DOTween directly in several runtime components. Consumer projects should install DOTween into the project `Assets` before using tween-enabled EFrame features.
+`com.eframework.core` uses `EFrameTween` for framework-owned transitions, scroll movement, and audio fades. Core includes a fallback backend, so new Basic projects do not need DOTween.
 
-- Recommended: install DOTween as a normal project plugin under `Assets`
-- Then use `EFrame Tools/项目初始化向导` to create or open `Assets/Resources/DOTweenSettings.asset`
-- Do not rely on configuring DOTween through a package-local copy
+DOTween can still be used as an optional runtime backend:
+
+- Install DOTween as a normal project plugin under `Assets`
+- Use `EFrame Tools/项目初始化向导` -> `Tween Backend` to detect DOTween and enable the adapter
+- Enabling the adapter adds `EFRAME_USE_DOTWEEN` and creates or opens `Assets/Resources/DOTweenSettings.asset`
+- Disable the adapter before removing DOTween from a project
 
 ## URP Dependency
 

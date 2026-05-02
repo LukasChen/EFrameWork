@@ -1,20 +1,19 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using DG.Tweening;
 using UnityEngine.Events;
-using System;
+using EFramework.Runtime.Tween;
 
 namespace EFramework.Runtime.UI.Components
 {
     /// <summary>
     /// QScroller 是一个自定义的 ScrollRect，允许根据水平和垂直单位进行吸附对齐。并提供了嵌套ScrollRect的支持。
-    /// 它继承自 Unity 的 ScrollRect，并使用 DOTween 实现平滑过渡。
+    /// 它继承自 Unity 的 ScrollRect，并使用 EFrameTween 实现平滑过渡。
     /// 用法：
     /// 1. 将此脚本挂载到组件上，用 QScroller 替换原有的 ScrollRect。
     /// 2. 设置 `m_snapHorizontalUnits` 和 `m_snapVerticalUnits` 以定义吸附行为,注意不能同时支持横向和纵向吸附。(设置为 2 表示三段式对齐)
     /// 3. 当用户停止拖拽或惯性减慢时会自动吸附到指定位置。
-    /// 注意：请确保你的项目已安装并配置好 DOTween。配合 QScrollerEditor使用可以更方便地调整参数。
+    /// 配合 QScrollerEditor 使用可以更方便地调整参数。
     /// Creator：Ethan.Hu 2025.6.10
     /// </summary>
     /// 
@@ -78,7 +77,7 @@ namespace EFramework.Runtime.UI.Components
             m_parentScrolling = false;
             m_isDragging = true;
             m_isSnapMoving = false; // 开始拖动时停止任何正在进行的吸附移动
-            DOTween.Kill(this);
+            EFrameTween.Kill(this);
         }
 
         public override void OnEndDrag(PointerEventData eventData)
@@ -196,15 +195,19 @@ namespace EFramework.Runtime.UI.Components
         {
             velocity = Vector2.zero;
             m_isSnapMoving = true;
-            DOTween.Kill(this);
-            DOTween.To(() => normalizedPosition, v => normalizedPosition = v, position, 0.15f)
-            .SetTarget(this).OnUpdate(() =>
-            {
-                onValueChanged?.Invoke(normalizedPosition);
-            }).OnComplete(() =>
-            {
-                m_isSnapMoving = false;
-            });
+            EFrameTween.Kill(this);
+            EFrameTween.Vector2(
+                normalizedPosition,
+                position,
+                0.15f,
+                value => normalizedPosition = value,
+                new EFrameTweenOptions
+                {
+                    Ease = EFrameEase.OutQuad,
+                    Target = this,
+                    OnUpdate = () => onValueChanged?.Invoke(normalizedPosition),
+                    OnComplete = () => m_isSnapMoving = false
+                });
         }
 
         public void SnapToHorizontalSegmentIndex(int index)

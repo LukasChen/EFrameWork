@@ -84,12 +84,6 @@ namespace EFramework.Editor.ProjectBootstrap
                 EditorGUILayout.HelpBox("Use Full Initialize Project for the standard bootstrap flow. Use the Basic template action when you only need to import the minimal runnable skeleton.", MessageType.None);
             }
 
-            if (!EFrameDotweenBootstrapUtility.IsDotweenInstalled() || !EFrameDotweenBootstrapUtility.IsDotweenSetupReady())
-            {
-                EditorGUILayout.Space();
-                EditorGUILayout.HelpBox(EFrameDotweenBootstrapUtility.GetInstallationGuidance(), MessageType.Info);
-            }
-
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 EditorGUILayout.LabelField("Actions", EditorStyles.boldLabel);
@@ -110,6 +104,34 @@ namespace EFramework.Editor.ProjectBootstrap
                 }
 
                 EditorGUILayout.HelpBox("Full Initialize Project runs the standard bootstrap chain. Basic Template imports the current minimal runnable skeleton. Initial UI Templates only re-copy the built-in Home and SampleModule prefabs into Assets.", MessageType.None);
+            }
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Tween Backend", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Status", EFrameDotweenBootstrapUtility.GetTweenBackendStatus());
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Enable DOTween Adapter"))
+                    {
+                        EnableDotweenAdapter();
+                    }
+
+                    if (GUILayout.Button("Disable DOTween Adapter"))
+                    {
+                        DisableDotweenAdapter();
+                    }
+                }
+
+                if (GUILayout.Button("Open DOTween Settings"))
+                {
+                    OpenDotweenSettings();
+                }
+
+                EditorGUILayout.HelpBox(EFrameDotweenBootstrapUtility.GetInstallationGuidance(), MessageType.None);
             }
 
             EditorGUILayout.Space();
@@ -221,10 +243,7 @@ namespace EFramework.Editor.ProjectBootstrap
                 return;
             }
 
-            if (!EnsureDotweenSetup())
-            {
-                return;
-            }
+            EnsureOptionalDotweenSetup();
 
             CreateOrRefreshStartUpScene();
         }
@@ -367,9 +386,9 @@ namespace EFramework.Editor.ProjectBootstrap
             return success;
         }
 
-        private bool EnsureDotweenSetup()
+        private bool EnsureOptionalDotweenSetup()
         {
-            var success = EFrameDotweenBootstrapUtility.EnsureDotweenSetup(out var message);
+            var success = EFrameDotweenBootstrapUtility.EnsureOptionalDotweenSetup(out var message);
             SetStatus(message, !success);
             return success;
         }
@@ -377,6 +396,20 @@ namespace EFramework.Editor.ProjectBootstrap
         private bool OpenDotweenSettings()
         {
             var success = EFrameDotweenBootstrapUtility.OpenDotweenSettings(out var message);
+            SetStatus(message, !success);
+            return success;
+        }
+
+        private bool EnableDotweenAdapter()
+        {
+            var success = EFrameDotweenBootstrapUtility.EnableDotweenAdapter(out var message);
+            SetStatus(message, !success);
+            return success;
+        }
+
+        private bool DisableDotweenAdapter()
+        {
+            var success = EFrameDotweenBootstrapUtility.DisableDotweenAdapter(out var message);
             SetStatus(message, !success);
             return success;
         }
@@ -1131,9 +1164,8 @@ namespace {moduleNamespace}.UI.Controllers
             var appResGroupReady = EFrameAddressablesBootstrapUtility.AreProjectAddressablesGroupsReady();
             var uiSortingLayersReady = EFrameUIBootstrapUtility.AreUISortingLayersReady();
             var audioReady = EFrameAudioBootstrapUtility.IsAudioSetupReady();
-            var dotweenReady = EFrameDotweenBootstrapUtility.IsDotweenSetupReady();
             var generatedResPathReady = EFrameAddressablesBootstrapUtility.IsGeneratedResPathReady();
-            return !startUpSceneExists || !aiManifestExists || !addressablesReady || !appResGroupReady || !generatedResPathReady || !uiSortingLayersReady || !audioReady || !dotweenReady;
+            return !startUpSceneExists || !aiManifestExists || !addressablesReady || !appResGroupReady || !generatedResPathReady || !uiSortingLayersReady || !audioReady;
         }
 
         [InitializeOnLoadMethod]

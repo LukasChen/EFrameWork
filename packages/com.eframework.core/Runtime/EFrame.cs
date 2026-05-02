@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using DG.Tweening;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.Audio;
 using EFramework.Runtime.DataStorage;
@@ -109,9 +108,6 @@ namespace EFramework.Runtime
 
             var designSize = component.ResolvedDesignSize;
             uiService.Init(component.UICamera, designSize.x, designSize.y, component.ResolvedFitMode, component.ResolvedEnableScreenFitDebugLog);
-
-            DOTween.Init(recycleAllByDefault: true, useSafeMode: true, logBehaviour: LogBehaviour.ErrorsOnly);
-            DOTween.SetTweensCapacity(500, 50);
 
             LastInitializationResult = EFrameInitializationResult.Success();
             Debug.Log("[EFrame] Initialize completed.");

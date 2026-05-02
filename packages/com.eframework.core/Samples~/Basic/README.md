@@ -13,6 +13,6 @@ Basic installs the standard startup shape:
 - `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
 - `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
 - `Assets/Modules/SampleModule/...`
-- Addressables, UI sorting layer, audio, DOTween settings, and generated `ResPath` setup
+- Addressables, UI sorting layer, audio, fallback tween backend readiness, and generated `ResPath` setup
 
 Basic intentionally depends only on `com.eframework.core` and core-standard Unity package dependencies. Optional EFrame extension packages are demonstrated by the separate Extension Showcase module.

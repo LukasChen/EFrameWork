@@ -4,14 +4,18 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.6.6] - 2026-05-02
+
 ### Added
 
 - Added a package-documented Basic sample/template as the minimal runnable initialization skeleton for `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, `SampleModule`, basic UI prefabs, audio setup, Addressables, and generated `ResPath`.
 - Added an optional Extension Showcase Project Module template with `ProcedureEFrameExtensionShowcaseEntry`, runtime showcase UI, extension demo registry entries, and initialization-window install/startup controls.
+- Added `EFrameTween` as the core tween facade with a built-in fallback backend and an optional DOTween adapter gated by `EFRAME_USE_DOTWEEN`.
 
 ### Changed
 
 - Updated the project initialization window with explicit Basic install, Extension Showcase install, Extension Showcase startup, and Basic startup restore actions.
+- Made DOTween optional for core runtime code; projects can enable or disable the adapter from the initialization window when DOTween is installed.
 
 ### Removed
 
@@ -22,9 +26,13 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 - Moved GM tools out of core into the optional `com.eframework.gm-tools` package.
 - Moved UI helper/animation components and lightweight extra controls out of core into the optional `com.eframework.ui-extras` package, including `UIHelper`, `UIAnimation`, `QTab`, and `EmptyRayCasterGraphic`.
 - Normalized EFrame-owned extension APIs under `EFramework.Extensions.*` namespaces and added the root `tools/Test-EFrameExtensionUnityCompile.ps1` validation path for extension packages.
-- Documented DOTween and URP as core-standard dependencies, with DOTween Free intentionally kept as a project-installed plugin instead of an unresolved UPM dependency.
+- Documented URP as a core-standard dependency and DOTween as an optional project-installed tween backend.
 - Removed NiceVibrations, `QVibration`, `IVibrationService`, and the `EFrame.Vibration` / `Context.Vibration` core entries.
 - Removed AudioEvents runtime/editor tooling from core, including `AudioEventManager`, audio event config assets, editor windows, and the `EFrame.AudioEvents` / `Context.AudioEvents` entries.
+
+### Fixed
+
+- Aligned optional DOTween adapter delay timing and target-kill completion behavior with the fallback tween backend.
 
 ## [0.6.5] - 2026-05-02
 
