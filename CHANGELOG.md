@@ -6,6 +6,12 @@ EFrameWork uses semantic versioning for framework releases. The release version 
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-05-02
+
+### Fixed
+
+- Removed the remaining deprecated `com.unity.textmeshpro` package reference from the bundled UniTask TextMeshPro assembly definition; TextMeshPro support now keys off `com.unity.ugui`.
+
 ## [0.4.5] - 2026-05-02
 
 ### Changed
