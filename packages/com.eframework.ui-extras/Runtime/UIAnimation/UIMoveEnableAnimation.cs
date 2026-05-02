@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using EFramework.Runtime.Tween;
 using UnityEngine;
 
 namespace EFramework.Extensions.UI.Extras.UIAnimation
@@ -9,6 +9,7 @@ namespace EFramework.Extensions.UI.Extras.UIAnimation
         [SerializeField] private RectTransform m_rectTransform;
         [SerializeField] private float m_openDuration = 0.15f;
         [SerializeField] private Vector2 m_moveOffset = new Vector2(0f, 20f);
+
         void OnEnable()
         {
             if (!this.gameObject.activeSelf) this.gameObject.SetActive(true);
@@ -17,15 +18,24 @@ namespace EFramework.Extensions.UI.Extras.UIAnimation
             {
                 m_rectTransform = this.GetComponent<RectTransform>();
             }
-            Vector2 startPos = m_rectTransform.anchoredPosition + m_moveOffset;
-            m_rectTransform.DOKill(true);
+
+            var targetPos = m_rectTransform.anchoredPosition;
+            var startPos = targetPos + m_moveOffset;
+            EFrameTween.Kill(m_rectTransform, true);
             m_rectTransform.anchoredPosition = startPos;
-            m_rectTransform.DOAnchorPos(m_rectTransform.anchoredPosition - m_moveOffset, m_openDuration)
-                .SetEase(Ease.OutCubic);
+            EFrameTween.Vector2(startPos, targetPos, m_openDuration, value => m_rectTransform.anchoredPosition = value, new EFrameTweenOptions
+            {
+                Target = m_rectTransform,
+                Ease = EFrameEase.OutQuad
+            });
         }
+
         private void OnDestroy()
         {
-            m_rectTransform.DOKill();
+            if (m_rectTransform != null)
+            {
+                EFrameTween.Kill(m_rectTransform);
+            }
         }
 
         void Reset()

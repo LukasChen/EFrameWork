@@ -63,7 +63,14 @@
 - 初始化窗口或 Addressables 同步流程能按 ResPath 目录选择生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
 - 托管资源目录导入、移动、删除后会自动同步 Addressables；Player Build 前会执行同步与校验；如果 `ResPath.Generated` 在构建前被刷新，构建会中止并提示等待 Unity 重新编译。
 
-### 3.5 文档与契约一致性
+### 3.5 Extension Showcase 模板
+
+- 维护 Extension Showcase 时，直接打开 `test-fixtures/EFrameShowcaseUnity` 调试 `Assets/Modules/EFrameExtensionShowcase` 源模块。
+- 发布前运行 `tools/Sync-EFrameShowcaseTemplate.ps1 -CheckOnly`，确认 `test-fixtures/EFrameShowcaseUnity/Assets/Modules/EFrameExtensionShowcase` 与 `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` 同步。
+- 如果 `-CheckOnly` 失败，先运行 `tools/Sync-EFrameShowcaseTemplate.ps1` 生成 package template，再重新检查；脚本会将 `.cs` / `.cs.meta` 转为 `.cs.txt` / `.cs.txt.meta`，其他模块资源和 `.meta` 原样同步。
+- 初始化窗口安装或刷新 Showcase 后，资源 `.meta` 必须随模板复制，确保 prefab、材质、ScriptableObject 等非代码资源引用稳定。
+
+### 3.6 文档与契约一致性
 
 - [EFRAME_AI_SETUP.md](../../packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md) 中的命令示例和流程说明准确。
 - [EFRAME_AI_ARCHITECTURE.md](../../packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md) 中的层级职责、命名边界和同步契约准确。

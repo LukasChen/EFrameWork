@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: App Scenes Group
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: App Scenes Group
+  m_GUID: f2ed8b24e62144c44bdf0867bb9ace39
+  m_SerializeEntries:
+  - m_GUID: 521ac4c20fee2a847b5d226441980a79
+    m_Address: Scenes/StartUp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - eframe-managed
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80e2977d92702f146a0f320f3dacbb68
+    m_Address: Scenes/StartUp_SETUP
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - eframe-managed
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ea168d3871b418e49ae55fb88e343876, type: 2}
+    - {fileID: 11400000, guid: dd68df21d79a10f429745f1c98d50235, type: 2}

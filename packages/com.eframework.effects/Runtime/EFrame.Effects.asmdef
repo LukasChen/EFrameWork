@@ -4,7 +4,6 @@
     "references": [
         "EFrame",
         "UniTask",
-        "DOTween.Modules",
         "UnityEngine.UI"
     ],
     "includePlatforms": [],

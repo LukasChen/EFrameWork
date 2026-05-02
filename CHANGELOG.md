@@ -6,6 +6,16 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+### Added
+
+- Added `test-fixtures/EFrameShowcaseUnity` as a runnable Unity fixture for Extension Showcase development.
+- Added `tools/Sync-EFrameShowcaseTemplate.ps1` to generate the package Showcase template from the fixture module while converting `.cs` files to `.cs.txt`.
+
+### Changed
+
+- Updated Extension Showcase installation to preserve module `.meta` files so non-code resources can be shipped with stable references.
+- Removed the DOTween requirement from `com.eframework.ui-extras` and `com.eframework.effects`; UI helpers, UI animations, and camera shake now use core `EFrameTween`.
+
 ## [0.6.8] - 2026-05-03
 
 ### Changed

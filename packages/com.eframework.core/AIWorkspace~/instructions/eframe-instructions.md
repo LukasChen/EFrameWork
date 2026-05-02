@@ -8,6 +8,10 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 本文件是使用 EFrame 的项目共享同步契约，聚焦稳定 runtime/editor 规则。
 
+## 协作执行边界
+
+- 当用户是在提出问题、要求解释或分析方案时，先按讨论处理：可以做必要的只读检查来回答，但在编辑文件、执行初始化/安装/刷新动作或其他会改变项目状态的操作前，必须先确认方案并等待明确批准。
+
 ## UI 契约
 - `Procedure` 只负责状态切换、进入/退出编排和生命周期清理；页面、弹窗、提示层切换优先作为现有流程内的 UI 行为，不滥增新 `Procedure`。
 - 业务 UI 推荐入口只暴露一条路径：通过 `EFrame.UI` 和 `UIControllerBase<TGeneratedView>` 管理页面、弹窗和提示；`QUI`、`IUIService`、`UIViewHandle` 是框架内部或进阶扩展概念，不作为普通业务代码的直接入口。

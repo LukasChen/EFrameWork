@@ -45,6 +45,9 @@ namespace EFramework.Editor.ProjectBootstrap
         };
 
         private static readonly Queue<(string packageName, string packageSpec)> PendingPackageAdds = new();
+        private static readonly Queue<Action> PendingEditorActions = new();
+        private static readonly object PendingEditorActionsLock = new();
+        private static bool s_pendingEditorActionProcessorRegistered;
         private static AddRequest s_packageAddRequest;
         private static string s_currentPackageName;
 
@@ -127,9 +130,30 @@ namespace EFramework.Editor.ProjectBootstrap
             {
                 EditorGUILayout.LabelField("Samples And Optional Modules", EditorStyles.boldLabel);
 
-                if (GUILayout.Button("Install Showcase"))
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    InstallExtensionShowcaseModule();
+                    if (GUILayout.Button("Install Showcase"))
+                    {
+                        InstallExtensionShowcaseModule();
+                    }
+
+                    if (GUILayout.Button("Refresh Showcase From Template"))
+                    {
+                        RefreshExtensionShowcaseModuleFromTemplate();
+                    }
+                }
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Set Showcase Startup"))
+                    {
+                        SetExtensionShowcaseAsStartup();
+                    }
+
+                    if (GUILayout.Button("Restore Basic Startup"))
+                    {
+                        RestoreBasicStartup();
+                    }
                 }
             }
 
@@ -510,6 +534,64 @@ namespace EFramework.Editor.ProjectBootstrap
             SetStatus($"{copyMessage} {packageMessage} {startupMessage}".Trim(), false);
         }
 
+        private void RefreshExtensionShowcaseModuleFromTemplate()
+        {
+            var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
+            if (!AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath) && !Directory.Exists(targetFullPath))
+            {
+                SetStatus($"Extension Showcase module is not installed at {ExtensionShowcaseTargetPath}. Install it first.", true);
+                return;
+            }
+
+            var shouldRefresh = EditorUtility.DisplayDialog(
+                "Refresh Extension Showcase",
+                $"This will replace {ExtensionShowcaseTargetPath} with the current package template. Local changes inside that module will be lost.",
+                "Refresh",
+                "Cancel");
+
+            if (!shouldRefresh)
+            {
+                SetStatus("Extension Showcase refresh was cancelled.", false);
+                return;
+            }
+
+            if (!DeleteExtensionShowcaseTarget(out var deleteMessage))
+            {
+                SetStatus(deleteMessage, true);
+                return;
+            }
+
+            if (!CopyExtensionShowcaseTemplate(out var copyMessage))
+            {
+                SetStatus(copyMessage, true);
+                return;
+            }
+
+            AssetDatabase.Refresh();
+            if (!SyncAddressablesAfterAssetChanges("Refreshed Extension Showcase module from template."))
+            {
+                return;
+            }
+
+            SetStatus($"{copyMessage} Replaced the existing module from the current template.", false);
+        }
+
+        private void SetExtensionShowcaseAsStartup()
+        {
+            if (TrySetExtensionShowcaseAsStartup(out var message))
+            {
+                SetStatus(message, false);
+            }
+        }
+
+        private void RestoreBasicStartup()
+        {
+            if (ConfigureStartUpProcedure(BasicStartupProcedureName, false, out var message))
+            {
+                SetStatus(message, false);
+            }
+        }
+
         private bool TrySetExtensionShowcaseAsStartup(out string message)
         {
             if (!AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath))
@@ -601,22 +683,44 @@ namespace EFramework.Editor.ProjectBootstrap
             SetStatus("AI checks running...", false);
 
             var projectRoot = ProjectRootPath;
+            var shell = GetPowerShellExecutable();
+            EnsurePendingEditorActionProcessor();
             _ = Task.Run(() =>
             {
-                var syncSucceeded = RunToolScriptBackground(
-                    frameworkRoot,
-                    "Initialize-EFrameAI.ps1",
-                    $"-TargetRoot \"{projectRoot}\" -Clients {AllAiClientsArgument} -StatusOnly",
-                    out var syncResult);
+                var syncSucceeded = false;
+                var healthSucceeded = false;
+                var syncResult = ToolScriptResult.Failed("Initialize-EFrameAI.ps1", "AI sync check did not run.");
+                var healthResult = ToolScriptResult.Failed("Test-EFrameAIProject.ps1", "AI health check did not run.");
 
-                var healthSucceeded = RunToolScriptBackground(
-                    frameworkRoot,
-                    "Test-EFrameAIProject.ps1",
-                    $"-TargetRoot \"{projectRoot}\" -FrameworkRoot \"{frameworkRoot}\"",
-                    out var healthResult);
-
-                EditorApplication.delayCall += () =>
+                try
                 {
+                    syncSucceeded = RunToolScriptBackground(
+                        frameworkRoot,
+                        shell,
+                        "Initialize-EFrameAI.ps1",
+                        $"-TargetRoot \"{projectRoot}\" -Clients {AllAiClientsArgument} -StatusOnly",
+                        out syncResult);
+
+                    healthSucceeded = RunToolScriptBackground(
+                        frameworkRoot,
+                        shell,
+                        "Test-EFrameAIProject.ps1",
+                        $"-TargetRoot \"{projectRoot}\" -FrameworkRoot \"{frameworkRoot}\"",
+                        out healthResult);
+                }
+                catch (Exception exception)
+                {
+                    syncResult = ToolScriptResult.Failed("Run AI Checks", exception.Message);
+                    healthResult = ToolScriptResult.Failed("Run AI Checks", exception.Message);
+                }
+
+                EnqueueEditorAction(() =>
+                {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
                     LogToolScriptResult(syncResult);
                     LogToolScriptResult(healthResult);
 
@@ -624,7 +728,7 @@ namespace EFramework.Editor.ProjectBootstrap
                     m_aiCheckIsError = !syncSucceeded || !healthSucceeded;
                     m_aiCheckMessage = BuildAiCheckMessage(syncSucceeded, syncResult, healthSucceeded, healthResult);
                     SetStatus(m_aiCheckIsError ? "AI checks completed with issues." : "AI checks passed.", m_aiCheckIsError);
-                };
+                });
             });
         }
 
@@ -715,6 +819,43 @@ namespace EFramework.Editor.ProjectBootstrap
             return true;
         }
 
+        private static bool DeleteExtensionShowcaseTarget(out string message)
+        {
+            try
+            {
+                if (AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath))
+                {
+                    if (!AssetDatabase.DeleteAsset(ExtensionShowcaseTargetPath))
+                    {
+                        message = $"Failed to delete existing Extension Showcase module at {ExtensionShowcaseTargetPath}.";
+                        return false;
+                    }
+                }
+                else
+                {
+                    var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
+                    if (Directory.Exists(targetFullPath))
+                    {
+                        Directory.Delete(targetFullPath, true);
+                    }
+
+                    var metaPath = $"{targetFullPath}.meta";
+                    if (File.Exists(metaPath))
+                    {
+                        File.Delete(metaPath);
+                    }
+                }
+
+                message = $"Deleted existing Extension Showcase module at {ExtensionShowcaseTargetPath}.";
+                return true;
+            }
+            catch (Exception exception)
+            {
+                message = $"Failed to delete existing Extension Showcase module: {exception.Message}";
+                return false;
+            }
+        }
+
         private static string AssetPathToFullPath(string assetPath)
         {
             if (assetPath.StartsWith("Packages/", StringComparison.Ordinal))
@@ -742,13 +883,12 @@ namespace EFramework.Editor.ProjectBootstrap
 
             foreach (var sourceFile in Directory.GetFiles(sourceDirectory))
             {
-                if (sourceFile.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
                 var fileName = Path.GetFileName(sourceFile);
-                if (fileName.EndsWith(".cs.txt", StringComparison.OrdinalIgnoreCase))
+                if (fileName.EndsWith(".cs.txt.meta", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileName = fileName.Substring(0, fileName.Length - ".txt.meta".Length) + ".meta";
+                }
+                else if (fileName.EndsWith(".cs.txt", StringComparison.OrdinalIgnoreCase))
                 {
                     fileName = fileName.Substring(0, fileName.Length - ".txt".Length);
                 }
@@ -1054,7 +1194,57 @@ namespace EFramework.Editor.ProjectBootstrap
             }
         }
 
-        private static bool RunToolScriptBackground(string frameworkRoot, string scriptName, string arguments, out ToolScriptResult result)
+        private static void EnsurePendingEditorActionProcessor()
+        {
+            if (s_pendingEditorActionProcessorRegistered)
+            {
+                return;
+            }
+
+            EditorApplication.update += ProcessPendingEditorActions;
+            s_pendingEditorActionProcessorRegistered = true;
+        }
+
+        private static void EnqueueEditorAction(Action action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            lock (PendingEditorActionsLock)
+            {
+                PendingEditorActions.Enqueue(action);
+            }
+        }
+
+        private static void ProcessPendingEditorActions()
+        {
+            while (true)
+            {
+                Action action;
+                lock (PendingEditorActionsLock)
+                {
+                    if (PendingEditorActions.Count == 0)
+                    {
+                        return;
+                    }
+
+                    action = PendingEditorActions.Dequeue();
+                }
+
+                try
+                {
+                    action.Invoke();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+        }
+
+        private static bool RunToolScriptBackground(string frameworkRoot, string shell, string scriptName, string arguments, out ToolScriptResult result)
         {
             var scriptPath = Path.Combine(frameworkRoot, "Tools~", scriptName);
             if (!File.Exists(scriptPath))
@@ -1067,7 +1257,7 @@ namespace EFramework.Editor.ProjectBootstrap
             {
                 var processStartInfo = new ProcessStartInfo
                 {
-                    FileName = GetPowerShellExecutable(),
+                    FileName = shell,
                     Arguments = $"-ExecutionPolicy Bypass -File \"{scriptPath}\" {arguments}",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

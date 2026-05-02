@@ -1,4 +1,4 @@
-﻿using DG.Tweening;
+using EFramework.Runtime.Tween;
 using UnityEngine;
 
 namespace EFramework.Extensions.UI.Extras.UIAnimation
@@ -12,16 +12,30 @@ namespace EFramework.Extensions.UI.Extras.UIAnimation
         private void Start()
         {
             if (!this.gameObject.activeSelf) this.gameObject.SetActive(true);
-            this.transform.DOKill(true);
+            EFrameTween.Kill(this.transform, true);
             this.transform.localScale = Vector3.one * m_startScale; // 起始稍小
-            this.transform.DOScale(1f, m_openDuration)         // 放大到 1
-                .SetEase(Ease.OutBack, m_easeOvershoot)                 // 稍微弹一下
-                .SetUpdate(true);                            // 可选：不受 Time.timeScale 影响
+            EFrameTween.Float(0f, 1f, m_openDuration, progress =>
+            {
+                var easedProgress = EvaluateOutBack(progress, m_easeOvershoot);
+                this.transform.localScale = Vector3.one * Mathf.LerpUnclamped(m_startScale, 1f, easedProgress);
+            }, new EFrameTweenOptions
+            {
+                Target = this.transform,
+                Ease = EFrameEase.Linear,
+                IgnoreTimeScale = true
+            });
         }
 
         private void OnDestroy()
         {
-            this.transform.DOKill();
+            EFrameTween.Kill(this.transform);
+        }
+
+        private static float EvaluateOutBack(float value, float overshoot)
+        {
+            value = Mathf.Clamp01(value) - 1f;
+            var coefficient = overshoot + 1f;
+            return 1f + coefficient * value * value * value + overshoot * value * value;
         }
     }
 }

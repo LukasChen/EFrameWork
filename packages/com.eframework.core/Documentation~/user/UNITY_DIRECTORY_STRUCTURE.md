@@ -327,7 +327,7 @@ Assets/Modules/<Name>/
 
 `Assets/Modules/EFrameExtensionShowcase/` 是框架提供的可选扩展示例模块安装位置。它通过 `EFrame Tools/项目初始化向导` 安装，不侵入 `Assets/App` 的 Basic 启动结构。
 
-Showcase 模块可以被设置为 StartUp 入口，用于集中查看 UI Virtual List、UI Extras、Effects、GMTools、Debug Console 等扩展演示入口；需要恢复最小 Basic 启动时，通过初始化向导执行 `Restore Basic Startup`。
+Showcase 模块可以被设置为 StartUp 入口，用于集中查看 UI Virtual List、UI Extras、Effects、GMTools、Debug Console 等扩展演示入口；维护模板时直接打开 `test-fixtures/EFrameShowcaseUnity` 调试源模块，并通过 `tools/Sync-EFrameShowcaseTemplate.ps1` 同步回 package template；需要恢复最小 Basic 启动时，通过初始化向导执行 `Restore Basic Startup`。
 
 详细安装方式见 [SAMPLES_AND_INITIALIZATION.md](SAMPLES_AND_INITIALIZATION.md)。
 

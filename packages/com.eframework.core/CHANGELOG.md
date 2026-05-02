@@ -4,6 +4,16 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+### Added
+
+- Added initialization-window controls to refresh the installed Extension Showcase module from the package template and switch startup between Showcase and Basic.
+- Added a synced AI collaboration contract requiring question and analysis requests to be handled as discussion first, with approval before project-changing actions.
+- Added a maintainer sync path for Extension Showcase where `test-fixtures/EFrameShowcaseUnity` is the editable Unity source and `tools/Sync-EFrameShowcaseTemplate.ps1` generates the package template.
+
+### Changed
+
+- Updated Extension Showcase template installation to copy module `.meta` files, including `.cs.txt.meta` to `.cs.meta` conversion, so non-code resources can keep stable references.
+
 ## [0.6.8] - 2026-05-03
 
 ### Changed

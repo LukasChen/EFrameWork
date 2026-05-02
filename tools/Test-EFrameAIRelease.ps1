@@ -480,6 +480,16 @@ try {
         $errors.Add("Initialize-EFrameAI.ps1 must not sync maintainer-* files.")
     }
 
+    $showcaseTemplateSyncScript = Join-Path $frameworkRoot "tools/Sync-EFrameShowcaseTemplate.ps1"
+    if (Test-Path -LiteralPath $showcaseTemplateSyncScript) {
+        try {
+            & $showcaseTemplateSyncScript -CheckOnly
+        }
+        catch {
+            $errors.Add("Extension Showcase template is out of sync with test-fixtures/EFrameShowcaseUnity. Run tools/Sync-EFrameShowcaseTemplate.ps1. $($_.Exception.Message)")
+        }
+    }
+
     Write-Host "EFrame AI release check"
     Write-Host "Framework root: $frameworkRoot"
     Write-Host "Changed AI-impacting files: $($aiImpactChanges.Count)"

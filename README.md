@@ -92,6 +92,18 @@ For package-only consumers, pass the installed package root as `-FrameworkRoot`.
 
 Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, run Unity bootstrap initialization, choose an AI platform, check AI sync status, sync the AI workspace, and run the AI health check from a single window. The same AI actions are available from `EFrame Tools/AI`.
 
+## Test Fixtures
+
+- `test-fixtures/EFrameConsumerUnity`: minimal consumer fixture used by package import and API compile checks.
+- `test-fixtures/EFrameShowcaseUnity`: runnable Unity fixture for editing and debugging `Assets/Modules/EFrameExtensionShowcase` with normal `.cs` files and module resources.
+
+After changing the Showcase fixture module, sync the package template before release:
+
+```powershell
+.\tools\Sync-EFrameShowcaseTemplate.ps1
+.\tools\Sync-EFrameShowcaseTemplate.ps1 -CheckOnly
+```
+
 ## Managed Resource Convention
 
 EFrame treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` as framework-managed Addressables content. Put assets in the mapped directory and let the editor automation own the Addressables group, address, and `eframe-managed` label.

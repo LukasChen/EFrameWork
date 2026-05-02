@@ -22,4 +22,3 @@ using EFramework.Extensions.Effects.IconBounce;
 - `com.eframework.core`
 - `com.unity.addressables`
 - `com.unity.ugui`
-- DOTween installed in the consuming project

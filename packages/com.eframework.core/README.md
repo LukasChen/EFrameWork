@@ -27,7 +27,7 @@ Core ships a **Basic** template as the minimal runnable project skeleton. It is 
 
 The Basic template source used by editor automation lives in `Editor/Templates/Basic`; the package sample description lives in `Samples~/Basic`. Use `EFrame Tools/项目初始化向导` and choose `Full Initialize Project` or `Install Basic Sample / Import Basic Template` rather than importing the sample folder manually.
 
-The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed from the initialization window, and can be set as the StartUp Procedure entrance. Its runtime UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console demo entries; current entries are stable placeholders ready for future focused demos.
+The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed or refreshed from the initialization window, and can be set as the StartUp Procedure entrance. Framework maintainers edit the runnable source module in `test-fixtures/EFrameShowcaseUnity` and sync it back to the package template with `tools/Sync-EFrameShowcaseTemplate.ps1`. Its runtime UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console demo entries; current entries are stable placeholders ready for future focused demos.
 
 The Simple Game Demo direction is intentionally outside this core repository and should be handled later as a separate git repository.
 

@@ -21,4 +21,3 @@ using EFramework.Extensions.UI.Extras.UIAnimation;
 
 - `com.eframework.core`
 - `com.unity.ugui`
-- DOTween installed in the consuming project

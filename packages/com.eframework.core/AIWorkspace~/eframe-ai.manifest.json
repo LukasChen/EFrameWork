@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.21",
-    "updatedAt":  "2026-05-02",
-    "notes":  "Record EFrameTween fallback backend and optional DOTween adapter semantics.",
+    "version":  "0.4.24",
+    "updatedAt":  "2026-05-03",
+    "notes":  "Record discussion-first execution boundary and Extension Showcase fixture workflow.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,30 +14,30 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "aa61e4d2ec88547d846eaaba573a3fd4546db0cead932a432fa45da569b5215b"
+                      "sha256":  "0a02c3738d94d0d2659af148288821ccd7212205eb067dec68e5dbe02d6162c6"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "100ea98c71d33b901db4b6850b3edff4710b89683490c273f1d9664146da7a5a"
+                      "sha256":  "03f384f93e1081d872399963975ee662a95793d5eb14c0dcdc75cd7090596c78"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "dbdc306ac61d123b9547266d21420f49444aafe37bfa72e9074a9f60caab2540"
+                      "sha256":  "c33c0253faa14d3b21b879de85db043a9278727a78202f98abd187e3c348610b"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "2f2c935bbe4568490f107e94e7e283431a3c656dc40a52e2951964f164edb163"
+                      "sha256":  "32f938848c8eb2e3831d94d09128ae222549213ad2c90a7e3ea379f938c3aab7"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "c257f27326c5cf222616e66eef8ce5e683d84791292152f9cd1a87e3c8f16123"
+                      "sha256":  "3e30e58ea7a85f66a733a8e6d66427eb8f7d2388c8a812c118ff87af9094cb75"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

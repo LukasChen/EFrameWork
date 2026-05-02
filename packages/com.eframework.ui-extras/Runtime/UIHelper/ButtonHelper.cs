@@ -1,8 +1,6 @@
-﻿using DG.Tweening;
-using EFramework.Runtime.Audio;
 using EFramework.Runtime.Event;
+using EFramework.Runtime.Tween;
 using EFramework.Runtime.UI;
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -19,7 +17,7 @@ namespace EFramework.Extensions.UI.Extras.UIHelper
         private Vector3 m_originalScale;
         [SerializeField] private bool m_clickAnimation = false;
         [SerializeField] private bool m_taReport;
-        
+
         private string m_viewName;
 
         public void OnPointerClick(PointerEventData eventData)
@@ -37,14 +35,17 @@ namespace EFramework.Extensions.UI.Extras.UIHelper
             var binding = gameObject.GetComponentInParent<QUIBinding>();
             if (binding != null && binding.Config.IsViewRoot)
             {
-                m_viewName =  binding.gameObject.name.Replace("(Clone)", "");
+                m_viewName = binding.gameObject.name.Replace("(Clone)", "");
             }
         }
 
-
         private void OnDestroy()
         {
-            m_button.transform.DOKill();
+            if (m_button != null)
+            {
+                EFrameTween.Kill(m_button.transform);
+            }
+
             CancelInvoke();
         }
 
@@ -57,11 +58,15 @@ namespace EFramework.Extensions.UI.Extras.UIHelper
         {
             if (m_clickAnimation)
             {
-                m_button.transform.DOKill(true);
+                EFrameTween.Kill(m_button.transform, true);
                 m_originalScale = m_rectTransform.localScale;
-                //根据按钮尺寸，缩放固定数值   
+                //根据按钮尺寸，缩放固定数值
                 float scale = Mathf.Clamp(1 - 15f / m_rectTransform.sizeDelta.magnitude, 0.8f, 1);
-                m_button.transform.DOScale(m_originalScale * scale, 0.05f);
+                EFrameTween.Vector3(m_originalScale, m_originalScale * scale, 0.05f, value => m_button.transform.localScale = value, new EFrameTweenOptions
+                {
+                    Target = m_button.transform,
+                    Ease = EFrameEase.OutQuad
+                });
             }
         }
 
@@ -69,7 +74,7 @@ namespace EFramework.Extensions.UI.Extras.UIHelper
         {
             if (m_clickAnimation)
             {
-                m_button.transform.DOKill();
+                EFrameTween.Kill(m_button.transform);
                 m_button.transform.localScale = m_originalScale;
             }
         }
