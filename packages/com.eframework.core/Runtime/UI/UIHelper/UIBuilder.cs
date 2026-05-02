@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace EFrame.Runtime.UI.UIHelper
+namespace EFramework.Runtime.UI.UIHelper
 {
     /// <summary>
     /// UIBuilder is a utility class for creating UI elements in Unity.

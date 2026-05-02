@@ -6,6 +6,12 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-05-02
+
+### Changed
+
+- Renamed framework runtime and editor namespaces from `EFrame.*` to `EFramework.*` so external consumers can import `EFramework.Runtime` and access the static `EFrame` entry without namespace/type collisions.
+
 ## [0.6.1] - 2026-05-02
 
 ### Added
@@ -31,7 +37,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 ### Changed
 
 - Renamed the framework brand from its legacy name to EFrame across runtime, editor tooling, package metadata, generated templates, documentation, and AI workspace contracts.
-- Standardized runtime namespaces on `EFrame.Runtime` and editor namespaces on `EFrame.Editor`.
+- Standardized runtime namespaces on `EFramework.Runtime` and editor namespaces on `EFramework.Editor`.
 - Standardized package assemblies on `EFrame` and `EFrame.Editor`.
 - Updated bootstrap scripts, UI binding templates, synced AI instructions, managed blocks, support docs, and generated HTML docs to use the EFrame naming contract.
 
@@ -128,7 +134,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ### Added
 
-- Added a dedicated `EFrame.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
+- Added a dedicated `EFramework.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
 
 ### Changed
 
@@ -192,8 +198,8 @@ EFrame uses semantic versioning for framework releases. The release version is r
 - Added `LastSaveResult` to `DataTable` so save attempts can report whether they wrote, skipped because data was clean, or failed.
 - Moved QUI sorting layer setup into the project bootstrap flow so initialization can auto-create required UI sorting layers, and added runtime QUI warnings when layers are missing.
 - Reorganized editor tooling into `ProjectBootstrap`, `UI`, and `Tools` groups so UI-specific inspectors, bootstrap setup, and developer shortcuts no longer mix under one root.
-- Unified legacy UI component namespaces under `EFrame.Runtime.UI` so `QScroller`, `QTab`, UI animations, and helper components no longer expose mixed historical prefixes.
-- Unified `QUIBinding` generated access classes and shipped UI templates on `EFrame.Runtime.UI.Generated` so newly generated view access code matches the runtime UI namespace family.
+- Unified legacy UI component namespaces under `EFramework.Runtime.UI` so `QScroller`, `QTab`, UI animations, and helper components no longer expose mixed historical prefixes.
+- Unified `QUIBinding` generated access classes and shipped UI templates on `EFramework.Runtime.UI.Generated` so newly generated view access code matches the runtime UI namespace family.
 - Split runtime UI layout adaptors and reusable controls into `Layout` and `Components` namespace groups so the UI root chain stays distinct from fitters and widget-style utilities.
 - Moved `UIBuilder` and `EmptyRayCasterGraphic` out of the runtime UI root so helper/toolbox code and lightweight reusable components no longer sit beside the core QUI chain.
 - Normalized `XListView` folder and namespace casing so component subfolders now follow the same stable naming style as their exported types.

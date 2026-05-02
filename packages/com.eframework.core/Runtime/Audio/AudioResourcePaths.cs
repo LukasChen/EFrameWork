@@ -1,4 +1,4 @@
-namespace EFrame.Runtime.Audio
+namespace EFramework.Runtime.Audio
 {
     public static class AudioResourcePaths
     {

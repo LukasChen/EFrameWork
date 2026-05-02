@@ -3,7 +3,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.ProjectBootstrap
+namespace EFramework.Editor.ProjectBootstrap
 {
     public class EFrameAudioSetup : EditorWindow
     {

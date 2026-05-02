@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
-namespace EFrame.Runtime.UI.Transitions
+namespace EFramework.Runtime.UI.Transitions
 {
     internal sealed class ScaleFadeViewTransition : IUIViewTransition
     {

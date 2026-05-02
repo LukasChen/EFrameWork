@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace EFrame.Runtime.UI.Handles
+namespace EFramework.Runtime.UI.Handles
 {
     public interface IUIViewHandle
     {

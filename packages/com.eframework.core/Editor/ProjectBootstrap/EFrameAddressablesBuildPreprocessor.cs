@@ -3,7 +3,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace EFrame.Editor.ProjectBootstrap
+namespace EFramework.Editor.ProjectBootstrap
 {
     internal sealed class EFrameAddressablesBuildPreprocessor : IPreprocessBuildWithReport
     {

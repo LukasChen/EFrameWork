@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime.UI.Layout
+namespace EFramework.Runtime.UI.Layout
 {
     /// <summary>
     /// 全屏适配组件 - 将 UI 元素扩展到安全区之外的全屏区域

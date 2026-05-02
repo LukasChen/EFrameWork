@@ -2,7 +2,7 @@ using Lofelt.NiceVibrations;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace EFrame.Runtime.Vibration
+namespace EFramework.Runtime.Vibration
 {
     /// <summary>
     /// 震动管理器，提供多种内置震动方案用于不同游戏场景

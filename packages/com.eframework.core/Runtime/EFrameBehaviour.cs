@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     public abstract class EFrameBehaviour : MonoBehaviour, IEFrameContextAware
     {

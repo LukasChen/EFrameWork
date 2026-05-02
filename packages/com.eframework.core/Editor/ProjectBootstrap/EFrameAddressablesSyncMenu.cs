@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 
-namespace EFrame.Editor.ProjectBootstrap
+namespace EFramework.Editor.ProjectBootstrap
 {
     internal static class EFrameAddressablesSyncMenu
     {

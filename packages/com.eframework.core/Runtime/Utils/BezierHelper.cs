@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     public static class BezierHelper
     {

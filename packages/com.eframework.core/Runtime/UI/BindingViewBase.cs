@@ -1,10 +1,10 @@
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
-using EFrame.Runtime;
-using EFrame.Runtime.Event;
+using EFramework.Runtime;
+using EFramework.Runtime.Event;
 
-namespace EFrame.Runtime.UI
+namespace EFramework.Runtime.UI
 {
     /// <summary>
     /// UI View 基类

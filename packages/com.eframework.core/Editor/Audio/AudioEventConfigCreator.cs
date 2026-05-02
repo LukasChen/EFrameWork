@@ -1,8 +1,8 @@
-using EFrame.Runtime.Audio;
+using EFramework.Runtime.Audio;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.Audio
+namespace EFramework.Editor.Audio
 {
     /// <summary>
     /// 音效事件配置资源创建工具

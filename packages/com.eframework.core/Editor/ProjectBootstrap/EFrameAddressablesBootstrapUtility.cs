@@ -10,7 +10,7 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
 
-namespace EFrame.Editor.ProjectBootstrap
+namespace EFramework.Editor.ProjectBootstrap
 {
     internal static class EFrameAddressablesBootstrapUtility
     {

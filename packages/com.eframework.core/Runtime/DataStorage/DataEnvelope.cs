@@ -1,6 +1,6 @@
 using System;
 
-namespace EFrame.Runtime.DataStorage
+namespace EFramework.Runtime.DataStorage
 {
     [Serializable]
     public sealed class DataEnvelope<T>

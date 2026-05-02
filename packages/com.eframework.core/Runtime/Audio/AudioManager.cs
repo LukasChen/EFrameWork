@@ -1,12 +1,12 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using EFrame.Runtime.Asset;
+using EFramework.Runtime.Asset;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace EFrame.Runtime.Audio
+namespace EFramework.Runtime.Audio
 {
     /// <summary>
     /// 音频管理器

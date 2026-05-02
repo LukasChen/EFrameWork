@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     /// <summary>
     /// 全局协程管理器

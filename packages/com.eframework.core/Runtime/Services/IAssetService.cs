@@ -5,7 +5,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using Object = UnityEngine.Object;
 
-namespace EFrame.Runtime.Asset
+namespace EFramework.Runtime.Asset
 {
     public readonly struct AssetHandle<T> : IDisposable where T : Object
     {

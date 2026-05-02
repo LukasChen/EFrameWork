@@ -1,4 +1,4 @@
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     public enum EFrameInitializationStage
     {

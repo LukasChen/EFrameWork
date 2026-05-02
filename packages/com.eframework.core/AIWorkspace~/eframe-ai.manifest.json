@@ -1,8 +1,8 @@
-﻿{
+{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.12",
+    "version":  "0.4.13",
     "updatedAt":  "2026-05-02",
-    "notes":  "Add consumer-fixture release validation coverage for cold start bootstrap checks.",
+    "notes":  "Rename synced framework namespace examples to EFramework while keeping the EFrame runtime entry type.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "56a358194e270bd3ce0b882d57c51df8aa046c2f6f86a38edbc1f5898e694029"
+                      "sha256":  "353a50528fc7759b7974c5c25b0f34603be278ae8615aa20f4dc34c8200c7b27"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -53,7 +53,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "850dec640eea2960b2bed7d70b38b8747d02cc5b66387886dc59fdcf0f6acfd0"
+                      "sha256":  "a5a718126360ace0967a23df5c704023a8ff938eaf6dc8f17f448bb5d35a73dc"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
@@ -73,11 +73,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
-                      "sha256":  "11f63acfeb5bf224586d580b1fd6cac2e80973b8e3c23183d39d42386ebe0e88"
+                      "sha256":  "82c1f12887d20085c0e74ca8ed32f051c87cda385d217e639aa6e9d23da37332"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "9284790371e9196ccbe510d7cc96610e67889a1ad43e41648387105d746a7606"
+                      "sha256":  "2378ef224e7b99c4abfacc11a0c7726fa55c002c95da79f1c68e34721f337a70"
                   }
               ]
 }

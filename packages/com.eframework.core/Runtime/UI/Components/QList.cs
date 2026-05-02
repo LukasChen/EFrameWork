@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace EFrame.Runtime.UI.Components
+namespace EFramework.Runtime.UI.Components
 {
     /// <summary>
     ///     QList 用于管理可复用的 UI 列表项，实现对象池和虚拟化，提高性能。

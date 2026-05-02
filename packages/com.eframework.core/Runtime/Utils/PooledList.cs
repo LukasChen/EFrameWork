@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     /// <summary>
     ///     PooledList\

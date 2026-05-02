@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime.Effect.IconBounce
+namespace EFramework.Runtime.Effect.IconBounce
 {
     /// <summary>
     /// 编辑器场景内快速调试用：挂到任意 GameObject，配置后一键预览回弹效果。

@@ -5,7 +5,7 @@
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     /// <summary>
     ///     对 string 的扩展方法。

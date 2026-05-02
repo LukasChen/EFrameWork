@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime.UI.Layout
+namespace EFramework.Runtime.UI.Layout
 {
     /// <summary>
     /// 屏幕比例/安全区/ScreenFit 调试输出工具。

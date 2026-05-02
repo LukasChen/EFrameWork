@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
-using EFrame.Runtime.UI.Components;
+using EFramework.Runtime.UI.Components;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.UI
+namespace EFramework.Editor.UI
 {
     [CustomEditor(typeof(QScroller))]
     public class QScrollerEditor : UnityEditor.UI.ScrollRectEditor

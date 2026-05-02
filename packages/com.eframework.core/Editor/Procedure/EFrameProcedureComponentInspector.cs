@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using EFrame.Runtime.Procedure;
+using EFramework.Runtime.Procedure;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.Procedure
+namespace EFramework.Editor.Procedure
 {
     [CustomEditor(typeof(EFrameProcedureComponent))]
     internal sealed class EFrameProcedureComponentInspector : UnityEditor.Editor

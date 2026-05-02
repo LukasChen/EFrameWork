@@ -202,7 +202,7 @@ Typical view class:
 
 ```csharp
 using UnityEngine.UI;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 
 namespace Demo.UI.Views
 {
@@ -243,7 +243,7 @@ Typical page controller:
 using System;
 using Demo.Common;
 using Demo.UI.Views;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 
 namespace Demo.UI.Controllers
 {
@@ -332,7 +332,7 @@ Lifecycle hooks are split by scope:
 
 ```csharp
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 
 namespace Demo.UI.Controllers
 {
@@ -480,7 +480,7 @@ Avoid these patterns:
 ## 14. Minimal End-To-End Example
 
 ```csharp
-using EFrame.Runtime.Procedure;
+using EFramework.Runtime.Procedure;
 
 public sealed class LobbyProcedure : EFrameProcedure
 {

@@ -11,7 +11,7 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 ## UI 契约
 - `Procedure` 只负责状态切换、进入/退出编排和生命周期清理；页面、弹窗、提示层切换优先作为现有流程内的 UI 行为，不滥增新 `Procedure`。
 - UI 应通过 `EFrame.UI` / `IUIService`、`UIControllerBase` 与 `UIViewHandle` 管理；`QUI` 是默认 UI 服务实现和层级宿主，不要在场景里手工堆常驻顶层 Canvas、EventSystem 或绕过框架的 UI 生命周期入口。
-- Runtime UI 组件、适配器、动画、helper 和生成绑定代码统一落在 `EFrame.Runtime.UI` 及其稳定子命名空间，例如 `Components`、`Layout`、`UIHelper`、`Generated`。
+- Runtime UI 组件、适配器、动画、helper 和生成绑定代码统一落在 `EFramework.Runtime.UI` 及其稳定子命名空间，例如 `Components`、`Layout`、`UIHelper`、`Generated`。
 - 命名保持框架约定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`，组件目录、类名和命名空间大小写一致。
 
 ## UI 主链

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime.Event;
-using EFrame.Runtime.Vibration;
+using EFramework.Runtime.Event;
+using EFramework.Runtime.Vibration;
 using Lofelt.NiceVibrations;
 using UnityEngine;
 
-namespace EFrame.Runtime.Audio
+namespace EFramework.Runtime.Audio
 {
     /// <summary>
     /// 音效事件管理器

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     /// <summary>
     /// 岛屿检测器，用于检测2D网格中的连通区域

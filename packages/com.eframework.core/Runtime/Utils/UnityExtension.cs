@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     /// <summary>
     ///     对 Unity 的扩展方法。

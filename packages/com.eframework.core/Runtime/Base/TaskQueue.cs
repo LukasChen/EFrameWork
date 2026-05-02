@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     /// <summary>
     /// 静态任务队列

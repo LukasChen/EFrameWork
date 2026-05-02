@@ -1,11 +1,11 @@
 using DG.Tweening;
-using EFrame.Runtime.Audio;
+using EFramework.Runtime.Audio;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EFrame.Runtime.UI.UIHelper
+namespace EFramework.Runtime.UI.UIHelper
 {
     [RequireComponent(typeof(Toggle))]
     public class ToggleHelper : MonoBehaviour, IPointerClickHandler

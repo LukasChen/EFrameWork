@@ -1,5 +1,5 @@
 ﻿using System;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 using EFrameConsumerFixture.Common;
 using EFrameConsumerFixture.Modules.SampleModule.UI.Views;
 

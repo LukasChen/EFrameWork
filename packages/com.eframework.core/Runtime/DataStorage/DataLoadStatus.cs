@@ -1,4 +1,4 @@
-namespace EFrame.Runtime.DataStorage
+namespace EFramework.Runtime.DataStorage
 {
     public enum DataLoadStatus
     {

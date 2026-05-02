@@ -1,6 +1,6 @@
 using System;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     public static class DateUtils
     {

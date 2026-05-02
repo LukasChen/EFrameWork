@@ -1,8 +1,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime.Asset;
+using EFramework.Runtime.Asset;
 
-namespace EFrame.Runtime.Procedure
+namespace EFramework.Runtime.Procedure
 {
     public abstract class EFrameProcedure
     {

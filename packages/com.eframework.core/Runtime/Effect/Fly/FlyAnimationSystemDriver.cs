@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime.Effect.Fly
+namespace EFramework.Runtime.Effect.Fly
 {
     /// <summary>
     /// 独立驱动 FlyAnimationSystem 更新的常驻组件。

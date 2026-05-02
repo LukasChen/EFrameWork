@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrame.Runtime.UI.UIHelper
+namespace EFramework.Runtime.UI.UIHelper
 {
     public class SmoothFillController : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 
-namespace EFrame.Runtime.UI.Handles
+namespace EFramework.Runtime.UI.Handles
 {
     public enum UIViewHandleState
     {

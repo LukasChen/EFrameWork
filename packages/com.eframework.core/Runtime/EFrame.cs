@@ -1,17 +1,17 @@
 using System;
 using System.Collections;
 using DG.Tweening;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Audio;
-using EFrame.Runtime.DataStorage;
-using EFrame.Runtime.Event;
-using EFrame.Runtime.UI;
-using EFrame.Runtime.Utils;
-using EFrame.Runtime.Vibration;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Audio;
+using EFramework.Runtime.DataStorage;
+using EFramework.Runtime.Event;
+using EFramework.Runtime.UI;
+using EFramework.Runtime.Utils;
+using EFramework.Runtime.Vibration;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     public static class EFrame
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using EFrameConsumerFixture.Common;
 using EFrameConsumerFixture.UI.Views;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 
 namespace EFrameConsumerFixture.UI.Controllers
 {

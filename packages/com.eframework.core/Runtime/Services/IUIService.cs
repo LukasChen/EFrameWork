@@ -1,12 +1,12 @@
 using System;
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime;
-using EFrame.Runtime.UI;
-using EFrame.Runtime.UI.Handles;
-using EFrame.Runtime.UI.Transitions;
+using EFramework.Runtime;
+using EFramework.Runtime.UI;
+using EFramework.Runtime.UI.Handles;
+using EFramework.Runtime.UI.Transitions;
 using UnityEngine;
 
-namespace EFrame.Runtime.UI
+namespace EFramework.Runtime.UI
 {
     public interface IUIService : IDisposable
     {

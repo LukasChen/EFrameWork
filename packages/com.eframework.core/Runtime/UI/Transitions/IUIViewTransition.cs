@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace EFrame.Runtime.UI.Transitions
+namespace EFramework.Runtime.UI.Transitions
 {
     public interface IUIViewTransition
     {

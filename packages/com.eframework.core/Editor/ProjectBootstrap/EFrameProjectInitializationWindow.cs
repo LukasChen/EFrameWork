@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using EFrame.Runtime;
-using EFrame.Runtime.Procedure;
+using EFramework.Runtime;
+using EFramework.Runtime.Procedure;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 
-namespace EFrame.Editor.ProjectBootstrap
+namespace EFramework.Editor.ProjectBootstrap
 {
     public sealed class EFrameProjectInitializationWindow : EditorWindow
     {
@@ -662,8 +662,8 @@ Recommended next steps:
         private string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
         {
             return $@"using Cysharp.Threading.Tasks;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Procedure;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Procedure;
 using {m_rootNamespace}.Common;
 using UnityEngine;
 
@@ -693,7 +693,7 @@ namespace {moduleNamespace}.Procedure
 
         private static string BuildModuleViewContent(string moduleName, string moduleNamespace)
         {
-            return $@"using EFrame.Runtime.UI;
+            return $@"using EFramework.Runtime.UI;
 using UnityEngine.UI;
 
 namespace {moduleNamespace}.UI.Views
@@ -724,7 +724,7 @@ namespace {moduleNamespace}.UI.Views
         private string BuildModuleControllerContent(string moduleName, string moduleNamespace)
         {
             return $@"using System;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 using {m_rootNamespace}.Common;
 using {moduleNamespace}.UI.Views;
 

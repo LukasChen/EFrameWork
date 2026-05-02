@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Audio;
-using EFrame.Runtime.Utils;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Audio;
+using EFramework.Runtime.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrame.Runtime.Effect.Fly
+namespace EFramework.Runtime.Effect.Fly
 {
     public readonly struct FlySequenceHandle
     {

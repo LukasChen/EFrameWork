@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using EFrameConsumerFixture.Procedure;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Procedure;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Procedure;
 using EFrameConsumerFixture.Common;
 using EFrameConsumerFixture.Modules.SampleModule.UI.Controllers;
 using UnityEngine;

@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-namespace EFrame.Runtime.UI.UIAnimation
+namespace EFramework.Runtime.UI.UIAnimation
 {
     public class UIEnableAnimation : MonoBehaviour
     {

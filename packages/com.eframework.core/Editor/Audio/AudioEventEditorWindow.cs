@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using EFrame.Runtime.Audio;
-using EFrame.Runtime.Event;
+using EFramework.Runtime.Audio;
+using EFramework.Runtime.Event;
 using Lofelt.NiceVibrations;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.Audio
+namespace EFramework.Editor.Audio
 {
     /// <summary>
     /// 音效事件管理编辑器窗口

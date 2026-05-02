@@ -1,28 +1,27 @@
-using EFrame.Runtime;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Event;
-using EFrame.Runtime.Procedure;
-using EFrame.Runtime.UI;
+using EFramework.Runtime;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Event;
+using EFramework.Runtime.Procedure;
+using EFramework.Runtime.UI;
 using UnityEngine;
-using EFrameRuntime = EFrame.Runtime.EFrame;
 
 namespace EFrameConsumerFixture
 {
     public sealed class ConsumerApiProbe : MonoBehaviour
     {
-        public bool IsInitialized => EFrameRuntime.Initialized;
-        public EFrameContext Current => EFrameRuntime.Current;
-        public IAssetService Assets => EFrameRuntime.Assets;
-        public IUIService UI => EFrameRuntime.UI;
-        public IEventService Events => EFrameRuntime.Events;
+        public bool IsInitialized => EFrame.Initialized;
+        public EFrameContext Current => EFrame.Current;
+        public IAssetService Assets => EFrame.Assets;
+        public IUIService UI => EFrame.UI;
+        public IEventService Events => EFrame.Events;
     }
 
     public sealed class ConsumerProcedure : EFrameProcedure
     {
         protected override void OnEnter(ProcedureEnterContext context)
         {
-            _ = EFrameRuntime.Current;
-            _ = EFrameRuntime.Assets;
+            _ = EFrame.Current;
+            _ = EFrame.Assets;
             _ = Context;
         }
     }

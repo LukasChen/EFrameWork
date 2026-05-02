@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace EFrame.Runtime.DataStorage
+namespace EFramework.Runtime.DataStorage
 {
     public class DefaultFrameDataModal
     {

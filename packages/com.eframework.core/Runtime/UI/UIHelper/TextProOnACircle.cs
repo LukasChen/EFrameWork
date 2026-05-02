@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace EFrame.Runtime.UI.UIHelper
+namespace EFramework.Runtime.UI.UIHelper
 {
     //MIT License
 

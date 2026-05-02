@@ -1,9 +1,9 @@
-using EFrame.Runtime.Event;
+using EFramework.Runtime.Event;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EFrame.Runtime.DataStorage
+namespace EFramework.Runtime.DataStorage
 {
     public sealed class DataManager : IDataService
     {

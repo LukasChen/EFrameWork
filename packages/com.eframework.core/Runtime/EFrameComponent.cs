@@ -1,12 +1,12 @@
-using EFrame.Runtime.DataStorage;
-using EFrame.Runtime.Event;
-using EFrame.Runtime.Procedure;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.DataStorage;
+using EFramework.Runtime.Event;
+using EFramework.Runtime.Procedure;
+using EFramework.Runtime.UI;
 using System;
 using UnityEngine;
 using System.Collections;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     [RequireComponent(typeof(EFrameProcedureComponent))]
     public class EFrameComponent : EFrameBehaviour

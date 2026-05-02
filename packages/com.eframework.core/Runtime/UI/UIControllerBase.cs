@@ -1,12 +1,12 @@
 using Cysharp.Threading.Tasks;
-using EFrame.Runtime;
-using EFrame.Runtime.UI.Handles;
+using EFramework.Runtime;
+using EFramework.Runtime.UI.Handles;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFrame.Runtime.UI
+namespace EFramework.Runtime.UI
 {
     #region Queueable Task Wrapper
 

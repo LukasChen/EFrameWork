@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EFrame.Runtime.Base.Attributes
+namespace EFramework.Runtime.Base.Attributes
 {
     public class MinMaxRangeAttribute : PropertyAttribute
     {

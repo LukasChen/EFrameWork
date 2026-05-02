@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace EFrame.Runtime.Utils
+namespace EFramework.Runtime.Utils
 {
     /*
      * 使用范例：

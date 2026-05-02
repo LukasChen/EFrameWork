@@ -1,8 +1,8 @@
 using System;
-using EFrame.Runtime.Audio;
+using EFramework.Runtime.Audio;
 using UnityEngine;
 
-namespace EFrame.Runtime.Effect.Fly
+namespace EFramework.Runtime.Effect.Fly
 {
     public enum FlyPathType
     {

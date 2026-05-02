@@ -5,7 +5,7 @@ using DG.Tweening;
 using UnityEngine.Events;
 using System;
 
-namespace EFrame.Runtime.UI.Components
+namespace EFramework.Runtime.UI.Components
 {
     /// <summary>
     /// QScroller 是一个自定义的 ScrollRect，允许根据水平和垂直单位进行吸附对齐。并提供了嵌套ScrollRect的支持。

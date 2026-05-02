@@ -1,4 +1,4 @@
-﻿using EFrame.Runtime.Procedure;
+﻿using EFramework.Runtime.Procedure;
 using UnityEngine;
 
 namespace EFrameConsumerFixture.Procedure

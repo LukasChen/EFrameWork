@@ -1,13 +1,13 @@
 using System;
-using EFrame.Runtime.Asset;
-using EFrame.Runtime.Audio;
-using EFrame.Runtime.DataStorage;
-using EFrame.Runtime.Event;
-using EFrame.Runtime.UI;
-using EFrame.Runtime.Vibration;
+using EFramework.Runtime.Asset;
+using EFramework.Runtime.Audio;
+using EFramework.Runtime.DataStorage;
+using EFramework.Runtime.Event;
+using EFramework.Runtime.UI;
+using EFramework.Runtime.Vibration;
 using UnityEngine;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     public sealed class EFrameContext : IDisposable
     {

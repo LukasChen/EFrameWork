@@ -4,6 +4,12 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-05-02
+
+### Changed
+
+- Renamed framework runtime and editor namespaces from `EFrame.*` to `EFramework.*` so external consumers can import `EFramework.Runtime` and access the static `EFrame` entry without namespace/type collisions.
+
 ## [0.6.1] - 2026-05-02
 
 ### Added
@@ -12,7 +18,7 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ### Changed
 
-- Kept the static `EFrame` runtime entry type in `EFrame.Runtime` and added consumer-fixture coverage for the namespace/type collision that requires an explicit alias or a future entry API rename.
+- Kept the static `EFrame` runtime entry type in `EFramework.Runtime` and added consumer-fixture coverage for the namespace/type collision that requires an explicit alias or a future entry API rename.
 
 ## [0.6.0] - 2026-05-02
 
@@ -33,9 +39,9 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 ### Changed
 
 - Renamed the package-facing framework brand to EFrame across package metadata, runtime/editor code, bootstrap templates, docs, and AI workspace support files.
-- Standardized runtime namespaces on `EFrame.Runtime` and editor namespaces on `EFrame.Editor`.
+- Standardized runtime namespaces on `EFramework.Runtime` and editor namespaces on `EFramework.Editor`.
 - Standardized package assemblies on `EFrame` and `EFrame.Editor`.
-- Updated built-in UI templates and generated binding defaults to use `EFrame.Runtime.UI.Generated`.
+- Updated built-in UI templates and generated binding defaults to use `EFramework.Runtime.UI.Generated`.
 
 ## [0.4.6] - 2026-05-02
 
@@ -135,7 +141,7 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ### Added
 
-- Added a dedicated `EFrame.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
+- Added a dedicated `EFramework.Editor` asmdef so package editor tooling compiles in an explicit Editor-only assembly with declared framework and plugin dependencies.
 
 ### Changed
 
@@ -189,8 +195,8 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 - Added `LastSaveResult` to `DataTable` so save attempts can report whether they wrote, skipped because data was clean, or failed.
 - Moved QUI sorting layer setup into the project bootstrap flow so initialization can auto-create required UI sorting layers, and added runtime QUI warnings when layers are missing.
 - Reorganized editor tooling into `ProjectBootstrap`, `UI`, and `Tools` groups so initialization utilities, UI inspectors, and developer shortcuts have clearer ownership.
-- Unified legacy UI component namespaces under `EFrame.Runtime.UI` so runtime UI widgets and helper components share one framework namespace family.
-- Unified `QUIBinding` generated access classes and built-in UI templates on `EFrame.Runtime.UI.Generated` so generated bindings follow the same runtime UI namespace family.
+- Unified legacy UI component namespaces under `EFramework.Runtime.UI` so runtime UI widgets and helper components share one framework namespace family.
+- Unified `QUIBinding` generated access classes and built-in UI templates on `EFramework.Runtime.UI.Generated` so generated bindings follow the same runtime UI namespace family.
 - Split runtime UI layout adaptors and reusable controls into `Layout` and `Components` namespace groups so core UI services and widget-style utilities are easier to distinguish.
 - Moved `UIBuilder` and `EmptyRayCasterGraphic` out of the runtime UI root so helper/toolbox code and lightweight reusable components align with `UIHelper` and `Components` ownership.
 - Normalized `XListView` folder and namespace casing so component subfolders now match the naming style of the exported runtime types.

@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Lofelt.NiceVibrations;
 
-namespace EFrame.Runtime.Vibration
+namespace EFramework.Runtime.Vibration
 {
     public interface IVibrationService
     {

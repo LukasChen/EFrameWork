@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace EFrame.Runtime.Procedure
+namespace EFramework.Runtime.Procedure
 {
     [DisallowMultipleComponent]
     [AddComponentMenu("EFrame/Procedure")]

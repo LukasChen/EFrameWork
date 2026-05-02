@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using EFrame.Runtime.Base.Attributes;
+using EFramework.Runtime.Base.Attributes;
 using Lofelt.NiceVibrations;
 using UnityEngine;
-namespace EFrame.Runtime.Audio
+namespace EFramework.Runtime.Audio
 {
     /// <summary>
     /// 多音频播放规则

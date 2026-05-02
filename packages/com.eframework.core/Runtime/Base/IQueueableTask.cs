@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace EFrame.Runtime
+namespace EFramework.Runtime
 {
     /// <summary>
     /// 可排队任务接口

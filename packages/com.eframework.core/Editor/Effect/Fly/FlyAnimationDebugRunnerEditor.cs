@@ -1,8 +1,8 @@
-using EFrame.Runtime.Effect.Fly;
+using EFramework.Runtime.Effect.Fly;
 using UnityEditor;
 using UnityEngine;
 
-namespace EFrame.Editor.Effect.Fly
+namespace EFramework.Editor.Effect.Fly
 {
     [CustomEditor(typeof(FlyAnimationDebugRunner))]
     [CanEditMultipleObjects]

@@ -3,13 +3,13 @@ using UnityEditor;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
-using EFrame.Runtime.UI;
+using EFramework.Runtime.UI;
 using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Text;
 
-namespace EFrame.Editor.UI
+namespace EFramework.Editor.UI
 {
     [CustomEditor(typeof(QUIBinding))]
     public class UIAutoBindingEditor : UnityEditor.Editor
@@ -826,7 +826,7 @@ namespace EFrame.Editor.UI
                 "UnityEngine.UI",
                 "TMPro",
                 "System.Linq",
-                "EFrame.Runtime.UI"
+                "EFramework.Runtime.UI"
             };
 
             // 根据组件类型添加额外的using
