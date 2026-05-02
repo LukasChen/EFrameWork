@@ -4,6 +4,14 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.6.8] - 2026-05-03
+
+### Changed
+
+- Added the EFrame logo to package README files.
+- Simplified the Extension Showcase initialization entry to a single install action that sets Showcase as the default startup.
+- Made AI workspace checks run asynchronously from the project initialization window to avoid blocking the Unity Editor UI.
+
 ## [0.6.7] - 2026-05-03
 
 ### Added

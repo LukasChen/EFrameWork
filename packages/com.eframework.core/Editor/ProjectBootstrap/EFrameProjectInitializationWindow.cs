@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using EFramework.Runtime;
 using EFramework.Runtime.Procedure;
 using EFramework.Runtime.UI;
@@ -52,6 +53,7 @@ namespace EFramework.Editor.ProjectBootstrap
         private string m_aiCheckMessage;
         private bool m_statusIsError;
         private bool m_aiCheckIsError;
+        private bool m_aiChecksRunning;
         private Texture2D m_logoTexture;
 
         [MenuItem("EFrame Tools/项目初始化向导", false, -100)]
@@ -104,9 +106,12 @@ namespace EFramework.Editor.ProjectBootstrap
                         RunAiSync();
                     }
 
-                    if (GUILayout.Button("Run AI Checks"))
+                    using (new EditorGUI.DisabledScope(m_aiChecksRunning))
                     {
-                        RunAiChecks();
+                        if (GUILayout.Button(m_aiChecksRunning ? "Checking..." : "Run AI Checks"))
+                        {
+                            RunAiChecks();
+                        }
                     }
                 }
 
@@ -122,22 +127,9 @@ namespace EFramework.Editor.ProjectBootstrap
             {
                 EditorGUILayout.LabelField("Samples And Optional Modules", EditorStyles.boldLabel);
 
-                if (GUILayout.Button("Install Extension Showcase Module"))
+                if (GUILayout.Button("Install Showcase"))
                 {
                     InstallExtensionShowcaseModule();
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Set Extension Showcase As Startup"))
-                    {
-                        SetExtensionShowcaseAsStartup();
-                    }
-
-                    if (GUILayout.Button("Restore Basic Startup"))
-                    {
-                        RestoreBasicStartup();
-                    }
                 }
             }
 
@@ -510,23 +502,24 @@ namespace EFramework.Editor.ProjectBootstrap
                 return;
             }
 
-            SetStatus($"{copyMessage} {packageMessage}".Trim(), false);
-        }
-
-        private void SetExtensionShowcaseAsStartup()
-        {
-            if (!AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath))
+            if (!TrySetExtensionShowcaseAsStartup(out var startupMessage))
             {
-                SetStatus($"Extension Showcase module is not installed at {ExtensionShowcaseTargetPath}.", true);
                 return;
             }
 
-            ConfigureStartUpProcedure(ExtensionShowcaseStartupProcedureName, true);
+            SetStatus($"{copyMessage} {packageMessage} {startupMessage}".Trim(), false);
         }
 
-        private void RestoreBasicStartup()
+        private bool TrySetExtensionShowcaseAsStartup(out string message)
         {
-            ConfigureStartUpProcedure(BasicStartupProcedureName, false);
+            if (!AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath))
+            {
+                message = $"Extension Showcase module is not installed at {ExtensionShowcaseTargetPath}.";
+                SetStatus(message, true);
+                return false;
+            }
+
+            return ConfigureStartUpProcedure(ExtensionShowcaseStartupProcedureName, true, out message);
         }
 
         [MenuItem("EFrame Tools/AI/Check Sync Status", false, 40)]
@@ -588,28 +581,51 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void RunAiChecks()
         {
-            var syncSucceeded = RunToolScript(
-                "Initialize-EFrameAI.ps1",
-                $"-TargetRoot \"{ProjectRootPath}\" -Clients {AllAiClientsArgument} -StatusOnly",
-                out var syncResult);
-
-            var healthSucceeded = false;
-            ToolScriptResult healthResult = default;
-            if (TryGetFrameworkRoot(out var frameworkRoot, out var error))
+            if (m_aiChecksRunning)
             {
-                healthSucceeded = RunToolScript(
+                return;
+            }
+
+            if (!TryGetFrameworkRoot(out var frameworkRoot, out var error))
+            {
+                var failedResult = ToolScriptResult.Failed("Test-EFrameAIProject.ps1", error);
+                m_aiCheckIsError = true;
+                m_aiCheckMessage = BuildAiCheckMessage(false, failedResult, false, failedResult);
+                SetStatus("AI checks completed with issues.", true);
+                return;
+            }
+
+            m_aiChecksRunning = true;
+            m_aiCheckIsError = false;
+            m_aiCheckMessage = "AI checks running...";
+            SetStatus("AI checks running...", false);
+
+            var projectRoot = ProjectRootPath;
+            _ = Task.Run(() =>
+            {
+                var syncSucceeded = RunToolScriptBackground(
+                    frameworkRoot,
+                    "Initialize-EFrameAI.ps1",
+                    $"-TargetRoot \"{projectRoot}\" -Clients {AllAiClientsArgument} -StatusOnly",
+                    out var syncResult);
+
+                var healthSucceeded = RunToolScriptBackground(
+                    frameworkRoot,
                     "Test-EFrameAIProject.ps1",
-                    $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\"",
-                    out healthResult);
-            }
-            else
-            {
-                healthResult = ToolScriptResult.Failed("Test-EFrameAIProject.ps1", error);
-            }
+                    $"-TargetRoot \"{projectRoot}\" -FrameworkRoot \"{frameworkRoot}\"",
+                    out var healthResult);
 
-            m_aiCheckIsError = !syncSucceeded || !healthSucceeded;
-            m_aiCheckMessage = BuildAiCheckMessage(syncSucceeded, syncResult, healthSucceeded, healthResult);
-            SetStatus(m_aiCheckIsError ? "AI checks completed with issues." : "AI checks passed.", m_aiCheckIsError);
+                EditorApplication.delayCall += () =>
+                {
+                    LogToolScriptResult(syncResult);
+                    LogToolScriptResult(healthResult);
+
+                    m_aiChecksRunning = false;
+                    m_aiCheckIsError = !syncSucceeded || !healthSucceeded;
+                    m_aiCheckMessage = BuildAiCheckMessage(syncSucceeded, syncResult, healthSucceeded, healthResult);
+                    SetStatus(m_aiCheckIsError ? "AI checks completed with issues." : "AI checks passed.", m_aiCheckIsError);
+                };
+            });
         }
 
         private void RunAiHealthCheck()
@@ -859,42 +875,48 @@ namespace EFramework.Editor.ProjectBootstrap
             s_packageAddRequest = Client.Add(next.packageSpec);
         }
 
-        private void ConfigureStartUpProcedure(string entranceProcedureTypeName, bool includeExtensionShowcase)
+        private bool ConfigureStartUpProcedure(string entranceProcedureTypeName, bool includeExtensionShowcase, out string message)
         {
             if (!File.Exists(Path.Combine(ProjectRootPath, StartUpScenePath)))
             {
-                SetStatus($"StartUp scene was not found at {StartUpScenePath}. Run Initialize / Repair Project first.", true);
-                return;
+                message = $"StartUp scene was not found at {StartUpScenePath}. Run Initialize / Repair Project first.";
+                SetStatus(message, true);
+                return false;
             }
 
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
-                return;
+                message = "StartUp scene update was cancelled.";
+                return false;
             }
 
             var scene = EditorSceneManager.OpenScene(StartUpScenePath, OpenSceneMode.Single);
             if (!scene.IsValid())
             {
-                SetStatus($"Failed to open StartUp scene: {StartUpScenePath}.", true);
-                return;
+                message = $"Failed to open StartUp scene: {StartUpScenePath}.";
+                SetStatus(message, true);
+                return false;
             }
 
             var procedureComponent = UnityEngine.Object.FindFirstObjectByType<EFrameProcedureComponent>();
             if (procedureComponent == null)
             {
-                SetStatus("StartUp scene does not contain an EFrameProcedureComponent on the Boot object.", true);
-                return;
+                message = "StartUp scene does not contain an EFrameProcedureComponent on the Boot object.";
+                SetStatus(message, true);
+                return false;
             }
 
             ConfigureProcedureComponent(procedureComponent, includeExtensionShowcase, entranceProcedureTypeName);
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene))
             {
-                SetStatus($"Failed to save StartUp scene after setting {entranceProcedureTypeName}.", true);
-                return;
+                message = $"Failed to save StartUp scene after setting {entranceProcedureTypeName}.";
+                SetStatus(message, true);
+                return false;
             }
 
-            SetStatus($"Set StartUp entrance procedure to {entranceProcedureTypeName}.", false);
+            message = $"Set StartUp entrance procedure to {entranceProcedureTypeName}.";
+            return true;
         }
 
         private void CreateModuleScaffold()
@@ -1029,6 +1051,69 @@ namespace EFramework.Editor.ProjectBootstrap
                 result = ToolScriptResult.Failed(scriptName, message);
                 SetStatus(message, true);
                 return false;
+            }
+        }
+
+        private static bool RunToolScriptBackground(string frameworkRoot, string scriptName, string arguments, out ToolScriptResult result)
+        {
+            var scriptPath = Path.Combine(frameworkRoot, "Tools~", scriptName);
+            if (!File.Exists(scriptPath))
+            {
+                result = ToolScriptResult.Failed(scriptName, $"Tool script not found: {scriptPath}");
+                return false;
+            }
+
+            try
+            {
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = GetPowerShellExecutable(),
+                    Arguments = $"-ExecutionPolicy Bypass -File \"{scriptPath}\" {arguments}",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = frameworkRoot
+                };
+
+                using var process = Process.Start(processStartInfo);
+                if (process == null)
+                {
+                    result = ToolScriptResult.Failed(scriptName, "Failed to start PowerShell process.");
+                    return false;
+                }
+
+                var standardOutput = process.StandardOutput.ReadToEnd();
+                var standardError = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                result = new ToolScriptResult
+                {
+                    ScriptName = scriptName,
+                    StandardOutput = standardOutput,
+                    StandardError = standardError,
+                    ExitCode = process.ExitCode,
+                    StatusMessage = process.ExitCode == 0 ? $"Completed {scriptName}." : $"Tool script failed: {scriptName}"
+                };
+                return process.ExitCode == 0;
+            }
+            catch (Exception exception)
+            {
+                result = ToolScriptResult.Failed(scriptName, $"Failed to execute {scriptName}: {exception.Message}");
+                return false;
+            }
+        }
+
+        private static void LogToolScriptResult(ToolScriptResult result)
+        {
+            if (!string.IsNullOrWhiteSpace(result.StandardOutput))
+            {
+                Debug.Log(result.StandardOutput.Trim());
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.StandardError))
+            {
+                Debug.LogWarning(result.StandardError.Trim());
             }
         }
 

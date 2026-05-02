@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Editor/ProjectBootstrap/Assets/EFrameLogo.png" alt="EFrame logo" width="160">
+</p>
+
 # EFrame Core
 
 EFrame Core is a reusable Unity game framework package extracted from `CozyBloomUnity/Assets/EFrame`.

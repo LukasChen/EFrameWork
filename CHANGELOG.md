@@ -6,6 +6,14 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.6.8] - 2026-05-03
+
+### Changed
+
+- Added the EFrame logo to repository and package README files.
+- Simplified the Extension Showcase initialization entry to a single install action that sets Showcase as the default startup.
+- Made AI workspace checks run asynchronously from the project initialization window to avoid blocking the Unity Editor UI.
+
 ## [0.6.7] - 2026-05-03
 
 ### Added
