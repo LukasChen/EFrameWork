@@ -4,6 +4,16 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.6.7] - 2026-05-03
+
+### Added
+
+- Added an EFrame logo asset to the project initialization window.
+
+### Changed
+
+- Simplified the project initialization window by consolidating setup actions, DOTween adapter controls, and AI workspace checks.
+
 ## [0.6.6] - 2026-05-02
 
 ### Added

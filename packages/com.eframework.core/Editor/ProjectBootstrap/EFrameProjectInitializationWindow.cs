@@ -21,6 +21,7 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string WindowTitle = "EFrame Project Init";
         private const string PackageName = "com.eframework.core";
         private const string AppNamespace = "GameApp";
+        private const string LogoAssetPath = "Packages/com.eframework.core/Editor/ProjectBootstrap/Assets/EFrameLogo.png";
         private const string StartUpScenePath = "Assets/Scenes/StartUp.unity";
         private const string StartUpGuidePath = "Assets/Scenes/StartUp_SETUP.md";
         private const string ModulesRootPath = "Assets/Modules";
@@ -30,7 +31,8 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string ExtensionShowcaseStartupProcedureName = "GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
         private const string ModuleNamePrefsKey = "EFrame.ProjectInitializationWindow.ModuleName";
-        private const string AiClientPrefsKey = "EFrame.ProjectInitializationWindow.AIClient";
+        private const string AllAiClientsArgument = "all";
+        private const string AllAiClientsLabel = "Codex, GitHub Copilot, and Claude Code";
 
         private static readonly string[] ExtensionPackageNames =
         {
@@ -46,17 +48,11 @@ namespace EFramework.Editor.ProjectBootstrap
         private static string s_currentPackageName;
 
         private string m_moduleName;
-        private AIClientSelection m_aiClientSelection;
         private string m_statusMessage;
+        private string m_aiCheckMessage;
         private bool m_statusIsError;
-
-        private enum AIClientSelection
-        {
-            All,
-            Codex,
-            Copilot,
-            ClaudeCode
-        }
+        private bool m_aiCheckIsError;
+        private Texture2D m_logoTexture;
 
         [MenuItem("EFrame Tools/项目初始化向导", false, -100)]
         public static void OpenWindow()
@@ -74,36 +70,17 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void OnGUI()
         {
-            EditorGUILayout.LabelField("EFrame Project Initialization", EditorStyles.boldLabel);
+            DrawHeader();
             EditorGUILayout.Space();
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("Project", ProjectRootPath);
-                EditorGUILayout.LabelField("Framework Root", TryGetFrameworkRoot(out var frameworkRoot, out var rootError) ? frameworkRoot : rootError);
-                EditorGUILayout.HelpBox("Use Full Initialize Project for the standard bootstrap flow. Use the Basic template action when you only need to import the minimal runnable skeleton.", MessageType.None);
-            }
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 EditorGUILayout.LabelField("Actions", EditorStyles.boldLabel);
 
-                if (GUILayout.Button("Full Initialize Project", GUILayout.Height(34f)))
+                if (GUILayout.Button("Initialize / Repair Project", GUILayout.Height(34f)))
                 {
                     RunFullInitialization();
                 }
-
-                if (GUILayout.Button("Install Basic Sample / Import Basic Template"))
-                {
-                    ImportBasicTemplate();
-                }
-
-                if (GUILayout.Button("Import Initial UI Templates"))
-                {
-                    ImportInitialTemplates();
-                }
-
-                EditorGUILayout.HelpBox("Full Initialize Project runs the standard bootstrap chain. Basic Template imports the current minimal runnable skeleton. Initial UI Templates only re-copy the built-in Home and SampleModule prefabs into Assets.", MessageType.None);
             }
 
             EditorGUILayout.Space();
@@ -111,27 +88,32 @@ namespace EFramework.Editor.ProjectBootstrap
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
                 EditorGUILayout.LabelField("Tween Backend", EditorStyles.boldLabel);
-                EditorGUILayout.LabelField("Status", EFrameDotweenBootstrapUtility.GetTweenBackendStatus());
+                DrawTweenBackendControls();
+            }
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("AI Workspace", EditorStyles.boldLabel);
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button("Enable DOTween Adapter"))
+                    if (GUILayout.Button("Sync / Repair AI Workspace"))
                     {
-                        EnableDotweenAdapter();
+                        RunAiSync();
                     }
 
-                    if (GUILayout.Button("Disable DOTween Adapter"))
+                    if (GUILayout.Button("Run AI Checks"))
                     {
-                        DisableDotweenAdapter();
+                        RunAiChecks();
                     }
                 }
 
-                if (GUILayout.Button("Open DOTween Settings"))
+                if (!string.IsNullOrWhiteSpace(m_aiCheckMessage))
                 {
-                    OpenDotweenSettings();
+                    EditorGUILayout.HelpBox(m_aiCheckMessage, m_aiCheckIsError ? MessageType.Error : MessageType.Info);
                 }
-
-                EditorGUILayout.HelpBox(EFrameDotweenBootstrapUtility.GetInstallationGuidance(), MessageType.None);
             }
 
             EditorGUILayout.Space();
@@ -157,42 +139,9 @@ namespace EFramework.Editor.ProjectBootstrap
                         RestoreBasicStartup();
                     }
                 }
-
-                EditorGUILayout.HelpBox("Extension Showcase installs to Assets/Modules/EFrameExtensionShowcase, starts a local file: package add for available sibling extension packages, and can switch the StartUp scene procedure entrance.", MessageType.None);
             }
 
             EditorGUILayout.Space();
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("AI Workspace", EditorStyles.boldLabel);
-                m_aiClientSelection = (AIClientSelection)EditorGUILayout.EnumPopup("AI Platform", m_aiClientSelection);
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Check AI Sync Status"))
-                    {
-                        RunAiSyncStatus();
-                    }
-
-                    if (GUILayout.Button("Sync AI Workspace"))
-                    {
-                        RunAiSync();
-                    }
-                }
-
-                if (GUILayout.Button("Run AI Health Check"))
-                {
-                    RunAiHealthCheck();
-                }
-
-                if (GUILayout.Button("Run Unity Compile Check"))
-                {
-                    RunUnityCompileCheck();
-                }
-
-                EditorGUILayout.HelpBox("These actions use the EFrame package tools to check, sync, and validate the project AI workspace while preserving project-owned instruction text outside EFrame managed blocks.", MessageType.None);
-            }
 
             if (!string.IsNullOrEmpty(m_statusMessage))
             {
@@ -204,10 +153,87 @@ namespace EFramework.Editor.ProjectBootstrap
         private void InitializeState()
         {
             m_moduleName = EditorPrefs.GetString(ModuleNamePrefsKey, string.Empty);
-            m_aiClientSelection = (AIClientSelection)EditorPrefs.GetInt(AiClientPrefsKey, (int)AIClientSelection.All);
         }
 
         private static string ProjectRootPath => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
+
+        private void DrawHeader()
+        {
+            m_logoTexture ??= AssetDatabase.LoadAssetAtPath<Texture2D>(LogoAssetPath);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+
+                using (new EditorGUILayout.VerticalScope(GUILayout.Width(180f)))
+                {
+                    if (m_logoTexture != null)
+                    {
+                        var rect = GUILayoutUtility.GetRect(76f, 76f, GUILayout.Width(76f), GUILayout.Height(76f));
+                        rect.x += 52f;
+                        GUI.DrawTexture(rect, m_logoTexture, ScaleMode.ScaleToFit, true);
+                    }
+
+                    var titleStyle = new GUIStyle(EditorStyles.boldLabel)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontSize = 14
+                    };
+                    EditorGUILayout.LabelField("EFrame", titleStyle);
+                }
+
+                GUILayout.FlexibleSpace();
+            }
+        }
+
+        private void DrawTweenBackendControls()
+        {
+            var dotweenInstalled = EFrameDotweenBootstrapUtility.IsDotweenInstalled();
+            var adapterEnabled = EFrameDotweenBootstrapUtility.IsDotweenAdapterEnabled();
+
+            string status;
+            string buttonLabel;
+            bool buttonEnabled;
+            Action buttonAction;
+
+            if (adapterEnabled && dotweenInstalled)
+            {
+                status = "DOTween Adapter 已启用";
+                buttonLabel = "已启用";
+                buttonEnabled = false;
+                buttonAction = null;
+            }
+            else if (adapterEnabled)
+            {
+                status = "DOTween Adapter 已启用，但未检测到 DOTween";
+                buttonLabel = "禁用失效 Adapter";
+                buttonEnabled = true;
+                buttonAction = () => DisableDotweenAdapter();
+            }
+            else if (dotweenInstalled)
+            {
+                status = "DOTween detected. Adapter not enabled.";
+                buttonLabel = "启用 DOTween Adapter";
+                buttonEnabled = true;
+                buttonAction = () => EnableDotweenAdapter();
+            }
+            else
+            {
+                status = "Fallback backend active. DOTween not detected.";
+                buttonLabel = "未检测到 DOTween";
+                buttonEnabled = false;
+                buttonAction = null;
+            }
+
+            EditorGUILayout.LabelField("Adapter", status);
+            using (new EditorGUI.DisabledScope(!buttonEnabled))
+            {
+                if (GUILayout.Button(buttonLabel))
+                {
+                    buttonAction?.Invoke();
+                }
+            }
+        }
 
         private void RunFullInitialization()
         {
@@ -533,23 +559,22 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void RunAiSyncStatus()
         {
-            EditorPrefs.SetInt(AiClientPrefsKey, (int)m_aiClientSelection);
-            RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {GetSelectedAIClientArgument()} -StatusOnly");
+            RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {AllAiClientsArgument} -StatusOnly");
         }
 
         private void RunAiSync()
         {
-            EditorPrefs.SetInt(AiClientPrefsKey, (int)m_aiClientSelection);
             if (!EditorUtility.DisplayDialog(
                     "Sync EFrame AI Workspace",
-                    $"This will sync framework-managed AI files for {GetSelectedAIClientLabel()}, while preserving project-owned instruction text outside EFrame managed blocks.",
+                    $"This will sync framework-managed AI files for {AllAiClientsLabel}, while preserving project-owned instruction text outside EFrame managed blocks.",
                     "Sync",
                     "Cancel"))
             {
                 return;
             }
 
-            if (!RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {GetSelectedAIClientArgument()} -Force"))
+            m_aiCheckMessage = string.Empty;
+            if (!RunToolScript("Initialize-EFrameAI.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Clients {AllAiClientsArgument} -Force"))
             {
                 return;
             }
@@ -559,6 +584,32 @@ namespace EFramework.Editor.ProjectBootstrap
                 RunToolScript("Install-EFrameAIProjectUpdater.ps1", $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\" -Force");
             }
 
+        }
+
+        private void RunAiChecks()
+        {
+            var syncSucceeded = RunToolScript(
+                "Initialize-EFrameAI.ps1",
+                $"-TargetRoot \"{ProjectRootPath}\" -Clients {AllAiClientsArgument} -StatusOnly",
+                out var syncResult);
+
+            var healthSucceeded = false;
+            ToolScriptResult healthResult = default;
+            if (TryGetFrameworkRoot(out var frameworkRoot, out var error))
+            {
+                healthSucceeded = RunToolScript(
+                    "Test-EFrameAIProject.ps1",
+                    $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\"",
+                    out healthResult);
+            }
+            else
+            {
+                healthResult = ToolScriptResult.Failed("Test-EFrameAIProject.ps1", error);
+            }
+
+            m_aiCheckIsError = !syncSucceeded || !healthSucceeded;
+            m_aiCheckMessage = BuildAiCheckMessage(syncSucceeded, syncResult, healthSucceeded, healthResult);
+            SetStatus(m_aiCheckIsError ? "AI checks completed with issues." : "AI checks passed.", m_aiCheckIsError);
         }
 
         private void RunAiHealthCheck()
@@ -577,26 +628,54 @@ namespace EFramework.Editor.ProjectBootstrap
             RunToolScript("Test-EFrameUnityCompile.ps1", $"-TargetRoot \"{ProjectRootPath}\"");
         }
 
-        private string GetSelectedAIClientArgument()
+        private static string BuildAiCheckMessage(bool syncSucceeded, ToolScriptResult syncResult, bool healthSucceeded, ToolScriptResult healthResult)
         {
-            return m_aiClientSelection switch
+            var lines = new List<string>
             {
-                AIClientSelection.Codex => "codex",
-                AIClientSelection.Copilot => "copilot",
-                AIClientSelection.ClaudeCode => "claude-code",
-                _ => "all"
+                syncSucceeded
+                    ? "AI sync: OK"
+                    : $"AI sync: FAIL - {ExtractToolSummary(syncResult)}",
+                healthSucceeded
+                    ? "AI health: OK"
+                    : $"AI health: FAIL - {ExtractToolSummary(healthResult)}"
             };
+
+            return string.Join(Environment.NewLine, lines);
         }
 
-        private string GetSelectedAIClientLabel()
+        private static string ExtractToolSummary(ToolScriptResult result)
         {
-            return m_aiClientSelection switch
+            if (!string.IsNullOrWhiteSpace(result.StandardError))
             {
-                AIClientSelection.Codex => "Codex",
-                AIClientSelection.Copilot => "GitHub Copilot",
-                AIClientSelection.ClaudeCode => "Claude Code",
-                _ => "Codex, GitHub Copilot, and Claude Code"
-            };
+                return FirstMeaningfulLine(result.StandardError);
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.StandardOutput))
+            {
+                return FirstMeaningfulLine(result.StandardOutput);
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.StatusMessage))
+            {
+                return result.StatusMessage;
+            }
+
+            return result.ExitCode == 0 ? "Completed." : $"Exit code {result.ExitCode}.";
+        }
+
+        private static string FirstMeaningfulLine(string value)
+        {
+            using var reader = new StringReader(value);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    return line.Trim();
+                }
+            }
+
+            return value.Trim();
         }
 
         private bool CopyExtensionShowcaseTemplate(out string message)
@@ -784,7 +863,7 @@ namespace EFramework.Editor.ProjectBootstrap
         {
             if (!File.Exists(Path.Combine(ProjectRootPath, StartUpScenePath)))
             {
-                SetStatus($"StartUp scene was not found at {StartUpScenePath}. Run Full Initialize Project or Install Basic Sample first.", true);
+                SetStatus($"StartUp scene was not found at {StartUpScenePath}. Run Initialize / Repair Project first.", true);
                 return;
             }
 
@@ -868,8 +947,14 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private bool RunToolScript(string scriptName, string arguments)
         {
+            return RunToolScript(scriptName, arguments, out _);
+        }
+
+        private bool RunToolScript(string scriptName, string arguments, out ToolScriptResult result)
+        {
             if (!TryGetFrameworkRoot(out var frameworkRoot, out var error))
             {
+                result = ToolScriptResult.Failed(scriptName, error);
                 SetStatus(error, true);
                 return false;
             }
@@ -877,7 +962,9 @@ namespace EFramework.Editor.ProjectBootstrap
             var scriptPath = Path.Combine(frameworkRoot, "Tools~", scriptName);
             if (!File.Exists(scriptPath))
             {
-                SetStatus($"Tool script not found: {scriptPath}", true);
+                var message = $"Tool script not found: {scriptPath}";
+                result = ToolScriptResult.Failed(scriptName, message);
+                SetStatus(message, true);
                 return false;
             }
 
@@ -898,13 +985,23 @@ namespace EFramework.Editor.ProjectBootstrap
                 using var process = Process.Start(processStartInfo);
                 if (process == null)
                 {
-                    SetStatus("Failed to start PowerShell process.", true);
+                    const string message = "Failed to start PowerShell process.";
+                    result = ToolScriptResult.Failed(scriptName, message);
+                    SetStatus(message, true);
                     return false;
                 }
 
                 var standardOutput = process.StandardOutput.ReadToEnd();
                 var standardError = process.StandardError.ReadToEnd();
                 process.WaitForExit();
+                result = new ToolScriptResult
+                {
+                    ScriptName = scriptName,
+                    StandardOutput = standardOutput,
+                    StandardError = standardError,
+                    ExitCode = process.ExitCode,
+                    StatusMessage = process.ExitCode == 0 ? $"Completed {scriptName}." : $"Tool script failed: {scriptName}"
+                };
 
                 if (!string.IsNullOrWhiteSpace(standardOutput))
                 {
@@ -928,8 +1025,30 @@ namespace EFramework.Editor.ProjectBootstrap
             }
             catch (Exception exception)
             {
-                SetStatus($"Failed to execute {scriptName}: {exception.Message}", true);
+                var message = $"Failed to execute {scriptName}: {exception.Message}";
+                result = ToolScriptResult.Failed(scriptName, message);
+                SetStatus(message, true);
                 return false;
+            }
+        }
+
+        private struct ToolScriptResult
+        {
+            public string ScriptName;
+            public string StandardOutput;
+            public string StandardError;
+            public string StatusMessage;
+            public int ExitCode;
+
+            public static ToolScriptResult Failed(string scriptName, string message)
+            {
+                return new ToolScriptResult
+                {
+                    ScriptName = scriptName,
+                    StandardError = message,
+                    StatusMessage = message,
+                    ExitCode = -1
+                };
             }
         }
 
