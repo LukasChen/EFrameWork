@@ -27,6 +27,9 @@
 
 - 代码与资源是否分离
 - 是否向非标准目录写入新功能
+- 新建或移动的文件是否已按 `eframe-directory-structure` 判定 App/Module ownership
+- UI prefab 是否按 Panels、Popups、Widgets、Common 归类
+- `.unity` 场景文件是否与 `SceneAssets` 依赖资源分离
 - 命名是否符合 `ProcedureXxx`、`XxxViewController`、`XxxView.prefab`
 
 ## 资源路径
@@ -34,6 +37,12 @@
 - 是否集中管理路径
 - 是否出现重复硬编码字符串
 - 是否使用 `ResPath.Generated` 或明确资源 id 入口
+
+## Unity 编译验证
+
+- 是否避免只用 `.sln`、`.slnx` 或 `dotnet build` 证明 Unity 项目可编译
+- 是否运行 `tools/Test-EFrameUnityCompile.ps1 -TargetRoot <ProjectRoot>` 或检查 Unity Editor/Bee 编译日志
+- 如果缺少 `Library/Bee/artifacts`，是否先打开 Unity 或运行一次 batch import 后再复核
 
 ## AI 配置
 

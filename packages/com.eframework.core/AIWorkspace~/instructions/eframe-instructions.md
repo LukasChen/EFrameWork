@@ -29,6 +29,20 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 - `Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的框架托管资源遵循 EFrame 目录契约。不要手动编辑它们的 Addressables group、address 或 managed label。
 - 新增、移动和删除的框架托管资源应由 EFrame editor automation 同步，并在 player build 前验证。业务代码应使用所选目录树生成的 `ResPath.Generated`，不要把 Addressables window 当作事实来源。
 
+## 目录结构
+
+- 新建、移动或归类 EFrame 业务代码、Editor 工具、生成物、UI prefab、场景、资源或模块内容前，先使用 `eframe-directory-structure` 判断目录归属；小范围编辑已有文件时沿用现有 ownership。
+- 主应用代码落在 `Assets/App/Runtime/...`，主应用 Editor 工具落在 `Assets/App/Editor/...`，生成代码落在 `Assets/App/Runtime/Generated/...` 或模块自己的 `Runtime/Generated/...`。
+- 主应用资源落在 `Assets/App/Res/...`，场景文件本体落在 `Assets/Scenes/...`，模块私有代码、资源和场景优先闭包在 `Assets/Modules/<Name>/{Runtime,Res,Editor,Scenes}`。
+- UI 资源按类型进入 `Res/UI/Panels`、`Res/UI/Popups`、`Res/UI/Widgets` 或 `Res/UI/Common`；场景依赖资源进入 `Res/SceneAssets`，不要和 `.unity` 场景文件混放。
+- 不要在 `Assets` 根下长期堆放零散脚本、资源或临时目录；项目确有特殊目录约束时写入项目自有 instruction，而不是修改同步得到的 `eframe-*` 文件。
+
+## Unity 编译验证
+
+- 验证业务项目 Unity 编译、升级迁移或生成代码可用性时，不要只依赖 `.sln`、`.slnx` 或 `dotnet build`；这些结果可能与 Unity Editor/Bee 编译链路不一致。
+- 需要接近 Unity Editor 实际 C# 编译结果时，运行 `tools/Test-EFrameUnityCompile.ps1 -TargetRoot <ProjectRoot>`，它会重放 `Library/Bee/artifacts` 下的 Roslyn response files；项目尚未生成 Bee artifacts 时，先打开 Unity 或运行一次 Unity batch import。
+- 如果只需要定位某个程序集，可传 `-AssemblyName Assembly-CSharp` 或具体 asmdef 程序集名；修复结论应以该工具或 Unity Editor Console/Bee 日志为准，而不是以 `dotnet build` 单独通过为准。
+
 ## 启动与运行时访问
 
 - 启动流程状态使用 EFrame 自有的 `EFrameProcedure` 和 `EFrameProcedureComponent`，不要绕过框架状态机手工驱动流程切换。

@@ -41,6 +41,7 @@
 ### 3.1 业务项目同步与健康检查
 
 - `Test-EFrameAIProject.ps1` 能在业务项目或测试同步目录中报告 manifest hash 状态、框架版本差异、缺失 managed block 和常见运行时代码风险。
+- `Test-EFrameUnityCompile.ps1` 能在已生成 Bee artifacts 的业务项目中重放 Unity Roslyn response files，捕获 `dotnet build` 可能漏掉的 Unity Editor 编译错误。
 - `Install-EFrameAIProjectUpdater.ps1` 能在测试项目目录中生成项目侧更新脚本。
 - `New-EFrameProjectAIOverlay.ps1` 仍是可选辅助脚本，不应被当作推荐同步主路径。
 

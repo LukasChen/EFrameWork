@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.15",
+    "version":  "0.4.17",
     "updatedAt":  "2026-05-02",
-    "notes":  "Align business UI guidance around generated View access classes and controller-first usage.",
+    "notes":  "Add Unity Bee compile validation contract and tool guidance.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "70879d64d8bd3d3ef5868273a8be12c43cee94f4154b4fce014da9b97d9a65e3"
+                      "sha256":  "2e41ddef3ca21ac507ef12f6ef9957fa676ca6c6846203fe45b4998e881c0955"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -48,20 +48,24 @@
                       "sha256":  "466d8339057238fd438896faede61f850687138de0ea98c4ecbd46bd5e953faf"
                   },
                   {
+                      "path":  ".github/skills/eframe-directory-structure/SKILL.md",
+                      "sha256":  "78f62eb053e7dd5b8b3ed4620323cb59329f7a2092f5289402d231fa9802e060"
+                  },
+                  {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
-                      "sha256":  "5788eeaa396837075a32c47faa3df5252cb62ab02a315942925283f95d6a3e1d"
+                      "sha256":  "57a1e9664d2f8aced94e61f6d2b92c637ff84c951e665b3e9d42ff8df905dd0c"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "a5a718126360ace0967a23df5c704023a8ff938eaf6dc8f17f448bb5d35a73dc"
+                      "sha256":  "a94ce99cedbbc0ca4122acb61aa7a46577a4816d037eeb6e7a1d05339057dc99"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "1da0a2ccdaa2c80b09b7a6f065d5525cf9ff1d3533204f5cf1a07ccd174635a8"
+                      "sha256":  "da4997ef358defb51197323213e278aa78db20f37b0b5128d145692e25477520"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
-                      "sha256":  "824677b160d239911ed111f54bfa88f0e934d5e165103401ad9bf4ed010a7879"
+                      "sha256":  "a1758f28c766d0493360709048d2c2fca7ba968abcb1a5b748a52d904372617a"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/references/resource-checklist.md",
@@ -69,7 +73,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/SKILL.md",
-                      "sha256":  "c9ec739d2601e8ea24d99c88a4f28b6980332055cd50c1f1f3e6bd8ef33ee3f5"
+                      "sha256":  "a964990bc1c35526fa40858955677be4a52cb2d5b802e1b3f27c1564fabfb849"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
@@ -77,7 +81,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "942fa843f2384b36e4f60109d73e25018d15dccb002bbe2c83552a22ece306a2"
+                      "sha256":  "a5cebed31beb91d5244bbc4b6cd552c18f5460a2a48cdbb4a679f543a31e501e"
                   }
               ]
 }

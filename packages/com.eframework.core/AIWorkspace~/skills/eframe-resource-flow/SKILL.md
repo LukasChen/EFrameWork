@@ -13,6 +13,7 @@ owns:
   - generated ResPath and assetId flow
   - async asset handle ownership
 delegatesTo:
+  - eframe-directory-structure
   - eframe-ui-feature
   - eframe-guideline-audit
 outputs:
@@ -41,6 +42,7 @@ forbiddenPatterns:
 10. Expect player builds to run an EFrame Addressables preflight that syncs groups, validates generated addresses, and fails the build if selected `ResPath.Generated` entries or managed entries drift.
 11. When editor tooling changes generated paths or Addressables grouping, update the corresponding bootstrap/generation workflow rather than patching business code around it.
 12. For UI resources, keep prefab ids and directory placement aligned with the UI contract; detailed controller/view naming and UI lifecycle rules belong to `eframe-ui-feature`.
+13. If ownership or exact directory placement is unclear, use `eframe-directory-structure` before choosing the Addressables-managed root.
 
 ## Output Checks
 

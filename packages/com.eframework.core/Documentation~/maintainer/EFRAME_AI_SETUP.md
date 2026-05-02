@@ -101,8 +101,9 @@ EFrame Tools/项目初始化向导
 - `Check AI Sync Status`：运行 `Initialize-EFrameAI.ps1 -Clients <platform> -StatusOnly`，检查 manifest 差异以及 manifest-tracked 文件是否漂移
 - `Sync AI Workspace`：运行 `Initialize-EFrameAI.ps1 -Clients <platform> -Force`，覆盖所选平台的框架托管 `eframe-*` 文件，并在项目 AI 入口文件中注入或更新 EFrame managed block；同时安装项目侧 updater
 - `Run AI Health Check`：运行 `Test-EFrameAIProject.ps1`，检查同步完整性、managed block 和常见运行时代码风险
+- `Run Unity Compile Check`：运行 `Test-EFrameUnityCompile.ps1`，重放 Unity Bee 生成的 Roslyn response files，捕获 `dotnet build` 可能漏掉的 Unity Editor 编译错误
 
-这些 AI 操作也可以从菜单 `EFrame Tools/AI/Check Sync Status`、`EFrame Tools/AI/Sync Workspace` 和 `EFrame Tools/AI/Run Health Check` 单独执行。
+这些 AI 操作也可以从菜单 `EFrame Tools/AI/Check Sync Status`、`EFrame Tools/AI/Sync Workspace`、`EFrame Tools/AI/Run Health Check` 和 `EFrame Tools/AI/Run Unity Compile Check` 单独执行。
 
 `Full Initialize Project` 会自动补齐 `QUI` 依赖的 Unity SortingLayer（`QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`），避免运行时 UI 排序异常。
 
@@ -173,6 +174,14 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 ```
 
 该检查会验证 manifest-tracked 文件和 managed block hash、框架版本差异、`eframe-*` instruction/skill 是否存在，并提示常见的运行时代码风险，例如同步 Addressables 等待或手工创建 runtime Canvas。
+
+如果需要验证 Unity Editor 实际编译链路，而不是只依赖 `.slnx` / `dotnet build`，运行：
+
+```powershell
+.\tools\Test-EFrameUnityCompile.ps1 -TargetRoot "D:\YourUnityProject"
+```
+
+该检查会查找目标项目 `Library/Bee/artifacts` 下的 Unity compiler response files，并使用 Unity 自带 Roslyn `csc` 执行 `@*.rsp` 和相邻 `*.rsp2`。如果项目还没有生成 Bee artifacts，先打开 Unity 或运行一次 batch import。可以用 `-AssemblyName Assembly-CSharp` 缩小到指定程序集。
 
 ## 6. 框架规则和项目规则如何同时生效
 

@@ -12,6 +12,7 @@ owns:
   - cross-skill integration plan
   - Procedure-level lifecycle placement
 delegatesTo:
+  - eframe-directory-structure
   - eframe-ui-feature
   - eframe-data-table
   - eframe-resource-flow
@@ -40,6 +41,7 @@ forbiddenPatterns:
 1. Classify the request: `Procedure`, UI, data table, resource flow, or a combined feature.
 2. Decide whether to create new structure or extend existing structure; prefer the smallest feature boundary that preserves EFrame lifecycle rules.
 3. Delegate detailed work:
+   - File, resource, scene, generated-code, or module directory placement: use `eframe-directory-structure`.
    - UI pages, popups, prefabs, controllers, bindings: use `eframe-ui-feature`.
    - Persistent gameplay/settings/progress data: use `eframe-data-table`.
    - Addressables, `ResPath`, prefab/audio/scene resources, async handles: use `eframe-resource-flow`.
@@ -60,7 +62,7 @@ Use `EFramework.Runtime.Procedure.EFrameProcedure` for new procedures, preload P
 1. 把运行时代码放入目标结构：`Assets/App/Runtime/...` 或 `Assets/Modules/<Name>/Runtime/...`。
 2. 把资源放入可映射目录：`Assets/App/Res/UI/...`、`Assets/App/Res/SceneAssets/...`、`Assets/Modules/<Name>/Res/...` 等。
 3. 将资源放入 EFrame 托管目录，并通过 `ResPath.Generated` 使用自动生成的资源 id，避免散写字符串或新增手写路径中心类。
-4. 具体目录职责和命名边界以同步得到的 `.github/instructions/eframe-instructions.md` 为准；项目特殊约束写进项目自有 instruction，不要改同步得到的 `eframe-*` 文件。
+4. 新建或移动目录前用 `eframe-directory-structure` 判定 App/Module ownership、生成目录和资源归属；项目特殊约束写进项目自有 instruction，不要改同步得到的 `eframe-*` 文件。
 
 ## Validation
 

@@ -112,6 +112,11 @@ namespace EFramework.Editor.ProjectBootstrap
                     RunAiHealthCheck();
                 }
 
+                if (GUILayout.Button("Run Unity Compile Check"))
+                {
+                    RunUnityCompileCheck();
+                }
+
                 EditorGUILayout.HelpBox("These actions use the EFrame package tools to check, sync, and validate the project AI workspace while preserving project-owned instruction text outside EFrame managed blocks.", MessageType.None);
             }
 
@@ -357,6 +362,13 @@ namespace EFramework.Editor.ProjectBootstrap
             GetWindow<EFrameProjectInitializationWindow>(true, WindowTitle).RunAiHealthCheck();
         }
 
+        [MenuItem("EFrame Tools/AI/Run Unity Compile Check", false, 43)]
+        private static void MenuRunUnityCompileCheck()
+        {
+            OpenWindow();
+            GetWindow<EFrameProjectInitializationWindow>(true, WindowTitle).RunUnityCompileCheck();
+        }
+
         private void RunAiSyncStatus()
         {
             EditorPrefs.SetInt(AiClientPrefsKey, (int)m_aiClientSelection);
@@ -396,6 +408,11 @@ namespace EFramework.Editor.ProjectBootstrap
             }
 
             RunToolScript("Test-EFrameAIProject.ps1", $"-TargetRoot \"{ProjectRootPath}\" -FrameworkRoot \"{frameworkRoot}\"");
+        }
+
+        private void RunUnityCompileCheck()
+        {
+            RunToolScript("Test-EFrameUnityCompile.ps1", $"-TargetRoot \"{ProjectRootPath}\"");
         }
 
         private string GetSelectedAIClientArgument()

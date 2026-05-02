@@ -272,6 +272,7 @@ try {
         "^tools/Initialize-EFrameColdStart\.ps1$",
         "^tools/Initialize-EFrameBootstrapCode\.ps1$",
         "^tools/Test-EFrameAIProject\.ps1$",
+        "^tools/Test-EFrameUnityCompile\.ps1$",
         "^tools/Test-EFrameAIRelease\.ps1$",
         "^packages/com\.eframework\.core/Editor/EFrameProjectInitializationWindow\.cs$",
         "^README\.md$",

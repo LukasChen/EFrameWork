@@ -6,6 +6,13 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-05-02
+
+### Added
+
+- Added the synced `eframe-directory-structure` skill and lightweight instruction triggers so business AI can classify EFrame Unity file, resource, scene, generated-code, and module directory placement before creating or moving assets.
+- Added `Test-EFrameUnityCompile.ps1` to replay Unity Bee Roslyn response files and catch Unity Editor compile errors that `dotnet build` can miss.
+
 ## [0.6.3] - 2026-05-02
 
 ### Changed

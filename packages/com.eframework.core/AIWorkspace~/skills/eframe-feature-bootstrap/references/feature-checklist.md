@@ -12,7 +12,7 @@
 - 主资源：`Assets/App/Res/...`
 - 业务模块：`Assets/Modules/<Name>/{Runtime,Res,Editor,Scenes}`
 - 生成代码：`Generated` 或固定生成目录
-- 细分职责、场景目录和基础骨架以同步得到的 `.github/instructions/eframe-instructions.md` 为准
+- 新建、移动或归类文件前用 `eframe-directory-structure` 判断细分职责、场景目录和资源归属
 
 ## 3. 命名
 
