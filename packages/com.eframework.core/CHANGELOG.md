@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.12] - 2026-05-03
+
+### Added
+
+- Added synced AI UI contract rules requiring static UI structure and visual states to be authored in prefabs, with runtime controllers limited to binding, refresh, state switching, and necessary dynamic item instantiation.
+
 ## [0.6.11] - 2026-05-03
 
 ### Added

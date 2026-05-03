@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.28",
+    "version":  "0.4.29",
     "updatedAt":  "2026-05-03",
-    "notes":  "Record Showcase-owned Virtual List sample window and dependencies.",
+    "notes":  "Add prefab-first static UI rules for business AI contracts.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "3e30e58ea7a85f66a733a8e6d66427eb8f7d2388c8a812c118ff87af9094cb75"
+                      "sha256":  "41ea60cb6ecbe143df15146819adb22a4d574a545478f43e921e89637a9e6abe"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -61,7 +61,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "da4997ef358defb51197323213e278aa78db20f37b0b5128d145692e25477520"
+                      "sha256":  "97f16d286a441f352b495f2eb2e1591c7942b73d7d528f8f685092c29a76edcb"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
@@ -77,11 +77,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/references/ui-checklist.md",
-                      "sha256":  "003f4654ed6290f7fb43996e0d1c122c34cfc8e7729f04350bf32dd88e86d0fe"
+                      "sha256":  "bc5d8ffe46bd604dc977e26f84a9cb9867152ea8bceebcd84f33a5046e8a3122"
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "a5cebed31beb91d5244bbc4b6cd552c18f5460a2a48cdbb4a679f543a31e501e"
+                      "sha256":  "64fdd2eff877e9b2a282c6d6df67ccaf738e7b2ebef084a649ea4f18a7e29ac9"
                   }
               ]
 }

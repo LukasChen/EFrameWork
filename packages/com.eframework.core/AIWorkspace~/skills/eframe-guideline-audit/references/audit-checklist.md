@@ -18,6 +18,9 @@
 - 是否存在手工新建顶层 Canvas 或多余 `EventSystem`
 - 承载框架 UI overlay 的运行时场景相机是否挂载 `EFrameSceneCamera`
 - `UIController` 是否负责绑定、刷新、销毁，而不是承担全部业务逻辑
+- UI 静态结构、布局、切图组装、九宫拉伸、按钮层级和可视状态是否已落实到 Unity prefab
+- Runtime Controller 是否避免大规模 `new GameObject` 拼装静态 UI，只保留必要的动态列表/Item 实例化
+- 动态生成的重复元素是否优先使用 prefab 中的 Template 或独立 Widget prefab
 - `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`
 - View 是否保持无参构造并通过 `OnBindingSet()` 接入 `QUIBinding`
 - Controller 是否通过 `CurrentView` 访问生成 View，而不是直接保存/驱动 `UIViewHandle` 或回退到旧 `View` facade
