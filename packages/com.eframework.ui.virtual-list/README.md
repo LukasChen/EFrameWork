@@ -19,4 +19,3 @@ using EFramework.Extensions.UI.VirtualList;
 
 - `com.eframework.core`
 - `com.unity.ugui`
-

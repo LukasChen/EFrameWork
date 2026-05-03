@@ -2,6 +2,26 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.11] - 2026-05-03
+
+### Added
+
+- Added a focused module-owned UI Virtual List sample window for the Extension Showcase, covering variable-size list rows, grid mode, scroll alignment, reload, item refresh, pooling, and visible-range reporting.
+
+### Changed
+
+- Limited the Extension Showcase module UI to UI Virtual List and Debug Console entries.
+- Made `Install Showcase` install its required extension packages before copying the module template, keeping Core free of extension runtime dependencies while allowing direct sample code inside the optional module.
+
+### Removed
+
+- Removed `com.eframework.gm-tools` from the initialization-window extension checklist, Showcase fixture dependencies, and extension compile validation.
+
+### Fixed
+
+- Fixed `Install Showcase` extension package auto-install for projects that consume EFrame Core from a git URL instead of a local framework checkout.
+- Changed the initialization window Sample area into an Extensions area with a default-selected extension package checklist before `Install Showcase`.
+
 ## [0.6.10] - 2026-05-03
 
 ### Changed

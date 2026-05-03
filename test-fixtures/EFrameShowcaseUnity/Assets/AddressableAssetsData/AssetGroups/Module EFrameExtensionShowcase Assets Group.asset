@@ -21,6 +21,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - eframe-managed
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c63873e1dad3b344a949798b1f431ad9
+    m_Address: Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - eframe-managed
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
   m_SchemaSet:

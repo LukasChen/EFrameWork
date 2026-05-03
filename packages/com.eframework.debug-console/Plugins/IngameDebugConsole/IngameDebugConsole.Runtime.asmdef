@@ -2,8 +2,7 @@
     "name": "IngameDebugConsole.Runtime",
     "rootNamespace": "",
     "references": [
-        "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

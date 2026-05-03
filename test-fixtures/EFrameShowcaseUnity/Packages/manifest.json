@@ -3,7 +3,6 @@
     "com.eframework.core": "file:../../../packages/com.eframework.core",
     "com.eframework.debug-console": "file:../../../packages/com.eframework.debug-console",
     "com.eframework.effects": "file:../../../packages/com.eframework.effects",
-    "com.eframework.gm-tools": "file:../../../packages/com.eframework.gm-tools",
     "com.eframework.ui-extras": "file:../../../packages/com.eframework.ui-extras",
     "com.eframework.ui.virtual-list": "file:../../../packages/com.eframework.ui.virtual-list",
     "com.unity.addressables": "2.9.1",

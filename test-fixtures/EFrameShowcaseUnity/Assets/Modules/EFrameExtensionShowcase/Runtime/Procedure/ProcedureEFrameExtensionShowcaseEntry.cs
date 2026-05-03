@@ -15,6 +15,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Procedure
         protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
         {
             await assets.PreloadAsync<GameObject>(ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView);
+            await assets.PreloadAsync<GameObject>(VirtualListShowcaseWindow.AssetPath);
         }
 
         protected override void OnEnter(ProcedureEnterContext context)

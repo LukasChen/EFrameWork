@@ -4,6 +4,27 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.6.11] - 2026-05-03
+
+### Added
+
+- Added a focused module-owned UI Virtual List sample window for the Extension Showcase, covering variable-size list rows, grid mode, scroll alignment, reload, item refresh, pooling, and visible-range reporting.
+- Added a Debug Console runtime helper so Showcase can instantiate and show the console panel on demand.
+
+### Changed
+
+- Limited the Extension Showcase module UI to UI Virtual List and Debug Console entries.
+- Made `Install Showcase` install its required extension packages before copying the module template, keeping Core free of extension runtime dependencies while allowing direct sample code inside the optional module.
+
+### Removed
+
+- Removed the `com.eframework.gm-tools` extension package from the framework package set.
+
+### Fixed
+
+- Fixed `Install Showcase` extension package auto-install for projects that consume EFrame Core from a git URL instead of a local framework checkout.
+- Changed the initialization window Sample area into an Extensions area with a default-selected extension package checklist before `Install Showcase`.
+
 ## [0.6.10] - 2026-05-03
 
 ### Changed

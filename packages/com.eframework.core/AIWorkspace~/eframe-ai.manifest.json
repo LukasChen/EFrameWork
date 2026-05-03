@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.27",
+    "version":  "0.4.28",
     "updatedAt":  "2026-05-03",
-    "notes":  "Record single-action Extension Showcase install and package dependency behavior.",
+    "notes":  "Record Showcase-owned Virtual List sample window and dependencies.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "4876cf306455f3a0c415f355164127767db4a98418d3b16e8d16a0ca6b5fb6e8"
+                      "sha256":  "d23326395d00cf48e11c560226f46f8c0ebc76fc3610b7c798db7a4d54787f1a"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",

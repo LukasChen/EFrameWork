@@ -146,7 +146,6 @@ namespace IngameDebugConsole
 				"Mono.",
 				"mscorlib",
 				"netstandard",
-				"TextMeshPro",
 				"Microsoft.GeneratedCode",
 				"I18N",
 				"Boo.",

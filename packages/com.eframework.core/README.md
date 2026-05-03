@@ -19,20 +19,20 @@ EFrame Core is a reusable Unity game framework package extracted from `CozyBloom
 EFrame is organized as three layers:
 
 - **Core**: stable infrastructure and the minimal initialization path in `com.eframework.core`.
-- **Extension**: optional packages such as virtual list, UI extras, effects, GM tools, and debug console.
+- **Extension**: optional packages such as virtual list, UI extras, effects, and debug console.
 - **Samples**: fixture-backed templates and optional module entry points that help a project adopt Core or try extensions without making them mandatory dependencies.
 
 Core ships a **Basic** template as the minimal runnable project skeleton. It is the maintained form of the current initialization template and creates `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, the Home UI prefab, audio setup, Addressables groups, and generated `ResPath` setup without depending on optional extension packages.
 
 The editable Basic source is a full Unity fixture at `test-fixtures/EFrameBasicTemplate`; its `Assets` folder is synced into `Editor/Templates/Basic` with `tools/Sync-EFrameBasicTemplate.ps1`. Use `EFrame Tools/项目初始化向导` and choose `Initialize / Repair Project` rather than importing folders manually.
 
-The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed or refreshed from the initialization window, and can be set as the StartUp Procedure entrance. Framework maintainers edit the runnable source module in `test-fixtures/EFrameShowcaseUnity` and sync it back to the package template with `tools/Sync-EFrameShowcaseTemplate.ps1`. Its prefab-backed runtime UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console demo entries; current entries are stable placeholders ready for future focused demos.
+The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed or refreshed from the initialization window, and can be set as the StartUp Procedure entrance. Framework maintainers edit the runnable source module in `test-fixtures/EFrameShowcaseUnity` and sync it back to the package template with `tools/Sync-EFrameShowcaseTemplate.ps1`. Installing Showcase also installs the focused extension packages it demonstrates. Its prefab-backed runtime UI keeps only UI Virtual List and Debug Console demo entries; UI Virtual List opens the module-owned `QVirtualListShowcaseWindow.prefab`.
 
 The Simple Game Demo direction is intentionally outside this core repository and should be handled later as a separate git repository.
 
 Unity package dependencies include Addressables, UGUI, Input System, Universal RP, and Unity Newtonsoft.Json. TextMeshPro functionality is supplied through UGUI. Core includes a lightweight fallback tween backend, while DOTween is an optional project-installed adapter target because DOTween Free is not a Unity registry dependency.
 
-Complex UI widgets, UI helper/animation components, presentation effects, GM/debug tools, event-driven audio authoring, haptics adapters, and third-party integrations should live in optional extension packages. Virtual list/grid controls are provided by `com.eframework.ui.virtual-list`, helper UI controls by `com.eframework.ui-extras`, presentation effects by `com.eframework.effects`, GM tools by `com.eframework.gm-tools`, and the runtime debug console by `com.eframework.debug-console`.
+Complex UI widgets, UI helper/animation components, presentation effects, debug tools, event-driven audio authoring, haptics adapters, and third-party integrations should live in optional extension packages. Virtual list/grid controls are provided by `com.eframework.ui.virtual-list`, helper UI controls by `com.eframework.ui-extras`, presentation effects by `com.eframework.effects`, and the runtime debug console by `com.eframework.debug-console`.
 
 Bundled plugin versions:
 

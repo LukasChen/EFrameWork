@@ -3,7 +3,7 @@
 EFrame uses three layers:
 
 - Core: `com.eframework.core`, stable runtime/editor infrastructure and the minimal startup skeleton.
-- Extension: optional packages such as `com.eframework.ui.virtual-list`, `com.eframework.ui-extras`, `com.eframework.effects`, `com.eframework.gm-tools`, and `com.eframework.debug-console`.
+- Extension: optional packages such as `com.eframework.ui.virtual-list`, `com.eframework.ui-extras`, `com.eframework.effects`, and `com.eframework.debug-console`.
 - Samples: project skeletons or modules installed into a consuming Unity project when they are useful.
 
 ## Basic
@@ -45,14 +45,17 @@ Install it from Unity:
 
 ```text
 EFrame Tools/项目初始化向导
+-> Install Extensions
 -> Install Showcase
 ```
 
-The installer copies the module template, refreshes assets, syncs managed Addressables, sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`, and writes local sibling extension packages into `Packages/manifest.json` as `file:` package references when this repository is used as a local framework checkout. If sibling packages are not found, the project can still keep the module and install extensions manually from git or UPM.
+`Install Extensions` expands a default-selected checklist for UI Virtual List, UI Extras, Effects, and Debug Console. It writes selected extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. If package sources cannot be inferred, the project can still install extensions manually from git or UPM.
+
+`Install Showcase` first installs `com.eframework.ui.virtual-list` and `com.eframework.debug-console`, then copies the module template, refreshes assets, syncs managed Addressables, and sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`.
 
 For framework template maintenance, open `test-fixtures/EFrameShowcaseUnity` directly in Unity and edit `Assets/Modules/EFrameExtensionShowcase/` there. Run `tools/Sync-EFrameShowcaseTemplate.ps1` before release to generate the package template; the script converts `.cs` to `.cs.txt` while preserving module resources and `.meta` files.
 
-The current showcase UI is backed by `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` and lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console entries. Each entry is a minimal runtime placeholder so future extension-specific demos can be added without changing the module shape.
+The current showcase UI is backed by `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` and lists only UI Virtual List and Debug Console entries. UI Virtual List opens the module-owned `QVirtualListShowcaseWindow.prefab` sample window, covering variable-size lists, grids, scrolling, reload, refresh, pooling, and visible-range reporting. Debug Console opens the runtime console panel.
 
 ## Simple Game Demo
 

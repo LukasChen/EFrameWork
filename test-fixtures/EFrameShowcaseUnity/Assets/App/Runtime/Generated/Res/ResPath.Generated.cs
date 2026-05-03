@@ -25,6 +25,7 @@ namespace EFramework.Generated
                                 public static class EFrameExtensionShowcase
                                 {
                                     public const string EFrameExtensionShowcaseView = "Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView";
+                                    public const string QVirtualListShowcaseWindow = "Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow";
                                 }
                             }
                         }

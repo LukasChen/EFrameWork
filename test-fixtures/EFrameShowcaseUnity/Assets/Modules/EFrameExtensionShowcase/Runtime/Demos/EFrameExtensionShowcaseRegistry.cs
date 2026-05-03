@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace GameApp.Modules.EFrameExtensionShowcase.Demos
 {
@@ -10,9 +9,6 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Demos
         private static readonly EFrameExtensionShowcaseDemo[] s_demos =
         {
             Create("UI Virtual List", "com.eframework.ui.virtual-list", "EFrame.UI.VirtualList", "Virtual list and grid controls for large scrollable data sets."),
-            Create("UI Extras", "com.eframework.ui-extras", "EFrame.UI.Extras", "Reusable UI helpers, tabs, non-rendering raycast targets, and UI animations."),
-            Create("Effects", "com.eframework.effects", "EFrame.Effects", "Presentation effects such as fly animation, icon bounce, and camera shake."),
-            Create("GMTools", "com.eframework.gm-tools", "EFrame.GMTools", "Runtime GM command and button helpers for development builds."),
             Create("Debug Console", "com.eframework.debug-console", "IngameDebugConsole.Runtime", "Runtime debug console integration.")
         };
 
@@ -35,8 +31,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Demos
                 title,
                 packageName,
                 assemblyName,
-                description,
-                () => Debug.Log($"[EFrameExtensionShowcase] Selected {title}. Replace this placeholder with a focused {packageName} demo."));
+                description);
         }
     }
 }

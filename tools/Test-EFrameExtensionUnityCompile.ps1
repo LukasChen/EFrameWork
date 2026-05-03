@@ -65,10 +65,6 @@ $extensionPackages = [ordered]@{
         Path = "packages/com.eframework.effects"
         Assemblies = @("EFrame.Effects", "EFrame.Effects.Editor")
     }
-    "com.eframework.gm-tools" = @{
-        Path = "packages/com.eframework.gm-tools"
-        Assemblies = @("EFrame.GMTools")
-    }
     "com.eframework.debug-console" = @{
         Path = "packages/com.eframework.debug-console"
         Assemblies = @("IngameDebugConsole.Runtime", "IngameDebugConsole.Editor")

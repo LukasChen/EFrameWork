@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Text;
-using TMPro;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.Text.RegularExpressions;
@@ -28,7 +27,7 @@ namespace IngameDebugConsole
 		public CanvasGroup CanvasGroup { get { return canvasGroupComponent; } }
 
 		[SerializeField]
-		private TextMeshProUGUI logText;
+		private Text logText;
 		[SerializeField]
 		private Image logTypeImage;
 
@@ -36,7 +35,7 @@ namespace IngameDebugConsole
 		[SerializeField]
 		private GameObject logCountParent;
 		[SerializeField]
-		private TextMeshProUGUI logCountText;
+		private Text logCountText;
 
 		[SerializeField]
 		private Button copyLogButton;
@@ -120,7 +119,7 @@ namespace IngameDebugConsole
 		// Show the collapsed count of the debug entry
 		public void ShowCount()
 		{
-			logCountText.SetText( "{0}", logEntry.count );
+			logCountText.text = logEntry.count.ToString();
 
 			if( !logCountParent.activeSelf )
 				logCountParent.SetActive( true );
@@ -157,7 +156,7 @@ namespace IngameDebugConsole
                         listView.manager.textBuffer = new char[maxLogLength];
 
                     text.CopyTo(0, listView.manager.textBuffer, 0, maxLogLength);
-                    logText.SetText(listView.manager.textBuffer, 0, maxLogLength);
+                    logText.text = new string(listView.manager.textBuffer, 0, maxLogLength);
                 }
             }
             else
@@ -180,7 +179,7 @@ namespace IngameDebugConsole
                     listView.manager.textBuffer = new char[sb.Length];
 
                 sb.CopyTo(0, listView.manager.textBuffer, 0, sb.Length);
-                logText.SetText(listView.manager.textBuffer, 0, sb.Length);
+                logText.text = new string(listView.manager.textBuffer, 0, sb.Length);
             }
         }
 
@@ -232,9 +231,7 @@ namespace IngameDebugConsole
 			}
 		}
 
-		/// Here, we're using <see cref="TMP_Text.GetRenderedValues(bool)"/> instead of <see cref="TMP_Text.preferredHeight"/> because the latter doesn't take
-		/// <see cref="TMP_Text.maxVisibleCharacters"/> into account. However, for <see cref="TMP_Text.GetRenderedValues(bool)"/> to work, we need to give it
-		/// enough space (increase log item's height) and let it regenerate its mesh <see cref="TMP_Text.ForceMeshUpdate"/>.
+		/// Uses the legacy uGUI Text preferred height after giving the item enough vertical space.
 		public float CalculateExpandedHeight( DebugLogEntry logEntry, DebugLogEntryTimestamp? logEntryTimestamp )
 		{
 			string text = logText.text;
@@ -242,8 +239,7 @@ namespace IngameDebugConsole
 
 			( transform as RectTransform ).sizeDelta = new Vector2( size.x, 10000f );
 			SetText( logEntry, logEntryTimestamp, true );
-			logText.ForceMeshUpdate();
-			float result = logText.GetRenderedValues( true ).y + copyLogButtonHeight;
+			float result = logText.preferredHeight + copyLogButtonHeight;
 
 			( transform as RectTransform ).sizeDelta = size;
 			logText.text = text;
