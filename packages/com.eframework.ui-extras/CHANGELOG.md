@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 - 2026-05-03
+
+- Replaced `StateButton` with `CheckableButton`, a single-Button checked/focused state component for mouse, keyboard, and gamepad-friendly UI.
+- Updated `Tabbar` to use explicit or child-collected `CheckableButton` items.
+
 ## 0.2.0 - 2026-05-03
 
 - Renamed the button tab selector component to `Tabbar` and its runtime script to `Components/Tabbar`.

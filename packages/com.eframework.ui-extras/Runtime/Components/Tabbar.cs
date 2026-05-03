@@ -15,20 +15,22 @@ namespace EFramework.Extensions.UI.Extras.Components
         {
         }
 
-        [Tooltip("Explicit StateButton items. Leave empty to auto collect child StateButton components.")]
-        [SerializeField] private List<StateButton> m_tabs = new();
-        [SerializeField] private bool m_autoCollectChildStateButtons = true;
-        [SerializeField] private bool m_includeInactiveStateButtons = true;
+        [Tooltip("Explicit CheckableButton items. Leave empty to auto collect child CheckableButton components.")]
+        [SerializeField] private List<CheckableButton> m_tabs = new();
+        [SerializeField] private bool m_autoCollectChildCheckableButtons = true;
+        [SerializeField] private bool m_includeInactiveCheckableButtons = true;
         [SerializeField] private int m_defaultIndex = 0;
-        [SerializeField] private bool m_selectOnEnable = true;
-        [SerializeField] private bool m_notifyOnInitialSelection = true;
+        [SerializeField] private bool m_checkOnEnable = true;
+        [SerializeField] private bool m_notifyOnInitialCheck = true;
+        [SerializeField] private bool m_focusCheckedOnEnable = false;
         [SerializeField] private bool m_allowReselect = false;
-        [SerializeField] public UnityEvent<int> OnTabSelected = new();
+        [SerializeField] public UnityEvent<int> OnTabChecked = new();
         [SerializeField] public UnityEvent<int> OnTabReselected = new();
         [SerializeField] public TabChangedEvent OnTabChanged = new();
 
-        private readonly List<StateButton> m_activeTabs = new();
+        private readonly List<CheckableButton> m_activeTabs = new();
         private readonly List<UnityAction> m_clickHandlers = new();
+        private readonly List<bool> m_previousToggleOnClick = new();
 
         public int CurrentIndex { get; private set; } = -1;
         public int TabCount => m_activeTabs.Count;
@@ -38,12 +40,17 @@ namespace EFramework.Extensions.UI.Extras.Components
             RebuildTabs();
             AddButtonListeners();
 
-            if (m_selectOnEnable)
+            if (m_checkOnEnable)
             {
                 int initialIndex = GetInitialIndex();
                 if (IsValidIndex(initialIndex))
                 {
-                    SelectTab(initialIndex, m_notifyOnInitialSelection);
+                    CheckTab(initialIndex, m_notifyOnInitialCheck);
+
+                    if (m_focusCheckedOnEnable)
+                    {
+                        FocusTab(initialIndex);
+                    }
                 }
                 else
                 {
@@ -53,7 +60,7 @@ namespace EFramework.Extensions.UI.Extras.Components
                 return;
             }
 
-            ApplySelectionState(CurrentIndex);
+            ApplyCheckedState(CurrentIndex);
         }
 
         private void OnDisable()
@@ -65,6 +72,8 @@ namespace EFramework.Extensions.UI.Extras.Components
         {
             if (index == CurrentIndex)
             {
+                ApplyCheckedState(CurrentIndex);
+
                 if (m_allowReselect)
                 {
                     OnTabReselected?.Invoke(index);
@@ -73,28 +82,28 @@ namespace EFramework.Extensions.UI.Extras.Components
                 return;
             }
 
-            SelectTab(index);
+            CheckTab(index);
         }
 
-        public void SelectTab(int index)
+        public void CheckTab(int index)
         {
-            SelectTab(index, true);
+            CheckTab(index, true);
         }
 
-        public void SelectTab(int index, bool notify)
+        public void CheckTab(int index, bool notify)
         {
-            if (!TrySelectTab(index, notify))
+            if (!TryCheckTab(index, notify))
             {
                 Debug.LogError($"{nameof(Tabbar)} index out of range: {index}", this);
             }
         }
 
-        public void SelectTabWithoutNotify(int index)
+        public void CheckTabWithoutNotify(int index)
         {
-            SelectTab(index, false);
+            CheckTab(index, false);
         }
 
-        public bool TrySelectTab(int index, bool notify = true)
+        public bool TryCheckTab(int index, bool notify = true)
         {
             if (!IsValidIndex(index))
             {
@@ -103,6 +112,8 @@ namespace EFramework.Extensions.UI.Extras.Components
 
             if (index == CurrentIndex)
             {
+                ApplyCheckedState(CurrentIndex);
+
                 if (m_allowReselect && notify)
                 {
                     OnTabReselected?.Invoke(index);
@@ -113,15 +124,28 @@ namespace EFramework.Extensions.UI.Extras.Components
 
             int previousIndex = CurrentIndex;
             CurrentIndex = index;
-            ApplySelectionState(index);
+            ApplyCheckedState(index);
 
             if (notify)
             {
-                OnTabSelected?.Invoke(index);
+                OnTabChecked?.Invoke(index);
                 OnTabChanged?.Invoke(previousIndex, index);
             }
 
             return true;
+        }
+
+        public void FocusCurrentTab()
+        {
+            FocusTab(CurrentIndex);
+        }
+
+        public void FocusTab(int index)
+        {
+            if (IsValidIndex(index))
+            {
+                m_activeTabs[index].Focus();
+            }
         }
 
         public Button GetButton(int index)
@@ -129,7 +153,7 @@ namespace EFramework.Extensions.UI.Extras.Components
             return IsValidIndex(index) ? m_activeTabs[index].Button : null;
         }
 
-        public StateButton GetStateButton(int index)
+        public CheckableButton GetCheckableButton(int index)
         {
             return IsValidIndex(index) ? m_activeTabs[index] : null;
         }
@@ -145,7 +169,7 @@ namespace EFramework.Extensions.UI.Extras.Components
                 CurrentIndex = GetInitialIndex();
             }
 
-            ApplySelectionState(CurrentIndex);
+            ApplyCheckedState(CurrentIndex);
         }
 
         private void RebuildTabs()
@@ -165,17 +189,17 @@ namespace EFramework.Extensions.UI.Extras.Components
                 return;
             }
 
-            if (!m_autoCollectChildStateButtons)
+            if (!m_autoCollectChildCheckableButtons)
             {
                 return;
             }
 
-            var stateButtons = GetComponentsInChildren<StateButton>(m_includeInactiveStateButtons);
-            for (int i = 0; i < stateButtons.Length; i++)
+            var checkableButtons = GetComponentsInChildren<CheckableButton>(m_includeInactiveCheckableButtons);
+            for (int i = 0; i < checkableButtons.Length; i++)
             {
-                if (stateButtons[i] != null && stateButtons[i].HasButton)
+                if (checkableButtons[i] != null && checkableButtons[i].HasButton)
                 {
-                    m_activeTabs.Add(stateButtons[i]);
+                    m_activeTabs.Add(checkableButtons[i]);
                 }
             }
         }
@@ -187,15 +211,17 @@ namespace EFramework.Extensions.UI.Extras.Components
             for (int i = 0; i < m_activeTabs.Count; i++)
             {
                 int index = i;
-                var stateButton = m_activeTabs[i];
-                if (stateButton == null || !stateButton.HasButton)
+                var checkableButton = m_activeTabs[i];
+                if (checkableButton == null || !checkableButton.HasButton)
                 {
                     continue;
                 }
 
                 UnityAction handler = () => OnTabButtonClick(index);
                 m_clickHandlers.Add(handler);
-                stateButton.OnClick.AddListener(handler);
+                m_previousToggleOnClick.Add(checkableButton.ToggleOnClick);
+                checkableButton.ToggleOnClick = false;
+                checkableButton.OnClick.AddListener(handler);
             }
         }
 
@@ -204,23 +230,25 @@ namespace EFramework.Extensions.UI.Extras.Components
             int count = Mathf.Min(m_activeTabs.Count, m_clickHandlers.Count);
             for (int i = 0; i < count; i++)
             {
-                var stateButton = m_activeTabs[i];
-                if (stateButton != null)
+                var checkableButton = m_activeTabs[i];
+                if (checkableButton != null)
                 {
-                    stateButton.OnClick.RemoveListener(m_clickHandlers[i]);
+                    checkableButton.OnClick.RemoveListener(m_clickHandlers[i]);
+                    checkableButton.ToggleOnClick = m_previousToggleOnClick[i];
                 }
             }
 
             m_clickHandlers.Clear();
+            m_previousToggleOnClick.Clear();
         }
 
-        private void ApplySelectionState(int selectedIndex)
+        private void ApplyCheckedState(int checkedIndex)
         {
             for (int i = 0; i < m_activeTabs.Count; i++)
             {
                 if (m_activeTabs[i] != null)
                 {
-                    m_activeTabs[i].SetSelectedWithoutNotify(i == selectedIndex);
+                    m_activeTabs[i].SetCheckedWithoutNotify(i == checkedIndex);
                 }
             }
         }

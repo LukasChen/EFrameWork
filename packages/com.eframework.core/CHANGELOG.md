@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.14] - 2026-05-03
+
+### Changed
+
+- Updated AI and user-facing UI Extras references for the new `CheckableButton` and renamed `Tabbar` components.
+
 ## [0.6.13] - 2026-05-03
 
 ### Changed

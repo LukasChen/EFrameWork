@@ -49,7 +49,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Prefabs include binding/config data such as default layer, cache, and animation root. |
 | Advanced/internal UI host | `IUIService` / `QUI`, `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs`, `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Use directly only for framework internals, advanced UI managers, navigation stack work, or debugging lifecycle state. |
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to runtime scene cameras that should host the framework UI overlay stack. |
-| Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Provides `StateButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation`; these are no longer core APIs. |
+| Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Provides `CheckableButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation`; these are no longer core APIs. |
 | Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Provides pooled virtual list/grid controls under `EFramework.Extensions.UI.VirtualList`. |
 
 Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal business View wrappers, direct `BindingViewBase` lifecycle driving, and direct business `UIViewHandle` ownership.

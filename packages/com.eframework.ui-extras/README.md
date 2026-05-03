@@ -4,8 +4,8 @@ Optional EFrame UI extension package for reusable helper components that are use
 
 ## Contents
 
-- `Components/StateButton`: reusable normal/selected switch between two UGUI Button variants.
-- `Components/Tabbar`: TabBar selector built from `StateButton` items.
+- `Components/CheckableButton`: single UGUI Button with checked, focused, pressed, and disabled visual states.
+- `Components/Tabbar`: TabBar selector built from `CheckableButton` items.
 - `Components/EmptyRayCasterGraphic`: invisible raycast target graphic.
 - `UIHelper`: button/toggle helpers, TextMeshPro curve helpers, rounded image effect, smooth fill, and UIBuilder utilities.
 - `UIAnimation`: reusable enable/fade/move/window open animation behaviours.

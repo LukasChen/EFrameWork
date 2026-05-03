@@ -4,6 +4,12 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.6.14] - 2026-05-03
+
+### Changed
+
+- Added UI Extras `CheckableButton`, rebuilt `Tabbar` on top of it, and updated AI/doc references to the gamepad-friendly checked/focused TabBar API.
+
 ## [0.6.13] - 2026-05-03
 
 ### Changed

@@ -1,7 +1,7 @@
 {
   "name": "com.eframework.ui-extras",
   "displayName": "EFrame UI Extras",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "unity": "6000.0",
   "description": "Optional EFrame UI extension package for helper components, UI animation behaviours, and lightweight reusable controls.",
   "keywords": [
@@ -15,7 +15,7 @@
     "name": "Ethan Hubin"
   },
   "dependencies": {
-    "com.eframework.core": "0.6.9",
+    "com.eframework.core": "0.6.14",
     "com.unity.ugui": "2.0.0"
   }
 }

@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.30",
+    "version":  "0.4.31",
     "updatedAt":  "2026-05-03",
-    "notes":  "Add UI extras StateButton and Tabbar guidance.",
+    "notes":  "Add UI extras CheckableButton guidance and Tabbar update.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,11 +33,11 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "f679fcf54f40569b7e5f8901608006bd457c53f4641c5a1b4e9c13b3899f25ec"
+                      "sha256":  "265a0f71aa29a2820cc945d08c4a76f84fa0c627b2a50669a39efc0057bf8463"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "394d0e285fe243fdd058b98d457bbf3aabb36d5107c21072b877996245dbfe69"
+                      "sha256":  "6a844214fac7a46e22e6b8a6aeac1c555785916c95dd216009c26f31c5632239"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

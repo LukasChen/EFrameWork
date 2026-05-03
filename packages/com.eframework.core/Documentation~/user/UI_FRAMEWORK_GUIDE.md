@@ -119,7 +119,7 @@ Current runtime UI folders under `packages/com.eframework.core/Runtime/UI/`:
 - `Layout/`: screen fitting and safe-area utilities
 - `Transitions/`: host-owned transition abstractions and built-in transitions
 
-`StateButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation` live in the optional `com.eframework.ui-extras` package under `EFramework.Extensions.UI.Extras.*`. `QVirtualListView` and `QVirtualGridView` live in the optional `com.eframework.ui.virtual-list` package under `EFramework.Extensions.UI.VirtualList`.
+`CheckableButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation` live in the optional `com.eframework.ui-extras` package under `EFramework.Extensions.UI.Extras.*`. `QVirtualListView` and `QVirtualGridView` live in the optional `com.eframework.ui.virtual-list` package under `EFramework.Extensions.UI.VirtualList`.
 
 ## 3. Recommended Flow
 
