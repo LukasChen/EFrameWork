@@ -7,19 +7,22 @@ namespace EFramework.Extensions.UI.Extras.Components
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]
-    public class CheckableButton : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+    public class CheckableButton : MonoBehaviour, ISelectHandler, IDeselectHandler, ISubmitHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
     {
         [Header("Button")]
         [SerializeField] private Button m_button;
+        [SerializeField] private bool m_forceButtonTransitionNone = true;
         [SerializeField] private bool m_checked = false;
         [SerializeField] private bool m_toggleOnClick = true;
         [SerializeField] private bool m_allowUncheck = true;
         [SerializeField] private bool m_focusOnClick = true;
         [SerializeField] private bool m_focusOnPointerEnter = false;
+        [SerializeField] private float m_submitPressedDuration = 0.08f;
 
         [Header("State Objects")]
         [SerializeField] private GameObject m_uncheckedState;
         [SerializeField] private GameObject m_checkedState;
+        [SerializeField] private GameObject m_hoverState;
         [SerializeField] private GameObject m_focusState;
         [SerializeField] private GameObject m_pressedState;
         [SerializeField] private GameObject m_disabledState;
@@ -29,6 +32,8 @@ namespace EFramework.Extensions.UI.Extras.Components
         [SerializeField] private Graphic m_targetGraphic;
         [SerializeField] private Color m_normalColor = Color.white;
         [SerializeField] private Color m_checkedColor = Color.white;
+        [SerializeField] private Color m_hoveredColor = Color.white;
+        [SerializeField] private Color m_checkedHoveredColor = Color.white;
         [SerializeField] private Color m_focusedColor = Color.white;
         [SerializeField] private Color m_checkedFocusedColor = Color.white;
         [SerializeField] private Color m_pressedColor = Color.white;
@@ -40,12 +45,16 @@ namespace EFramework.Extensions.UI.Extras.Components
         [SerializeField] public UnityEvent<bool> OnFocusChanged = new();
 
         private bool m_focused;
+        private bool m_hovered;
         private bool m_pressed;
         private bool m_listenerAdded;
+        private bool m_lastInteractable;
+        private bool m_hasInteractableSnapshot;
 
         public Button Button => m_button;
         public bool IsChecked => m_checked;
         public bool IsFocused => m_focused;
+        public bool IsHovered => m_hovered;
         public bool IsPressed => m_pressed;
         public bool HasButton => m_button != null;
         public bool ToggleOnClick
@@ -63,12 +72,14 @@ namespace EFramework.Extensions.UI.Extras.Components
         private void Awake()
         {
             EnsureButton();
+            EnsureButtonTransition();
             ApplyState();
         }
 
         private void OnEnable()
         {
             EnsureButton();
+            EnsureButtonTransition();
             AddButtonListener();
             ApplyState();
         }
@@ -76,17 +87,39 @@ namespace EFramework.Extensions.UI.Extras.Components
         private void OnDisable()
         {
             RemoveButtonListener();
+            CancelInvoke(nameof(ClearPressed));
             m_pressed = false;
+            m_hovered = false;
             SetFocused(false, false);
+        }
+
+        private void Update()
+        {
+            bool interactable = IsInteractableForState();
+            if (m_hasInteractableSnapshot && m_lastInteractable == interactable)
+            {
+                return;
+            }
+
+            if (!interactable)
+            {
+                CancelInvoke(nameof(ClearPressed));
+                m_pressed = false;
+                m_hovered = false;
+            }
+
+            ApplyState(interactable);
         }
 
         private void Reset()
         {
             m_button = GetComponent<Button>();
             m_targetGraphic = m_button != null ? m_button.targetGraphic : GetComponent<Graphic>();
+            EnsureButtonTransition();
             m_uncheckedState = FindChildState("unchecked", "uncheck", "normal");
             m_checkedState = FindChildState("checked", "check", "selected", "select");
-            m_focusState = FindChildState("focused", "focus", "highlight", "hover");
+            m_hoverState = FindChildState("hovered", "hover", "pointer");
+            m_focusState = FindChildState("focused", "focus", "highlight");
             m_pressedState = FindChildState("pressed", "press", "down");
             m_disabledState = FindChildState("disabled", "disable", "inactive");
         }
@@ -103,6 +136,7 @@ namespace EFramework.Extensions.UI.Extras.Components
                 m_targetGraphic = m_button.targetGraphic;
             }
 
+            EnsureButtonTransition();
             ApplyState();
         }
 
@@ -113,39 +147,61 @@ namespace EFramework.Extensions.UI.Extras.Components
 
         public void OnDeselect(BaseEventData eventData)
         {
-            m_pressed = false;
+            ClearPressed();
             SetFocused(false, true);
+        }
+
+        public void OnSubmit(BaseEventData eventData)
+        {
+            if (!IsInteractableForState())
+            {
+                return;
+            }
+
+            SetPressed(true);
+
+            if (m_submitPressedDuration > 0f)
+            {
+                CancelInvoke(nameof(ClearPressed));
+                Invoke(nameof(ClearPressed), m_submitPressedDuration);
+            }
+            else
+            {
+                ClearPressed();
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!IsInteractable())
+            if (!IsInteractableForState())
             {
                 return;
             }
+
+            m_hovered = true;
 
             if (m_focusOnPointerEnter)
             {
                 Focus();
-                return;
             }
 
-            SetFocused(true, true);
+            ApplyState();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
+            if (!m_hovered)
             {
                 return;
             }
 
-            SetFocused(false, true);
+            m_hovered = false;
+            ApplyState();
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (!IsInteractable())
+            if (!IsInteractableForState())
             {
                 return;
             }
@@ -155,19 +211,12 @@ namespace EFramework.Extensions.UI.Extras.Components
                 Focus();
             }
 
-            m_pressed = true;
-            ApplyState();
+            SetPressed(true);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (!m_pressed)
-            {
-                return;
-            }
-
-            m_pressed = false;
-            ApplyState();
+            ClearPressed();
         }
 
         public void Check()
@@ -219,7 +268,7 @@ namespace EFramework.Extensions.UI.Extras.Components
 
         public void Focus()
         {
-            if (!IsInteractable() || EventSystem.current == null)
+            if (!IsInteractableForState() || EventSystem.current == null)
             {
                 return;
             }
@@ -247,6 +296,14 @@ namespace EFramework.Extensions.UI.Extras.Components
             if (m_button == null)
             {
                 m_button = GetComponent<Button>();
+            }
+        }
+
+        private void EnsureButtonTransition()
+        {
+            if (m_forceButtonTransitionNone && m_button != null && m_button.transition != Selectable.Transition.None)
+            {
+                m_button.transition = Selectable.Transition.None;
             }
         }
 
@@ -289,15 +346,47 @@ namespace EFramework.Extensions.UI.Extras.Components
             }
         }
 
+        private void SetPressed(bool pressed)
+        {
+            if (m_pressed == pressed)
+            {
+                ApplyState();
+                return;
+            }
+
+            m_pressed = pressed;
+            ApplyState();
+        }
+
+        private void ClearPressed()
+        {
+            CancelInvoke(nameof(ClearPressed));
+            SetPressed(false);
+        }
+
         private void ApplyState()
         {
-            bool interactable = IsInteractable();
+            ApplyState(IsInteractableForState());
+        }
 
-            SetActive(m_uncheckedState, interactable && !m_checked);
-            SetActive(m_checkedState, interactable && m_checked);
-            SetActive(m_focusState, interactable && m_focused);
-            SetActive(m_pressedState, interactable && m_pressed);
-            SetActive(m_disabledState, !interactable);
+        private void ApplyState(bool interactable)
+        {
+            m_lastInteractable = interactable;
+            m_hasInteractableSnapshot = true;
+
+            bool uncheckedActive = interactable && !m_checked;
+            bool checkedActive = interactable && m_checked;
+            bool hoverActive = interactable && m_hovered;
+            bool focusActive = interactable && m_focused;
+            bool pressedActive = interactable && m_pressed;
+            bool disabledActive = !interactable;
+
+            SetActive(m_uncheckedState, IsStateObjectActive(m_uncheckedState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
+            SetActive(m_checkedState, IsStateObjectActive(m_checkedState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
+            SetActive(m_hoverState, IsStateObjectActive(m_hoverState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
+            SetActive(m_focusState, IsStateObjectActive(m_focusState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
+            SetActive(m_pressedState, IsStateObjectActive(m_pressedState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
+            SetActive(m_disabledState, IsStateObjectActive(m_disabledState, uncheckedActive, checkedActive, hoverActive, focusActive, pressedActive, disabledActive));
 
             if (m_useGraphicColor && m_targetGraphic != null)
             {
@@ -322,6 +411,11 @@ namespace EFramework.Extensions.UI.Extras.Components
                 return m_checkedFocusedColor;
             }
 
+            if (m_checked && m_hovered)
+            {
+                return m_checkedHoveredColor;
+            }
+
             if (m_checked)
             {
                 return m_checkedColor;
@@ -332,12 +426,27 @@ namespace EFramework.Extensions.UI.Extras.Components
                 return m_focusedColor;
             }
 
+            if (m_hovered)
+            {
+                return m_hoveredColor;
+            }
+
             return m_normalColor;
         }
 
-        private bool IsInteractable()
+        private bool IsInteractableForState()
         {
-            return m_button != null && m_button.IsActive() && m_button.IsInteractable();
+            if (m_button == null)
+            {
+                return false;
+            }
+
+            if (!Application.isPlaying)
+            {
+                return m_button.interactable;
+            }
+
+            return m_button.IsActive() && m_button.IsInteractable();
         }
 
         private GameObject FindChildState(params string[] nameParts)
@@ -365,6 +474,28 @@ namespace EFramework.Extensions.UI.Extras.Components
             {
                 target.SetActive(active);
             }
+        }
+
+        private bool IsStateObjectActive(
+            GameObject target,
+            bool uncheckedActive,
+            bool checkedActive,
+            bool hoverActive,
+            bool focusActive,
+            bool pressedActive,
+            bool disabledActive)
+        {
+            if (target == null)
+            {
+                return false;
+            }
+
+            return (target == m_uncheckedState && uncheckedActive)
+                || (target == m_checkedState && checkedActive)
+                || (target == m_hoverState && hoverActive)
+                || (target == m_focusState && focusActive)
+                || (target == m_pressedState && pressedActive)
+                || (target == m_disabledState && disabledActive);
         }
     }
 }

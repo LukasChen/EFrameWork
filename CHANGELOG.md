@@ -4,6 +4,13 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.6.15] - 2026-05-03
+
+### Fixed
+
+- Fixed UI Extras `CheckableButton` state object handling so reused state references stay active when any matching state should be visible.
+- Synchronized Basic and Extension Showcase template metadata with their fixture sources for release validation.
+
 ## [0.6.14] - 2026-05-03
 
 ### Changed

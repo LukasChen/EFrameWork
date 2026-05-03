@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.31",
+    "version":  "0.4.32",
     "updatedAt":  "2026-05-03",
-    "notes":  "Add UI extras CheckableButton guidance and Tabbar update.",
+    "notes":  "Release CheckableButton shared state fix and synced template metadata.",
     "clients":  [
                     "codex",
                     "copilot",

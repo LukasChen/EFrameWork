@@ -2,6 +2,13 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.15] - 2026-05-03
+
+### Fixed
+
+- Fixed UI Extras `CheckableButton` state object handling so reused state references stay active when any matching state should be visible.
+- Synchronized Basic and Extension Showcase template metadata with their fixture sources for release validation.
+
 ## [0.6.14] - 2026-05-03
 
 ### Changed

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 - 2026-05-03
+
+- Fixed `CheckableButton` state object handling so reused state references stay active when any matching state should be visible.
+
 ## 0.2.1 - 2026-05-03
 
 - Replaced `StateButton` with `CheckableButton`, a single-Button checked/focused state component for mouse, keyboard, and gamepad-friendly UI.
