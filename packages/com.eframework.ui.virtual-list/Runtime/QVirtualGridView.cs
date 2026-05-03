@@ -23,6 +23,9 @@ namespace EFramework.Extensions.UI.VirtualList
         [SerializeField] private Vector2 m_cellSize = new(100f, 100f);
         [SerializeField] private Vector2 m_spacing;
         [SerializeField] private int m_constraintCount = 1;
+        [SerializeField] private bool m_autoWrapCrossAxis;
+        [SerializeField] private int m_minAutoConstraintCount = 1;
+        [SerializeField] private int m_maxAutoConstraintCount;
         [SerializeField] private float m_overscan = 100f;
         [SerializeField] private RectOffset m_padding = new();
 
@@ -47,6 +50,8 @@ namespace EFramework.Extensions.UI.VirtualList
         }
 
         public int Count => m_adapter != null ? Mathf.Max(0, m_adapter.Count) : 0;
+        public bool AutoWrapCrossAxis => m_autoWrapCrossAxis;
+        public int CurrentConstraintCount => ConstraintCount;
 
         public QVirtualGridDirection Direction
         {
@@ -70,7 +75,7 @@ namespace EFramework.Extensions.UI.VirtualList
         }
 
         private bool IsVertical => Direction == QVirtualGridDirection.Vertical;
-        private int ConstraintCount => Mathf.Max(1, m_constraintCount);
+        private int ConstraintCount => m_autoWrapCrossAxis ? CalculateAutoConstraintCount() : Mathf.Max(1, m_constraintCount);
         private float MainCellSize => IsVertical ? Mathf.Max(0f, m_cellSize.y) : Mathf.Max(0f, m_cellSize.x);
         private float MainSpacing => IsVertical ? Mathf.Max(0f, m_spacing.y) : Mathf.Max(0f, m_spacing.x);
         private float CrossCellSize => IsVertical ? Mathf.Max(0f, m_cellSize.x) : Mathf.Max(0f, m_cellSize.y);
@@ -110,6 +115,9 @@ namespace EFramework.Extensions.UI.VirtualList
         {
             if (m_initialized && isActiveAndEnabled)
             {
+                var offset = GetScrollOffset();
+                RebuildContentSize();
+                SetScrollOffset(offset);
                 RefreshVisibleItems();
             }
         }
@@ -467,6 +475,28 @@ namespace EFramework.Extensions.UI.VirtualList
             return Mathf.Clamp(line * ConstraintCount + ConstraintCount - 1, 0, Mathf.Max(0, Count - 1));
         }
 
+        private int CalculateAutoConstraintCount()
+        {
+            var cellSize = CrossCellSize;
+            if (cellSize <= 0f)
+            {
+                return Mathf.Max(1, m_minAutoConstraintCount);
+            }
+
+            var spacing = CrossSpacing;
+            var availableLength = GetViewportCrossLength() - GetCrossStartPadding() - GetCrossEndPadding();
+            var rawCount = Mathf.FloorToInt((Mathf.Max(0f, availableLength) + spacing) / (cellSize + spacing));
+            var minCount = Mathf.Max(1, m_minAutoConstraintCount);
+            var count = Mathf.Max(minCount, rawCount);
+
+            if (m_maxAutoConstraintCount > 0)
+            {
+                count = Mathf.Min(Mathf.Max(minCount, m_maxAutoConstraintCount), count);
+            }
+
+            return count;
+        }
+
         private void SetContentSize(float width, float height)
         {
             m_content.sizeDelta = new Vector2(Mathf.Max(0f, width), Mathf.Max(0f, height));
@@ -517,6 +547,16 @@ namespace EFramework.Extensions.UI.VirtualList
             }
 
             return Mathf.Max(0f, IsVertical ? m_viewport.rect.height : m_viewport.rect.width);
+        }
+
+        private float GetViewportCrossLength()
+        {
+            if (m_viewport == null)
+            {
+                return 0f;
+            }
+
+            return Mathf.Max(0f, IsVertical ? m_viewport.rect.width : m_viewport.rect.height);
         }
 
         private float GetStartPadding()
