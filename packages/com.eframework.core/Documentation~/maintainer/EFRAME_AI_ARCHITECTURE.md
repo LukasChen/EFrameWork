@@ -4,7 +4,7 @@ EFrame is maintained as a Unity framework plus a synchronized AI collaboration l
 
 ## 1. Design Goal
 
-The goal is to make every new EFrame project start with working Unity scaffolding, then let the user explicitly choose and sync the AI clients they need from the Unity Editor.
+The goal is to make every new EFrame project start with a copied Basic Unity template, then let the user sync the supported AI clients from the Unity Editor or package tools.
 
 Cold-start and upgrade flows must keep these parts aligned:
 
@@ -60,11 +60,11 @@ When one part changes the expected project shape, the matching AI guidance must 
 `tools/`
 
 - Imports and updates the AI layer in business projects.
-- Creates cold-start project structure and bootstrap code.
+- Creates cold-start project structure and copies the Basic startup template.
 - Installs project-side sync scripts.
 - Injects or updates EFrame managed blocks in project-owned AI entry files without overwriting local project rules.
 - Checks business-project AI workspace health after sync or framework upgrades.
-- Lets Unity Editor users choose which AI clients to sync instead of coupling AI contract sync to cold-start.
+- Lets Unity Editor users sync the supported AI clients instead of coupling AI contract sync to cold-start.
 
 Business project `.github/`
 
@@ -84,7 +84,7 @@ Any change in the following areas must include an AI layer impact check:
 - `Procedure` lifecycle templates or responsibilities
 - `QUI`, `UIController`, UI prefab, or layer management rules
 - `ResPath`, Addressables group rules, or resource directory conventions
-- Cold-start scripts, bootstrap code templates, sample modules, or editor initialization windows
+- Cold-start scripts, Basic/Showcase templates, optional modules, or editor initialization windows
 - Directory structure docs or release/setup docs
 
 If the change affects how Copilot, Codex, or Claude Code should generate, refactor, or audit EFrame projects, update the relevant `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or `packages/com.eframework.core/AIWorkspace~` instruction/skill in the same change set. Keep always-on boundaries in instructions; put multi-step workflows, audits, and detailed checklists in skills or skill references.

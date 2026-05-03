@@ -14,7 +14,7 @@ namespace EFramework.Generated
             }
             public static class Modules
             {
-                public static class SampleModule
+                public static class EFrameExtensionShowcase
                 {
                     public static class Res
                     {
@@ -22,9 +22,9 @@ namespace EFramework.Generated
                         {
                             public static class Panels
                             {
-                                public static class SampleModuleMain
+                                public static class EFrameExtensionShowcase
                                 {
-                                    public const string SampleModuleMainView = "Modules/SampleModule/Res/UI/Panels/SampleModuleMain/SampleModuleMainView";
+                                    public const string EFrameExtensionShowcaseView = "Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView";
                                 }
                             }
                         }

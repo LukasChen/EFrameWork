@@ -271,9 +271,14 @@ try {
         "^tools/Install-EFrameAIProjectUpdater\.ps1$",
         "^tools/Initialize-EFrameColdStart\.ps1$",
         "^tools/Initialize-EFrameBootstrapCode\.ps1$",
+        "^tools/Sync-EFrameBasicTemplate\.ps1$",
         "^tools/Test-EFrameAIProject\.ps1$",
         "^tools/Test-EFrameUnityCompile\.ps1$",
         "^tools/Test-EFrameAIRelease\.ps1$",
+        "^packages/com\.eframework\.core/Editor/ProjectBootstrap/.*\.cs$",
+        "^packages/com\.eframework\.core/Editor/Templates/.*",
+        "^test-fixtures/EFrameBasicTemplate/.*",
+        "^test-fixtures/EFrameShowcaseUnity/Assets/Modules/EFrameExtensionShowcase/.*",
         "^packages/com\.eframework\.core/Editor/EFrameProjectInitializationWindow\.cs$",
         "^README\.md$",
         "^packages/com\.eframework\.core/Documentation~/.*"
@@ -487,6 +492,16 @@ try {
         }
         catch {
             $errors.Add("Extension Showcase template is out of sync with test-fixtures/EFrameShowcaseUnity. Run tools/Sync-EFrameShowcaseTemplate.ps1. $($_.Exception.Message)")
+        }
+    }
+
+    $basicTemplateSyncScript = Join-Path $frameworkRoot "tools/Sync-EFrameBasicTemplate.ps1"
+    if (Test-Path -LiteralPath $basicTemplateSyncScript) {
+        try {
+            & $basicTemplateSyncScript -CheckOnly
+        }
+        catch {
+            $errors.Add("Basic template is out of sync with test-fixtures/EFrameBasicTemplate. Run tools/Sync-EFrameBasicTemplate.ps1. $($_.Exception.Message)")
         }
     }
 

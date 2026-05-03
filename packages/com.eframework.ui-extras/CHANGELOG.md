@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 - 2026-05-03
 
 - Removed the runtime DOTween dependency from UI helper and animation components; UI Extras now uses the core `EFrameTween` facade.
 

@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using EFramework.Runtime;
 using EFramework.Runtime.Procedure;
-using EFramework.Runtime.UI;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
@@ -24,14 +22,12 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string AppNamespace = "GameApp";
         private const string LogoAssetPath = "Packages/com.eframework.core/Editor/ProjectBootstrap/Assets/EFrameLogo.png";
         private const string StartUpScenePath = "Assets/Scenes/StartUp.unity";
-        private const string StartUpGuidePath = "Assets/Scenes/StartUp_SETUP.md";
-        private const string ModulesRootPath = "Assets/Modules";
+        private const string BasicTemplatePath = "Packages/com.eframework.core/Editor/Templates/Basic/Assets";
         private const string ExtensionShowcaseTargetPath = "Assets/Modules/EFrameExtensionShowcase";
         private const string ExtensionShowcaseTemplatePath = "Packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase";
         private const string BasicStartupProcedureName = "GameApp.Procedure.ProcedureLauncher";
         private const string ExtensionShowcaseStartupProcedureName = "GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
-        private const string ModuleNamePrefsKey = "EFrame.ProjectInitializationWindow.ModuleName";
         private const string AllAiClientsArgument = "all";
         private const string AllAiClientsLabel = "Codex, GitHub Copilot, and Claude Code";
 
@@ -51,7 +47,6 @@ namespace EFramework.Editor.ProjectBootstrap
         private static AddRequest s_packageAddRequest;
         private static string s_currentPackageName;
 
-        private string m_moduleName;
         private string m_statusMessage;
         private string m_aiCheckMessage;
         private bool m_statusIsError;
@@ -168,7 +163,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void InitializeState()
         {
-            m_moduleName = EditorPrefs.GetString(ModuleNamePrefsKey, string.Empty);
         }
 
         private static string ProjectRootPath => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
@@ -262,7 +256,13 @@ namespace EFramework.Editor.ProjectBootstrap
             }
             else
             {
-                SetStatus("Framework root was not detected as a local repo. Running scene initialization only.", false);
+                if (!CopyBasicTemplate(true, out var copyMessage))
+                {
+                    SetStatus(copyMessage, true);
+                    return;
+                }
+
+                SetStatus($"Framework root was not detected as a local repo. {copyMessage}", false);
             }
 
             if (!EnsureAddressablesInitialized())
@@ -275,11 +275,6 @@ namespace EFramework.Editor.ProjectBootstrap
                 return;
             }
 
-            if (!EnsureSampleUIPrefabs())
-            {
-                return;
-            }
-
             if (!EnsureAudioSetup())
             {
                 return;
@@ -287,49 +282,14 @@ namespace EFramework.Editor.ProjectBootstrap
 
             EnsureOptionalDotweenSetup();
 
-            CreateOrRefreshStartUpScene();
-        }
-
-        private void CreateOrRefreshStartUpScene()
-        {
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            if (!SyncAddressablesAfterAssetChanges("Initialized or repaired Basic template."))
             {
                 return;
             }
-
-            var sceneDirectory = Path.GetDirectoryName(StartUpScenePath);
-            if (!string.IsNullOrEmpty(sceneDirectory) && !Directory.Exists(sceneDirectory))
-            {
-                Directory.CreateDirectory(sceneDirectory);
-            }
-
-            var newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            var mainCameraObject = new GameObject("Main Camera", typeof(Camera));
-            mainCameraObject.tag = "MainCamera";
-
-            var camera = mainCameraObject.GetComponent<Camera>();
-            camera.clearFlags = CameraClearFlags.Skybox;
-            camera.orthographic = false;
-
-            var bootObject = new GameObject("Boot", typeof(EFrameProcedureComponent), typeof(EFrameComponent));
-            var procedureComponent = bootObject.GetComponent<EFrameProcedureComponent>();
-            var eframeComponent = bootObject.GetComponent<EFrameComponent>();
-
-            ConfigureProcedureComponent(procedureComponent, false, BasicStartupProcedureName);
-            ConfigureEFrameComponent(eframeComponent, procedureComponent, camera);
 
             EnsureStartUpSceneInBuildSettings(StartUpScenePath);
-
-            if (!EditorSceneManager.SaveScene(newScene, StartUpScenePath))
-            {
-                SetStatus("Failed to save StartUp scene.", true);
-                return;
-            }
-
-            Selection.activeObject = bootObject;
-            SetStatus($"Created or refreshed {StartUpScenePath}.", false);
             AssetDatabase.Refresh();
+            SetStatus($"Initialized or repaired Basic template and registered {StartUpScenePath}.", false);
         }
 
         private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent, bool includeExtensionShowcase, string entranceProcedureTypeName)
@@ -341,8 +301,7 @@ namespace EFramework.Editor.ProjectBootstrap
             var procedureTypeNames = new List<string>
             {
                 $"{AppNamespace}.Procedure.ProcedureLauncher",
-                $"{AppNamespace}.Procedure.ProcedureHome",
-                $"{AppNamespace}.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry"
+                $"{AppNamespace}.Procedure.ProcedureHome"
             };
 
             if (includeExtensionShowcase)
@@ -363,21 +322,6 @@ namespace EFramework.Editor.ProjectBootstrap
             procedureObject.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void ConfigureEFrameComponent(EFrameComponent eframeComponent, EFrameProcedureComponent procedureComponent, Camera mainCamera)
-        {
-            var eframeObject = new SerializedObject(eframeComponent);
-            eframeObject.FindProperty("m_procedureComponent").objectReferenceValue = procedureComponent;
-            eframeObject.FindProperty("UICamera").objectReferenceValue = mainCamera;
-            eframeObject.FindProperty("SceneCamera").objectReferenceValue = mainCamera;
-
-            var designSize = eframeObject.FindProperty("DesignSize");
-            designSize.FindPropertyRelative("x").intValue = 1080;
-            designSize.FindPropertyRelative("y").intValue = 1920;
-
-            eframeObject.FindProperty("FitMode").enumValueIndex = (int)ScreenFitMode.Auto;
-            eframeObject.ApplyModifiedPropertiesWithoutUndo();
-        }
-
         private static void EnsureStartUpSceneInBuildSettings(string scenePath)
         {
             var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
@@ -386,37 +330,9 @@ namespace EFramework.Editor.ProjectBootstrap
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 
-        private void OpenStartUpGuide()
-        {
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(StartUpGuidePath);
-            if (asset == null)
-            {
-                SetStatus($"Guide not found at {StartUpGuidePath}. Run bootstrap generation first.", true);
-                return;
-            }
-
-            Selection.activeObject = asset;
-            EditorGUIUtility.PingObject(asset);
-            SetStatus($"Opened guide at {StartUpGuidePath}.", false);
-        }
-
         private bool EnsureAddressablesInitialized()
         {
             var success = EFrameAddressablesBootstrapUtility.EnsureAddressablesInitialized(out var message);
-            SetStatus(message, !success);
-            return success;
-        }
-
-        private bool EnsureProjectAddressablesGroups()
-        {
-            var success = EFrameAddressablesBootstrapUtility.EnsureProjectAddressablesGroups(out var message);
-            SetStatus(message, !success);
-            return success;
-        }
-
-        private bool GenerateResPathCode()
-        {
-            var success = EFrameAddressablesBootstrapUtility.GenerateResPathCode(out var message);
             SetStatus(message, !success);
             return success;
         }
@@ -435,13 +351,6 @@ namespace EFramework.Editor.ProjectBootstrap
             return success;
         }
 
-        private bool OpenDotweenSettings()
-        {
-            var success = EFrameDotweenBootstrapUtility.OpenDotweenSettings(out var message);
-            SetStatus(message, !success);
-            return success;
-        }
-
         private bool EnableDotweenAdapter()
         {
             var success = EFrameDotweenBootstrapUtility.EnableDotweenAdapter(out var message);
@@ -456,58 +365,11 @@ namespace EFramework.Editor.ProjectBootstrap
             return success;
         }
 
-        private bool EnsureSampleUIPrefabs()
-        {
-            var success = EFrameSampleUIPrefabUtility.EnsureBootstrapSampleUIPrefabs(out var message);
-            if (!success)
-            {
-                SetStatus(message, true);
-                return false;
-            }
-
-            return SyncAddressablesAfterAssetChanges(message);
-        }
-
         private bool EnsureUISortingLayers()
         {
             var success = EFrameUIBootstrapUtility.EnsureUISortingLayers(out var message);
             SetStatus(message, !success);
             return success;
-        }
-
-        private void ImportInitialTemplates()
-        {
-            EnsureSampleUIPrefabs();
-        }
-
-        private void ImportBasicTemplate()
-        {
-            if (!RunToolScript("Initialize-EFrameBootstrapCode.ps1", $"-TargetRoot \"{ProjectRootPath}\""))
-            {
-                return;
-            }
-
-            if (!EnsureUISortingLayers())
-            {
-                return;
-            }
-
-            if (!EnsureSampleUIPrefabs())
-            {
-                return;
-            }
-
-            if (!EnsureAudioSetup())
-            {
-                return;
-            }
-
-            if (!EnsureProjectAddressablesGroups())
-            {
-                return;
-            }
-
-            SyncAddressablesAfterAssetChanges("Imported Basic sample/template.");
         }
 
         private void InstallExtensionShowcaseModule()
@@ -798,6 +660,24 @@ namespace EFramework.Editor.ProjectBootstrap
             return value.Trim();
         }
 
+        private bool CopyBasicTemplate(bool overwrite, out string message)
+        {
+            var sourceFullPath = AssetPathToFullPath(BasicTemplatePath);
+            if (!Directory.Exists(sourceFullPath))
+            {
+                message = $"Basic template was not found: {BasicTemplatePath}.";
+                return false;
+            }
+
+            var targetFullPath = Path.Combine(ProjectRootPath, "Assets");
+            CopyDirectory(sourceFullPath, targetFullPath, overwrite);
+            AssetDatabase.Refresh();
+            message = overwrite
+                ? "Repaired Basic template from the package template."
+                : "Imported missing Basic template files from the package template.";
+            return true;
+        }
+
         private bool CopyExtensionShowcaseTemplate(out string message)
         {
             if (AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath) || Directory.Exists(Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath)))
@@ -877,7 +757,7 @@ namespace EFramework.Editor.ProjectBootstrap
             return Path.Combine(ProjectRootPath, assetPath.Replace('/', Path.DirectorySeparatorChar));
         }
 
-        private static void CopyDirectory(string sourceDirectory, string targetDirectory)
+        private static void CopyDirectory(string sourceDirectory, string targetDirectory, bool overwrite = false)
         {
             Directory.CreateDirectory(targetDirectory);
 
@@ -894,13 +774,18 @@ namespace EFramework.Editor.ProjectBootstrap
                 }
 
                 var targetFile = Path.Combine(targetDirectory, fileName);
-                File.Copy(sourceFile, targetFile, false);
+                if (File.Exists(targetFile) && !overwrite)
+                {
+                    continue;
+                }
+
+                File.Copy(sourceFile, targetFile, overwrite);
             }
 
             foreach (var sourceChildDirectory in Directory.GetDirectories(sourceDirectory))
             {
                 var targetChildDirectory = Path.Combine(targetDirectory, Path.GetFileName(sourceChildDirectory));
-                CopyDirectory(sourceChildDirectory, targetChildDirectory);
+                CopyDirectory(sourceChildDirectory, targetChildDirectory, overwrite);
             }
         }
 
@@ -1057,54 +942,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
             message = $"Set StartUp entrance procedure to {entranceProcedureTypeName}.";
             return true;
-        }
-
-        private void CreateModuleScaffold()
-        {
-            var sanitizedModuleName = SanitizeIdentifier(m_moduleName);
-            if (string.IsNullOrWhiteSpace(sanitizedModuleName))
-            {
-                SetStatus("Enter a valid module name before creating a module scaffold.", true);
-                return;
-            }
-
-            var targetPath = $"{ModulesRootPath}/{sanitizedModuleName}";
-            if (AssetDatabase.IsValidFolder(targetPath) || File.Exists(Path.Combine(ProjectRootPath, targetPath)))
-            {
-                SetStatus($"Module already exists: {targetPath}", true);
-                return;
-            }
-
-            try
-            {
-                CreateModuleScaffoldFiles(sanitizedModuleName);
-                if (!EFrameSampleUIPrefabUtility.EnsureModuleViewTemplate(sanitizedModuleName, out var templateMessage))
-                {
-                    SetStatus(templateMessage, true);
-                    return;
-                }
-
-                if (!SyncAddressablesAfterAssetChanges(templateMessage))
-                {
-                    return;
-                }
-
-                EditorPrefs.SetString(ModuleNamePrefsKey, sanitizedModuleName);
-                AssetDatabase.Refresh();
-
-                var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(targetPath);
-                if (asset != null)
-                {
-                    Selection.activeObject = asset;
-                    EditorGUIUtility.PingObject(asset);
-                }
-
-                SetStatus($"Created module scaffold at {targetPath}.", false);
-            }
-            catch (Exception exception)
-            {
-                SetStatus($"Failed to create module scaffold: {exception.Message}", true);
-            }
         }
 
         private bool RunToolScript(string scriptName, string arguments)
@@ -1365,170 +1202,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
             frameworkRoot = packageInfo.resolvedPath;
             return true;
-        }
-
-        private static string SanitizeIdentifier(string rawValue)
-        {
-            if (string.IsNullOrWhiteSpace(rawValue))
-            {
-                return string.Empty;
-            }
-
-            var characters = new List<char>(rawValue.Length);
-            foreach (var character in rawValue)
-            {
-                if (char.IsLetterOrDigit(character) || character == '_')
-                {
-                    characters.Add(character);
-                }
-            }
-
-            return new string(characters.ToArray());
-        }
-
-        private void CreateModuleScaffoldFiles(string moduleName)
-        {
-            var moduleNamespace = $"{AppNamespace}.Modules.{moduleName}";
-            var moduleRoot = Path.Combine(ProjectRootPath, "Assets", "Modules", moduleName);
-
-            WriteScaffoldFile(Path.Combine(moduleRoot, "README.md"), BuildModuleGuideContent(moduleName));
-            WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "Procedure", $"Procedure{moduleName}Entry.cs"), BuildModuleProcedureContent(moduleName, moduleNamespace));
-            WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "UI", "Views", $"{moduleName}MainView.cs"), BuildModuleViewContent(moduleName, moduleNamespace));
-            WriteScaffoldFile(Path.Combine(moduleRoot, "Runtime", "UI", "Controllers", $"{moduleName}MainViewController.cs"), BuildModuleControllerContent(moduleName, moduleNamespace));
-
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Editor"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "UI", "Panels", $"{moduleName}Main"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "UI", "Common"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "SceneAssets", "Common"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "FX", "Common"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "FX", "UI"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "FX", "Scene"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Res", "FX", "Gameplay"));
-            Directory.CreateDirectory(Path.Combine(moduleRoot, "Scenes"));
-        }
-
-        private static void WriteScaffoldFile(string filePath, string content)
-        {
-            var directory = Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.WriteAllText(filePath, content);
-        }
-
-        private static string BuildModuleGuideContent(string moduleName)
-        {
-            return $@"# {moduleName}
-
-This is a formal business module scaffold generated by EFrame.
-
-Recommended next steps:
-
-1. Replace placeholder logs with actual module entry logic.
-2. The scaffold already copies `{moduleName}MainView.prefab` into `Assets/Modules/{moduleName}/Res/UI/Panels/{moduleName}Main`; adjust that prefab in-place instead of rebuilding it from scratch.
-3. Add module scenes under `Assets/Modules/{moduleName}/Scenes` if this module owns scene content.
-4. Put module-private FX under `Assets/Modules/{moduleName}/Res/FX`; only move shared content back to `Assets/App/...` when it is truly common.
-";
-        }
-
-        private string BuildModuleProcedureContent(string moduleName, string moduleNamespace)
-        {
-            return $@"using Cysharp.Threading.Tasks;
-using EFramework.Generated;
-using EFramework.Runtime.Asset;
-using EFramework.Runtime.Procedure;
-using UnityEngine;
-
-namespace {moduleNamespace}.Procedure
-{{
-    public sealed class Procedure{moduleName}Entry : EFrameProcedure
-    {{
-        protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
-        {{
-            await assets.PreloadAsync<GameObject>(ResPath.Generated.Modules.{moduleName}.Res.UI.Panels.{moduleName}Main.{moduleName}MainView);
-        }}
-
-        protected override void OnEnter(ProcedureEnterContext context)
-        {{
-            base.OnEnter(context);
-            Debug.Log(""[Procedure{moduleName}Entry] Entered. TODO: open {moduleName}MainView."");
-        }}
-
-        protected override void OnLeave(bool isShutdown)
-        {{
-            base.OnLeave(isShutdown);
-        }}
-    }}
-}}
-";
-        }
-
-        private static string BuildModuleViewContent(string moduleName, string moduleNamespace)
-        {
-            return $@"using EFramework.Runtime.UI;
-using UnityEngine.UI;
-
-namespace {moduleNamespace}.UI.Views
-{{
-    public sealed class {moduleName}MainView : BindingViewBase
-    {{
-        public {moduleName}MainView()
-        {{
-        }}
-
-        protected override void OnBindingSet()
-        {{
-            base.OnBindingSet();
-            CacheComponents();
-        }}
-
-        public Button BackButton {{ get; private set; }}
-
-        private void CacheComponents()
-        {{
-            BackButton = Binding == null ? null : Binding.transform.Find(""Panel/BackButton"")?.GetComponent<Button>();
-        }}
-    }}
-}}
-";
-        }
-
-        private string BuildModuleControllerContent(string moduleName, string moduleNamespace)
-        {
-            return $@"using System;
-using EFramework.Generated;
-using EFramework.Runtime.UI;
-using {moduleNamespace}.UI.Views;
-
-namespace {moduleNamespace}.UI.Controllers
-{{
-    public sealed class {moduleName}MainViewController : UIControllerBase<{moduleName}MainView>
-    {{
-        public Action BackRequested {{ get; set; }}
-
-        protected override string AssetPath => ResPath.Generated.Modules.{moduleName}.Res.UI.Panels.{moduleName}Main.{moduleName}MainView;
-
-        protected override void OnViewCreated()
-        {{
-            base.OnViewCreated();
-            AddButtonClickListener(CurrentView.BackButton, OnBackButtonClick);
-        }}
-
-        protected override void OnViewDestroyed()
-        {{
-            BackRequested = null;
-            base.OnViewDestroyed();
-        }}
-
-        private void OnBackButtonClick()
-        {{
-            BackRequested?.Invoke();
-        }}
-    }}
-}}
-";
         }
 
         private bool SyncAddressablesAfterAssetChanges(string changeMessage)

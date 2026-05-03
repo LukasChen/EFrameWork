@@ -2,16 +2,20 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
-## [Unreleased]
+## [0.6.9] - 2026-05-03
 
 ### Added
 
 - Added initialization-window controls to refresh the installed Extension Showcase module from the package template and switch startup between Showcase and Basic.
 - Added a synced AI collaboration contract requiring question and analysis requests to be handled as discussion first, with approval before project-changing actions.
 - Added a maintainer sync path for Extension Showcase where `test-fixtures/EFrameShowcaseUnity` is the editable Unity source and `tools/Sync-EFrameShowcaseTemplate.ps1` generates the package template.
+- Added a maintainer sync path for the Basic template where `test-fixtures/EFrameBasicTemplate/Assets` is the editable source and `tools/Sync-EFrameBasicTemplate.ps1` generates the package template.
 
 ### Changed
 
+- Changed Basic initialization to copy the package template, including `StartUp.unity` and `HomeView.prefab`, instead of dynamically generating the startup code and UI prefab.
+- Removed the legacy sample module from the Basic initialization template and fixtures; Basic now stops at `ProcedureHome` showing the Home initialization screen.
+- Changed the Extension Showcase runtime UI to load the module-owned `EFrameExtensionShowcaseView.prefab` instead of building Canvas/Text/Button objects in code.
 - Updated Extension Showcase template installation to copy module `.meta` files, including `.cs.txt.meta` to `.cs.meta` conversion, so non-code resources can keep stable references.
 
 ## [0.6.8] - 2026-05-03
@@ -36,7 +40,7 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ### Added
 
-- Added a package-documented Basic sample/template as the minimal runnable initialization skeleton for `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, `SampleModule`, basic UI prefabs, audio setup, Addressables, and generated `ResPath`.
+- Added a package-documented Basic sample/template as the minimal runnable initialization skeleton for `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, basic UI prefabs, audio setup, Addressables, and generated `ResPath`.
 - Added an optional Extension Showcase Project Module template with `ProcedureEFrameExtensionShowcaseEntry`, runtime showcase UI, extension demo registry entries, and initialization-window install/startup controls.
 - Added `EFrameTween` as the core tween facade with a built-in fallback backend and an optional DOTween adapter gated by `EFRAME_USE_DOTWEEN`.
 

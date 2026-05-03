@@ -170,7 +170,6 @@ MonoBehaviour:
   m_availableProcedureTypeNames:
   - GameApp.Procedure.ProcedureLauncher
   - GameApp.Procedure.ProcedureHome
-  - GameApp.Modules.SampleModule.Procedure.ProcedureSampleModuleEntry
   - GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry
   m_entranceProcedureTypeName: GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry
 --- !u!4 &563642608

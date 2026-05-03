@@ -14,15 +14,10 @@ Install it from Unity:
 
 ```text
 EFrame Tools/项目初始化向导
--> Full Initialize Project
+-> Initialize / Repair Project
 ```
 
-or, for the template portion only:
-
-```text
-EFrame Tools/项目初始化向导
--> Install Basic Sample / Import Basic Template
-```
+The initializer copies the package Basic template and then repairs Addressables, UI sorting layers, audio, fallback tween readiness, and build settings.
 
 Basic creates or prepares:
 
@@ -32,12 +27,11 @@ Basic creates or prepares:
 - `Assets/App/Runtime/UI/Views/HomeView.cs`
 - `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
 - `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
-- `Assets/Modules/SampleModule/...`
 - Addressables groups and generated `ResPath`
 - UI sorting layers
 - basic audio resources and fallback tween backend readiness
 
-The package sample under `Samples~/Basic` is documentation for package users. The initializer uses the machine template under `Editor/Templates/Basic` plus the existing UI prefab templates under `Editor/Templates/UI`.
+The editable Basic source is a full Unity fixture under `test-fixtures/EFrameBasicTemplate`; maintainers sync its `Assets` folder into `Editor/Templates/Basic` with `tools/Sync-EFrameBasicTemplate.ps1`.
 
 ## Extension Showcase Module
 
@@ -63,7 +57,7 @@ Use these buttons to control startup:
 - `Set Showcase Startup`: sets the StartUp scene `EFrameProcedureComponent` entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`.
 - `Restore Basic Startup`: restores the entrance to `GameApp.Procedure.ProcedureLauncher`.
 
-The current showcase UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console entries. Each entry is a minimal runtime placeholder so future extension-specific demos can be added without changing the module shape.
+The current showcase UI is backed by `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` and lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console entries. Each entry is a minimal runtime placeholder so future extension-specific demos can be added without changing the module shape.
 
 ## Simple Game Demo
 

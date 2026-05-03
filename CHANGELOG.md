@@ -4,15 +4,18 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
-## [Unreleased]
+## [0.6.9] - 2026-05-03
 
 ### Added
 
 - Added `test-fixtures/EFrameShowcaseUnity` as a runnable Unity fixture for Extension Showcase development.
 - Added `tools/Sync-EFrameShowcaseTemplate.ps1` to generate the package Showcase template from the fixture module while converting `.cs` files to `.cs.txt`.
+- Added `test-fixtures/EFrameBasicTemplate` and `tools/Sync-EFrameBasicTemplate.ps1` so the Basic initialization template is maintained from a fixture source.
 
 ### Changed
 
+- Changed Basic initialization to copy the package template, including `StartUp.unity` and `HomeView.prefab`, and removed the old sample module from the Basic, Showcase, and Consumer startup paths.
+- Changed the Extension Showcase UI from script-built Canvas/Text/Button objects to a copied module prefab under `Res/UI/Panels/EFrameExtensionShowcase`.
 - Updated Extension Showcase installation to preserve module `.meta` files so non-code resources can be shipped with stable references.
 - Removed the DOTween requirement from `com.eframework.ui-extras` and `com.eframework.effects`; UI helpers, UI animations, and camera shake now use core `EFrameTween`.
 

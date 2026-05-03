@@ -4,7 +4,6 @@ using EFramework.Runtime.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -94,15 +93,7 @@ namespace EFramework.Runtime.Utils
                 go.SetNativeSize();
             }
         }
-        public static void SetText(TextMeshProUGUI go, string value)
-        {
-            if (IsNull(go))
-            {
-                return;
-            }
 
-            go.text = value;
-        }
         public static void SetFullStretch(RectTransform rectTransform)
         {
             // 设置锚点模式为全屏拉伸

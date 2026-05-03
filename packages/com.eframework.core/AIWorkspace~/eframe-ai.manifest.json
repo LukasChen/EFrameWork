@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.24",
+    "version":  "0.4.26",
     "updatedAt":  "2026-05-03",
-    "notes":  "Record discussion-first execution boundary and Extension Showcase fixture workflow.",
+    "notes":  "Record prefab-backed Extension Showcase module UI boundary.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "32f938848c8eb2e3831d94d09128ae222549213ad2c90a7e3ea379f938c3aab7"
+                      "sha256":  "b183866d3a5549d0bbc4e5585fda10619826dd098b8f9a4019168024c0923771"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",

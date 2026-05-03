@@ -122,7 +122,7 @@ function Write-ColdStartSummary {
     Write-ColdStartStatus -Name "Directory scaffold" -State $directoryState -Detail "$($directories.Count) standard directories under Assets/ and tools/"
     Write-ColdStartStatus -Name "AI workspace" -State (Get-StateForPath ".github/eframe-ai.manifest.json" (-not $IncludeAIWorkspace)) -Detail ".github instructions, skills, and manifest"
     Write-ColdStartStatus -Name "Project updater" -State (Get-StateForPath "tools/Sync-EFrameAIFromFramework.ps1" ((-not $IncludeAIWorkspace) -or $SkipProjectUpdater)) -Detail "tools/Sync-EFrameAIFromFramework.ps1"
-    Write-ColdStartStatus -Name "Bootstrap code" -State (Get-StateForPath "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs" $SkipBootstrapCode) -Detail "Generated ResPath, Procedure, Home UI, SampleModule, and StartUp_SETUP.md"
+    Write-ColdStartStatus -Name "Basic template" -State (Get-StateForPath "Assets/App/Runtime/Generated/Res/ResPath.Generated.cs" $SkipBootstrapCode) -Detail "Copied Basic startup scene, Procedure, Home UI, generated ResPath placeholder, and StartUp_SETUP.md"
 
     Write-Host ""
     Write-Host "Next steps:"
@@ -130,7 +130,7 @@ function Write-ColdStartSummary {
 
     $step = 2
     if (-not $IncludeAIWorkspace) {
-        Write-Host "$step. Open Unity and use EFrame Tools/AI to choose AI clients and sync the AI workspace"
+        Write-Host "$step. Open Unity and use EFrame Tools/AI to sync the AI workspace"
     }
     else {
         Write-Host "$step. Add project-specific AI rules outside the EFrame managed block in your project instruction files"
@@ -138,10 +138,10 @@ function Write-ColdStartSummary {
     $step++
 
     if ($SkipBootstrapCode) {
-        Write-Host "$step. Generate bootstrap code later with tools/Initialize-EFrameBootstrapCode.ps1"
+        Write-Host "$step. Copy the Basic template later with tools/Initialize-EFrameBootstrapCode.ps1"
     }
     else {
-        Write-Host "$step. Open Assets/Scenes/StartUp_SETUP.md and build the startup scene in Unity"
+        Write-Host "$step. Open Unity and run EFrame Tools/Addressables/Sync Groups And Generate ResPath if managed resources are not current"
     }
     $step++
 
@@ -167,7 +167,7 @@ if ($IncludeAIWorkspace) {
     & (Join-Path $scriptRoot "Initialize-EFrameAI.ps1") -TargetRoot $resolvedTargetRoot -Clients $AIClients -Force:$Force
 }
 else {
-    Write-Host "Skipped AI workspace sync. Use the Unity EFrame Tools/AI menu or run Initialize-EFrameAI.ps1 when you are ready to choose AI clients."
+    Write-Host "Skipped AI workspace sync. Use the Unity EFrame Tools/AI menu or run Initialize-EFrameAI.ps1 when you are ready to sync AI clients."
 }
 
 if ($IncludeAIWorkspace -and -not $SkipProjectUpdater) {

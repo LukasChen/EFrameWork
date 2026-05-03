@@ -1,31 +1,11 @@
-﻿using System;
 using EFramework.Generated;
-using GameApp.UI.Views;
 using EFramework.Runtime.UI;
+using GameApp.UI.Views;
 
 namespace GameApp.UI.Controllers
 {
     public sealed class HomeViewController : UIControllerBase<HomeView>
     {
-        public Action ModuleTestRequested { get; set; }
-
         protected override string AssetPath => ResPath.Generated.UI.Panels.Home.HomeView;
-
-        protected override void OnViewCreated()
-        {
-            base.OnViewCreated();
-            AddButtonClickListener(CurrentView.ModuleTestButton, OnModuleTestButtonClick);
-        }
-
-        protected override void OnViewDestroyed()
-        {
-            ModuleTestRequested = null;
-            base.OnViewDestroyed();
-        }
-
-        private void OnModuleTestButtonClick()
-        {
-            ModuleTestRequested?.Invoke();
-        }
     }
 }

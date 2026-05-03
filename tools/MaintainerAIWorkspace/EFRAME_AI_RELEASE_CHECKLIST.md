@@ -47,14 +47,14 @@
 
 ### 3.2 冷启动与 bootstrap
 
-- `Initialize-EFrameBootstrapCode.ps1` 能在测试项目目录中生成最小启动代码和场景说明。
-- `Initialize-EFrameColdStart.ps1` 能在空测试目录中完成冷启动，并输出包含目录、AI workspace、updater、bootstrap code 的 summary。
+- `Initialize-EFrameBootstrapCode.ps1` 能在测试项目目录中复制 Basic 模板，并把 `.cs.txt` / `.cs.txt.meta` 还原为 `.cs` / `.cs.meta`。
+- `Initialize-EFrameColdStart.ps1` 能在空测试目录中完成冷启动，并输出包含目录、AI workspace、updater、Basic template 的 summary。
 - 冷启动 summary 中没有意外 `WARN`；使用 `-Skip...` 参数时，对应项显示为 `SKIP`。
 
 ### 3.3 Unity 初始化窗口与 AI 菜单
 
-- Unity 菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可创建 `StartUp.unity` 与 `Boot` 结构。
-- 初始化窗口和 `EFrame Tools/AI/*` 菜单能按平台选择 Codex、Copilot、Claude Code 或全部平台，并能运行 AI status、sync、health check；框架不是本地 clone 时会给出可理解的降级提示。
+- Unity 菜单 `EFrame Tools/项目初始化向导` 能打开窗口，并可从 Basic 模板复制或修复 `StartUp.unity`、`Boot` 结构和 Home UI。
+- 初始化窗口和 `EFrame Tools/AI/*` 菜单默认覆盖 Codex、Copilot、Claude Code 全部客户端，并能运行 AI status、sync、health check；框架不是本地 clone 时会给出可理解的降级提示。
 - 初始化窗口会自动补齐 `QUI` 依赖的 Unity SortingLayer；手动修复入口可单独执行。
 
 ### 3.4 Addressables 与 ResPath
@@ -63,7 +63,11 @@
 - 初始化窗口或 Addressables 同步流程能按 ResPath 目录选择生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
 - 托管资源目录导入、移动、删除后会自动同步 Addressables；Player Build 前会执行同步与校验；如果 `ResPath.Generated` 在构建前被刷新，构建会中止并提示等待 Unity 重新编译。
 
-### 3.5 Extension Showcase 模板
+### 3.5 Basic 与 Extension Showcase 模板
+
+- 维护 Basic 时，直接打开完整 Unity fixture `test-fixtures/EFrameBasicTemplate` 调试；编辑其 `Assets` 源模板后运行 `tools/Sync-EFrameBasicTemplate.ps1` 生成 package template。
+- 发布前运行 `tools/Sync-EFrameBasicTemplate.ps1 -CheckOnly`，确认 `test-fixtures/EFrameBasicTemplate/Assets` 与 `packages/com.eframework.core/Editor/Templates/Basic/Assets` 同步。
+- Basic 模板必须停在 `ProcedureHome` 显示 `HomeView` 初始化信息，不包含 legacy sample module 或 optional extension package 引用；`HomeView.prefab`、`StartUp.unity` 和 `.meta` 应随模板复制。
 
 - 维护 Extension Showcase 时，直接打开 `test-fixtures/EFrameShowcaseUnity` 调试 `Assets/Modules/EFrameExtensionShowcase` 源模块。
 - 发布前运行 `tools/Sync-EFrameShowcaseTemplate.ps1 -CheckOnly`，确认 `test-fixtures/EFrameShowcaseUnity/Assets/Modules/EFrameExtensionShowcase` 与 `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` 同步。

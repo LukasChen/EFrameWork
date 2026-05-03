@@ -27,7 +27,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.eframework.core": "0.6.5",
+        "com.eframework.core": "0.6.9",
         "com.unity.addressables": "2.9.1",
         "com.unity.ugui": "2.0.0"
       }
@@ -47,7 +47,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.eframework.core": "0.6.5",
+        "com.eframework.core": "0.6.9",
         "com.unity.ugui": "2.0.0"
       }
     },

@@ -79,4 +79,4 @@ var shopMainView = ResPath.Generated.Modules.Shop.Res.UI.Panels.ShopMain.ShopMai
 - 不要在业务逻辑里散写完整地址字符串。
 - 不要手改 `ResPath.Generated.cs`。
 - 不要让同一类资源同时走 `AssetReference` 和裸字符串两种入口。
-- 不要把示例模块 `SampleModule` 当成长期业务占位不处理；确认结构后应替换为真实模块命名或清理无用示例。
+- 不要把临时验证资源长期留在托管目录；确认结构后应替换为真实命名或清理无用资源。

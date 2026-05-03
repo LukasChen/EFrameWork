@@ -1,6 +1,6 @@
 # EFrame AI 接入说明
 
-这套配置把 EFrame 开发规范沉淀为可继承的 AI 工作区层。新项目引入框架并完成 Unity 冷启动后，可在编辑器窗口选择 Codex、GitHub Copilot 或 Claude Code 平台并同步对应 AI 契约。
+这套配置把 EFrame 开发规范沉淀为可继承的 AI 工作区层。新项目引入框架并完成 Unity 冷启动后，可在编辑器窗口同步 Codex、GitHub Copilot 和 Claude Code 的 AI 契约。
 
 AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启动模板、目录结构、资源路径规范、冷启动脚本或同步流程时，同步维护配套 instructions、skills 和说明文档；发布与 manifest 边界见 [EFRAME_AI_RELEASE_CHECKLIST.md](../../../../tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
 
@@ -27,7 +27,7 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 - `tools/Initialize-EFrameAI.ps1`：把上述工作区文件同步到目标项目根目录
 - `tools/Install-EFrameAIProjectUpdater.ps1`：在业务项目里生成一键更新脚本
 - `tools/Initialize-EFrameColdStart.ps1`：一键完成新项目冷启动
-- `tools/Initialize-EFrameBootstrapCode.ps1`：生成最小启动场景/Procedure 占位代码
+- `tools/Initialize-EFrameBootstrapCode.ps1`：复制 Basic 启动模板，不再动态生成场景、Procedure 或示例模块
 - `packages/com.eframework.core/Documentation~/user/RESPATH_CONVENTION.md`：资源地址中心类与自动生成规则说明
 - `packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md`：AI 协作层架构、命名边界和同步契约
 - `Packages/com.eframework.core/Editor/EFrameProjectInitializationWindow.cs`：Unity 编辑器初始化窗口
@@ -44,42 +44,41 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 
 - 创建推荐目录骨架
 - 目录骨架内容以 `packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md` 为基准
-- 生成最小启动代码骨架、`Assets/App/Res/Bootstrap/README.md`、`Assets/Modules/SampleModule/*` 范例模块和 `Assets/Scenes/StartUp_SETUP.md`
+- 复制 Basic 模板，包括 `StartUp.unity`、最小启动代码、`Assets/App/Res/Bootstrap/README.md`、`HomeView.prefab` 和 `Assets/Scenes/StartUp_SETUP.md`
 
-冷启动默认不自动同步 AI 契约。脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、项目 updater 和 bootstrap code 的状态；AI 相关项默认显示 `SKIP`，由 Unity 初始化窗口或 `EFrame Tools/AI` 菜单选择平台后同步。状态含义：
+冷启动默认不自动同步 AI 契约。脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、项目 updater 和 Basic template 的状态；AI 相关项默认显示 `SKIP`，由 Unity 初始化窗口或 `EFrame Tools/AI` 菜单同步全部支持的 AI 客户端。状态含义：
 
 - `OK`：本次已生成或目标项目中已存在。
 - `SKIP`：用户通过 `-Skip...` 参数主动跳过。
 - `WARN`：预期产物不存在，需要检查前面的脚本输出。
 
-如果你确实希望命令行冷启动同时同步 AI，可以显式传入 `-IncludeAIWorkspace -AIClients all`；否则推荐在 Unity 初始化窗口里选择平台后手动同步。
+如果你确实希望命令行冷启动同时同步 AI，可以显式传入 `-IncludeAIWorkspace -AIClients all`；否则推荐在 Unity 初始化窗口里手动同步。
 
-如果你只想补最小启动代码骨架，可以单独执行：
+如果你只想复制 Basic 启动模板，可以单独执行：
 
 ```powershell
 .\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject"
 ```
 
-它会生成：
+它会从 `packages/com.eframework.core/Editor/Templates/Basic/Assets` 复制：
 
 - `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`（资源常量生成物，命名空间固定为 `EFramework.Generated`）
 - `Assets/App/Runtime/Procedure/ProcedureLauncher.cs`
 - `Assets/App/Runtime/Procedure/ProcedureHome.cs`
 - `Assets/App/Runtime/UI/Views/HomeView.cs`
 - `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
+- `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
 - `Assets/App/Res/Bootstrap/README.md`
-- `Assets/Modules/SampleModule/README.md`
-- `Assets/Modules/SampleModule/Runtime/**/*.cs` 示例模块脚本
+- `Assets/Scenes/StartUp.unity`
 - `Assets/Scenes/StartUp_SETUP.md`
 
-默认范例流程为：`ProcedureLauncher -> ProcedureHome -> HomeUI`。HomeUI 会显示一个“模块测试”按钮，点击后切换到 `SampleModule` 的示例流程与示例界面。
+默认范例流程为：`ProcedureLauncher -> ProcedureHome -> HomeUI`。HomeUI 只显示初始化完成信息，不再包含示例模块入口。
 
-在 Unity 初始化窗口里执行 `Import Initial Templates`，会一次性从 EFrame package 导入所有内置初始范例模板，包括：
+在 Unity 初始化窗口里执行 `Initialize / Repair Project`，会一次性从 EFrame package 导入 Basic 模板，包括：
 
 - `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
-- `Assets/Modules/SampleModule/Res/UI/Panels/SampleModuleMain/SampleModuleMainView.prefab`
 
-这两个 prefab 都带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它们。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这些 prefab。
+该 prefab 带有 `QUIBinding`，运行时示例代码会按标准资源路径加载它。模板复制完成后，项目可以在自己的 `Assets/...` 下直接接管和修改这个 prefab。
 
 生成的 View 访问类采用工具生成模式：View 保持无参构造，通过 `OnBindingSet()` 缓存 `QUIBinding` 组件引用；Controller 通过 `CurrentView` 访问运行中 View，并按 `OnViewCreated()` / `OnViewDestroyed()` 管理实例级绑定，按 `OnViewOpened()` / `OnViewClosed()` 管理每次打开关闭的刷新或暂停逻辑。
 
@@ -95,19 +94,15 @@ EFrame Tools/项目初始化向导
 
 窗口支持：
 
-- `Full Initialize Project`：执行标准初始化链路，包括冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景与示例模板导入
-- `Import Initial Templates`：仅重新导入内置初始范例模板，例如 `HomeView.prefab` 与 `SampleModuleMainView.prefab`
-- `AI Platform`：选择要同步的平台，可选 `All`、`Codex`、`Copilot`、`ClaudeCode`
-- `Check AI Sync Status`：运行 `Initialize-EFrameAI.ps1 -Clients <platform> -StatusOnly`，检查 manifest 差异以及 manifest-tracked 文件是否漂移
-- `Sync AI Workspace`：运行 `Initialize-EFrameAI.ps1 -Clients <platform> -Force`，覆盖所选平台的框架托管 `eframe-*` 文件，并在项目 AI 入口文件中注入或更新 EFrame managed block；同时安装项目侧 updater
-- `Run AI Health Check`：运行 `Test-EFrameAIProject.ps1`，检查同步完整性、managed block 和常见运行时代码风险
-- `Run Unity Compile Check`：运行 `Test-EFrameUnityCompile.ps1`，重放 Unity Bee 生成的 Roslyn response files，捕获 `dotnet build` 可能漏掉的 Unity Editor 编译错误
+- `Initialize / Repair Project`：执行标准初始化链路，包括冷启动、Basic 模板复制、Addressables/ResPath、Audio、DOTween、StartUp 场景与 Home UI 导入
+- `Sync / Repair AI Workspace`：运行 `Initialize-EFrameAI.ps1 -Clients all -Force`，覆盖框架托管 `eframe-*` 文件，并在项目 AI 入口文件中注入或更新 EFrame managed block；同时安装项目侧 updater
+- `Run AI Checks`：依次运行 `Initialize-EFrameAI.ps1 -Clients all -StatusOnly` 和 `Test-EFrameAIProject.ps1`，检查 manifest 差异、manifest-tracked 文件漂移、managed block 和常见运行时代码风险
 
-这些 AI 操作也可以从菜单 `EFrame Tools/AI/Check Sync Status`、`EFrame Tools/AI/Sync Workspace`、`EFrame Tools/AI/Run Health Check` 和 `EFrame Tools/AI/Run Unity Compile Check` 单独执行。
+这些 AI 操作也可以从菜单 `EFrame Tools/AI/Check Sync Status`、`EFrame Tools/AI/Sync Workspace`、`EFrame Tools/AI/Run Health Check` 和 `EFrame Tools/AI/Run Unity Compile Check` 单独执行；菜单入口同样默认面向 Codex、GitHub Copilot 和 Claude Code 全部客户端。
 
-`Full Initialize Project` 会自动补齐 `QUI` 依赖的 Unity SortingLayer（`QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`），避免运行时 UI 排序异常。
+`Initialize / Repair Project` 会自动补齐 `QUI` 依赖的 Unity SortingLayer（`QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`），避免运行时 UI 排序异常。
 
-如果项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口可以创建启动场景；AI 同步按钮会提示在框架仓库根目录执行对应脚本。
+如果项目不是通过本地框架仓库 path 引入，而是通过包缓存或远端包引入，窗口仍会从 package 内 Basic 模板复制启动场景与资源；AI 同步按钮会提示在框架仓库根目录执行对应脚本。
 
 Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，运行时通过 `AudioResourcePaths` 集中加载。
 

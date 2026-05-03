@@ -151,13 +151,15 @@ function Invoke-EFrameColdStart {
         "Assets/App/Runtime/Procedure/ProcedureHome.cs",
         "Assets/App/Runtime/UI/Views/HomeView.cs",
         "Assets/App/Runtime/UI/Controllers/HomeViewController.cs",
+        "Assets/App/Res/UI/Panels/Home/HomeView.prefab",
+        "Assets/Scenes/StartUp.unity",
         "Assets/Scenes/StartUp_SETUP.md"
     )
 
     foreach ($relativePath in $requiredPaths) {
         $absolutePath = Join-Path $projectFullPath $relativePath
         if (-not (Test-Path -LiteralPath $absolutePath)) {
-            throw "Cold start did not generate expected file: $relativePath"
+            throw "Cold start did not create expected Basic template file: $relativePath"
         }
     }
 }

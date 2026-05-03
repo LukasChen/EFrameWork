@@ -49,7 +49,7 @@
                     </div>
                     <div class="eyebrow">Project Bootstrap</div>
                     <h1>Editor 侧最有价值的不是零散菜单，而是把冷启动和升级动作收敛成稳定入口。</h1>
-                    <p class="lead">EFrame 当前已经把项目初始化、Addressables 同步、模板导入、Audio 初始化、DOTween 前置条件整理成 Editor 工具链。文档页要做的是告诉你每个入口负责什么，而不是只罗列菜单名。</p>
+                    <p class="lead">EFrame 当前已经把项目初始化、Addressables 同步、模板复制、Audio 初始化、DOTween 前置条件整理成 Editor 工具链。文档页要做的是告诉你每个入口负责什么，而不是只罗列菜单名。</p>
                     <div class="meta-list">
                         <div><dt>主入口</dt><dd>`EFrame Tools/项目初始化向导`</dd></div>
                         <div><dt>日常同步</dt><dd>Managed directory auto-sync + build preflight</dd></div>
@@ -80,15 +80,15 @@
                     <div class="module-list">
                         <div class="module-row">
                             <strong>`EFrameProjectInitializationWindow`</strong>
-                            <p>项目初始化总入口，负责冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景和初始模板导入。</p>
+                            <p>项目初始化总入口，负责冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景和 Basic 模板复制。</p>
                         </div>
                         <div class="module-row">
                             <strong>`EFrameAddressablesSyncMenu`</strong>
                             <p>作为资源地址修复/验证入口，重新同步托管 Addressables 分组，并按窗口中选择的目录生成 `ResPath.Generated.cs`，不触发完整初始化流程。</p>
                         </div>
                         <div class="module-row">
-                            <strong>`EFrameUIBootstrapUtility` / `EFrameSampleUIPrefabUtility`</strong>
-                            <p>负责 UI sorting layer、示例 prefab、运行时必需资源模板的落地。</p>
+                            <strong>`EFrameUIBootstrapUtility` / Basic template copy</strong>
+                            <p>负责 UI sorting layer、Basic prefab、运行时必需资源模板的落地。</p>
                         </div>
                         <div class="module-row">
                             <strong>`EFrameAudioBootstrapUtility` / `EFrameDotweenBootstrapUtility`</strong>
@@ -110,8 +110,8 @@
                                 <tr><th>场景</th><th>推荐入口</th><th>原因</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>全新项目接入</td><td>`Full Initialize Project`</td><td>一次补齐场景、目录、资源、UI layer、Audio、DOTween 和模板。</td></tr>
-                                <tr><td>只重新导入示例 UI</td><td>`Import Initial Templates`</td><td>避免整套初始化重跑，只更新示例 prefab。</td></tr>
+                                <tr><td>全新项目接入</td><td>`Initialize / Repair Project`</td><td>一次复制 Basic 模板并补齐场景、目录、资源、UI layer、Audio、DOTween。</td></tr>
+                                <tr><td>重置 Basic 启动入口</td><td>`Restore Basic Startup`</td><td>将 StartUp 场景入口恢复为 Basic 的 `ProcedureLauncher`。</td></tr>
                                 <tr><td>资源移动后重新整理地址</td><td>Auto-sync, or `Sync Groups And Generate ResPath` for repair</td><td>托管目录变化会自动同步；菜单入口保留给手动修复和验证。</td></tr>
                             </tbody>
                         </table>
@@ -155,7 +155,7 @@
                         </article>
                         <article class="feature-card">
                             <h3>模板与资源</h3>
-                            <p>导入 `HomeView.prefab`、示例模块 prefab、Audio 配置和相关资源约束。</p>
+                            <p>复制 Basic 模板中的 `HomeView.prefab`、Audio 配置和相关资源约束。</p>
                         </article>
                         <article class="feature-card">
                             <h3>Addressables / ResPath</h3>

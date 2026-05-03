@@ -1,3 +1,6 @@
+using Cysharp.Threading.Tasks;
+using EFramework.Generated;
+using EFramework.Runtime.Asset;
 using EFramework.Runtime.Procedure;
 using GameApp.Modules.EFrameExtensionShowcase.UI;
 using GameApp.Procedure;
@@ -8,6 +11,11 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Procedure
     public sealed class ProcedureEFrameExtensionShowcaseEntry : EFrameProcedure
     {
         private EFrameExtensionShowcaseController m_controller;
+
+        protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
+        {
+            await assets.PreloadAsync<GameObject>(ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView);
+        }
 
         protected override void OnEnter(ProcedureEnterContext context)
         {

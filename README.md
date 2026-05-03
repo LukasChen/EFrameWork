@@ -64,10 +64,10 @@ To cold-start a new project in one command:
 .\tools\Initialize-EFrameColdStart.ps1 -TargetRoot "D:\YourUnityProject" -Force
 ```
 
-To generate the minimal startup Procedure/bootstrap placeholder code only:
+To copy only the Basic startup template without AI sync:
 
 ```powershell
-.\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject" -RootNamespace "YourGame"
+.\tools\Initialize-EFrameBootstrapCode.ps1 -TargetRoot "D:\YourUnityProject" -Force
 ```
 
 To install a project-side updater script:
@@ -90,16 +90,19 @@ To inspect a business project after AI sync or framework upgrades, run:
 
 For package-only consumers, pass the installed package root as `-FrameworkRoot`.
 
-Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to create `StartUp.unity`, the `Boot` object structure, run Unity bootstrap initialization, choose an AI platform, check AI sync status, sync the AI workspace, and run the AI health check from a single window. The same AI actions are available from `EFrame Tools/AI`.
+Inside Unity Editor, you can also open `EFrame Tools/项目初始化向导` to copy or repair the Basic template, register `StartUp.unity`, run Unity bootstrap initialization, check AI sync status, sync the AI workspace, and run the AI health check from a single window. The same AI actions are available from `EFrame Tools/AI`.
 
 ## Test Fixtures
 
 - `test-fixtures/EFrameConsumerUnity`: minimal consumer fixture used by package import and API compile checks.
+- `test-fixtures/EFrameBasicTemplate`: runnable Unity fixture for editing and debugging the Basic startup template. Its `Assets` folder syncs into `packages/com.eframework.core/Editor/Templates/Basic`.
 - `test-fixtures/EFrameShowcaseUnity`: runnable Unity fixture for editing and debugging `Assets/Modules/EFrameExtensionShowcase` with normal `.cs` files and module resources.
 
-After changing the Showcase fixture module, sync the package template before release:
+After changing the Basic or Showcase fixture, sync the package template before release:
 
 ```powershell
+.\tools\Sync-EFrameBasicTemplate.ps1
+.\tools\Sync-EFrameBasicTemplate.ps1 -CheckOnly
 .\tools\Sync-EFrameShowcaseTemplate.ps1
 .\tools\Sync-EFrameShowcaseTemplate.ps1 -CheckOnly
 ```

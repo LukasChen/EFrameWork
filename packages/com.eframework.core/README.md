@@ -13,7 +13,6 @@ EFrame Core is a reusable Unity game framework package extracted from `CozyBloom
 - `AIWorkspace~/`: package-shipped AI rules, skills, managed blocks, and manifest used by EFrame AI sync.
 - `Tools~/`: package-shipped PowerShell tools for AI sync, cold start, updater installation, and project health checks.
 - `Plugins/`: remaining bundled third-party dependencies that still ship with this package.
-- `Samples~/`: Basic and optional module sample documentation for package users.
 
 ## Architecture Layers
 
@@ -21,13 +20,13 @@ EFrame is organized as three layers:
 
 - **Core**: stable infrastructure and the minimal initialization path in `com.eframework.core`.
 - **Extension**: optional packages such as virtual list, UI extras, effects, GM tools, and debug console.
-- **Samples**: installable examples and module entry points that help a project adopt Core or try extensions without making them mandatory dependencies.
+- **Samples**: fixture-backed templates and optional module entry points that help a project adopt Core or try extensions without making them mandatory dependencies.
 
-Core ships a **Basic** template as the minimal runnable project skeleton. It is the maintained form of the current initialization template and creates `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, `SampleModule`, basic UI prefabs, audio setup, Addressables groups, and generated `ResPath` setup without depending on optional extension packages.
+Core ships a **Basic** template as the minimal runnable project skeleton. It is the maintained form of the current initialization template and creates `StartUp.unity`, `ProcedureLauncher`, `ProcedureHome`, `HomeView`, the Home UI prefab, audio setup, Addressables groups, and generated `ResPath` setup without depending on optional extension packages.
 
-The Basic template source used by editor automation lives in `Editor/Templates/Basic`; the package sample description lives in `Samples~/Basic`. Use `EFrame Tools/项目初始化向导` and choose `Full Initialize Project` or `Install Basic Sample / Import Basic Template` rather than importing the sample folder manually.
+The editable Basic source is a full Unity fixture at `test-fixtures/EFrameBasicTemplate`; its `Assets` folder is synced into `Editor/Templates/Basic` with `tools/Sync-EFrameBasicTemplate.ps1`. Use `EFrame Tools/项目初始化向导` and choose `Initialize / Repair Project` rather than importing folders manually.
 
-The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed or refreshed from the initialization window, and can be set as the StartUp Procedure entrance. Framework maintainers edit the runnable source module in `test-fixtures/EFrameShowcaseUnity` and sync it back to the package template with `tools/Sync-EFrameShowcaseTemplate.ps1`. Its runtime UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console demo entries; current entries are stable placeholders ready for future focused demos.
+The **Extension Showcase** is an optional Project Module installed to `Assets/Modules/EFrameExtensionShowcase/`. It is copied from `Editor/Templates/Modules/EFrameExtensionShowcase`, can be installed or refreshed from the initialization window, and can be set as the StartUp Procedure entrance. Framework maintainers edit the runnable source module in `test-fixtures/EFrameShowcaseUnity` and sync it back to the package template with `tools/Sync-EFrameShowcaseTemplate.ps1`. Its prefab-backed runtime UI lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console demo entries; current entries are stable placeholders ready for future focused demos.
 
 The Simple Game Demo direction is intentionally outside this core repository and should be handled later as a separate git repository.
 

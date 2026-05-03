@@ -2,7 +2,7 @@
 
 All notable changes to the `com.eframework.effects` Unity package are documented in this file.
 
-## [Unreleased]
+## [0.1.1] - 2026-05-03
 
 ### Added
 

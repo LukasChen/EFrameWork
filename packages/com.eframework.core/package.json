@@ -1,7 +1,7 @@
 {
   "name": "com.eframework.core",
   "displayName": "EFrame Core",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "unity": "6000.0",
   "description": "Reusable Unity game framework extracted from CozyBloom.",
   "keywords": [
@@ -19,17 +19,5 @@
     "com.unity.inputsystem": "1.19.0",
     "com.unity.render-pipelines.universal": "17.0.4",
     "com.unity.nuget.newtonsoft-json": "3.2.1"
-  },
-  "samples": [
-    {
-      "displayName": "Basic Project Skeleton",
-      "description": "Minimal runnable EFrame startup skeleton documented for the initialization window.",
-      "path": "Samples~/Basic"
-    },
-    {
-      "displayName": "Extension Showcase Module",
-      "description": "Optional project module reference for EFrame extension demos.",
-      "path": "Samples~/ExtensionShowcaseModule"
-    }
-  ]
+  }
 }

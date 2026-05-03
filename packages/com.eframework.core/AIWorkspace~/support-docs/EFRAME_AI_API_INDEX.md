@@ -100,7 +100,7 @@ Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
 | Full project initialization | `EFrameProjectInitializationWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Unity menu entry for cold-start/bootstrap tasks. |
-| Install minimal runnable startup skeleton | `Install Basic Sample / Import Basic Template` | `packages/com.eframework.core/Editor/Templates/Basic`, `packages/com.eframework.core/Samples~/Basic` | Basic is the core-owned minimal project skeleton and must not depend on optional extension packages. |
+| Install minimal runnable startup skeleton | `Initialize / Repair Project` | `packages/com.eframework.core/Editor/Templates/Basic`, `test-fixtures/EFrameBasicTemplate` | Basic is copied from the package template, stops at `ProcedureHome` showing `HomeView`, and must not depend on optional extension packages or legacy sample modules. |
 | Install optional extension demos | `Install Showcase` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Copies the full module template to `Assets/Modules/EFrameExtensionShowcase`, converts `.cs.txt` to `.cs`, preserves module resource `.meta` files, tries local sibling `file:` extension package installs, and can set `ProcedureEFrameExtensionShowcaseEntry` as StartUp entrance. |
 | Preview template changes for optional extension demos | `Refresh Showcase From Template` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Replaces the installed `Assets/Modules/EFrameExtensionShowcase` copy after confirmation, refreshes assets, and re-syncs managed Addressables. Framework maintainers edit the source module in `test-fixtures/EFrameShowcaseUnity` and sync it back with `tools/Sync-EFrameShowcaseTemplate.ps1`. |
 | Restore minimal startup flow | `Restore Basic Startup` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Sets the StartUp scene `EFrameProcedureComponent` entrance back to `GameApp.Procedure.ProcedureLauncher`. |
@@ -111,10 +111,10 @@ Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 
 Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor APIs can make narrow serialized changes.
 
-## Samples And Optional Modules
+## Templates And Optional Modules
 
 | Need | Use | Source | Notes |
 | --- | --- | --- | --- |
-| Minimal new-project baseline | Basic | `packages/com.eframework.core/Samples~/Basic`, `packages/com.eframework.core/Editor/Templates/Basic` | Use the initialization window instead of manually copying sample folders. |
-| Extension demo launcher | `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Optional Project Module; does not belong in core runtime and should remain isolated under `Assets/Modules/EFrameExtensionShowcase`. |
+| Minimal new-project baseline | Basic | `test-fixtures/EFrameBasicTemplate`, `packages/com.eframework.core/Editor/Templates/Basic` | Maintainers open the full Unity fixture, edit its `Assets` source, and sync it with `tools/Sync-EFrameBasicTemplate.ps1`; users run the initialization window instead of manually copying template folders. |
+| Extension demo launcher | `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Optional Project Module with a prefab-backed UI under `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase`; does not belong in core runtime and should remain isolated under `Assets/Modules/EFrameExtensionShowcase`. |
 | Future full game demo | Separate repository | n/a | Do not implement a complete Simple Game Demo inside `com.eframework.core`. |

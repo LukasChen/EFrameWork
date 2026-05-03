@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  -
+  - Water
+  - UI
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  -
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: QuiBackground
+    uniqueID: 1
+    locked: 0
+  - name: QuiPanel
+    uniqueID: 2
+    locked: 0
+  - name: QuiPopUp
+    uniqueID: 3
+    locked: 0
+  - name: QuiTooltip
+    uniqueID: 4
+    locked: 0
+  - name: QuiEffect
+    uniqueID: 5
+    locked: 0
+  - name: QuiTop
+    uniqueID: 6
+    locked: 0
+  m_RenderingLayers:
+  - Default
+  m_MigratedRenderPipelines: []
