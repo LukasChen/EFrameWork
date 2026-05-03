@@ -48,14 +48,9 @@ EFrame Tools/项目初始化向导
 -> Install Showcase
 ```
 
-The installer copies the module template, refreshes assets, syncs managed Addressables, and tries to add local sibling extension packages with `file:` package references when this repository is used as a local framework checkout. If sibling packages are not found, the project can still keep the module and install extensions manually from git or UPM.
+The installer copies the module template, refreshes assets, syncs managed Addressables, sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`, and writes local sibling extension packages into `Packages/manifest.json` as `file:` package references when this repository is used as a local framework checkout. If sibling packages are not found, the project can still keep the module and install extensions manually from git or UPM.
 
-For framework template maintenance, open `test-fixtures/EFrameShowcaseUnity` directly in Unity and edit `Assets/Modules/EFrameExtensionShowcase/` there. Run `tools/Sync-EFrameShowcaseTemplate.ps1` before release to generate the package template; the script converts `.cs` to `.cs.txt` while preserving module resources and `.meta` files. In a consuming project, `Refresh Showcase From Template` replaces the installed `Assets/Modules/EFrameExtensionShowcase/` copy after confirmation, refreshes assets, and re-syncs managed Addressables.
-
-Use these buttons to control startup:
-
-- `Set Showcase Startup`: sets the StartUp scene `EFrameProcedureComponent` entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`.
-- `Restore Basic Startup`: restores the entrance to `GameApp.Procedure.ProcedureLauncher`.
+For framework template maintenance, open `test-fixtures/EFrameShowcaseUnity` directly in Unity and edit `Assets/Modules/EFrameExtensionShowcase/` there. Run `tools/Sync-EFrameShowcaseTemplate.ps1` before release to generate the package template; the script converts `.cs` to `.cs.txt` while preserving module resources and `.meta` files.
 
 The current showcase UI is backed by `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` and lists UI Virtual List, UI Extras, Effects, GMTools, and Debug Console entries. Each entry is a minimal runtime placeholder so future extension-specific demos can be added without changing the module shape.
 

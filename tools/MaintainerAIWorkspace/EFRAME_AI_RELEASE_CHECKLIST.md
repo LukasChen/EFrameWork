@@ -72,7 +72,7 @@
 - 维护 Extension Showcase 时，直接打开 `test-fixtures/EFrameShowcaseUnity` 调试 `Assets/Modules/EFrameExtensionShowcase` 源模块。
 - 发布前运行 `tools/Sync-EFrameShowcaseTemplate.ps1 -CheckOnly`，确认 `test-fixtures/EFrameShowcaseUnity/Assets/Modules/EFrameExtensionShowcase` 与 `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` 同步。
 - 如果 `-CheckOnly` 失败，先运行 `tools/Sync-EFrameShowcaseTemplate.ps1` 生成 package template，再重新检查；脚本会将 `.cs` / `.cs.meta` 转为 `.cs.txt` / `.cs.txt.meta`，其他模块资源和 `.meta` 原样同步。
-- 初始化窗口安装或刷新 Showcase 后，资源 `.meta` 必须随模板复制，确保 prefab、材质、ScriptableObject 等非代码资源引用稳定。
+- 初始化窗口安装 Showcase 后，资源 `.meta` 必须随模板复制，确保 prefab、材质、ScriptableObject 等非代码资源引用稳定。
 
 ### 3.6 文档与契约一致性
 

@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using EFramework.Runtime.Procedure;
 using UnityEditor;
 using UnityEditor.PackageManager;
-using UnityEditor.PackageManager.Requests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -40,12 +41,9 @@ namespace EFramework.Editor.ProjectBootstrap
             "com.eframework.debug-console"
         };
 
-        private static readonly Queue<(string packageName, string packageSpec)> PendingPackageAdds = new();
         private static readonly Queue<Action> PendingEditorActions = new();
         private static readonly object PendingEditorActionsLock = new();
         private static bool s_pendingEditorActionProcessorRegistered;
-        private static AddRequest s_packageAddRequest;
-        private static string s_currentPackageName;
 
         private string m_statusMessage;
         private string m_aiCheckMessage;
@@ -125,30 +123,9 @@ namespace EFramework.Editor.ProjectBootstrap
             {
                 EditorGUILayout.LabelField("Samples And Optional Modules", EditorStyles.boldLabel);
 
-                using (new EditorGUILayout.HorizontalScope())
+                if (GUILayout.Button("Install Showcase", GUILayout.Height(28f)))
                 {
-                    if (GUILayout.Button("Install Showcase"))
-                    {
-                        InstallExtensionShowcaseModule();
-                    }
-
-                    if (GUILayout.Button("Refresh Showcase From Template"))
-                    {
-                        RefreshExtensionShowcaseModuleFromTemplate();
-                    }
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Set Showcase Startup"))
-                    {
-                        SetExtensionShowcaseAsStartup();
-                    }
-
-                    if (GUILayout.Button("Restore Basic Startup"))
-                    {
-                        RestoreBasicStartup();
-                    }
+                    InstallExtensionShowcaseModule();
                 }
             }
 
@@ -374,7 +351,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void InstallExtensionShowcaseModule()
         {
-            TryInstallLocalExtensionPackages(out var packageMessage);
             if (!CopyExtensionShowcaseTemplate(out var copyMessage))
             {
                 SetStatus(copyMessage, true);
@@ -393,7 +369,8 @@ namespace EFramework.Editor.ProjectBootstrap
                 return;
             }
 
-            SetStatus($"{copyMessage} {packageMessage} {startupMessage}".Trim(), false);
+            TryInstallLocalExtensionPackages(out var packageMessage);
+            SetStatus($"{copyMessage} {startupMessage} {packageMessage}".Trim(), false);
         }
 
         private void RefreshExtensionShowcaseModuleFromTemplate()
@@ -797,19 +774,21 @@ namespace EFramework.Editor.ProjectBootstrap
                 return false;
             }
 
-            var packageParent = Directory.GetParent(frameworkRoot)?.FullName;
-            if (string.IsNullOrEmpty(packageParent))
+            if (!TryResolveLocalExtensionPackageRoot(frameworkRoot, out var packageParent))
             {
-                message = "Could not resolve the package parent directory. Install extension packages manually if needed.";
+                message = "Could not resolve local sibling extension packages. Install them manually from git or UPM if this is not a local framework checkout.";
                 return false;
             }
 
-            var started = 0;
+            var added = 0;
             var missing = new List<string>();
+            var alreadyInstalled = 0;
+            var dependenciesToAdd = new Dictionary<string, string>();
             foreach (var packageName in ExtensionPackageNames)
             {
-                if (UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{packageName}") != null)
+                if (IsPackageDependencyPresent(packageName))
                 {
+                    alreadyInstalled++;
                     continue;
                 }
 
@@ -820,29 +799,36 @@ namespace EFramework.Editor.ProjectBootstrap
                     continue;
                 }
 
-                EnqueuePackageAdd(packageName, $"file:{siblingPath.Replace('\\', '/')}");
-                started++;
+                dependenciesToAdd[packageName] = BuildLocalPackageSpec(siblingPath);
             }
 
-            if (started > 0)
+            if (dependenciesToAdd.Count > 0)
             {
-                StartPackageInstallQueue();
+                if (!TryAddDependenciesToProjectManifest(dependenciesToAdd, out added, out var manifestMessage))
+                {
+                    message = manifestMessage;
+                    return false;
+                }
+
+                Client.Resolve();
             }
 
-            message = BuildExtensionPackageInstallMessage(started, missing);
-            return started > 0;
+            message = BuildExtensionPackageInstallMessage(added, alreadyInstalled, missing);
+            return added > 0;
         }
 
-        private static string BuildExtensionPackageInstallMessage(int started, List<string> missing)
+        private static string BuildExtensionPackageInstallMessage(int added, int alreadyInstalled, List<string> missing)
         {
             var parts = new List<string>();
-            if (started > 0)
+            if (added > 0)
             {
-                parts.Add($"Started installing {started} local extension package(s).");
+                parts.Add($"Added {added} local extension package {FormatDependencyNoun(added)} to Packages/manifest.json.");
             }
             else
             {
-                parts.Add("No local extension package install was started.");
+                parts.Add(alreadyInstalled > 0
+                    ? "All available local extension package dependencies were already present."
+                    : "No local extension package dependency was added.");
             }
 
             if (missing.Count > 0)
@@ -853,51 +839,221 @@ namespace EFramework.Editor.ProjectBootstrap
             return string.Join(" ", parts);
         }
 
-        private static void EnqueuePackageAdd(string packageName, string packageSpec)
+        private static bool TryResolveLocalExtensionPackageRoot(string frameworkRoot, out string packageParent)
         {
-            PendingPackageAdds.Enqueue((packageName, packageSpec));
-        }
+            packageParent = string.Empty;
 
-        private static void StartPackageInstallQueue()
-        {
-            EditorApplication.update -= ProcessPackageInstallQueue;
-            EditorApplication.update += ProcessPackageInstallQueue;
-            ProcessPackageInstallQueue();
-        }
-
-        private static void ProcessPackageInstallQueue()
-        {
-            if (s_packageAddRequest != null)
+            var current = new DirectoryInfo(frameworkRoot);
+            while (current != null)
             {
-                if (!s_packageAddRequest.IsCompleted)
+                if (IsExtensionPackageRoot(current.FullName))
                 {
-                    return;
+                    packageParent = current.FullName;
+                    return true;
                 }
 
-                if (s_packageAddRequest.Status == StatusCode.Success)
+                var packagesPath = Path.Combine(current.FullName, "packages");
+                if (IsExtensionPackageRoot(packagesPath))
                 {
-                    Debug.Log($"[EFrame] Installed extension package: {s_currentPackageName}");
-                }
-                else
-                {
-                    Debug.LogWarning($"[EFrame] Failed to install extension package {s_currentPackageName}: {s_packageAddRequest.Error?.message}");
+                    packageParent = packagesPath;
+                    return true;
                 }
 
-                s_packageAddRequest = null;
-                s_currentPackageName = string.Empty;
+                current = current.Parent;
             }
 
-            if (PendingPackageAdds.Count == 0)
+            return false;
+        }
+
+        private static bool IsExtensionPackageRoot(string packageParent)
+        {
+            if (string.IsNullOrEmpty(packageParent) || !Directory.Exists(packageParent))
             {
-                EditorApplication.update -= ProcessPackageInstallQueue;
-                AssetDatabase.Refresh();
-                return;
+                return false;
             }
 
-            var next = PendingPackageAdds.Dequeue();
-            s_currentPackageName = next.packageName;
-            Debug.Log($"[EFrame] Installing extension package {next.packageName} from {next.packageSpec}");
-            s_packageAddRequest = Client.Add(next.packageSpec);
+            foreach (var packageName in ExtensionPackageNames)
+            {
+                if (Directory.Exists(Path.Combine(packageParent, packageName)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsPackageDependencyPresent(string packageName)
+        {
+            if (UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{packageName}") != null)
+            {
+                return true;
+            }
+
+            var manifestPath = GetProjectManifestPath();
+            if (!File.Exists(manifestPath))
+            {
+                return false;
+            }
+
+            var manifest = File.ReadAllText(manifestPath);
+            if (!TryFindDependenciesObject(manifest, out var dependenciesStart, out var dependenciesEnd))
+            {
+                return false;
+            }
+
+            var dependencies = manifest.Substring(dependenciesStart, dependenciesEnd - dependenciesStart + 1);
+            return Regex.IsMatch(dependencies, $"\"{Regex.Escape(packageName)}\"\\s*:", RegexOptions.CultureInvariant);
+        }
+
+        private static string BuildLocalPackageSpec(string packagePath)
+        {
+            var manifestDirectory = Path.GetDirectoryName(GetProjectManifestPath());
+            var specPath = string.IsNullOrEmpty(manifestDirectory)
+                ? packagePath
+                : Path.GetRelativePath(manifestDirectory, packagePath);
+
+            return $"file:{specPath.Replace('\\', '/')}";
+        }
+
+        private static bool TryAddDependenciesToProjectManifest(IReadOnlyDictionary<string, string> dependenciesToAdd, out int added, out string message)
+        {
+            added = 0;
+            var manifestPath = GetProjectManifestPath();
+            if (!File.Exists(manifestPath))
+            {
+                message = $"Project manifest was not found at {manifestPath}. Extension packages were not installed automatically.";
+                return false;
+            }
+
+            var manifest = File.ReadAllText(manifestPath);
+            if (!TryFindDependenciesObject(manifest, out var dependenciesStart, out var dependenciesEnd))
+            {
+                message = "Project manifest does not contain a dependencies object. Extension packages were not installed automatically.";
+                return false;
+            }
+
+            var insertIndex = dependenciesEnd;
+            while (insertIndex > dependenciesStart + 1 && char.IsWhiteSpace(manifest[insertIndex - 1]))
+            {
+                insertIndex--;
+            }
+
+            var dependenciesContent = manifest.Substring(dependenciesStart + 1, insertIndex - dependenciesStart - 1);
+            var hasExistingDependencies = Regex.IsMatch(dependenciesContent, "\"[^\"]+\"\\s*:", RegexOptions.CultureInvariant);
+            var newline = DetectNewLine(manifest);
+            var insertion = new StringBuilder();
+            if (hasExistingDependencies)
+            {
+                insertion.Append(",");
+            }
+
+            foreach (var dependency in dependenciesToAdd)
+            {
+                if (added > 0)
+                {
+                    insertion.Append(",");
+                }
+
+                insertion.Append(newline);
+                insertion.Append("    \"");
+                insertion.Append(dependency.Key);
+                insertion.Append("\": \"");
+                insertion.Append(dependency.Value);
+                insertion.Append("\"");
+                added++;
+            }
+
+            if (added == 0)
+            {
+                message = "No local extension package dependency was added.";
+                return true;
+            }
+
+            File.WriteAllText(manifestPath, manifest.Insert(insertIndex, insertion.ToString()), new UTF8Encoding(false));
+            message = $"Added {added} local extension package {FormatDependencyNoun(added)} to Packages/manifest.json.";
+            return true;
+        }
+
+        private static string FormatDependencyNoun(int count)
+        {
+            return count == 1 ? "dependency" : "dependencies";
+        }
+
+        private static string DetectNewLine(string text)
+        {
+            return text.IndexOf("\r\n", StringComparison.Ordinal) >= 0 ? "\r\n" : "\n";
+        }
+
+        private static bool TryFindDependenciesObject(string manifest, out int objectStart, out int objectEnd)
+        {
+            objectStart = -1;
+            objectEnd = -1;
+
+            var match = Regex.Match(manifest, "\"dependencies\"\\s*:\\s*\\{", RegexOptions.CultureInvariant);
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            objectStart = manifest.IndexOf('{', match.Index + match.Length - 1);
+            if (objectStart < 0)
+            {
+                return false;
+            }
+
+            var depth = 0;
+            var inString = false;
+            var escaping = false;
+            for (var index = objectStart; index < manifest.Length; index++)
+            {
+                var character = manifest[index];
+                if (inString)
+                {
+                    if (escaping)
+                    {
+                        escaping = false;
+                    }
+                    else if (character == '\\')
+                    {
+                        escaping = true;
+                    }
+                    else if (character == '"')
+                    {
+                        inString = false;
+                    }
+
+                    continue;
+                }
+
+                if (character == '"')
+                {
+                    inString = true;
+                    continue;
+                }
+
+                if (character == '{')
+                {
+                    depth++;
+                }
+                else if (character == '}')
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        objectEnd = index;
+                        return true;
+                    }
+                }
+            }
+
+            objectStart = -1;
+            return false;
+        }
+
+        private static string GetProjectManifestPath()
+        {
+            return Path.Combine(ProjectRootPath, "Packages", "manifest.json");
         }
 
         private bool ConfigureStartUpProcedure(string entranceProcedureTypeName, bool includeExtensionShowcase, out string message)

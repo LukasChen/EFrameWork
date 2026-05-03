@@ -2,6 +2,13 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.10] - 2026-05-03
+
+### Changed
+
+- Changed the initialization-window Sample area to a single `Install Showcase` action that sets Showcase as StartUp automatically.
+- Updated Extension Showcase installation to write local sibling extension packages into `Packages/manifest.json` as `file:` dependencies and resolve Package Manager packages.
+
 ## [0.6.9] - 2026-05-03
 
 ### Added
