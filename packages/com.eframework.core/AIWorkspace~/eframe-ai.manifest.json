@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.29",
+    "version":  "0.4.30",
     "updatedAt":  "2026-05-03",
-    "notes":  "Add prefab-first static UI rules for business AI contracts.",
+    "notes":  "Add UI extras StateButton and Tabbar guidance.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,11 +33,11 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "d23326395d00cf48e11c560226f46f8c0ebc76fc3610b7c798db7a4d54787f1a"
+                      "sha256":  "f679fcf54f40569b7e5f8901608006bd457c53f4641c5a1b4e9c13b3899f25ec"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "41ea60cb6ecbe143df15146819adb22a4d574a545478f43e921e89637a9e6abe"
+                      "sha256":  "394d0e285fe243fdd058b98d457bbf3aabb36d5107c21072b877996245dbfe69"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

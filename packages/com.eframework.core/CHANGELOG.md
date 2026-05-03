@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.13] - 2026-05-03
+
+### Changed
+
+- Updated AI and user-facing UI Extras references for the new `StateButton` and renamed `Tabbar` components.
+
 ## [0.6.12] - 2026-05-03
 
 ### Added
@@ -89,7 +95,7 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 - Moved Unity Ingame Debug Console out of core into the optional `com.eframework.debug-console` package.
 - Moved reusable presentation effects out of core into the optional `com.eframework.effects` package, including fly animation, icon bounce, camera shake, and their editor tooling.
 - Moved GM tools out of core into the optional `com.eframework.gm-tools` package.
-- Moved UI helper/animation components and lightweight extra controls out of core into the optional `com.eframework.ui-extras` package, including `UIHelper`, `UIAnimation`, `QTab`, and `EmptyRayCasterGraphic`.
+- Moved UI helper/animation components and lightweight extra controls out of core into the optional `com.eframework.ui-extras` package, including `UIHelper`, `UIAnimation`, `Tabbar`, and `EmptyRayCasterGraphic`.
 - Normalized EFrame-owned extension APIs under `EFramework.Extensions.*` namespaces and added the root `tools/Test-EFrameExtensionUnityCompile.ps1` validation path for extension packages.
 - Documented URP as a core-standard dependency and DOTween as an optional project-installed tween backend.
 - Removed NiceVibrations, `QVibration`, `IVibrationService`, and the `EFrame.Vibration` / `Context.Vibration` core entries.

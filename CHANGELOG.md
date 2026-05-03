@@ -4,6 +4,12 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.6.13] - 2026-05-03
+
+### Changed
+
+- Added UI Extras `StateButton`, rebuilt `Tabbar` on top of it, and updated AI/doc references to the new TabBar-style API.
+
 ## [0.6.12] - 2026-05-03
 
 ### Added
@@ -322,7 +328,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 - Added `LastSaveResult` to `DataTable` so save attempts can report whether they wrote, skipped because data was clean, or failed.
 - Moved QUI sorting layer setup into the project bootstrap flow so initialization can auto-create required UI sorting layers, and added runtime QUI warnings when layers are missing.
 - Reorganized editor tooling into `ProjectBootstrap`, `UI`, and `Tools` groups so UI-specific inspectors, bootstrap setup, and developer shortcuts no longer mix under one root.
-- Unified legacy UI component namespaces under `EFramework.Runtime.UI` so `QScroller`, `QTab`, UI animations, and helper components no longer expose mixed historical prefixes.
+- Unified legacy UI component namespaces under `EFramework.Runtime.UI` so `QScroller`, `Tabbar`, UI animations, and helper components no longer expose mixed historical prefixes.
 - Unified `QUIBinding` generated access classes and shipped UI templates on `EFramework.Runtime.UI.Generated` so newly generated view access code matches the runtime UI namespace family.
 - Split runtime UI layout adaptors and reusable controls into `Layout` and `Components` namespace groups so the UI root chain stays distinct from fitters and widget-style utilities.
 - Moved `UIBuilder` and `EmptyRayCasterGraphic` out of the runtime UI root so helper/toolbox code and lightweight reusable components no longer sit beside the core QUI chain.

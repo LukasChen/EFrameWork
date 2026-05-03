@@ -20,7 +20,7 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 - UI 静态结构、布局、切图组装、九宫拉伸、按钮层级和可视状态优先落实到 Unity prefab。
 - Runtime Controller 不应大规模 `new GameObject` 拼装静态 UI；Controller 只负责事件绑定、数据刷新、状态切换和必要的动态列表/Item 实例化。
 - 需要动态生成的重复元素应优先使用 prefab 中的 Template 或独立 Widget prefab。
-- Core runtime UI 只承载 host、binding、controller、handle、transition、layout 与 `QScroller` 主链路；`QTab`、`UIHelper`、`UIAnimation`、virtual list/grid 等扩展组件需要显式依赖对应可选包。业务生成绑定代码使用工具生成的 `EFramework.Generated.UI`。
+- Core runtime UI 只承载 host、binding、controller、handle、transition、layout 与 `QScroller` 主链路；`StateButton`、`Tabbar`、`UIHelper`、`UIAnimation`、virtual list/grid 等扩展组件需要显式依赖对应可选包。业务生成绑定代码使用工具生成的 `EFramework.Generated.UI`。
 - 命名保持框架约定：`ProcedureXxx`、`XxxViewController`、`XxxView.prefab`，组件目录、类名和命名空间大小写一致。
 
 ## UI 主链
