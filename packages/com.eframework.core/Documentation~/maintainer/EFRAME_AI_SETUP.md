@@ -131,9 +131,9 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 .\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Force
 ```
 
-执行后，目标项目会得到所选平台需要的 EFrame AI 接入内容。所有平台都会收到共享的 `.github/instructions/eframe-*`、`.github/skills/eframe-*` 和 `.github/eframe/EFRAME_AI_API_INDEX.md`；Codex 使用项目自己的 `AGENTS.md` 中的 EFrame managed block，GitHub Copilot 使用项目自己的 `.github/copilot-instructions.md` 中的 EFrame managed block，Claude Code 使用项目自己的 `CLAUDE.md` 中的 EFrame managed block。
+执行后，目标项目会得到所选平台需要的 EFrame AI 接入内容。所有平台都会收到共享的 `.github/instructions/eframe-*` 和 `.github/eframe/EFRAME_AI_API_INDEX.md`；Codex 使用项目自己的 `AGENTS.md` 中的 EFrame managed block，并接收 `.agents/skills/eframe-*`；GitHub Copilot 使用项目自己的 `.github/copilot-instructions.md` 中的 EFrame managed block，并接收 `.github/skills/eframe-*`；Claude Code 使用项目自己的 `CLAUDE.md` 中的 EFrame managed block，并接收 `.claude/skills/eframe-*`。
 
-同步过程不会复制人读维护文档 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`，也不会复制维护 AI 契约 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录。业务项目接收的是所选平台需要的 EFrame managed block、`.github/instructions/eframe-*`、`.github/skills/eframe-*`、`.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json`。
+同步过程不会复制人读维护文档 `EFRAME_AI_ARCHITECTURE.md`、`EFRAME_AI_SETUP.md`，也不会复制维护 AI 契约 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 到目标项目根目录。业务项目接收的是所选平台需要的 EFrame managed block、`.github/instructions/eframe-*`、平台原生 `eframe-*` skills、`.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json`。
 
 ## 5. 框架同步方式
 
@@ -187,7 +187,7 @@ Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSe
 - Copilot 框架层：由框架仓库同步到项目 `.github/instructions/eframe-instructions.md`
 - 项目层：项目自己维护根 instruction、`.github/instructions/*.md` 或其他 AI 工具入口
 - API 查询层：框架同步 `.github/eframe/EFRAME_AI_API_INDEX.md`，业务 AI 在生成或重构代码前用它确认稳定 API 入口
-- 工作流层：框架同步 `.github/skills/eframe-*`，项目可按自己的方式维护本地技能或规则
+- 工作流层：框架按平台同步原生 `eframe-*` skills，项目可按自己的方式维护本地技能或规则
 
 Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude Code 分别从项目根目录入口文件中的 EFrame managed block 跳转到同步后的共享规则、API index 和 workflow。
 

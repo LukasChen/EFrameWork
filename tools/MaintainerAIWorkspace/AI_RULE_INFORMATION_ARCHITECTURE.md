@@ -5,7 +5,7 @@ This document defines the target information architecture for EFrame AI rules. I
 ## Design Principles
 
 1. Each rule has one canonical definition.
-2. Platform outputs such as synced instructions, skills, support docs, and managed blocks render rules; they do not become independent sources of truth.
+2. Platform outputs such as synced instructions, native skills, support docs, and managed blocks render rules; they do not become independent sources of truth.
 3. Rule content is structured before wording is optimized.
 4. Layering is explicit: governance, business contract, workflow, reference, validation, and platform output concerns are not mixed.
 5. Loading policy limits context before platform output. A platform receives the smallest rule view it can reliably apply, in the file shape that platform needs.
@@ -145,6 +145,10 @@ Platform outputs combine what was previously separated as rendered files and pla
 - Is the output synced, maintainer-only, or local to the framework repository?
 
 Platform outputs must not redefine EFrame business rules. They only render or point to rule views.
+
+Current platform capability and native skill paths are tracked in [AI_PLATFORM_CAPABILITY_MATRIX.md](AI_PLATFORM_CAPABILITY_MATRIX.md). The current business skill source renders to `.agents/skills/eframe-*` for Codex, `.github/skills/eframe-*` for VS Code GitHub Copilot, and `.claude/skills/eframe-*` for Claude Code. Root entries and always-on instructions should not list skill routing; platform-native skill metadata owns task activation.
+
+The API index is an API lookup cache. It may contain API names, source paths, and very short use/avoid notes only. Workflow steps, checklists, canonical rule prose, platform adapters, release process, and manifest maintenance belong outside the API index.
 
 ## Migration Sequence
 

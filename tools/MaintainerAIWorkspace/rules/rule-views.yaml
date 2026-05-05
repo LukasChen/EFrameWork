@@ -83,6 +83,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
       syncedPath: .github/skills/eframe-feature-bootstrap/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-feature-bootstrap/SKILL.md
+        copilot: .github/skills/eframe-feature-bootstrap/SKILL.md
+        claude-code: .claude/skills/eframe-feature-bootstrap/SKILL.md
     includes:
       - set: workflow.feature-bootstrap
         render: full
@@ -103,6 +107,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
       syncedPath: .github/skills/eframe-directory-structure/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-directory-structure/SKILL.md
+        copilot: .github/skills/eframe-directory-structure/SKILL.md
+        claude-code: .claude/skills/eframe-directory-structure/SKILL.md
     includes:
       - set: directory.ownership
         render: full
@@ -117,6 +125,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
       syncedPath: .github/skills/eframe-ui-feature/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-ui-feature/SKILL.md
+        copilot: .github/skills/eframe-ui-feature/SKILL.md
+        claude-code: .claude/skills/eframe-ui-feature/SKILL.md
     includes:
       - set: ui.business-contract
         render: full
@@ -142,6 +154,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
       syncedPath: .github/skills/eframe-resource-flow/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-resource-flow/SKILL.md
+        copilot: .github/skills/eframe-resource-flow/SKILL.md
+        claude-code: .claude/skills/eframe-resource-flow/SKILL.md
     includes:
       - set: resources.asset-flow
         render: full
@@ -156,6 +172,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
       syncedPath: .github/skills/eframe-data-table/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-data-table/SKILL.md
+        copilot: .github/skills/eframe-data-table/SKILL.md
+        claude-code: .claude/skills/eframe-data-table/SKILL.md
     includes:
       - set: data.persistence
         render: full
@@ -168,6 +188,10 @@ views:
     targetOutput:
       sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
       syncedPath: .github/skills/eframe-guideline-audit/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-guideline-audit/SKILL.md
+        copilot: .github/skills/eframe-guideline-audit/SKILL.md
+        claude-code: .claude/skills/eframe-guideline-audit/SKILL.md
     includes:
       - set: workflow.guideline-audit
         render: checklist

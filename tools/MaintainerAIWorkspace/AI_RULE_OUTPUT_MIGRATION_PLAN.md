@@ -24,8 +24,8 @@
 ## 当前进度
 
 - Phase A：已通过 `rules/rule-views.yaml` 的 `targetOutput` 和本计划的输出文件映射建立显式对应关系。
-- Phase B：已在 `0.6.18` / manifest `0.4.35` 中瘦身三个 managed blocks，使平台入口只保留路由、最小 baseline 和 handoff。
-- Phase C：已在 `0.6.19` / manifest `0.4.36` 中瘦身 always-on instruction，使常驻规则只保留稳定边界和 task handoff。
+- Phase B：已在 `0.6.18` / manifest `0.4.35` 中瘦身三个 managed blocks，使平台入口只保留路由、最小 baseline 和 handoff；后续进一步移除 native skill 路由。
+- Phase C：已在 `0.6.19` / manifest `0.4.36` 中瘦身 always-on instruction，使常驻规则只保留稳定边界和 task handoff；后续进一步移除 task handoff 列表。
 - Phase D：已在 `0.6.20` / manifest `0.4.37` 中收敛 API index，使它只承载 API lookup 和短行为提示。
 - Phase E：已在 `0.6.21` / manifest `0.4.38` 中整理 specialized skills 和 references，使 coordinator/audit skill 只做分流和审查框架，详细 checklist 回到 reference。
 - Phase F 尚未执行。
@@ -34,18 +34,20 @@
 
 | 当前输出源 | 同步目标 | Rule View | 迁移目标 |
 | --- | --- | --- | --- |
-| `AIWorkspace~/instructions/eframe-instructions.md` | `.github/instructions/eframe-instructions.md` | `instruction.eframe-always-on` | 最小 always-on 规则，只保留短边界和 handoff |
-| `AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md` | `.github/eframe/EFRAME_AI_API_INDEX.md` | `support-doc.api-index` | API lookup + 极短 use/avoid note，不承载 workflow |
-| `AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md` | `.github/skills/eframe-feature-bootstrap/SKILL.md` | `skill.feature-bootstrap` | 总控 workflow，只做分类、边界和 specialized skill handoff |
-| `AIWorkspace~/skills/eframe-directory-structure/SKILL.md` | `.github/skills/eframe-directory-structure/SKILL.md` | `skill.directory-structure` | 目录和 ownership 规则主入口 |
-| `AIWorkspace~/skills/eframe-ui-feature/SKILL.md` | `.github/skills/eframe-ui-feature/SKILL.md` | `skill.ui-feature` | UI 业务契约主入口 |
-| `AIWorkspace~/skills/eframe-resource-flow/SKILL.md` | `.github/skills/eframe-resource-flow/SKILL.md` | `skill.resource-flow` | 资源和 Addressables flow 主入口 |
-| `AIWorkspace~/skills/eframe-data-table/SKILL.md` | `.github/skills/eframe-data-table/SKILL.md` | `skill.data-table` | 数据表和事件持久化主入口 |
-| `AIWorkspace~/skills/eframe-guideline-audit/SKILL.md` | `.github/skills/eframe-guideline-audit/SKILL.md` | `skill.guideline-audit` | 业务审查入口，不混入 release governance |
-| `AIWorkspace~/managed-blocks/eframe-codex-root.md` | `AGENTS.md` managed block | `managed-block.codex` | Codex 平台路由和最小 baseline |
-| `AIWorkspace~/managed-blocks/eframe-copilot-root.md` | `.github/copilot-instructions.md` managed block | `managed-block.copilot` | Copilot 平台路由和最小 baseline |
-| `AIWorkspace~/managed-blocks/eframe-claude-root.md` | `CLAUDE.md` managed block | `managed-block.claude-code` | Claude Code 平台路由和最小 baseline |
-| `AIWorkspace~/skills/*/references/*.md` | `.github/skills/*/references/*.md` | specialized skill references | 详细 checklist，只服务对应 skill |
+| `AIWorkspace~/instructions/eframe-instructions.md` | `.github/instructions/eframe-instructions.md` | `instruction.eframe-always-on` | 最小 always-on 规则，只保留短边界，不列 skill 路由 |
+| `AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md` | `.github/eframe/EFRAME_AI_API_INDEX.md` | `support-doc.api-index` | API lookup + 极短 use/avoid note，不承载 workflow、checklist、规则全文、平台适配或 release 内容 |
+| `AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.feature-bootstrap` | 总控 workflow，只做分类、边界和 specialized skill handoff |
+| `AIWorkspace~/skills/eframe-directory-structure/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.directory-structure` | 目录和 ownership 规则主入口 |
+| `AIWorkspace~/skills/eframe-ui-feature/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.ui-feature` | UI 业务契约主入口 |
+| `AIWorkspace~/skills/eframe-resource-flow/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.resource-flow` | 资源和 Addressables flow 主入口 |
+| `AIWorkspace~/skills/eframe-data-table/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.data-table` | 数据表和事件持久化主入口 |
+| `AIWorkspace~/skills/eframe-guideline-audit/SKILL.md` | `.agents/skills` / `.github/skills` / `.claude/skills` | `skill.guideline-audit` | 业务审查入口，不混入 release governance |
+| `AIWorkspace~/managed-blocks/eframe-codex-root.md` | `AGENTS.md` managed block | `managed-block.codex` | Codex 平台入口和最小 baseline，不列 native skill 路由 |
+| `AIWorkspace~/managed-blocks/eframe-copilot-root.md` | `.github/copilot-instructions.md` managed block | `managed-block.copilot` | Copilot 平台入口和最小 baseline，不列 native skill 路由 |
+| `AIWorkspace~/managed-blocks/eframe-claude-root.md` | `CLAUDE.md` managed block | `managed-block.claude-code` | Claude Code 平台入口和最小 baseline，不列 native skill 路由 |
+| `AIWorkspace~/skills/*/references/*.md` | platform-native skill `references/` | specialized skill references | 详细 checklist，只服务对应 skill |
+
+Managed blocks and always-on instructions must not list native skill paths as routing instructions. Platform-native skill metadata owns workflow activation.
 
 ## 迁移原则
 

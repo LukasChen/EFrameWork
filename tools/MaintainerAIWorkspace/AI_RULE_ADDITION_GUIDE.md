@@ -142,7 +142,7 @@
 
 1. 如果只是 API 查询，更新 `EFRAME_AI_API_INDEX.md`。
 2. 如果 API 自带行为约束，先确认 registry 是否已有对应规则。
-3. API index 只写 source path 和短 note，不写 workflow。
+3. API index 只写 API 名称、source path 和极短 use/avoid note，不写 workflow、checklist、规则全文、平台适配或 release 内容。
 4. 修改 support doc 属于同步输出变化，更新 manifest/hash/changelog。
 
 ## 禁止模式

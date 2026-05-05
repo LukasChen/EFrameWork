@@ -1,6 +1,6 @@
 # EFrame AI API Index
 
-This index is a compact map of stable EFrame APIs for business-project AI. Use it to choose framework entry points before generating or refactoring code. It is not a workflow checklist; for implementation steps, read the relevant `.github/skills/eframe-*` skill.
+This index is a compact map of stable EFrame APIs for business-project AI. Use it to choose framework entry points before generating or refactoring code. It is not a workflow checklist.
 
 After AI sync, business projects receive this document at `.github/eframe/EFRAME_AI_API_INDEX.md`.
 

@@ -172,8 +172,20 @@ function Test-ManifestEntrySelected {
         return Test-AIClientSelected -SelectedClients $SelectedClients -Client "claude-code"
     }
 
-    if ($relativePath -like ".github/instructions/eframe-*" -or $relativePath -like ".github/skills/eframe-*") {
+    if ($relativePath -like ".github/instructions/eframe-*") {
         return $SelectedClients.Count -gt 0
+    }
+
+    if ($relativePath -like ".github/skills/eframe-*") {
+        return Test-AIClientSelected -SelectedClients $SelectedClients -Client "copilot"
+    }
+
+    if ($relativePath -like ".agents/skills/eframe-*") {
+        return Test-AIClientSelected -SelectedClients $SelectedClients -Client "codex"
+    }
+
+    if ($relativePath -like ".claude/skills/eframe-*") {
+        return Test-AIClientSelected -SelectedClients $SelectedClients -Client "claude-code"
     }
 
     if ($relativePath -like ".github/eframe/*") {
@@ -226,7 +238,12 @@ function Test-ManifestEntryIsSupportFile {
         return $false
     }
 
-    if ($relativePath -like ".github/instructions/*" -or $relativePath -like ".github/skills/*") {
+    if (
+        $relativePath -like ".github/instructions/*" -or
+        $relativePath -like ".github/skills/*" -or
+        $relativePath -like ".agents/skills/*" -or
+        $relativePath -like ".claude/skills/*"
+    ) {
         return $false
     }
 
@@ -700,12 +717,16 @@ function Write-SyncStatusReport {
     $sourceInstructionDirectory = Join-Path $sourceRoot "instructions"
     $targetInstructionDirectory = Join-Path $destinationRoot "instructions"
     $sourceSkillDirectory = Join-Path $sourceRoot "skills"
-    $targetSkillDirectory = Join-Path $destinationRoot "skills"
+    $targetCopilotSkillDirectory = Join-Path $destinationRoot "skills"
+    $targetCodexSkillDirectory = Join-Path (Join-Path $resolvedTargetRoot ".agents") "skills"
+    $targetClaudeSkillDirectory = Join-Path (Join-Path $resolvedTargetRoot ".claude") "skills"
 
     $managedInstructionNames = Get-ManagedItemNames -DirectoryPath $sourceInstructionDirectory -Pattern "eframe-*"
     $managedSkillNames = Get-ManagedItemNames -DirectoryPath $sourceSkillDirectory -Pattern "eframe-*"
     $staleInstructionNames = Get-StaleManagedItemNames -SourceDirectory $sourceInstructionDirectory -DestinationDirectory $targetInstructionDirectory -ManagedPattern "eframe-*"
-    $staleSkillNames = Get-StaleManagedItemNames -SourceDirectory $sourceSkillDirectory -DestinationDirectory $targetSkillDirectory -ManagedPattern "eframe-*"
+    $staleCopilotSkillNames = Get-StaleManagedItemNames -SourceDirectory $sourceSkillDirectory -DestinationDirectory $targetCopilotSkillDirectory -ManagedPattern "eframe-*"
+    $staleCodexSkillNames = Get-StaleManagedItemNames -SourceDirectory $sourceSkillDirectory -DestinationDirectory $targetCodexSkillDirectory -ManagedPattern "eframe-*"
+    $staleClaudeSkillNames = Get-StaleManagedItemNames -SourceDirectory $sourceSkillDirectory -DestinationDirectory $targetClaudeSkillDirectory -ManagedPattern "eframe-*"
     $supportDocPaths = @((Get-SelectedSupportFileEntries -Entries $sourceManifestFileEntries) | ForEach-Object { [string]$_.path } | Sort-Object -Unique)
 
     Write-Host ""
@@ -720,9 +741,19 @@ function Write-SyncStatusReport {
     Write-List -Title "Framework-managed support docs:" -Items $supportDocPaths
     Write-List -Title "Project-owned root instruction files receiving EFrame managed blocks:" -Items (Get-ManagedRootBlockTargetPaths -SelectedClients $SelectedClients)
     Write-List -Title "Framework-managed instructions:" -Items $managedInstructionNames
-    Write-List -Title "Framework-managed skills:" -Items $managedSkillNames
+    if (Test-AIClientSelected -SelectedClients $SelectedClients -Client "copilot") {
+        Write-List -Title "Framework-managed Copilot skills (.github/skills):" -Items $managedSkillNames
+    }
+    if (Test-AIClientSelected -SelectedClients $SelectedClients -Client "codex") {
+        Write-List -Title "Framework-managed Codex skills (.agents/skills):" -Items $managedSkillNames
+    }
+    if (Test-AIClientSelected -SelectedClients $SelectedClients -Client "claude-code") {
+        Write-List -Title "Framework-managed Claude Code skills (.claude/skills):" -Items $managedSkillNames
+    }
     Write-List -Title "Stale framework instruction items removed only with -Force:" -Items $staleInstructionNames
-    Write-List -Title "Stale framework skill items removed only with -Force:" -Items $staleSkillNames
+    Write-List -Title "Stale Copilot skill items removed only with -Force:" -Items $staleCopilotSkillNames
+    Write-List -Title "Stale Codex skill items removed only with -Force:" -Items $staleCodexSkillNames
+    Write-List -Title "Stale Claude Code skill items removed only with -Force:" -Items $staleClaudeSkillNames
     Write-Host ""
 }
 
@@ -777,7 +808,17 @@ if (-not (Test-Path $destinationRoot)) {
 }
 
 Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "instructions") -DestinationDirectory (Join-Path $destinationRoot "instructions") -ManagedPattern "eframe-*" -Overwrite:$Force
-Sync-ManagedDirectoryItems -SourceDirectory (Join-Path $sourceRoot "skills") -DestinationDirectory (Join-Path $destinationRoot "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
+
+$sourceSkillsDirectory = Join-Path $sourceRoot "skills"
+if (Test-AIClientSelected -SelectedClients $selectedClients -Client "copilot") {
+    Sync-ManagedDirectoryItems -SourceDirectory $sourceSkillsDirectory -DestinationDirectory (Join-Path $destinationRoot "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
+}
+if (Test-AIClientSelected -SelectedClients $selectedClients -Client "codex") {
+    Sync-ManagedDirectoryItems -SourceDirectory $sourceSkillsDirectory -DestinationDirectory (Join-Path (Join-Path $resolvedTargetRoot ".agents") "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
+}
+if (Test-AIClientSelected -SelectedClients $selectedClients -Client "claude-code") {
+    Sync-ManagedDirectoryItems -SourceDirectory $sourceSkillsDirectory -DestinationDirectory (Join-Path (Join-Path $resolvedTargetRoot ".claude") "skills") -ManagedPattern "eframe-*" -Overwrite:$Force
+}
 
 foreach ($documentName in $aiDocumentNames) {
     Sync-File -SourcePath (Join-Path $frameworkRoot $documentName) -DestinationPath (Join-Path $resolvedTargetRoot $documentName) -Overwrite:$Force

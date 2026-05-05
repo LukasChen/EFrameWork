@@ -16,8 +16,8 @@
 
 | 项目 | 合并前 main | 本分支最终 |
 | --- | --- | --- |
-| Package version | `0.6.16` | `0.6.22` |
-| AI manifest version | `0.4.33` | `0.4.39` |
+| Package version | `0.6.16` | `0.6.23` |
+| AI manifest version | `0.4.33` | `0.4.40` |
 | 分支 | `main` | `codex/ai-contract-refactor-plan` |
 
 ## 同步输出变更
@@ -30,10 +30,12 @@
 | `0.6.20` | `0.4.37` | `EFRAME_AI_API_INDEX.md` 收敛为 API lookup 和短 note |
 | `0.6.21` | `0.4.38` | coordinator / audit skill 分流化，细节回到 references |
 | `0.6.22` | `0.4.39` | 修复 Unity asset `applyTo` 和 UI 入口 forbidden wording |
+| `0.6.23` | `0.4.40` | 为 Codex、GitHub Copilot、Claude Code 增加平台原生 skill 输出路径，并移除 always-on / managed block 的 skill 路由列表 |
 
 业务可见结果：
 
-- `AGENTS.md` / Copilot / Claude Code managed blocks 只做入口路由。
+- `AGENTS.md` / Copilot / Claude Code managed blocks 只做入口 baseline，不列 native skill 路由。
+- Codex 接收 `.agents/skills/eframe-*`，GitHub Copilot 接收 `.github/skills/eframe-*`，Claude Code 接收 `.claude/skills/eframe-*`。
 - Always-on instruction 覆盖 `.cs`、`.prefab`、`.unity`、`.asset`。
 - Unity YAML 编辑口径为业务 AI 优先直接编辑 YAML，Editor API 只作为异常 fallback。
 - UI 业务入口统一为 `EFrame.UI` + `UIControllerBase<TGeneratedView>`。

@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.23] - 2026-05-05
+
+### Changed
+
+- Added platform-native EFrame skill sync outputs for Codex `.agents/skills`, GitHub Copilot `.github/skills`, and Claude Code `.claude/skills`, while keeping always-on instructions and managed blocks free of skill routing lists.
+
 ## [0.6.22] - 2026-05-05
 
 ### Fixed

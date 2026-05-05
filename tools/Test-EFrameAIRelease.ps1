@@ -166,7 +166,10 @@ function Get-ExpectedManifestFilePaths {
     if (Test-Path $workspaceSkillsPath) {
         foreach ($skillDirectory in Get-ChildItem -Path $workspaceSkillsPath -Directory -Filter "eframe-*") {
             foreach ($file in Get-ChildItem -Path $skillDirectory.FullName -Recurse -File) {
-                $paths.Add((Convert-AIWorkspacePathToManifestPath -Path $file.FullName))
+                $githubPath = Convert-AIWorkspacePathToManifestPath -Path $file.FullName
+                $paths.Add($githubPath)
+                $paths.Add(".agents/skills/" + $githubPath.Substring(".github/skills/".Length))
+                $paths.Add(".claude/skills/" + $githubPath.Substring(".github/skills/".Length))
             }
         }
     }
@@ -477,6 +480,33 @@ try {
         $nonEmptyLineCount = @((Get-Content -LiteralPath $instructionPath -Encoding UTF8) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
         if ($nonEmptyLineCount -gt 90) {
             $warnings.Add("$instructionName has $nonEmptyLineCount non-empty lines. Keep synced instructions short; move workflow details to skills.")
+        }
+    }
+
+    $apiIndexPath = Join-Path $aiSupportDocsRoot "EFRAME_AI_API_INDEX.md"
+    if (Test-Path -LiteralPath $apiIndexPath) {
+        $apiIndexText = Get-Content -LiteralPath $apiIndexPath -Raw -Encoding UTF8
+        $forbiddenApiIndexHeadingPatterns = @(
+            "(?im)^##\s+.*\b(Checklist|Steps|Workflow|Release|Manifest|Platform|Adapter)\b",
+            "(?im)^###\s+.*\b(Checklist|Steps|Workflow|Release|Manifest|Platform|Adapter)\b"
+        )
+        foreach ($pattern in $forbiddenApiIndexHeadingPatterns) {
+            if ($apiIndexText -match $pattern) {
+                $warnings.Add("EFRAME_AI_API_INDEX.md may be carrying workflow/checklist/platform/release structure matching '$pattern'. Keep it to API lookup and short notes.")
+            }
+        }
+
+        $apiIndexRows = @($apiIndexText -split "`r?`n" | Where-Object { $_ -match '^\|.+\|$' -and $_ -notmatch '^\|\s*-+' })
+        foreach ($row in $apiIndexRows) {
+            if ($row -notmatch '\|\s*Need\s*\|\s*Use\s*\|\s*Source\s*\|\s*Note\s*\|') {
+                $columns = @($row.Trim('|') -split '\|')
+                if ($columns.Count -ge 4) {
+                    $note = $columns[$columns.Count - 1].Trim()
+                    if ($note.Length -gt 220) {
+                        $warnings.Add("EFRAME_AI_API_INDEX.md has an API note longer than 220 characters: $($note.Substring(0, [Math]::Min(80, $note.Length)))...")
+                    }
+                }
+            }
         }
     }
 

@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.39",
+    "version":  "0.4.40",
     "updatedAt":  "2026-05-05",
-    "notes":  "Fix Unity asset instruction activation and feature UI entry wording.",
+    "notes":  "Add platform-native EFrame skill outputs without always-on skill routing lists.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,33 +14,43 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "899af2f4175522bd76aeeae9d1d9b16b7159df4a730a260c4b34d15818724de0"
+                      "sha256":  "cfb47298a1c0c5defda2e5c1db71d2c9794d4a5e79de6cd1de5b9c53108eca01"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "c05b87f88cc51082501cba69738581ed94ced5544e7b42a2575c963a346d7202"
+                      "sha256":  "6c16eb433b625b0927c64b64712524911a4dab4fe70d06bb8f2cd813d9a8faea"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "0291225417b0ace856668ae59813bf949eaf953955791324e2b9b01652ae9a35"
+                      "sha256":  "bdca4803acff5889c8349164f4fcdc89c260bd744fbd6acec4048acf9978b0a0"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "7f9ed486a81894c560da5e41029308e94da51fba91f2abbb4576281f639739be"
+                      "sha256":  "cae87c32e40d7b57fe843aa3d45b7e9d4b3ff4cfb4c531379b42fee71b3cfc0b"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "039f2ff8db4ff668f8216aaefdbc9d51865599ed07002fdbd3e39fc59ecf5979"
+                      "sha256":  "38a0980577b4ffd93495e94ff189e42c84cba03aa8c6b3997a6fc64de5ce9944"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
+                      "sha256":  "ba13e112e9566bf15561b6d507c23899d21924c36e15d44ef7c4e5e877156beb"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-data-table/references/data-table-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md",
+                      "sha256":  "ba13e112e9566bf15561b6d507c23899d21924c36e15d44ef7c4e5e877156beb"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-data-table/references/data-table-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md",
                       "sha256":  "ba13e112e9566bf15561b6d507c23899d21924c36e15d44ef7c4e5e877156beb"
                   },
                   {
@@ -48,7 +58,27 @@
                       "sha256":  "466d8339057238fd438896faede61f850687138de0ea98c4ecbd46bd5e953faf"
                   },
                   {
+                      "path":  ".agents/skills/eframe-data-table/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-data-table/SKILL.md",
+                      "sha256":  "466d8339057238fd438896faede61f850687138de0ea98c4ecbd46bd5e953faf"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-data-table/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-data-table/SKILL.md",
+                      "sha256":  "466d8339057238fd438896faede61f850687138de0ea98c4ecbd46bd5e953faf"
+                  },
+                  {
                       "path":  ".github/skills/eframe-directory-structure/SKILL.md",
+                      "sha256":  "78f62eb053e7dd5b8b3ed4620323cb59329f7a2092f5289402d231fa9802e060"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-directory-structure/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-directory-structure/SKILL.md",
+                      "sha256":  "78f62eb053e7dd5b8b3ed4620323cb59329f7a2092f5289402d231fa9802e060"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-directory-structure/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-directory-structure/SKILL.md",
                       "sha256":  "78f62eb053e7dd5b8b3ed4620323cb59329f7a2092f5289402d231fa9802e060"
                   },
                   {
@@ -56,15 +86,55 @@
                       "sha256":  "f72413637ae66eff67e05ae1fd5e98d093636aae81ff98c070efd43ad58eeffc"
                   },
                   {
+                      "path":  ".agents/skills/eframe-feature-bootstrap/references/feature-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-feature-bootstrap/references/feature-checklist.md",
+                      "sha256":  "f72413637ae66eff67e05ae1fd5e98d093636aae81ff98c070efd43ad58eeffc"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-feature-bootstrap/references/feature-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-feature-bootstrap/references/feature-checklist.md",
+                      "sha256":  "f72413637ae66eff67e05ae1fd5e98d093636aae81ff98c070efd43ad58eeffc"
+                  },
+                  {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
                       "sha256":  "7cd6a80638fdf950e24c2cd8ee5bd9f54c4ac3bc0905864477c89bdfb87ce5da"
                   },
                   {
+                      "path":  ".agents/skills/eframe-feature-bootstrap/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md",
+                      "sha256":  "7cd6a80638fdf950e24c2cd8ee5bd9f54c4ac3bc0905864477c89bdfb87ce5da"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-feature-bootstrap/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md",
+                      "sha256":  "7cd6a80638fdf950e24c2cd8ee5bd9f54c4ac3bc0905864477c89bdfb87ce5da"
+                  },
+                  {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "97f16d286a441f352b495f2eb2e1591c7942b73d7d528f8f685092c29a76edcb"
+                      "sha256":  "c3d538624807534a98ac058a0d5ad0ba099ebbfd26a415f88b658f39f4fd7523"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-guideline-audit/references/audit-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md",
+                      "sha256":  "c3d538624807534a98ac058a0d5ad0ba099ebbfd26a415f88b658f39f4fd7523"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-guideline-audit/references/audit-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md",
+                      "sha256":  "c3d538624807534a98ac058a0d5ad0ba099ebbfd26a415f88b658f39f4fd7523"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
+                      "sha256":  "02965a29198ab9d068f16470fcee97637b88f9b68537ac097b922f9a40224449"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-guideline-audit/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/SKILL.md",
+                      "sha256":  "02965a29198ab9d068f16470fcee97637b88f9b68537ac097b922f9a40224449"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-guideline-audit/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/SKILL.md",
                       "sha256":  "02965a29198ab9d068f16470fcee97637b88f9b68537ac097b922f9a40224449"
                   },
                   {
@@ -72,7 +142,27 @@
                       "sha256":  "917cd00da32ef9e5c604f95d01ad6e0e2ac6ea4cddc15ce544dd5af3bb0aeef2"
                   },
                   {
+                      "path":  ".agents/skills/eframe-resource-flow/references/resource-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md",
+                      "sha256":  "917cd00da32ef9e5c604f95d01ad6e0e2ac6ea4cddc15ce544dd5af3bb0aeef2"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-resource-flow/references/resource-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md",
+                      "sha256":  "917cd00da32ef9e5c604f95d01ad6e0e2ac6ea4cddc15ce544dd5af3bb0aeef2"
+                  },
+                  {
                       "path":  ".github/skills/eframe-resource-flow/SKILL.md",
+                      "sha256":  "a964990bc1c35526fa40858955677be4a52cb2d5b802e1b3f27c1564fabfb849"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-resource-flow/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-resource-flow/SKILL.md",
+                      "sha256":  "a964990bc1c35526fa40858955677be4a52cb2d5b802e1b3f27c1564fabfb849"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-resource-flow/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-resource-flow/SKILL.md",
                       "sha256":  "a964990bc1c35526fa40858955677be4a52cb2d5b802e1b3f27c1564fabfb849"
                   },
                   {
@@ -80,7 +170,27 @@
                       "sha256":  "bc5d8ffe46bd604dc977e26f84a9cb9867152ea8bceebcd84f33a5046e8a3122"
                   },
                   {
+                      "path":  ".agents/skills/eframe-ui-feature/references/ui-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md",
+                      "sha256":  "bc5d8ffe46bd604dc977e26f84a9cb9867152ea8bceebcd84f33a5046e8a3122"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-ui-feature/references/ui-checklist.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md",
+                      "sha256":  "bc5d8ffe46bd604dc977e26f84a9cb9867152ea8bceebcd84f33a5046e8a3122"
+                  },
+                  {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
+                      "sha256":  "64fdd2eff877e9b2a282c6d6df67ccaf738e7b2ebef084a649ea4f18a7e29ac9"
+                  },
+                  {
+                      "path":  ".agents/skills/eframe-ui-feature/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
+                      "sha256":  "64fdd2eff877e9b2a282c6d6df67ccaf738e7b2ebef084a649ea4f18a7e29ac9"
+                  },
+                  {
+                      "path":  ".claude/skills/eframe-ui-feature/SKILL.md",
+                      "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
                       "sha256":  "64fdd2eff877e9b2a282c6d6df67ccaf738e7b2ebef084a649ea4f18a7e29ac9"
                   }
               ]

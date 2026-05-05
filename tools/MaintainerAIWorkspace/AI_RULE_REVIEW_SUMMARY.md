@@ -8,7 +8,7 @@
 
 - 每条规则已有结构化 registry 草案。
 - rule sets / rule views / loading policy 已建立分层引用。
-- managed blocks、always-on instruction、API index、skills 和 references 已按职责瘦身。
+- managed blocks、always-on instruction、API index、platform-native skills 和 references 已按职责瘦身。
 - 常见任务的按需加载模拟成立。
 - 维护者 release / manifest 规则未进入业务 `eframe-*` skills。
 
@@ -36,14 +36,15 @@
 | D：API index | `0.6.20` | `0.4.37` | API index 收敛为 lookup 表和短行为提示 |
 | E：skills / references | `0.6.21` | `0.4.38` | coordinator/audit skill 分流化，详细 checklist 回到 references |
 | 自审修复 | `0.6.22` | `0.4.39` | 修复 Unity asset `applyTo` 和 UI 入口措辞 |
+| 平台原生 skills | `0.6.23` | `0.4.40` | Codex `.agents/skills`、Copilot `.github/skills`、Claude Code `.claude/skills` 分平台同步 |
 
 ## 同步输出职责
 
 | 输出 | 当前职责 | 不应承载 |
 | --- | --- | --- |
-| Managed blocks | 平台入口、文件路由、最小 baseline | 详细 UI / resource / data / release 规则 |
-| `eframe-instructions.md` | 必须常驻的稳定边界和 task handoff | 多步骤 workflow、长 checklist |
-| `EFRAME_AI_API_INDEX.md` | API lookup、source path、短 use/avoid note | 工作流步骤、发布规则 |
+| Managed blocks | 平台入口和维护边界 baseline | skill 路由、详细 UI / resource / data / release 规则 |
+| `eframe-instructions.md` | 必须常驻的稳定边界 | skill 路由、多步骤 workflow、长 checklist |
+| `EFRAME_AI_API_INDEX.md` | API lookup、source path、极短 use/avoid note | workflow、checklist、规则全文、平台适配、发布规则 |
 | `eframe-feature-bootstrap` | 总控 workflow、任务分类、specialized skill handoff | UI/resource/data 细节规则 |
 | `eframe-guideline-audit` | 业务审查路由和结果格式 | framework release / manifest 结论 |
 | Specialized skills | 各领域 workflow | 维护者发布流程 |

@@ -50,6 +50,6 @@
 ## AI 配置
 
 - 业务项目是否保留 EFrame managed block，不复制整份框架规则到项目自有 instruction
-- 是否存在手改同步得到的 `.github/instructions/eframe-*` 或 `.github/skills/eframe-*`
+- 是否存在手改同步得到的 `.github/instructions/eframe-*` 或平台原生 `eframe-*` skill 输出
 - `.github/eframe/EFRAME_AI_API_INDEX.md` 和 `.github/eframe-ai.manifest.json` 是否存在
 - 初始化脚本和接入说明是否可用

@@ -25,7 +25,7 @@
 6. `Test-EFrameAIRelease.ps1` 通过，并能拦截 manifest 未更新、manifest 版本未递增、文件清单或 hash 不匹配、frontmatter 无效、synced instruction 过长、`eframe-*` skill 元数据缺失、或 maintainer-only 内容误进入同步层等问题。
 7. `Test-EFrameConsumer.ps1` 通过，确认 package 以真实业务项目形态导入后能执行 `Initialize-EFrameColdStart.ps1`、解析依赖、编译 asmdef，并从外部代码使用运行时入口与 `EFramework.Runtime.*` 类型。
 8. `Initialize-EFrameAI.ps1 -StatusOnly` 与 `Initialize-EFrameAI.ps1 -Force` 都能正常运行。
-9. `Initialize-EFrameAI.ps1 -Force` 只同步框架托管项：`.github/instructions/eframe-*`、`.github/skills/eframe-*`、`.github/eframe/EFRAME_AI_API_INDEX.md`，以及 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 中的 EFrame managed block。
+9. `Initialize-EFrameAI.ps1 -Force` 只同步框架托管项：`.github/instructions/eframe-*`、平台原生 `eframe-*` skills（Codex `.agents/skills`、Copilot `.github/skills`、Claude Code `.claude/skills`）、`.github/eframe/EFRAME_AI_API_INDEX.md`，以及 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 中的 EFrame managed block。
 10. `Initialize-EFrameAI.ps1 -StatusOnly` 能按 `-Clients` 报告托管项状态、managed block 接入情况、框架源已移除的 `eframe-*` 项，以及 manifest-tracked 文件或 block 的 hash 漂移。
 11. 如果这是正式 release，检查通过后先向维护者确认待提交范围、版本号、tag 和目标远端；确认后再提交 release 变更、创建与 `packages/com.eframework.core/package.json` 版本一致的 git tag，例如 `v0.2.2`，并按确认范围推送。
 

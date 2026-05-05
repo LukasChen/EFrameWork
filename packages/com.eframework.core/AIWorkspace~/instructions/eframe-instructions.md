@@ -6,21 +6,12 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 
 # EFrame Framework 规则
 
-本文件是使用 EFrame 的项目共享同步契约，只保留必须常驻的稳定边界。多步骤实现、目录判断、UI 细节、资源生命周期、数据表和审查 checklist 由对应 `eframe-*` skill 承载。
+本文件是使用 EFrame 的项目共享同步契约，只保留必须常驻的稳定边界。
 
 ## 协作边界
 
 - 当用户是在提出问题、要求解释或分析方案时，先按讨论处理：可以做必要的只读检查来回答，但在编辑文件、执行初始化/安装/刷新动作或其他会改变项目状态的操作前，必须先确认方案并等待明确批准。
 - 不要直接修改同步得到的 `eframe-*` instruction、skill、reference 或 managed block 来表达项目私有差异；项目私有规则必须写在项目自有 instruction 或其他项目拥有的位置。
-
-## 任务分流
-
-- 新增功能、启动链路、Procedure、Context、UI、资源或数据表工作前，优先读取 `.github/skills/eframe-feature-bootstrap/SKILL.md`，再按任务进入更具体的 EFrame skill。
-- 新建、移动或归类 runtime code、Editor tooling、生成代码、UI prefab、场景、资源或模块内容前，读取 `.github/skills/eframe-directory-structure/SKILL.md`。
-- UI 页面、弹窗、提示层、View prefab、UIController、binding、layer 或 UI lifecycle 工作读取 `.github/skills/eframe-ui-feature/SKILL.md`。
-- 资源目录、Addressables、`ResPath.Generated`、预加载、实例化、释放或资源审查工作读取 `.github/skills/eframe-resource-flow/SKILL.md`。
-- 持久化数据表、StorageKey、dirty tracking、save/load、migration 或 LastLoadResult/LastSaveResult 工作读取 `.github/skills/eframe-data-table/SKILL.md`。
-- 业务项目规范审查、实现复核或 Unity 编译结论读取 `.github/skills/eframe-guideline-audit/SKILL.md`。
 
 ## 启动与 Context
 
