@@ -373,8 +373,8 @@ rules:
     audience: [business-ai, maintainer-ai]
     domain: ui
     layer: business-contract
-    status: candidate
-    canonicalText: IUIService, QUI, and UIViewHandle are framework-internal or advanced-extension concepts, not ordinary business entry points.
+    status: stable
+    canonicalText: Business code must not directly own or drive IUIService, QUI, or UIViewHandle; these are framework-internal or advanced-extension concepts, not ordinary business entry points.
     dependsOn: [U01]
     currentLocations:
       - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
@@ -387,7 +387,7 @@ rules:
       eframe-guideline-audit: checklist
       EFRAME_AI_API_INDEX: api-note
     normalization:
-      - Business-facing files should not present QUI, IUIService, or UIViewHandle as ordinary feature entry points.
+      - Business-facing files must not present QUI, IUIService, or UIViewHandle as ordinary feature entry points.
       - Framework-internal docs may describe the handle-first runtime implementation separately.
 
   - id: U03
@@ -428,7 +428,7 @@ rules:
     audience: [business-ai]
     domain: ui
     layer: workflow
-    status: candidate
+    status: stable
     canonicalText: Controllers access live generated views through CurrentView, not saved handles or obsolete View facades.
     dependsOn: [U03, U04]
     forbiddenPatterns:

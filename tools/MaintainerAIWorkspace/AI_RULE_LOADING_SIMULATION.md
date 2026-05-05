@@ -263,4 +263,4 @@
 
 - `workflow.guideline-audit` 是最宽的业务集合，需要持续防止它变成“全规则加载入口”。
 - `feature-bootstrap` 的 optional skill 列表较长，但它现在只做总控和分流，当前可以接受。
-- `U02` 和 `U05` 仍建议保持 `candidate`，等人工审查 UI 口径后再转 stable。
+- `U02` 和 `U05` 已经人工确认并转为 stable；后续只按实际业务反馈微调措辞。

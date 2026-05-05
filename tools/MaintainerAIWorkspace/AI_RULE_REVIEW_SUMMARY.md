@@ -63,11 +63,11 @@
 
 | 规则 | 当前状态 | 审查问题 |
 | --- | --- | --- |
-| `G05` | stable | 项目私有规则是否只放项目自有 instruction，不进入同步 `eframe-*` 文件 |
-| `U02` | candidate | 是否足够明确地禁止普通业务代码直接持有 `QUI`、`IUIService`、`UIViewHandle` |
-| `U05` | candidate | `CurrentView` 是否已经成为业务侧唯一推荐的 generated View 访问方式 |
-| `R06` | stable | 托管 Addressables 是否明确归 EFrame editor automation 维护 |
-| `E04` | stable | YAML-first 是否足够强，Editor API 是否只作为异常 fallback |
+| `G05` | stable / confirmed | 项目私有规则只放项目自有 instruction，不进入同步 `eframe-*` 文件 |
+| `U02` | stable / confirmed | 明确禁止普通业务代码直接持有 `QUI`、`IUIService`、`UIViewHandle` |
+| `U05` | stable / confirmed | `CurrentView` 确认为业务侧唯一推荐的 generated View 访问方式 |
+| `R06` | stable / confirmed | 托管 Addressables 归 EFrame editor automation 维护 |
+| `E04` | stable / confirmed | YAML-first / fallback-only 口径已确认 |
 
 ## 按需加载结论
 
@@ -99,11 +99,10 @@ Release check 当前显示无未提交 AI-impacting synced 文件变更。
 
 ## 剩余风险
 
-1. `U02` 和 `U05` 仍是 candidate，需要人工确认 UI 口径后再考虑 stable。
-2. `workflow.guideline-audit` 是最宽的业务集合，后续容易膨胀成全规则入口。
-3. `feature-bootstrap` 的 optional skill 较多，需要继续防止它重新复制 specialized rules。
-4. 目前输出仍是人工维护，没有生成器保证 registry 与 markdown 完全一致。
-5. 重复 full text 检查仍是 warning 原型，只能发现原样复制，不能替代人工审查语义重复。
+1. `workflow.guideline-audit` 是最宽的业务集合，后续容易膨胀成全规则入口。
+2. `feature-bootstrap` 的 optional skill 较多，需要继续防止它重新复制 specialized rules。
+3. 目前输出仍是人工维护，没有生成器保证 registry 与 markdown 完全一致。
+4. 重复 full text 检查仍是 warning 原型，只能发现原样复制，不能替代人工审查语义重复。
 
 ## 建议审查清单
 
@@ -121,9 +120,9 @@ Release check 当前显示无未提交 AI-impacting synced 文件变更。
 
 短期：
 
-1. 人工审查 `U02`、`U05`、`E04`、`R06`、`G05`。
-2. 按审查反馈只做小修，不开始生成化。
-3. 根据 warning 结果决定是否扩大重复 full text 检查范围。
+1. 按后续使用反馈只做小修，不开始完整生成化。
+2. 根据 warning 结果决定是否扩大重复 full text 检查范围。
+3. 准备合并或选择一个轻量生成化试点。
 
 中期：
 

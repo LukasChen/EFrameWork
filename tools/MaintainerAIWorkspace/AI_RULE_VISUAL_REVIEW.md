@@ -216,9 +216,11 @@ flowchart TD
 建议用短反馈，直接按规则 ID 或视图 ID 写：
 
 ```text
-U02: canonical text 需要更强硬。
-E04: OK。
-R06/R07: 归属和自动化需要拆得更清楚。
+U02: OK，明确禁止普通业务代码直接持有 QUI/IUIService/UIViewHandle。
+U05: OK，CurrentView 是业务侧唯一推荐的 generated View 访问方式。
+E04: OK，YAML-first / fallback-only 确认。
+R06: OK。
+G05: OK。
 instruction.eframe-always-on: fullRules 太多。
 platform.codex: 应该包含 E04 summary。
 ```
