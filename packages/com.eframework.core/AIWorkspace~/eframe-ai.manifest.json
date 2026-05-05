@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.32",
-    "updatedAt":  "2026-05-03",
-    "notes":  "Release CheckableButton shared state fix and synced template metadata.",
+    "version":  "0.4.33",
+    "updatedAt":  "2026-05-05",
+    "notes":  "Release Unity serialized asset editing contract update.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "6a844214fac7a46e22e6b8a6aeac1c555785916c95dd216009c26f31c5632239"
+                      "sha256":  "1ee424d9e81a610dd10d544684ca3a5d6b6decf126372e81783e931b78834b1a"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

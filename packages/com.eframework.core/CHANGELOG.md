@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.16] - 2026-05-05
+
+### Changed
+
+- Updated synced AI editor guidance for Unity prefab, scene object, and asset edits to allow narrow, transparent YAML edits while preserving Unity serialized identity and using Editor APIs for high-risk structural changes.
+
 ## [0.6.15] - 2026-05-03
 
 ### Fixed

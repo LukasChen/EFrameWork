@@ -67,9 +67,9 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 ## Editor 工具
 
 - Editor 代码只负责生成、导入、菜单命令、校验和 Inspector 扩展；Runtime 程序集不要引用 Editor 程序集，也不要把运行时业务逻辑塞进 `Editor` 程序集。
-- 生成器必须稳定、可重复执行，并有明确覆盖策略；默认避免无提示覆盖用户文件，生成物进入 `Generated`、`App/Res/UI`、`Resources/UI` 等约定路径。
-- 工具脚本先显式校验前置条件，例如目标目录、已有资源、覆盖意图和必需配置；失败时给出可修复的错误信息。
-- 修改 prefab、scene object 或 `.asset` 时使用 Unity Editor 正规路径，例如 `Undo`、`PrefabUtility`、`EditorUtility.SetDirty`、`AssetDatabase.SaveAssets/Refresh`；不要用不透明的文本替换制造 Unity 序列化噪音。
+- 修改 prefab、scene object 或 `.asset` 时，业务 AI 优先直接编辑 Unity YAML；修改必须局部、透明、可审查，并保持 `guid`、`fileID`、`PrefabInstance`、`m_Modification`、组件顺序、层级和引用关系稳定。
+- 禁止重写整个 Unity 资源文件、批量重排序列化块，或做不透明的大范围文本替换制造 Unity 序列化噪音。
+- 当修改涉及结构、组件、引用、nested prefab、variant override、UI binding 等高风险语义，或 YAML 修改后无法确认稳定性时，再使用 Unity Editor 正规路径修复和保存，例如 `Undo`、`SerializedObject`、`PrefabUtility`、`EditorUtility.SetDirty`、`AssetDatabase.SaveAssets/Refresh`。
 - UI 预制体、场景对象或绑定代码必须与运行时命名对齐：`XxxView.prefab`、`XxxViewController`、`ProcedureXxx`。
 - UI 基础配置（例如框架 UI 宿主依赖的 SortingLayer）优先进入 `ProjectBootstrap` 初始化链路；目录按职责分层到 `Editor/UI`、`Editor/ProjectBootstrap`、`Editor/Tools`。
 
