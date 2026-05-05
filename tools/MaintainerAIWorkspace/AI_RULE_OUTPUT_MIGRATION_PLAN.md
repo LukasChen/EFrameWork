@@ -19,6 +19,8 @@
 
 当前同步输出仍然是人工维护的 markdown 文件，尚未由 registry 生成。
 
+人工审查摘要见 [AI_RULE_REVIEW_SUMMARY.md](./AI_RULE_REVIEW_SUMMARY.md)。
+
 ## 当前进度
 
 - Phase A：已通过 `rules/rule-views.yaml` 的 `targetOutput` 和本计划的输出文件映射建立显式对应关系。
