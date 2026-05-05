@@ -1,0 +1,241 @@
+# EFrame AI rule sets draft.
+# Maintainer-only. Rule sets group registry rule IDs by domain or workflow.
+
+schemaVersion: 0.1
+status: draft
+updatedAt: 2026-05-05
+registry: registry.yaml
+
+sets:
+  governance.sync-boundary:
+    title: Sync Boundary And Ownership
+    purpose: Defines framework-owned versus project-owned AI rule surfaces.
+    audience: [maintainer-ai, business-ai]
+    rules:
+      - G01
+      - G02
+      - G03
+      - G04
+      - G05
+      - G06
+      - G07
+      - G08
+      - G09
+
+  governance.business-entry:
+    title: Business Project Entry Baseline
+    purpose: Minimal rules that business project AI should see from root managed blocks or always-on instructions.
+    audience: [business-ai]
+    rules:
+      - G04
+      - G05
+      - G10
+      - P01
+      - P04
+      - P05
+      - U01
+      - U02
+      - R01
+      - R06
+
+  startup.procedure-lifecycle:
+    title: Procedure Startup And Lifecycle
+    purpose: Startup, procedure, initialization, context, camera, and bootstrap boundaries.
+    audience: [business-ai]
+    rules:
+      - P01
+      - P02
+      - P03
+      - P04
+      - P05
+      - P06
+      - P07
+      - P08
+
+  ui.business-contract:
+    title: Business UI Contract
+    purpose: Controller-first business UI behavior and framework-internal UI boundary.
+    audience: [business-ai]
+    rules:
+      - U01
+      - U02
+      - U03
+      - U04
+      - U05
+      - U06
+      - U07
+      - U08
+      - U09
+      - U10
+      - P07
+      - P08
+      - D03
+      - R01
+
+  resources.asset-flow:
+    title: Resource And Addressables Flow
+    purpose: Resource IDs, Addressables ownership, preload, handle release, managed resource automation, and build preflight.
+    audience: [business-ai]
+    rules:
+      - R01
+      - R02
+      - R03
+      - R04
+      - R05
+      - R06
+      - R07
+      - R08
+      - R09
+      - P03
+      - P05
+      - D01
+
+  directory.ownership:
+    title: Directory Ownership And Naming
+    purpose: App/module ownership, generated code placement, UI and scene directories, and project exceptions.
+    audience: [business-ai]
+    rules:
+      - D01
+      - D02
+      - D03
+      - D04
+      - D05
+      - D06
+      - G05
+      - R06
+
+  data.persistence:
+    title: Persistent Data And Events
+    purpose: Data table shape, registration, mutation, migration, save timing, load/save results, and scoped events.
+    audience: [business-ai]
+    rules:
+      - T01
+      - T02
+      - T03
+      - T04
+      - T05
+      - T06
+      - T07
+      - P05
+
+  editor.unity-serialization:
+    title: Editor Tooling And Unity Serialization
+    purpose: Editor assembly boundary, YAML-first Unity serialized editing, fallback APIs, and compile validation.
+    audience: [business-ai]
+    rules:
+      - E01
+      - E02
+      - E03
+      - E04
+      - E05
+      - D02
+
+  workflow.feature-bootstrap:
+    title: Feature Bootstrap Workflow
+    purpose: Coordinated feature scaffolding across procedure, UI, data, resources, directory, and audit work.
+    audience: [business-ai]
+    rules:
+      - W01
+      - D01
+      - P01
+      - P02
+      - P03
+      - U01
+      - U02
+      - R01
+      - T01
+      - W02
+
+  workflow.guideline-audit:
+    title: Guideline Audit Workflow
+    purpose: Compliance review across startup, procedure, UI, resources, directory, data, editor, and AI contract drift.
+    audience: [business-ai]
+    rules:
+      - W02
+      - G05
+      - P01
+      - P02
+      - P06
+      - P07
+      - P08
+      - U01
+      - U02
+      - U05
+      - U06
+      - U07
+      - R01
+      - R04
+      - R06
+      - R08
+      - D01
+      - D05
+      - T01
+      - T03
+      - T05
+      - T07
+      - E01
+      - E04
+      - E05
+
+  maintainer.release-governance:
+    title: Maintainer Release Governance
+    purpose: Release, manifest, sync boundary, and maintainer-only workflow constraints.
+    audience: [maintainer-ai]
+    rules:
+      - G01
+      - G02
+      - G03
+      - G06
+      - G07
+      - G08
+      - G09
+      - W03
+      - W04
+
+  platform.codex:
+    title: Codex Platform Output Inputs
+    purpose: Rules and routing needed by Codex entry output.
+    audience: [platform-output]
+    rules:
+      - G04
+      - G05
+      - G10
+      - P01
+      - U01
+      - U02
+      - R01
+      - R06
+      - W01
+      - W02
+
+  platform.copilot:
+    title: Copilot Platform Output Inputs
+    purpose: Rules and routing needed by GitHub Copilot instruction output.
+    audience: [platform-output]
+    rules:
+      - G04
+      - G05
+      - G10
+      - P01
+      - P05
+      - U01
+      - U02
+      - R01
+      - R06
+
+  platform.claude-code:
+    title: Claude Code Platform Output Inputs
+    purpose: Rules and routing needed by Claude Code entry output.
+    audience: [platform-output]
+    rules:
+      - G04
+      - G05
+      - G10
+      - P01
+      - U01
+      - U02
+      - R01
+      - R06
+      - W01
+      - W02
+

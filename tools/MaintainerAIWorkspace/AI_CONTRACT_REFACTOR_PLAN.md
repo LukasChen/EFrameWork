@@ -190,5 +190,6 @@ Start with Phase 0 and Phase 1 only:
 1. Add `AI_RULE_INFORMATION_ARCHITECTURE.md`.
 2. Keep `AI_RULE_INVENTORY.md` as the bridge inventory.
 3. Add `rules/registry.yaml` as the first structured registry draft.
-4. Do not change synced rule content while the architecture is still settling.
-5. Run release check to ensure no synced-surface regression.
+4. Add `rules/rule-sets.yaml` and `rules/rule-views.yaml` for layered references.
+5. Do not change synced rule content while the architecture is still settling.
+6. Run release check to ensure no synced-surface regression.

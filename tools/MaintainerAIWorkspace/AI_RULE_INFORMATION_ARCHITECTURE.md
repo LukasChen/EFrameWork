@@ -143,9 +143,9 @@ Platform outputs must not redefine EFrame business rules. They only render or po
 
 1. Freeze the current inventory and assign stable rule IDs in `AI_RULE_INVENTORY.md`.
 2. Convert the inventory into a structured registry draft at `rules/registry.yaml`.
-3. Define rule sets for common task domains: UI, resources, data, directory, editor, procedure, audit, release.
-4. Define rule views for current purposes: always-on, workflow, API lookup, audit, release, and setup.
-5. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files.
+3. Define rule sets for common task domains in `rules/rule-sets.yaml`: UI, resources, data, directory, editor, procedure, audit, release.
+4. Define rule views for current purposes in `rules/rule-views.yaml`: always-on, workflow, API lookup, audit, release, and setup.
+5. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files through the rule views.
 6. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
 7. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
 8. Only then consider generating platform outputs.
