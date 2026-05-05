@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.37",
+    "version":  "0.4.38",
     "updatedAt":  "2026-05-05",
-    "notes":  "Slim API index into lookup tables with short behavior notes.",
+    "notes":  "Clarify synced AI skill ownership and reference handoffs.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -41,7 +41,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
-                      "sha256":  "94c0cd6794e0e5439815e6979ee1d88b66eb548a096413b20ab79cb2f637648b"
+                      "sha256":  "ba13e112e9566bf15561b6d507c23899d21924c36e15d44ef7c4e5e877156beb"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/SKILL.md",
@@ -53,11 +53,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/references/feature-checklist.md",
-                      "sha256":  "57a1e9664d2f8aced94e61f6d2b92c637ff84c951e665b3e9d42ff8df905dd0c"
+                      "sha256":  "f72413637ae66eff67e05ae1fd5e98d093636aae81ff98c070efd43ad58eeffc"
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "a94ce99cedbbc0ca4122acb61aa7a46577a4816d037eeb6e7a1d05339057dc99"
+                      "sha256":  "2e6b5b0466774d67fb9fd24dfadf0d8eb6570148c575829ca6955fe2d3b6faf7"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
@@ -65,11 +65,11 @@
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
-                      "sha256":  "a1758f28c766d0493360709048d2c2fca7ba968abcb1a5b748a52d904372617a"
+                      "sha256":  "02965a29198ab9d068f16470fcee97637b88f9b68537ac097b922f9a40224449"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/references/resource-checklist.md",
-                      "sha256":  "d78149479f7f0ebc537b5279631f19731dbb8d25c3222e61e3e474ed52d76048"
+                      "sha256":  "917cd00da32ef9e5c604f95d01ad6e0e2ac6ea4cddc15ce544dd5af3bb0aeef2"
                   },
                   {
                       "path":  ".github/skills/eframe-resource-flow/SKILL.md",

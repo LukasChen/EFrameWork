@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.21] - 2026-05-05
+
+### Changed
+
+- Clarified synced AI skill ownership so coordinator and audit skills delegate detailed UI, resource, directory, data, and compile checks to specialized skills and references.
+
 ## [0.6.20] - 2026-05-05
 
 ### Changed

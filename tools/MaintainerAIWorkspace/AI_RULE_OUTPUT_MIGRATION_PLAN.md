@@ -25,7 +25,8 @@
 - Phase B：已在 `0.6.18` / manifest `0.4.35` 中瘦身三个 managed blocks，使平台入口只保留路由、最小 baseline 和 handoff。
 - Phase C：已在 `0.6.19` / manifest `0.4.36` 中瘦身 always-on instruction，使常驻规则只保留稳定边界和 task handoff。
 - Phase D：已在 `0.6.20` / manifest `0.4.37` 中收敛 API index，使它只承载 API lookup 和短行为提示。
-- Phase E 以后尚未执行。
+- Phase E：已在 `0.6.21` / manifest `0.4.38` 中整理 specialized skills 和 references，使 coordinator/audit skill 只做分流和审查框架，详细 checklist 回到 reference。
+- Phase F 尚未执行。
 
 ## 输出文件映射
 
