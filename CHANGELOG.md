@@ -4,6 +4,12 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.6.18] - 2026-05-05
+
+### Changed
+
+- Slimmed synced AI managed blocks into platform routing baselines that hand off Procedure, UI, data, resources, directory, and Unity serialized editing details to the synced instruction and specialized EFrame skills.
+
 ## [0.6.17] - 2026-05-05
 
 ### Changed

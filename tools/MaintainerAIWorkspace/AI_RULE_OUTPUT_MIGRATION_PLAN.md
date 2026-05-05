@@ -19,6 +19,12 @@
 
 当前同步输出仍然是人工维护的 markdown 文件，尚未由 registry 生成。
 
+## 当前进度
+
+- Phase A：已通过 `rules/rule-views.yaml` 的 `targetOutput` 和本计划的输出文件映射建立显式对应关系。
+- Phase B：已在 `0.6.18` / manifest `0.4.35` 中瘦身三个 managed blocks，使平台入口只保留路由、最小 baseline 和 handoff。
+- Phase C 以后尚未执行。
+
 ## 输出文件映射
 
 | 当前输出源 | 同步目标 | Rule View | 迁移目标 |
@@ -226,4 +232,3 @@
 - 它们文件短、风险相对可控。
 - 它们天然应该只做路由和最小 baseline。
 - 改完后能直接验证平台入口是否仍能指向 instruction / skills / API index。
-

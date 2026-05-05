@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.18] - 2026-05-05
+
+### Changed
+
+- Slimmed synced AI managed blocks into platform routing baselines that hand off Procedure, UI, data, resources, directory, and Unity serialized editing details to the synced instruction and specialized EFrame skills.
+
 ## [0.6.17] - 2026-05-05
 
 ### Changed

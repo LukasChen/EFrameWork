@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.34",
+    "version":  "0.4.35",
     "updatedAt":  "2026-05-05",
-    "notes":  "Align Unity serialized asset editing contract to YAML-first fallback flow.",
+    "notes":  "Slim managed blocks into platform routing baselines.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -14,21 +14,21 @@
                       "kind":  "managedBlock",
                       "blockId":  "eframework-copilot-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-copilot-root.md",
-                      "sha256":  "0a02c3738d94d0d2659af148288821ccd7212205eb067dec68e5dbe02d6162c6"
+                      "sha256":  "899af2f4175522bd76aeeae9d1d9b16b7159df4a730a260c4b34d15818724de0"
                   },
                   {
                       "path":  "AGENTS.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-codex-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-codex-root.md",
-                      "sha256":  "03f384f93e1081d872399963975ee662a95793d5eb14c0dcdc75cd7090596c78"
+                      "sha256":  "c05b87f88cc51082501cba69738581ed94ced5544e7b42a2575c963a346d7202"
                   },
                   {
                       "path":  "CLAUDE.md",
                       "kind":  "managedBlock",
                       "blockId":  "eframework-claude-root",
                       "sourcePath":  "AIWorkspace~/managed-blocks/eframe-claude-root.md",
-                      "sha256":  "c33c0253faa14d3b21b879de85db043a9278727a78202f98abd187e3c348610b"
+                      "sha256":  "0291225417b0ace856668ae59813bf949eaf953955791324e2b9b01652ae9a35"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
