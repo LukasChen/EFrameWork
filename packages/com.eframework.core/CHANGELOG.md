@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.19] - 2026-05-05
+
+### Changed
+
+- Slimmed the synced always-on AI instruction into stable EFrame boundaries and task handoffs, moving detailed UI, resource, directory, data, audit, and compile guidance to specialized EFrame skills.
+
 ## [0.6.18] - 2026-05-05
 
 ### Changed

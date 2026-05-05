@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.35",
+    "version":  "0.4.36",
     "updatedAt":  "2026-05-05",
-    "notes":  "Slim managed blocks into platform routing baselines.",
+    "notes":  "Slim always-on instruction into stable EFrame boundaries and task handoffs.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "bd27052a4006b6caefba9c24c7cde303fef18b2c0a4693c56e83758ba280c93f"
+                      "sha256":  "ef180cfa782353bee2fda040c6198f221f053df9a92d1fd95c25ac6382cc1a4c"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

@@ -23,7 +23,8 @@
 
 - Phase A：已通过 `rules/rule-views.yaml` 的 `targetOutput` 和本计划的输出文件映射建立显式对应关系。
 - Phase B：已在 `0.6.18` / manifest `0.4.35` 中瘦身三个 managed blocks，使平台入口只保留路由、最小 baseline 和 handoff。
-- Phase C 以后尚未执行。
+- Phase C：已在 `0.6.19` / manifest `0.4.36` 中瘦身 always-on instruction，使常驻规则只保留稳定边界和 task handoff。
+- Phase D 以后尚未执行。
 
 ## 输出文件映射
 
