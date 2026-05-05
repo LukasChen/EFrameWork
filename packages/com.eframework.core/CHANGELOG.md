@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.20] - 2026-05-05
+
+### Changed
+
+- Slimmed the synced AI API index into API lookup tables with short behavior notes, moving workflow detail out of the support document surface.
+
 ## [0.6.19] - 2026-05-05
 
 ### Changed
