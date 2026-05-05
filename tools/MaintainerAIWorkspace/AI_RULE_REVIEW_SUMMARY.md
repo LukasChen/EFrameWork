@@ -24,6 +24,8 @@
 4. `AI_RULE_OUTPUT_MIGRATION_PLAN.md`：看 A-E 迁移范围和 Phase F 前置条件。
 5. `rules/registry.yaml`：只在需要逐条规则反馈时打开。
 
+新增规则或修改规则落点时，先读 `AI_RULE_ADDITION_GUIDE.md`。
+
 ## 已完成范围
 
 | Phase | 版本 | Manifest | 结果 |

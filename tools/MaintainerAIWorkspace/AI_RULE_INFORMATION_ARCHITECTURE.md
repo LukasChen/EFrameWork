@@ -35,6 +35,8 @@ graph TD
 
 Current validation entry: `tools/MaintainerAIWorkspace/Test-EFrameAIRuleArchitecture.ps1`.
 
+New rule placement and review workflow: `tools/MaintainerAIWorkspace/AI_RULE_ADDITION_GUIDE.md`.
+
 ## Canonical Rule Schema
 
 The eventual registry can be YAML or JSON. The schema should stay boring and tool-friendly.
