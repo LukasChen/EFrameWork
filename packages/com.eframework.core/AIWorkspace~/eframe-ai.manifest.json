@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.38",
+    "version":  "0.4.39",
     "updatedAt":  "2026-05-05",
-    "notes":  "Clarify synced AI skill ownership and reference handoffs.",
+    "notes":  "Fix Unity asset instruction activation and feature UI entry wording.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -37,7 +37,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "ef180cfa782353bee2fda040c6198f221f053df9a92d1fd95c25ac6382cc1a4c"
+                      "sha256":  "039f2ff8db4ff668f8216aaefdbc9d51865599ed07002fdbd3e39fc59ecf5979"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
@@ -57,7 +57,7 @@
                   },
                   {
                       "path":  ".github/skills/eframe-feature-bootstrap/SKILL.md",
-                      "sha256":  "2e6b5b0466774d67fb9fd24dfadf0d8eb6570148c575829ca6955fe2d3b6faf7"
+                      "sha256":  "7cd6a80638fdf950e24c2cd8ee5bd9f54c4ac3bc0905864477c89bdfb87ce5da"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",

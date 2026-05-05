@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.22] - 2026-05-05
+
+### Fixed
+
+- Fixed synced AI instruction activation for Unity `.prefab`, `.unity`, and `.asset` edits and aligned feature bootstrap UI bypass wording with the `EFrame.UI/UIControllerBase` business entry contract.
+
 ## [0.6.21] - 2026-05-05
 
 ### Changed

@@ -23,7 +23,7 @@ outputs:
   - validation handoff checklist
 forbiddenPatterns:
   - putting business gameplay logic in the startup scene
-  - bypassing QUI/UIController for feature UI
+  - bypassing EFrame.UI/UIControllerBase for feature UI
   - scattering runtime resource address strings
 ---
 
