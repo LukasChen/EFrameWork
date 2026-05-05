@@ -37,16 +37,15 @@ forbiddenPatterns:
 
 ## Audit Flow
 
-1. 找到启动链路入口，确认没有把业务逻辑塞回启动场景。
-2. 检查 `Procedure` 是否只做状态编排，进入退出是否对称清理。
-3. 检查 UI 是否经过 `QUI` 层级管理，控制器是否承担了正确职责；如果 UI 细节较多，按 `eframe-ui-feature` 的工作流逐项复核。
-4. 检查项目初始化链路是否会自动补齐 `QUI` 依赖的 Unity SortingLayer，运行时缺层级时是否有明确校验提示，并确认承载框架 UI overlay 的相机使用 `EFrameSceneCamera`。
-5. 检查资源和代码目录是否可映射；如果目录归属、App/Module 边界、生成物或场景/资源分离是主要问题，按 `eframe-directory-structure` 复核。
-6. 检查运行时资源是否通过 `ResPath.Generated` 与框架资源服务进入；如果涉及 preload、Addressables、handle ownership 或 build preflight，按 `eframe-resource-flow` 复核。
-7. 检查事件订阅与生命周期清理是否成对，数据表是否统一注册到框架数据服务；如果涉及 `StorageKey`、迁移、dirty 或 save/load 结果语义，按 `eframe-data-table` 复核。
-8. 检查业务代码是否绕过 `IUIService/QUI`、`UIViewHandle`、`ResPath.Generated`、框架数据表入口或其他已同步的 EFrame 合约。
-9. 如果结论依赖 Unity 编译是否通过，优先使用 `tools/Test-EFrameUnityCompile.ps1 -TargetRoot <ProjectRoot>` 或 Unity Editor/Bee 日志复核；不要把 `dotnet build` 单独通过当作 Unity 编译通过。
-10. 如果发现问题主要属于框架源码、发布、同步工具或冷启动模板调整，标记为超出业务项目 audit 范围。
+1. Classify the changed surface: startup, Procedure, UI, directory, resources, data/events, AI config, or Unity compile validation.
+2. Review business-facing EFrame boundaries first: initialization, injected `Context`, `EFrame.UI/UIControllerBase`, `ResPath.Generated`, managed Addressables, data table entry, and generated View access.
+3. Delegate detailed checks to the owning skill when a surface dominates the review:
+   - Directory and ownership: `eframe-directory-structure`.
+   - UI lifecycle, binding, layer, overlay camera, or prefab structure: `eframe-ui-feature`.
+   - ResPath, Addressables, preload, handle ownership, or build preflight: `eframe-resource-flow`.
+   - StorageKey, dirty state, migration, or save/load result semantics: `eframe-data-table`.
+4. If the conclusion depends on Unity compilation, use `tools/Test-EFrameUnityCompile.ps1 -TargetRoot <ProjectRoot>` or Unity Editor/Bee logs; do not treat `dotnet build` alone as Unity compile proof.
+5. If the finding belongs to framework source maintenance, release, sync tooling, cold-start template authoring, or AI contract maintenance, mark it as outside business-project audit scope.
 
 ## Output Expectations
 

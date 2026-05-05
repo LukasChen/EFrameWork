@@ -124,6 +124,37 @@ function Get-FileHashText {
         [string]$Path
     )
 
+    $textExtensions = @(
+        ".asmdef",
+        ".asset",
+        ".cs",
+        ".json",
+        ".mat",
+        ".md",
+        ".meta",
+        ".mixer",
+        ".prefab",
+        ".shader",
+        ".txt",
+        ".unity",
+        ".uss",
+        ".uxml"
+    )
+    $extension = [System.IO.Path]::GetExtension($Path)
+    if ($extension -in $textExtensions) {
+        $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+        $normalized = $text -replace "`r`n", "`n"
+        $normalized = $normalized -replace "`r", "`n"
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+        $sha = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            return ([System.BitConverter]::ToString($sha.ComputeHash($bytes)) -replace "-", "").ToLowerInvariant()
+        }
+        finally {
+            $sha.Dispose()
+        }
+    }
+
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 

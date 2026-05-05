@@ -1,0 +1,275 @@
+# EFrame AI rule views draft.
+# Maintainer-only. Rule views select rule sets and rendering levels for platform outputs.
+
+schemaVersion: 0.1
+status: draft
+updatedAt: 2026-05-05
+registry: registry.yaml
+ruleSets: rule-sets.yaml
+
+views:
+  instruction.eframe-always-on:
+    title: EFrame Always-On Business Instruction
+    purpose: Short stable business contract used by synced eframe-instructions.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      syncedPath: .github/instructions/eframe-instructions.md
+    includes:
+      - set: governance.business-entry
+        render: summary
+      - set: startup.procedure-lifecycle
+        render: handoff
+      - set: ui.business-contract
+        render: handoff
+      - set: resources.asset-flow
+        render: handoff
+      - set: directory.ownership
+        render: handoff
+      - set: data.persistence
+        render: handoff
+      - set: editor.unity-serialization
+        render: summary
+    fullRules:
+      - G05
+      - G10
+      - P04
+      - P05
+      - U01
+      - U02
+      - R01
+      - R06
+      - E04
+    exclusions:
+      - maintainer.release-governance
+    handoffs:
+      - skill.feature-bootstrap
+      - skill.directory-structure
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+      - skill.guideline-audit
+
+  support-doc.api-index:
+    title: EFrame AI API Index
+    purpose: Stable API lookup with short behavior notes.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      syncedPath: .github/eframe/EFRAME_AI_API_INDEX.md
+    includes:
+      - set: startup.procedure-lifecycle
+        render: api-note
+      - set: ui.business-contract
+        render: api-note
+      - set: resources.asset-flow
+        render: api-note
+      - set: data.persistence
+        render: api-note
+      - set: editor.unity-serialization
+        render: api-note
+    fullRules: []
+    exclusions:
+      - G01
+      - G02
+      - G03
+      - G06
+      - G07
+      - G08
+      - G09
+      - W04
+
+  skill.feature-bootstrap:
+    title: Feature Bootstrap Skill View
+    purpose: Top-level feature planning and delegation across EFrame concerns.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+      syncedPath: .github/skills/eframe-feature-bootstrap/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-feature-bootstrap/SKILL.md
+        copilot: .github/skills/eframe-feature-bootstrap/SKILL.md
+        claude-code: .claude/skills/eframe-feature-bootstrap/SKILL.md
+    includes:
+      - set: workflow.feature-bootstrap
+        render: full
+      - set: startup.procedure-lifecycle
+        render: summary
+      - set: directory.ownership
+        render: summary
+    handoffs:
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+      - skill.directory-structure
+      - skill.guideline-audit
+
+  skill.directory-structure:
+    title: Directory Structure Skill View
+    purpose: File and resource placement decisions.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      syncedPath: .github/skills/eframe-directory-structure/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-directory-structure/SKILL.md
+        copilot: .github/skills/eframe-directory-structure/SKILL.md
+        claude-code: .claude/skills/eframe-directory-structure/SKILL.md
+    includes:
+      - set: directory.ownership
+        render: full
+      - set: resources.asset-flow
+        render: handoff
+      - set: ui.business-contract
+        render: handoff
+
+  skill.ui-feature:
+    title: UI Feature Skill View
+    purpose: Business UI page, popup, widget, controller, view, prefab, and lifecycle work.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      syncedPath: .github/skills/eframe-ui-feature/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-ui-feature/SKILL.md
+        copilot: .github/skills/eframe-ui-feature/SKILL.md
+        claude-code: .claude/skills/eframe-ui-feature/SKILL.md
+    includes:
+      - set: ui.business-contract
+        render: full
+      - set: resources.asset-flow
+        render: handoff
+      - set: directory.ownership
+        render: handoff
+    fullRules:
+      - U01
+      - U02
+      - U03
+      - U04
+      - U05
+      - U06
+      - U07
+      - U08
+      - U09
+      - U10
+
+  skill.resource-flow:
+    title: Resource Flow Skill View
+    purpose: Addressables, generated resource IDs, preload, instantiate, handle release, and managed resource automation.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      syncedPath: .github/skills/eframe-resource-flow/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-resource-flow/SKILL.md
+        copilot: .github/skills/eframe-resource-flow/SKILL.md
+        claude-code: .claude/skills/eframe-resource-flow/SKILL.md
+    includes:
+      - set: resources.asset-flow
+        render: full
+      - set: directory.ownership
+        render: handoff
+      - set: ui.business-contract
+        render: handoff
+
+  skill.data-table:
+    title: Data Table Skill View
+    purpose: Persistent data table modeling, mutation, migration, save/load status, and events.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      syncedPath: .github/skills/eframe-data-table/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-data-table/SKILL.md
+        copilot: .github/skills/eframe-data-table/SKILL.md
+        claude-code: .claude/skills/eframe-data-table/SKILL.md
+    includes:
+      - set: data.persistence
+        render: full
+      - set: startup.procedure-lifecycle
+        render: summary
+
+  skill.guideline-audit:
+    title: Guideline Audit Skill View
+    purpose: Business project compliance review.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
+      syncedPath: .github/skills/eframe-guideline-audit/SKILL.md
+      nativeSkillPaths:
+        codex: .agents/skills/eframe-guideline-audit/SKILL.md
+        copilot: .github/skills/eframe-guideline-audit/SKILL.md
+        claude-code: .claude/skills/eframe-guideline-audit/SKILL.md
+    includes:
+      - set: workflow.guideline-audit
+        render: checklist
+    fullRules:
+      - W02
+    exclusions:
+      - maintainer.release-governance
+
+  managed-block.codex:
+    title: Codex Managed Block View
+    purpose: Codex routing and minimal business baseline.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      syncedPath: AGENTS.md managed block
+    includes:
+      - set: platform.codex
+        render: summary
+    handoffs:
+      - instruction.eframe-always-on
+      - support-doc.api-index
+      - skill.feature-bootstrap
+      - skill.guideline-audit
+
+  managed-block.copilot:
+    title: Copilot Managed Block View
+    purpose: GitHub Copilot routing and minimal business baseline.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-copilot-root.md
+      syncedPath: .github/copilot-instructions.md managed block
+    includes:
+      - set: platform.copilot
+        render: summary
+    handoffs:
+      - instruction.eframe-always-on
+      - support-doc.api-index
+      - skill.feature-bootstrap
+      - skill.guideline-audit
+
+  managed-block.claude-code:
+    title: Claude Code Managed Block View
+    purpose: Claude Code routing and minimal business baseline.
+    targetOutput:
+      sourcePath: packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+      syncedPath: CLAUDE.md managed block
+    includes:
+      - set: platform.claude-code
+        render: summary
+    handoffs:
+      - instruction.eframe-always-on
+      - support-doc.api-index
+      - skill.feature-bootstrap
+      - skill.guideline-audit
+
+  maintainer.release-checklist:
+    title: Maintainer Release Checklist View
+    purpose: Release, manifest, sync, tag, and push gate.
+    targetOutput:
+      sourcePath: tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      syncedPath: null
+    includes:
+      - set: maintainer.release-governance
+        render: full
+    exclusions:
+      - governance.business-entry
+      - ui.business-contract
+
+  maintainer.ai-contract-skill:
+    title: Maintainer AI Contract Skill View
+    purpose: Route AI contract changes to the correct layer.
+    targetOutput:
+      sourcePath: tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      syncedPath: null
+    includes:
+      - set: maintainer.release-governance
+        render: full
+      - set: governance.sync-boundary
+        render: full
+    exclusions:
+      - platform.codex
+      - platform.copilot
+      - platform.claude-code

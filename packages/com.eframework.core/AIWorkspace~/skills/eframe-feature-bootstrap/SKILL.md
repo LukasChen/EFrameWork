@@ -23,7 +23,7 @@ outputs:
   - validation handoff checklist
 forbiddenPatterns:
   - putting business gameplay logic in the startup scene
-  - bypassing QUI/UIController for feature UI
+  - bypassing EFrame.UI/UIControllerBase for feature UI
   - scattering runtime resource address strings
 ---
 
@@ -40,7 +40,7 @@ forbiddenPatterns:
 
 1. Classify the request: `Procedure`, UI, data table, resource flow, or a combined feature.
 2. Decide whether to create new structure or extend existing structure; prefer the smallest feature boundary that preserves EFrame lifecycle rules.
-3. Delegate detailed work:
+3. Delegate detailed work instead of copying specialized rules:
    - File, resource, scene, generated-code, or module directory placement: use `eframe-directory-structure`.
    - UI pages, popups, prefabs, controllers, bindings: use `eframe-ui-feature`.
    - Persistent gameplay/settings/progress data: use `eframe-data-table`.
@@ -49,27 +49,17 @@ forbiddenPatterns:
 5. Validate the whole feature with `eframe-guideline-audit` when the implementation is complete.
 6. If the request is mainly about project initialization, editor bootstrap automation, framework release flow, or AI sync tooling, treat it as outside this business feature skill.
 
-## Procedure
+## Coordinator Boundaries
 
-Use `EFramework.Runtime.Procedure.EFrameProcedure` for new procedures, preload Procedure-owned resources in `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)`, and use `ChangeState<TProcedure>(payload)` for one-shot enter data; persistent state belongs in `Context.Data`, module services, or events.
-
-1. 先判定需求是否真的需要新 `Procedure`。
-2. 如果不涉及状态切换、场景生命周期或玩法根对象切换，优先落成所在流程内的 UI 行为。
-3. 如果需要新 `Procedure`，约束进入退出对称、资源清理完整、跳转条件明确。
-
-## Structure
-
-1. 把运行时代码放入目标结构：`Assets/App/Runtime/...` 或 `Assets/Modules/<Name>/Runtime/...`。
-2. 把资源放入可映射目录：`Assets/App/Res/UI/...`、`Assets/App/Res/SceneAssets/...`、`Assets/Modules/<Name>/Res/...` 等。
-3. 将资源放入 EFrame 托管目录，并通过 `ResPath.Generated` 使用自动生成的资源 id，避免散写字符串或新增手写路径中心类。
-4. 新建或移动目录前用 `eframe-directory-structure` 判定 App/Module ownership、生成目录和资源归属；项目特殊约束写进项目自有 instruction，不要改同步得到的 `eframe-*` 文件。
+- Own only the feature boundary decision, integration plan, and Procedure-level lifecycle placement.
+- Use `EFrameProcedure` only when the feature truly changes state, scene lifecycle, or gameplay root ownership.
+- Keep detailed UI, data, resource, directory, and audit rules in their specialized skills and references.
+- Keep project-specific directory or naming exceptions in project-owned instructions, not synced `eframe-*` files.
 
 ## Validation
 
-1. 校验生命周期是否成对：进入/退出、创建/销毁、订阅/退订。
-2. 校验命名、目录、资源路径、UI 层级和数据入口是否由对应 specialized skill 覆盖。
-3. 如果项目里存在非标准目录，明确本次改动如何收敛到目标结构。
-4. 如果一个子任务需要超过几条具体实现规则，不要把规则复制到这里；改用对应 specialized skill 或 reference。
-5. 如果在框架仓库内发现本次功能改变了公共模板、冷启动流程或 AI 协作层，说明它超出业务功能 bootstrap 范围。
+1. Confirm each delegated concern has been handled by the owning skill or reference.
+2. Confirm lifecycle ownership is explicit for procedures, controllers, resources, events, and data.
+3. Confirm the feature did not add framework-maintenance, release, or AI sync work to a business workflow.
 
 需要更细的骨架和核对项时，加载 [feature checklist](./references/feature-checklist.md)。

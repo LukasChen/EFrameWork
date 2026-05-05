@@ -2,6 +2,52 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.0] - 2026-05-05
+
+### Changed
+
+- Added platform-native EFrame skill sync outputs for Codex `.agents/skills`, GitHub Copilot `.github/skills`, and Claude Code `.claude/skills`, while keeping always-on instructions and managed blocks free of skill routing lists.
+
+### Fixed
+
+- Fixed AI manifest file hashes for text files.
+
+## [0.6.22] - 2026-05-05
+
+### Fixed
+
+- Fixed synced AI instruction activation for Unity `.prefab`, `.unity`, and `.asset` edits and aligned feature bootstrap UI bypass wording with the `EFrame.UI/UIControllerBase` business entry contract.
+
+## [0.6.21] - 2026-05-05
+
+### Changed
+
+- Clarified synced AI skill ownership so coordinator and audit skills delegate detailed UI, resource, directory, data, and compile checks to specialized skills and references.
+
+## [0.6.20] - 2026-05-05
+
+### Changed
+
+- Slimmed the synced AI API index into API lookup tables with short behavior notes, moving workflow detail out of the support document surface.
+
+## [0.6.19] - 2026-05-05
+
+### Changed
+
+- Slimmed the synced always-on AI instruction into stable EFrame boundaries and task handoffs, moving detailed UI, resource, directory, data, audit, and compile guidance to specialized EFrame skills.
+
+## [0.6.18] - 2026-05-05
+
+### Changed
+
+- Slimmed synced AI managed blocks into platform routing baselines that hand off Procedure, UI, data, resources, directory, and Unity serialized editing details to the synced instruction and specialized EFrame skills.
+
+## [0.6.17] - 2026-05-05
+
+### Changed
+
+- Aligned synced AI Unity serialized asset guidance to prefer direct, narrow YAML edits, using Unity Editor APIs or other fallback paths only when direct YAML editing cannot complete or validation shows abnormal serialized state.
+
 ## [0.6.16] - 2026-05-05
 
 ### Changed

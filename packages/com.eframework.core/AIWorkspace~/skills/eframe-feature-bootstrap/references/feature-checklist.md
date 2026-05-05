@@ -25,6 +25,11 @@
 
 `Procedure`:
 
+- 只在状态切换、场景生命周期或玩法根对象切换时新增 `Procedure`
+- 使用 `EFramework.Runtime.Procedure.EFrameProcedure`
+- Procedure-owned 资源在 `OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)` 中预加载
+- 一次性进入参数通过 `ChangeState<TProcedure>(payload)` / `ProcedureEnterContext` 传递
+- 持久状态进入 `Context.Data`、模块服务或事件，不放在一次性 enter payload 中
 - `OnEnter`: 保存上下文、注册事件、创建对象、派发进入事件
 - `OnLeave`: 退订事件、关闭 UI、销毁对象、清空引用
 
@@ -39,6 +44,7 @@
 - UI 子任务是否已交给 `eframe-ui-feature`
 - 数据表子任务是否已交给 `eframe-data-table`
 - 资源/Addressables 子任务是否已交给 `eframe-resource-flow`
+- 目录/App vs Module ownership 子任务是否已交给 `eframe-directory-structure`
 - 框架源码、同步工具或 AI 发布事项是否已标记为超出业务功能范围
 
 ## 6. 验证

@@ -1,0 +1,1024 @@
+# EFrame AI rule registry draft.
+# Maintainer-only. Do not sync this file to business projects.
+
+schemaVersion: 0.1
+status: draft
+updatedAt: 2026-05-05
+sourceInventory: ../AI_RULE_INVENTORY.md
+notes:
+  - This registry is a structured draft of existing rules, not yet a generator source.
+  - Existing AIWorkspace files remain the active synced outputs until a later migration explicitly adopts generation.
+  - Platform outputs must render or reference these rules; they must not become independent rule sources.
+
+domains:
+  governance: Sync boundaries, ownership, release responsibilities, and project custom rules.
+  startup: Startup, procedure state, context access, lifecycle, cameras, and bootstrap.
+  ui: Business UI contract, generated views, controller lifecycle, prefab-first layout, and framework internals boundary.
+  resources: Addressables, ResPath, asset handles, preload, release, and managed resources.
+  directory: App/module ownership, generated code, scenes, resources, and naming placement.
+  data: Persistent data tables, events, save/load, migration, and dirty tracking.
+  editor: Editor tooling, Unity YAML edits, generated assets, and compile validation.
+  workflow: Skill routing, audit, sync, release, and platform output flow.
+
+renderingLevels:
+  full: The platform output may include the full canonical text.
+  summary: The platform output may include a short restatement with no new semantics.
+  checklist: The platform output may turn the rule into a verification question.
+  handoff: The platform output should point to another rule view or skill.
+  api-note: The platform output may mention the API entry and short use/avoid guidance.
+  none: The rule must not appear in that output.
+
+rules:
+  - id: G01
+    title: AIWorkspace is the business AI contract source
+    audience: [maintainer-ai]
+    domain: governance
+    layer: governance
+    status: stable
+    canonicalText: Business-project AI contract sources must live under packages/com.eframework.core/AIWorkspace~/ so package-only consumers receive them.
+    currentLocations:
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      - AGENTS.md
+      - CLAUDE.md
+      - .github/copilot-instructions.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      maintainer-ai-contract: full
+      root-entries: summary
+      maintainer-docs: summary
+
+  - id: G02
+    title: Documentation is human-facing
+    audience: [maintainer-ai, human-maintainer]
+    domain: governance
+    layer: governance
+    status: stable
+    canonicalText: packages/com.eframework.core/Documentation~/ is human-facing documentation and is not a synced AI contract source.
+    currentLocations:
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      - AGENTS.md
+      - CLAUDE.md
+      - .github/copilot-instructions.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      maintainer-ai-contract: full
+      root-entries: summary
+      maintainer-docs: summary
+
+  - id: G03
+    title: Maintainer workspace is not synced
+    audience: [maintainer-ai, human-maintainer]
+    domain: governance
+    layer: governance
+    status: stable
+    canonicalText: tools/MaintainerAIWorkspace/ is maintainer-only and must not sync to business projects.
+    forbiddenPatterns:
+      - adding tools/MaintainerAIWorkspace paths to eframe-ai.manifest.json
+      - copying maintainer release rules into eframe-* skills
+    currentLocations:
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - AGENTS.md
+      - CLAUDE.md
+      - .github/copilot-instructions.md
+    rendering:
+      maintainer-ai-contract: full
+      release-checklist: full
+      root-entries: summary
+
+  - id: G04
+    title: Projects own root AI entries
+    audience: [business-ai, maintainer-ai]
+    domain: governance
+    layer: business-contract
+    status: stable
+    canonicalText: Business projects own their root AI entry files; EFrame sync only updates managed blocks and framework-owned eframe-* files.
+    dependsOn: [G01, G03]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-copilot-root.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+    rendering:
+      managed-blocks: summary
+      eframe-instructions: summary
+      maintainer-docs: summary
+
+  - id: G05
+    title: Project-specific rules stay outside EFrame synced files
+    audience: [business-ai, maintainer-ai]
+    domain: governance
+    layer: business-contract
+    status: stable
+    canonicalText: Project-specific rules must stay outside synced eframe-* files and outside EFrame managed blocks.
+    dependsOn: [G04]
+    forbiddenPatterns:
+      - editing synced eframe-* files to express project-only conventions
+      - placing project-private rules inside EFrame managed block markers
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-copilot-root.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+    rendering:
+      eframe-instructions: full
+      managed-blocks: summary
+      release-checklist: checklist
+
+  - id: G06
+    title: Manifest is a sync marker
+    audience: [maintainer-ai, human-maintainer]
+    domain: governance
+    layer: maintainer-only
+    status: stable
+    canonicalText: The AI manifest is a sync and drift marker, not a product version.
+    currentLocations:
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - README.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      release-checklist: full
+      maintainer-docs: summary
+
+  - id: G07
+    title: AI-impacting changes update AI contracts
+    audience: [maintainer-ai]
+    domain: governance
+    layer: maintainer-only
+    status: stable
+    canonicalText: Changes that affect business-project generation, refactoring, auditing, sync, or setup must update matching AI contract files in the same change set.
+    dependsOn: [G01, G06]
+    currentLocations:
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+      - README.md
+    rendering:
+      release-checklist: full
+      maintainer-docs: summary
+
+  - id: G08
+    title: Instructions versus skills boundary
+    audience: [maintainer-ai]
+    domain: governance
+    layer: maintainer-only
+    status: stable
+    canonicalText: Always-on boundaries belong in instructions; multi-step workflows belong in skills or references.
+    currentLocations:
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      maintainer-ai-contract: full
+      release-checklist: checklist
+
+  - id: G09
+    title: EFrame and maintainer naming boundary
+    audience: [maintainer-ai]
+    domain: governance
+    layer: maintainer-only
+    status: stable
+    canonicalText: Synced business files use the eframe-* prefix; maintainer-only workflows use maintainer-*.
+    dependsOn: [G03, G08]
+    forbiddenPatterns:
+      - synced maintainer-* files
+      - release or manifest workflows inside eframe-* skills
+    currentLocations:
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md
+    rendering:
+      maintainer-ai-contract: full
+      release-checklist: checklist
+
+  - id: G10
+    title: Discussion-first behavior
+    audience: [business-ai]
+    domain: governance
+    layer: business-contract
+    status: stable
+    canonicalText: Questions and analysis requests are discussion first; do read-only inspection before changing project state.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-copilot-root.md
+    rendering:
+      eframe-instructions: full
+      managed-blocks: summary
+
+  - id: P01
+    title: Procedure state machine
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: State transitions use EFrameProcedure and EFrameProcedureComponent; do not bypass the framework state machine.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+    rendering:
+      eframe-instructions: summary
+      EFRAME_AI_API_INDEX: api-note
+      eframe-feature-bootstrap: full
+
+  - id: P02
+    title: Procedure orchestration boundary
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: Procedure owns state orchestration, preload, enter/leave cleanup, and lifecycle boundaries; simple UI changes should stay in the active flow.
+    dependsOn: [P01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+    rendering:
+      eframe-instructions: full
+      EFRAME_AI_API_INDEX: api-note
+      eframe-feature-bootstrap: full
+      eframe-guideline-audit: checklist
+
+  - id: P03
+    title: Procedure preload and enter context
+    audience: [business-ai]
+    domain: startup
+    layer: workflow
+    status: stable
+    canonicalText: Procedure-owned resources preload in OnPreloadAsync(IAssetPreloadScope, ProcedureEnterContext); one-shot transition data uses ProcedureEnterContext.
+    dependsOn: [P01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+    rendering:
+      eframe-feature-bootstrap: full
+      eframe-resource-flow: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: P04
+    title: Initialize before service access
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: EFrame.Initialize(...) must complete before accessing framework service shortcuts.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+    rendering:
+      eframe-instructions: full
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: P05
+    title: Prefer injected Context
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: Framework-aware runtime types prefer injected Context; static EFrame.* shortcuts are for startup, static entry points, or non-injected code.
+    dependsOn: [P04]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-copilot-root.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+    rendering:
+      eframe-instructions: full
+      managed-blocks: summary
+      skills: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: P06
+    title: Minimal startup scene
+    audience: [business-ai]
+    domain: startup
+    layer: reference
+    status: stable
+    canonicalText: Startup scenes stay minimal and avoid resident business UI or gameplay objects.
+    dependsOn: [P01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+    rendering:
+      eframe-guideline-audit: checklist
+      eframe-feature-bootstrap: summary
+
+  - id: P07
+    title: Framework UI overlay camera
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: Runtime scene cameras that host framework UI overlay use EFrameSceneCamera; business code does not poll cameras or maintain camera stacks manually.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+    rendering:
+      eframe-instructions: full
+      EFRAME_AI_API_INDEX: api-note
+      eframe-ui-feature: checklist
+
+  - id: P08
+    title: QUI SortingLayer bootstrap
+    audience: [business-ai]
+    domain: startup
+    layer: business-contract
+    status: stable
+    canonicalText: Required QUI SortingLayers are supplied by initialization/bootstrap, with explicit validation when missing.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-guideline-audit: checklist
+      maintainer-docs: summary
+
+  - id: U01
+    title: Business UI entry
+    audience: [business-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: Ordinary business UI enters through EFrame.UI and UIControllerBase<TGeneratedView>.
+    dependsOn: [P04]
+    forbiddenPatterns:
+      - direct business UIViewHandle ownership
+      - normal feature code using IUIService as entry point
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      managed-blocks: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: U02
+    title: UI internals boundary
+    audience: [business-ai, maintainer-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: Business code must not directly own or drive IUIService, QUI, or UIViewHandle; these are framework-internal or advanced-extension concepts, not ordinary business entry points.
+    dependsOn: [U01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      eframe-guideline-audit: checklist
+      EFRAME_AI_API_INDEX: api-note
+    normalization:
+      - Business-facing files must not present QUI, IUIService, or UIViewHandle as ordinary feature entry points.
+      - Framework-internal docs may describe the handle-first runtime implementation separately.
+
+  - id: U03
+    title: Controller show and hide lifecycle
+    audience: [business-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: Business UI open and close work goes through controllers and Show/Hide APIs, not direct View, Binding, or Handle ownership.
+    dependsOn: [U01, U02]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: U04
+    title: Generated view access classes
+    audience: [business-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: View access classes are generated from UI Binding under EFramework.Generated.UI; business users do not hand-write normal View wrappers.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: U05
+    title: CurrentView access
+    audience: [business-ai]
+    domain: ui
+    layer: workflow
+    status: stable
+    canonicalText: Controllers access live generated views through CurrentView, not saved handles or obsolete View facades.
+    dependsOn: [U03, U04]
+    forbiddenPatterns:
+      - saving UIViewHandle in business code
+      - using obsolete View facade in controllers
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+    rendering:
+      eframe-ui-feature: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: U06
+    title: Prefab-first static UI
+    audience: [business-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: Static UI structure, layout, slicing, visual states, and button hierarchy are authored in Unity prefabs first.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+      - CHANGELOG.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      checklists: checklist
+
+  - id: U07
+    title: Controller responsibility boundary
+    audience: [business-ai]
+    domain: ui
+    layer: business-contract
+    status: stable
+    canonicalText: Runtime controllers handle event binding, data refresh, state switching, and necessary dynamic item instantiation; they do not build static UI at scale.
+    dependsOn: [U06]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+    rendering:
+      eframe-instructions: full
+      eframe-ui-feature: full
+      checklists: checklist
+
+  - id: U08
+    title: Repeated UI elements use templates or widgets
+    audience: [business-ai]
+    domain: ui
+    layer: workflow
+    status: stable
+    canonicalText: Repeated dynamic elements prefer prefab templates or standalone widget prefabs.
+    dependsOn: [U06, U07]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+    rendering:
+      eframe-ui-feature: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: U09
+    title: UI layer defaults
+    audience: [business-ai]
+    domain: ui
+    layer: workflow
+    status: stable
+    canonicalText: UI layer defaults map pages to QuiPanel, popups to QuiPopUp, tooltips to QuiTooltip, and top overlays to QuiTop.
+    dependsOn: [P08]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+    rendering:
+      eframe-ui-feature: full
+      checklists: checklist
+
+  - id: U10
+    title: UI lifecycle scope
+    audience: [business-ai]
+    domain: ui
+    layer: workflow
+    status: stable
+    canonicalText: UI lifecycle separates instance-level create/destroy from per-open open/close refresh or pause behavior.
+    dependsOn: [U03]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/references/ui-checklist.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+    rendering:
+      eframe-ui-feature: full
+      checklists: checklist
+      eframe-instructions: summary
+
+  - id: R01
+    title: Runtime resource IDs use ResPath
+    audience: [business-ai]
+    domain: resources
+    layer: business-contract
+    status: stable
+    canonicalText: Runtime resource IDs come from generated ResPath.Generated; do not scatter Addressables address strings or handwritten path centers.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-codex-root.md
+      - packages/com.eframework.core/AIWorkspace~/managed-blocks/eframe-claude-root.md
+    rendering:
+      eframe-instructions: full
+      eframe-resource-flow: full
+      managed-blocks: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: R02
+    title: AssetReference authoring boundary
+    audience: [business-ai]
+    domain: resources
+    layer: workflow
+    status: stable
+    canonicalText: AssetReference is allowed for editor authoring fields, but runtime business logic should receive generated asset IDs.
+    dependsOn: [R01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md
+    rendering:
+      eframe-resource-flow: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: R03
+    title: Procedure hot-path preload
+    audience: [business-ai]
+    domain: resources
+    layer: workflow
+    status: stable
+    canonicalText: Procedure hot paths preload resources and instantiate or load through Context.Assets or framework asset services.
+    dependsOn: [P03, R01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+    rendering:
+      eframe-resource-flow: full
+      eframe-instructions: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: R04
+    title: Asset handle release path
+    audience: [business-ai]
+    domain: resources
+    layer: reference
+    status: stable
+    canonicalText: Asset handles and instances must have an owner-specific release path.
+    dependsOn: [R03]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+    rendering:
+      eframe-resource-flow: summary
+      resource-checklist: checklist
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: R05
+    title: Avoid synchronous Addressables hot paths
+    audience: [business-ai]
+    domain: resources
+    layer: business-contract
+    status: stable
+    canonicalText: Avoid WaitForCompletion and synchronous Addressables paths unless the reason is documented.
+    dependsOn: [R03]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+    rendering:
+      eframe-resource-flow: full
+      eframe-instructions: summary
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: R06
+    title: Managed Addressables ownership
+    audience: [business-ai]
+    domain: resources
+    layer: business-contract
+    status: stable
+    canonicalText: Addressables entries under managed resource roots are framework-owned; do not hand-edit groups, addresses, or labels.
+    forbiddenPatterns:
+      - manually editing Addressables entries under Assets/App/Res
+      - manually editing Addressables entries under Assets/Scenes
+      - manually editing Addressables entries under Assets/Modules
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md
+    rendering:
+      eframe-instructions: full
+      eframe-resource-flow: full
+      checklists: checklist
+
+  - id: R07
+    title: Managed resource automation
+    audience: [business-ai]
+    domain: resources
+    layer: workflow
+    status: stable
+    canonicalText: Managed resource import, move, delete, repair, and ResPath generation flow through EFrame editor automation.
+    dependsOn: [R06]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md
+    rendering:
+      eframe-resource-flow: full
+      EFRAME_AI_API_INDEX: api-note
+      checklists: checklist
+
+  - id: R08
+    title: Build preflight for managed resources
+    audience: [business-ai]
+    domain: resources
+    layer: business-contract
+    status: stable
+    canonicalText: Player builds must preflight managed Addressables and generated ResPath drift.
+    dependsOn: [R06, R07]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-resource-flow/references/resource-checklist.md
+    rendering:
+      eframe-instructions: full
+      eframe-resource-flow: summary
+      checklists: checklist
+
+  - id: R09
+    title: Audio resources path
+    audience: [business-ai]
+    domain: resources
+    layer: business-contract
+    status: stable
+    canonicalText: Framework-owned audio resources stay under Assets/Resources/Audio.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      EFRAME_AI_API_INDEX: api-note
+      maintainer-docs: summary
+
+  - id: D01
+    title: App versus Module ownership
+    audience: [business-ai]
+    domain: directory
+    layer: workflow
+    status: stable
+    canonicalText: Decide App versus Module ownership before choosing path shape.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/references/feature-checklist.md
+    rendering:
+      eframe-directory-structure: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: D02
+    title: Runtime Editor Generated separation
+    audience: [business-ai]
+    domain: directory
+    layer: workflow
+    status: stable
+    canonicalText: Runtime, Editor, and Generated code use separate directories.
+    dependsOn: [D01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+    rendering:
+      eframe-directory-structure: full
+      eframe-instructions: summary
+
+  - id: D03
+    title: UI prefab directory classification
+    audience: [business-ai]
+    domain: directory
+    layer: workflow
+    status: stable
+    canonicalText: UI prefabs are classified into Panels, Popups, Widgets, or Common.
+    dependsOn: [D01, U01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature/SKILL.md
+    rendering:
+      eframe-directory-structure: full
+      eframe-ui-feature: summary
+      eframe-instructions: summary
+
+  - id: D04
+    title: Scene file and scene assets separation
+    audience: [business-ai]
+    domain: directory
+    layer: workflow
+    status: stable
+    canonicalText: Unity scene files and scene dependency resources are separated.
+    dependsOn: [D01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+    rendering:
+      eframe-directory-structure: full
+      eframe-instructions: summary
+
+  - id: D05
+    title: No loose Assets root sprawl
+    audience: [business-ai]
+    domain: directory
+    layer: business-contract
+    status: stable
+    canonicalText: Do not accumulate long-lived loose scripts, assets, or temporary folders under the Assets root.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-directory-structure: checklist
+
+  - id: D06
+    title: Naming and directory exceptions
+    audience: [business-ai]
+    domain: directory
+    layer: business-contract
+    status: stable
+    canonicalText: Naming follows ProcedureXxx, XxxViewController, and XxxView.prefab; project-specific exceptions go in project-owned instructions.
+    dependsOn: [G05]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-directory-structure/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/references/feature-checklist.md
+    rendering:
+      eframe-instructions: full
+      eframe-directory-structure: checklist
+      eframe-feature-bootstrap: checklist
+
+  - id: T01
+    title: Persistent data table shape
+    audience: [business-ai]
+    domain: data
+    layer: workflow
+    status: stable
+    canonicalText: Persistent state uses serializable data plus DataTable<TData>, with public parameterless constructor and stable unique storage key.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md
+    rendering:
+      eframe-data-table: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: T02
+    title: Framework data service registration
+    audience: [business-ai]
+    domain: data
+    layer: workflow
+    status: stable
+    canonicalText: Tables are registered and retrieved through the framework data service, preferably via injected Context.Data.
+    dependsOn: [P05, T01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+    rendering:
+      eframe-data-table: full
+      EFRAME_AI_API_INDEX: api-note
+
+  - id: T03
+    title: Table-owned data mutation
+    audience: [business-ai]
+    domain: data
+    layer: workflow
+    status: stable
+    canonicalText: Data mutation goes through table-owned APIs such as properties, methods, SetValue, or Mutate; raw data is not externally mutable.
+    dependsOn: [T01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md
+    rendering:
+      eframe-data-table: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: T04
+    title: Data migration
+    audience: [business-ai]
+    domain: data
+    layer: workflow
+    status: stable
+    canonicalText: Schema changes declare CurrentVersion and implement migration.
+    dependsOn: [T01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md
+    rendering:
+      eframe-data-table: full
+      checklists: checklist
+
+  - id: T05
+    title: Structured load save results
+    audience: [business-ai]
+    domain: data
+    layer: workflow
+    status: stable
+    canonicalText: Load/save decisions use structured LastLoadResult and LastSaveResult, not log parsing.
+    dependsOn: [T01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/references/data-table-checklist.md
+    rendering:
+      eframe-data-table: full
+      eframe-instructions: summary
+      checklists: checklist
+
+  - id: T06
+    title: Save timing
+    audience: [business-ai]
+    domain: data
+    layer: business-contract
+    status: stable
+    canonicalText: Default save timing is pause/quit; explicit saves happen at business checkpoints.
+    dependsOn: [T01]
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-data-table/SKILL.md
+    rendering:
+      eframe-instructions: full
+      eframe-data-table: summary
+
+  - id: T07
+    title: Scoped event subscriptions
+    audience: [business-ai]
+    domain: data
+    layer: business-contract
+    status: stable
+    canonicalText: Event subscriptions prefer scoped subscription semantics and lifecycle-bound disposal.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+    rendering:
+      eframe-instructions: full
+      EFRAME_AI_API_INDEX: api-note
+      eframe-guideline-audit: checklist
+
+  - id: E01
+    title: Editor assembly boundary
+    audience: [business-ai]
+    domain: editor
+    layer: business-contract
+    status: stable
+    canonicalText: Editor code owns generation, import, menu commands, validation, and inspector extensions; runtime code must not reference Editor assemblies.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+    rendering:
+      eframe-instructions: full
+      eframe-guideline-audit: checklist
+
+  - id: E02
+    title: Stable generators
+    audience: [business-ai]
+    domain: editor
+    layer: reference
+    status: candidate
+    canonicalText: Generators are stable, repeatable, and explicit about overwrite behavior.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+      - historical eframe-instructions wording
+    rendering:
+      eframe-guideline-audit: checklist
+      eframe-instructions: none
+
+  - id: E03
+    title: Tool prerequisite validation
+    audience: [business-ai]
+    domain: editor
+    layer: reference
+    status: candidate
+    canonicalText: Tool scripts validate prerequisites and produce actionable errors.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+      - historical eframe-instructions wording
+    rendering:
+      eframe-guideline-audit: checklist
+      eframe-instructions: none
+
+  - id: E04
+    title: YAML-first Unity serialized editing
+    audience: [business-ai]
+    domain: editor
+    layer: business-contract
+    status: stable
+    canonicalText: Business AI prefers direct, narrow, reviewable Unity YAML edits; Unity Editor APIs and other fallback paths are used only when direct YAML editing cannot complete, cannot preserve references, or validation shows abnormal serialized state.
+    forbiddenPatterns:
+      - whole-file Unity YAML rewrite
+      - bulk serialization block reorder
+      - using Editor APIs as the first choice without a YAML failure or validation abnormality
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md
+      - tools/MaintainerAIWorkspace/AI_RULE_INVENTORY.md
+    rendering:
+      eframe-instructions: full
+      EFRAME_AI_API_INDEX: api-note
+      eframe-guideline-audit: checklist
+
+  - id: E05
+    title: Unity compile validation
+    audience: [business-ai]
+    domain: editor
+    layer: business-contract
+    status: stable
+    canonicalText: Unity compile validation should use Unity Editor/Bee artifacts or tools/Test-EFrameUnityCompile.ps1, not only .sln or dotnet build.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+    rendering:
+      eframe-instructions: full
+      eframe-guideline-audit: full
+      maintainer-docs: summary
+
+  - id: W01
+    title: Feature bootstrap coordinator
+    audience: [business-ai]
+    domain: workflow
+    layer: workflow
+    status: stable
+    canonicalText: eframe-feature-bootstrap is the top-level feature coordinator and delegates specialized UI, data, resource, directory, and audit work.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-feature-bootstrap/SKILL.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+    rendering:
+      eframe-feature-bootstrap: full
+      release-checklist: checklist
+
+  - id: W02
+    title: Guideline audit boundary
+    audience: [business-ai]
+    domain: workflow
+    layer: workflow
+    status: stable
+    canonicalText: eframe-guideline-audit is the business-project compliance review workflow and should not mix in framework release checks.
+    currentLocations:
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/SKILL.md
+      - packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md
+    rendering:
+      eframe-guideline-audit: full
+      audit-checklist: checklist
+
+  - id: W03
+    title: Business AI sync flow
+    audience: [business-ai, maintainer-ai]
+    domain: workflow
+    layer: workflow
+    status: stable
+    canonicalText: Business sync flow uses status before force, then project health checks when needed.
+    dependsOn: [G06]
+    currentLocations:
+      - packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+    rendering:
+      maintainer-docs: full
+      release-checklist: summary
+
+  - id: W04
+    title: Framework AI contract release flow
+    audience: [maintainer-ai]
+    domain: workflow
+    layer: maintainer-only
+    status: stable
+    canonicalText: Framework AI contract releases follow package changelog, manifest version/hash, release check, and explicit maintainer confirmation before commit, tag, or push.
+    dependsOn: [G06, G07]
+    currentLocations:
+      - tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md
+      - tools/MaintainerAIWorkspace/skills/maintainer-ai-contract/SKILL.md
+    rendering:
+      release-checklist: full
+      maintainer-ai-contract: full

@@ -1,0 +1,245 @@
+# EFrame AI loading policy draft.
+# Maintainer-only. This file describes which rule views should be loaded for common tasks.
+
+schemaVersion: 0.1
+status: draft
+updatedAt: 2026-05-05
+registry: registry.yaml
+ruleSets: rule-sets.yaml
+ruleViews: rule-views.yaml
+
+contextModes:
+  summary: Load only short boundaries and handoffs.
+  workflow: Load task steps and essential contract rules.
+  checklist: Load review checklists and verification rules.
+  full: Load full rule text for maintenance or migration.
+
+globalPolicy:
+  always:
+    - Respect project-owned rules outside EFrame managed blocks.
+    - Keep maintainer-only release and manifest rules out of business-project tasks.
+    - Prefer handoff to specialized views instead of loading unrelated full checklists.
+  avoidByDefault:
+    - maintainer.release-checklist
+    - maintainer.ai-contract-skill
+    - maintainer.release-governance
+  escalation:
+    - Load audit views only when the task asks for review, compliance, regression risk, or broad validation.
+    - Load release governance only when AI sync, manifest, package release, tag, or publish is in scope.
+    - Load API index only when selecting or verifying framework API entry points.
+
+scenarios:
+  question-or-analysis:
+    description: User asks for explanation, analysis, or recommendation without requesting edits.
+    maxContextMode: summary
+    alwaysLoad:
+      - instruction.eframe-always-on
+    optional:
+      - support-doc.api-index
+    loadWhen:
+      support-doc.api-index:
+        - API names or framework entry points are being compared.
+        - The answer depends on exact runtime/editor API location.
+    avoid:
+      - skill.guideline-audit
+      - maintainer.release-checklist
+      - maintainer.ai-contract-skill
+    stopRules:
+      - Do not load detailed checklists unless the user asks for an audit.
+      - Do not change project state before approval.
+
+  feature-bootstrap:
+    description: New feature or feature restructuring across multiple EFrame concerns.
+    maxContextMode: workflow
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.feature-bootstrap
+    optional:
+      - skill.directory-structure
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+      - support-doc.api-index
+    loadWhen:
+      skill.directory-structure:
+        - New files, folders, modules, resources, scenes, or generated code are involved.
+      skill.ui-feature:
+        - The feature includes pages, popups, widgets, UI controllers, view bindings, or prefabs.
+      skill.resource-flow:
+        - The feature loads prefabs, scenes, audio, Addressables resources, or generated ResPath IDs.
+      skill.data-table:
+        - The feature persists settings, progress, inventory, options, or gameplay state.
+      support-doc.api-index:
+        - API entry point selection is uncertain.
+    avoid:
+      - maintainer.release-checklist
+      - maintainer.ai-contract-skill
+    stopRules:
+      - Do not load every specialized skill by default.
+      - Do not create a new Procedure for simple UI state changes without checking P02.
+
+  ui-feature:
+    description: UI page, popup, tooltip, widget, controller, prefab, binding, or UI lifecycle work.
+    maxContextMode: workflow
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.ui-feature
+    optional:
+      - skill.directory-structure
+      - skill.resource-flow
+      - support-doc.api-index
+    loadWhen:
+      skill.directory-structure:
+        - UI prefab or controller placement is unclear.
+      skill.resource-flow:
+        - UI prefab IDs, Addressables, preload, handle release, or pooled assets are involved.
+      support-doc.api-index:
+        - UI framework API names need verification.
+    avoid:
+      - skill.data-table
+      - maintainer.release-checklist
+      - maintainer.ai-contract-skill
+    stopRules:
+      - Do not load data table rules unless persistent data is part of the UI work.
+      - Do not treat QUI, IUIService, or UIViewHandle as ordinary business entry points.
+
+  resource-flow:
+    description: Addressables, ResPath, assets, prefabs, scenes, audio, preload, handles, or managed resources.
+    maxContextMode: workflow
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.resource-flow
+    optional:
+      - skill.directory-structure
+      - skill.ui-feature
+      - support-doc.api-index
+    loadWhen:
+      skill.directory-structure:
+        - Resource ownership or target directory is unclear.
+      skill.ui-feature:
+        - The resource is a UI prefab, widget, or UI-owned asset.
+      support-doc.api-index:
+        - Asset service or editor bootstrap API names need verification.
+    avoid:
+      - skill.data-table
+      - maintainer.release-checklist
+    stopRules:
+      - Do not load UI lifecycle details for non-UI resources.
+      - Do not hand-edit managed Addressables entries under managed roots.
+
+  data-table:
+    description: Persistent data, settings, player progress, inventory, migration, save/load results, or dirty state.
+    maxContextMode: workflow
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.data-table
+    optional:
+      - support-doc.api-index
+      - skill.guideline-audit
+    loadWhen:
+      support-doc.api-index:
+        - Data service or DataTable API names need verification.
+      skill.guideline-audit:
+        - The task asks for compliance review or regression risk after implementation.
+    avoid:
+      - skill.ui-feature
+      - skill.resource-flow
+      - maintainer.release-checklist
+    stopRules:
+      - Do not load UI or resource workflows unless the data feature directly touches them.
+      - Do not parse logs for load/save behavior.
+
+  directory-decision:
+    description: File placement, module ownership, generated code, UI prefab folders, scenes, resources, or project layout.
+    maxContextMode: workflow
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.directory-structure
+    optional:
+      - skill.ui-feature
+      - skill.resource-flow
+    loadWhen:
+      skill.ui-feature:
+        - The artifact is a UI prefab, controller, view, widget, popup, or panel.
+      skill.resource-flow:
+        - The artifact is an Addressables-managed resource or generated ResPath source.
+    avoid:
+      - skill.data-table
+      - maintainer.release-checklist
+    stopRules:
+      - Do not load release governance for ordinary placement decisions.
+      - Project-specific directory exceptions belong in project-owned instructions.
+
+  guideline-audit:
+    description: Compliance review, regression review, broad EFrame guideline check, or drift investigation.
+    maxContextMode: checklist
+    alwaysLoad:
+      - instruction.eframe-always-on
+      - skill.guideline-audit
+    optional:
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+      - skill.directory-structure
+      - support-doc.api-index
+    loadWhen:
+      skill.ui-feature:
+        - UI lifecycle, prefab, controller, binding, or UI layer findings are likely.
+      skill.resource-flow:
+        - Asset loading, Addressables, ResPath, preload, or handle ownership findings are likely.
+      skill.data-table:
+        - Persistent data, migration, dirty state, save/load, or event findings are likely.
+      skill.directory-structure:
+        - File placement, module ownership, generated code, or scene/resource separation findings are likely.
+      support-doc.api-index:
+        - A finding depends on exact framework API names.
+    avoid:
+      - maintainer.release-checklist
+    stopRules:
+      - Do not mix framework release checklist conclusions into a business project audit.
+      - Findings should cite the specific boundary category and rule ID when possible.
+
+  ai-contract-maintenance:
+    description: Maintaining AI rules, rule registry, sync boundary, manifests, skills, or platform outputs.
+    maxContextMode: full
+    alwaysLoad:
+      - maintainer.ai-contract-skill
+      - maintainer.release-checklist
+    optional:
+      - instruction.eframe-always-on
+      - support-doc.api-index
+      - skill.guideline-audit
+    loadWhen:
+      instruction.eframe-always-on:
+        - Synced business rules are being modified.
+      support-doc.api-index:
+        - API lookup guidance or support docs are being modified.
+      skill.guideline-audit:
+        - Business audit rules or workflow boundaries are being modified.
+    avoid: []
+    stopRules:
+      - Do not put release or manifest maintenance rules into eframe-* skills.
+      - Any synced AIWorkspace change requires manifest/hash/changelog/release-check handling.
+
+  release-check:
+    description: Package release, manifest version/hash update, tag, push, or publish preparation.
+    maxContextMode: full
+    alwaysLoad:
+      - maintainer.release-checklist
+      - maintainer.ai-contract-skill
+    optional:
+      - support-doc.api-index
+      - instruction.eframe-always-on
+    loadWhen:
+      support-doc.api-index:
+        - Support docs changed.
+      instruction.eframe-always-on:
+        - Synced instruction changed.
+    avoid:
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+    stopRules:
+      - Do not commit, tag, or push framework releases without maintainer confirmation.
+      - Do not treat manifest version as public product version.
+
