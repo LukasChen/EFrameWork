@@ -4,14 +4,20 @@
 
 ## 模拟结论
 
-当前策略基本满足按需加载目标：
+当前策略满足按需加载目标，且已经经过 A-E 输出迁移后的二次自审：
 
 - 普通提问只加载 always-on 视图，不加载 audit / release / specialized skills。
 - UI、资源、数据、目录任务默认只加载对应 specialized skill，其他领域走 optional + loadWhen。
 - 审查任务会加载 audit 视图，但 specialized skills 仍是按发现类型加载。
 - AI 契约维护和 release check 才会加载 maintainer 规则。
 
-已在自查中收窄 `instruction.eframe-always-on`：它现在只保留最小 full rules，并把 startup / UI / resource / data / directory 细节改为 handoff。
+已完成并复查：
+
+- Managed blocks 只保留平台路由和最小 baseline。
+- `instruction.eframe-always-on` 只保留最小 full rules，并把 startup / UI / resource / data / directory 细节改为 handoff。
+- `EFRAME_AI_API_INDEX.md` 只承载 API lookup 和短行为提示。
+- Coordinator/audit skills 只做分流和审查框架，详细 checklist 回到 references。
+- Unity asset edits 已通过 instruction `applyTo` 覆盖 `.prefab`、`.unity`、`.asset`。
 
 ## 模拟 1：普通解释问题
 
@@ -210,6 +216,39 @@
 
 污染风险：低。maintainer 规则只在维护场景加载，不污染业务任务。
 
+## 模拟 7：直接编辑 Unity prefab YAML
+
+用户请求：
+
+```text
+直接修改 HomeView.prefab，把按钮文本绑定到新的节点引用。
+```
+
+匹配场景：`ui-feature` 或 `resource-flow`，同时由 `instruction.eframe-always-on` 的 asset `applyTo` 触发
+
+加载：
+
+- `instruction.eframe-always-on`
+- `skill.ui-feature`
+
+按条件加载：
+
+- `skill.resource-flow`：涉及 prefab asset id、Addressables、ResPath 或加载路径时
+- `support-doc.api-index`：需要确认 UI / binding API 名称时
+
+避免：
+
+- `maintainer.release-checklist`
+- Unity Editor API 作为第一选择
+
+预期上下文：
+
+- `E04` YAML-first：优先直接、局部、透明、可审查地编辑 Unity YAML
+- `U01/U02/U05`：业务 UI 入口、内部 UI 边界、`CurrentView`
+- `R01/R06`：需要资源路径时使用 `ResPath.Generated`，不手改托管 Addressables 条目
+
+污染风险：低。资产编辑触发 always-on 后能拿到 YAML-first 和 fallback-only 口径；只有 UI/资源相关 skill 会按需进入。
+
 ## 发现的问题和处理
 
 | 问题 | 处理 |
@@ -217,11 +256,11 @@
 | `instruction.eframe-always-on` 初稿 summary 引入太多业务集合 | 已改为 handoff，fullRules 收窄到最小业务边界 |
 | `skill.guideline-audit` 用 `render: none` 表达排除 | 已改为 `exclusions` |
 | 架构校验没有检查 view handoffs | 已补充 handoff 引用校验 |
+| `eframe-instructions.md` 的 `applyTo` 未覆盖 Unity asset YAML | 已加入 `.prefab`、`.unity`、`.asset` |
+| `feature-bootstrap` 将 `QUI` 写进业务 UI bypass 口径 | 已改为 `EFrame.UI/UIControllerBase` |
 
 ## 剩余观察点
 
-- `support-doc.api-index` 仍覆盖多个 domain 的 `api-note`，后续审查时要确保它只承载 API lookup，不承载 workflow 细节。
 - `workflow.guideline-audit` 是最宽的业务集合，需要持续防止它变成“全规则加载入口”。
-- `feature-bootstrap` 的 optional skill 列表较长，但它是总控 workflow，当前可以接受。
+- `feature-bootstrap` 的 optional skill 列表较长，但它现在只做总控和分流，当前可以接受。
 - `U02` 和 `U05` 仍建议保持 `candidate`，等人工审查 UI 口径后再转 stable。
-
