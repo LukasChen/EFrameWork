@@ -33,6 +33,7 @@ Reduce drift and ambiguity in the EFrame AI collaboration layer without changing
 | Rule inventory, migration notes, release hygiene | `tools/MaintainerAIWorkspace/` |
 | Human explanation and setup | `packages/com.eframework.core/Documentation~/maintainer/` |
 | Rule information architecture | `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md` |
+| Visual review guide | `tools/MaintainerAIWorkspace/AI_RULE_VISUAL_REVIEW.md` |
 
 ## Phase 0: Rule Information Architecture
 
@@ -41,6 +42,7 @@ Build the architecture before tuning rule wording.
 Deliverables:
 
 - Add `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md`.
+- Add `tools/MaintainerAIWorkspace/AI_RULE_VISUAL_REVIEW.md`.
 - Define target layers: rule registry, rule sets, rule views, platform outputs, and validation.
 - Define the canonical rule schema and rendering levels.
 - Define the single-source ownership rule: full normative wording lives in one place, while platform outputs use summaries, checklists, handoffs, or API notes.
