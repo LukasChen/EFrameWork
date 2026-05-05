@@ -45,7 +45,7 @@
 | D：API index | `0.6.20` | `0.4.37` | API index 收敛为 lookup 表和短行为提示 |
 | E：skills / references | `0.6.21` | `0.4.38` | coordinator/audit skill 分流化，详细 checklist 回到 references |
 | 自审修复 | `0.6.22` | `0.4.39` | 修复 Unity asset `applyTo` 和 UI 入口措辞 |
-| 平台原生 skills | `0.6.23` | `0.4.40` | Codex `.agents/skills`、Copilot `.github/skills`、Claude Code `.claude/skills` 分平台同步 |
+| 平台原生 skills | `0.7.0` | `0.4.40` | Codex `.agents/skills`、Copilot `.github/skills`、Claude Code `.claude/skills` 分平台同步 |
 
 ## 同步输出职责
 

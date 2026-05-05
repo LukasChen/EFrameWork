@@ -16,7 +16,7 @@
 
 | 项目 | 合并前 main | 本分支最终 |
 | --- | --- | --- |
-| Package version | `0.6.16` | `0.6.23` |
+| Package version | `0.6.16` | `0.7.0` |
 | AI manifest version | `0.4.33` | `0.4.40` |
 | 分支 | `main` | `codex/ai-contract-refactor-plan` |
 
@@ -30,7 +30,7 @@
 | `0.6.20` | `0.4.37` | `EFRAME_AI_API_INDEX.md` 收敛为 API lookup 和短 note |
 | `0.6.21` | `0.4.38` | coordinator / audit skill 分流化，细节回到 references |
 | `0.6.22` | `0.4.39` | 修复 Unity asset `applyTo` 和 UI 入口 forbidden wording |
-| `0.6.23` | `0.4.40` | 为 Codex、GitHub Copilot、Claude Code 增加平台原生 skill 输出路径，并移除 always-on / managed block 的 skill 路由列表 |
+| `0.7.0` | `0.4.40` | 为 Codex、GitHub Copilot、Claude Code 增加平台原生 skill 输出路径，并移除 always-on / managed block 的 skill 路由列表 |
 
 业务可见结果：
 
@@ -111,7 +111,7 @@ git log main..HEAD --oneline
 
 建议合并条件：
 
-- 维护者接受同步输出最终版本 `0.6.23`。
+- 维护者接受同步输出最终版本 `0.7.0`。
 - 维护者接受 manifest 最终版本 `0.4.40`。
 - 维护者接受本分支新增 maintainer-only 规则架构作为后续规则治理基线。
 - 最终验证命令全部通过。

@@ -2,7 +2,7 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
-## [0.6.23] - 2026-05-05
+## [0.7.0] - 2026-05-05
 
 ### Changed
 
