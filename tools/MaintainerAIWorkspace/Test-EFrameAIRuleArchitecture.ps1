@@ -159,6 +159,51 @@ function Assert-AllKnown {
     }
 }
 
+function Get-RegistryCanonicalTexts {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return @()
+    }
+
+    $records = New-Object System.Collections.Generic.List[object]
+    $currentId = $null
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        $idMatch = [regex]::Match($line, '^\s{2}- id:\s*([A-Z][0-9][0-9])\s*$')
+        if ($idMatch.Success) {
+            $currentId = $idMatch.Groups[1].Value
+            continue
+        }
+
+        $textMatch = [regex]::Match($line, '^\s{4}canonicalText:\s*(.+?)\s*$')
+        if ($textMatch.Success -and $currentId) {
+            $text = $textMatch.Groups[1].Value.Trim()
+            if ($text.Length -ge 80) {
+                $records.Add([pscustomobject]@{
+                    Id = $currentId
+                    Text = $text
+                })
+            }
+        }
+    }
+
+    return @($records.ToArray())
+}
+
+function Get-RelativePathForDisplay {
+    param(
+        [string]$Base,
+        [string]$Path
+    )
+
+    try {
+        return [System.IO.Path]::GetRelativePath($Base, $Path)
+    }
+    catch {
+        return $Path
+    }
+}
+
 Require-File $registryPath | Out-Null
 Require-File $setsPath | Out-Null
 Require-File $viewsPath | Out-Null
@@ -227,6 +272,75 @@ $businessViews = @($viewIds | Where-Object { $_ -like "skill.*" -or $_ -like "in
 foreach ($view in $businessViews) {
     if ($view -match "release|maintainer") {
         Add-Warning "Business-facing view name contains maintainer/release term: $view"
+    }
+}
+
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $maintainerRoot "../..")).Path
+$aiWorkspaceRoot = Join-Path $repoRoot "packages/com.eframework.core/AIWorkspace~"
+$managedBlockRoot = Join-Path $aiWorkspaceRoot "managed-blocks"
+$apiIndexPath = Join-Path $aiWorkspaceRoot "support-docs/EFRAME_AI_API_INDEX.md"
+$instructionPath = Join-Path $aiWorkspaceRoot "instructions/eframe-instructions.md"
+$skillRoot = Join-Path $aiWorkspaceRoot "skills"
+
+if (Test-Path -LiteralPath $managedBlockRoot) {
+    $managedBlockDetailTerms = @(
+        "EFrameProcedure",
+        "UIControllerBase",
+        "ResPath.Generated",
+        "StorageKey",
+        "YAML-first",
+        "Unity YAML",
+        "Addressables group",
+        "DataTable<",
+        "CurrentView"
+    )
+
+    foreach ($managedBlock in Get-ChildItem -LiteralPath $managedBlockRoot -Filter "*.md") {
+        $content = Get-Content -LiteralPath $managedBlock.FullName -Raw
+        foreach ($term in $managedBlockDetailTerms) {
+            if ($content -like "*$term*") {
+                Add-Warning "Managed block may be carrying detailed rule text '$term': $(Get-RelativePathForDisplay -Base $repoRoot -Path $managedBlock.FullName)"
+            }
+        }
+    }
+}
+
+if (Test-Path -LiteralPath $apiIndexPath) {
+    $apiContent = Get-Content -LiteralPath $apiIndexPath -Raw
+    $apiWorkflowPatterns = @(
+        '(?m)^##\s+Workflow\b',
+        '(?m)^##\s+Checklist\b',
+        '(?m)^##\s+Output Checks\b',
+        '(?m)^\s*\d+\.\s+'
+    )
+
+    foreach ($pattern in $apiWorkflowPatterns) {
+        if ([regex]::IsMatch($apiContent, $pattern)) {
+            Add-Warning "API index may be carrying workflow/checklist structure matching '$pattern': $(Get-RelativePathForDisplay -Base $repoRoot -Path $apiIndexPath)"
+        }
+    }
+}
+
+$platformOutputFiles = @()
+foreach ($path in @($instructionPath, $apiIndexPath)) {
+    if (Test-Path -LiteralPath $path) {
+        $platformOutputFiles += Get-Item -LiteralPath $path
+    }
+}
+if (Test-Path -LiteralPath $managedBlockRoot) {
+    $platformOutputFiles += Get-ChildItem -LiteralPath $managedBlockRoot -Filter "*.md"
+}
+if (Test-Path -LiteralPath $skillRoot) {
+    $platformOutputFiles += Get-ChildItem -LiteralPath $skillRoot -Recurse -File -Include "*.md"
+}
+
+$canonicalTextRecords = Get-RegistryCanonicalTexts -Path $registryPath
+foreach ($record in $canonicalTextRecords) {
+    foreach ($file in $platformOutputFiles) {
+        $content = Get-Content -LiteralPath $file.FullName -Raw
+        if ($content.Contains($record.Text)) {
+            Add-Warning "Canonical rule text appears verbatim in platform output ($($record.Id)): $(Get-RelativePathForDisplay -Base $repoRoot -Path $file.FullName)"
+        }
     }
 }
 

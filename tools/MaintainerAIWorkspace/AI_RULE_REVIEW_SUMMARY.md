@@ -89,13 +89,21 @@
 
 Release check 当前显示无未提交 AI-impacting synced 文件变更。
 
+`Test-EFrameAIRuleArchitecture.ps1` 已增加保守 warning 原型：
+
+- managed block 中出现过细业务/API 术语时提示。
+- API index 出现 workflow/checklist 型结构时提示。
+- registry `canonicalText` 被原样复制到平台输出时提示。
+
+这些 warning 只用于人工审查，不阻塞 release。
+
 ## 剩余风险
 
 1. `U02` 和 `U05` 仍是 candidate，需要人工确认 UI 口径后再考虑 stable。
 2. `workflow.guideline-audit` 是最宽的业务集合，后续容易膨胀成全规则入口。
 3. `feature-bootstrap` 的 optional skill 较多，需要继续防止它重新复制 specialized rules。
 4. 目前输出仍是人工维护，没有生成器保证 registry 与 markdown 完全一致。
-5. 规则重复检查仍主要靠人工和结构引用校验，尚未检查 markdown 中的重复 full text。
+5. 重复 full text 检查仍是 warning 原型，只能发现原样复制，不能替代人工审查语义重复。
 
 ## 建议审查清单
 
@@ -115,7 +123,7 @@ Release check 当前显示无未提交 AI-impacting synced 文件变更。
 
 1. 人工审查 `U02`、`U05`、`E04`、`R06`、`G05`。
 2. 按审查反馈只做小修，不开始生成化。
-3. 增加一个重复 full text 检查原型，先作为 warning。
+3. 根据 warning 结果决定是否扩大重复 full text 检查范围。
 
 中期：
 
