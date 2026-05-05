@@ -4,14 +4,14 @@ This plan is maintainer-only. It does not sync to business projects and must not
 
 ## Goal
 
-Reduce drift and ambiguity in the EFrame AI collaboration layer without changing business-project behavior first. The immediate target is to build a stable rule information architecture: every rule is structured, every rule has one canonical definition, rendered files reference rules by layer, and platform adaptation happens only after the core rule model is stable.
+Reduce drift and ambiguity in the EFrame AI collaboration layer without changing business-project behavior first. The immediate target is to build a stable rule information architecture: every rule is structured, every rule has one canonical definition, rule views select rules by purpose, and platform outputs render those views only after the core rule model is stable.
 
 ## Current Baseline
 
 - EFrame `0.6.16` accepts the synced Unity serialized asset editing guidance and passes `tools/Test-EFrameAIRelease.ps1`.
 - Business-project sync still depends on `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` and file-level hashes.
 - The synced surface contains managed blocks, one always-on instruction, one API index, six `eframe-*` skills, and skill references.
-- The largest maintainability risks are repeated rule text, UI internal/business perspective mixing, lack of rule-level ownership metadata, and platform-specific entry files becoming accidental rule sources.
+- The largest maintainability risks are repeated rule text, UI internal/business perspective mixing, lack of rule-level ownership metadata, and platform outputs becoming accidental rule sources.
 
 ## Non-Goals
 
@@ -20,7 +20,7 @@ Reduce drift and ambiguity in the EFrame AI collaboration layer without changing
 - Do not move release or manifest maintenance rules into `eframe-*` skills.
 - Do not generate all instructions and skills in the first pass.
 - Do not change business-project AI behavior without a manifest bump, changelog entry, and release check.
-- Do not start platform-specific adaptation until the rule registry, rule views, and rendered-file layering are defined.
+- Do not start platform-specific output tuning until the rule registry, rule views, and platform-output layering are defined.
 
 ## Placement Decisions
 
@@ -41,14 +41,14 @@ Build the architecture before tuning rule wording.
 Deliverables:
 
 - Add `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md`.
-- Define target layers: rule registry, rule sets, rule views, rendered files, platform adapters, and validation.
+- Define target layers: rule registry, rule sets, rule views, platform outputs, and validation.
 - Define the canonical rule schema and rendering levels.
-- Define the single-source ownership rule: full normative wording lives in one place, while other surfaces use summaries, checklists, handoffs, or API notes.
+- Define the single-source ownership rule: full normative wording lives in one place, while platform outputs use summaries, checklists, handoffs, or API notes.
 
 Acceptance:
 
-- Maintainers can explain where a rule is defined, where it is rendered, and which platform activates it.
-- Platform adapters are explicitly out of scope for rule authorship.
+- Maintainers can explain where a rule is defined, which rule view selects it, and which platform output renders it.
+- Platform outputs are explicitly out of scope for rule authorship.
 - No synced output changes are required for this phase.
 
 ## Phase 1: Maintainer Rule Inventory
@@ -85,13 +85,14 @@ Deliverables:
 - Choose YAML or JSON for the draft registry.
 - Convert high-confidence inventory rows into structured rule records.
 - Add rule sets for UI, resources, data, directory, editor, procedure, audit, release, and platform.
-- Add rule views for the current rendered files.
+- Add rule views for the current purposes: always-on, workflow, API lookup, audit, release, and setup.
+- Add platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files.
 
 Acceptance:
 
 - Each migrated rule has required schema fields.
 - Every migrated rule has exactly one canonical text.
-- Rendered-file mapping uses explicit rendering levels: `full`, `summary`, `checklist`, `handoff`, `api-note`, or `none`.
+- Platform-output mapping uses explicit rendering levels: `full`, `summary`, `checklist`, `handoff`, `api-note`, or `none`.
 - No generated output is required.
 
 ## Phase 3: Business/Internal Contract Split
@@ -155,7 +156,7 @@ Acceptance:
 
 ## Phase 6: Optional Generation
 
-Only consider generation after the registry, rule views, and checks have been used in at least one real AI contract release.
+Only consider generation after the registry, rule views, platform outputs, and checks have been used in at least one real AI contract release.
 
 Candidate generated outputs:
 

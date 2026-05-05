@@ -5,19 +5,18 @@ This document defines the target information architecture for EFrame AI rules. I
 ## Design Principles
 
 1. Each rule has one canonical definition.
-2. Synced instructions, skills, support docs, managed blocks, and platform-specific entries reference or render rules; they do not become independent sources of truth.
+2. Platform outputs such as synced instructions, skills, support docs, and managed blocks render rules; they do not become independent sources of truth.
 3. Rule content is structured before wording is optimized.
-4. Layering is explicit: governance, business contract, workflow, reference, validation, and platform adapter concerns are not mixed.
-5. Platform adaptation is the last step. A platform receives the smallest rule view it can reliably apply.
+4. Layering is explicit: governance, business contract, workflow, reference, validation, and platform output concerns are not mixed.
+5. Platform output is the last step. A platform receives the smallest rule view it can reliably apply, in the file shape that platform needs.
 
 ## Target Layers
 
 ```mermaid
 graph TD
     A["Rule Registry<br/>canonical structured rules"] --> B["Rule Sets<br/>task/domain groupings"]
-    B --> C["Rule Views<br/>instruction, skill, support-doc, audit, release"]
-    C --> D["Rendered Files<br/>AIWorkspace~, managed blocks, maintainer docs"]
-    D --> E["Platform Adapters<br/>Codex, Copilot, Claude Code, future clients"]
+    B --> C["Rule Views<br/>purpose-specific selections"]
+    C --> D["Platform Outputs<br/>Codex, Copilot, Claude Code, maintainer docs"]
     A --> F["Validation<br/>duplicate, dependency, audience, contradiction checks"]
 ```
 
@@ -27,9 +26,8 @@ graph TD
 | --- | --- | --- | --- |
 | Rule Registry | Structured source of every AI rule | Yes | No, until generation is deliberately adopted |
 | Rule Sets | Groups rules by domain, task, or audience | No | No |
-| Rule Views | Selects rule IDs and rendering style for a surface | No | No |
-| Rendered Files | Concrete markdown or JSON files used today | No, after migration | Some files do |
-| Platform Adapters | Client-specific entry and activation behavior | No | Some adapters render managed blocks |
+| Rule Views | Selects rule IDs and rendering style for a purpose such as always-on boundaries, UI workflow, audit, or API lookup | No | No |
+| Platform Outputs | Client-specific files, entry behavior, output paths, and activation text | No | Some outputs do |
 | Validation | Checks integrity and drift | No | No |
 
 ## Canonical Rule Schema
@@ -115,49 +113,50 @@ validation:
 | Skill reference | Detailed checklist | `checklist`, `full` when it is the owner |
 | API index | Lookup map plus short behavioral notes | `api-note`, `summary` |
 | Maintainer checklist | Release and sync gate | `full` for maintainer-only rules |
-| Platform adapter | Client-specific activation mechanics | `handoff`, `summary` |
+| Platform output | Client-specific activation mechanics and file shape | `handoff`, `summary` |
 
 ## Single-Source Rule Ownership
 
 During migration, `AI_RULE_INVENTORY.md` is a human-maintained bridge. The final desired state is:
 
 1. A rule's normative wording lives in the registry.
-2. Rendered markdown may include only permitted render levels.
-3. If two rendered files need the same rule, they reference the same rule ID.
-4. If wording changes, the registry changes first, then rendered outputs update.
-5. Release checks verify that no synced file introduces a second full normative copy unless the registry allows it.
+2. Platform output markdown may include only permitted render levels.
+3. If two platform outputs need the same rule, they reference the same rule ID.
+4. If wording changes, the registry changes first, then platform outputs update.
+5. Release checks verify that no platform output introduces a second full normative copy unless the registry allows it.
 
-## Platform Adapter Boundary
+## Platform Output Boundary
 
-Platform adapters should answer only these questions:
+Platform outputs combine what was previously separated as rendered files and platform adapters. They should answer only these questions:
 
 - Where does this client read entry instructions?
 - Can this client load skills automatically, manually, or not at all?
 - What file shape does this client require?
 - Which rule views should this client receive?
 - What activation text is needed to route the client to the right synced files?
+- Where should the output be written in the framework source and in the synced business project?
+- Is the output synced, maintainer-only, or local to the framework repository?
 
-Platform adapters must not redefine EFrame business rules. They only render or point to rule views.
+Platform outputs must not redefine EFrame business rules. They only render or point to rule views.
 
 ## Migration Sequence
 
 1. Freeze the current inventory and assign stable rule IDs.
 2. Convert the inventory into a structured registry draft.
 3. Define rule sets for common task domains: UI, resources, data, directory, editor, procedure, audit, release.
-4. Define rule views for current rendered files.
-5. Normalize duplicated rendered files so they carry summaries, checklists, or handoffs instead of full duplicate wording.
-6. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform adapter leakage.
-7. Only then consider generating rendered files.
-8. After rendered files are stable, add platform-specific adapters for Codex, Copilot, Claude Code, and future clients.
+4. Define rule views for current purposes: always-on, workflow, API lookup, audit, release, and setup.
+5. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files.
+6. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
+7. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
+8. Only then consider generating platform outputs.
 
 ## First Architecture Milestone
 
 The first milestone is complete when maintainers can answer these questions without opening every synced file:
 
 - Which rule is canonical?
-- Which files render it?
+- Which platform outputs render it?
 - Which files only summarize or check it?
 - Which audience owns it?
 - Which rules depend on it?
-- Which platform adapters activate it?
-
+- Which platform outputs activate it?
