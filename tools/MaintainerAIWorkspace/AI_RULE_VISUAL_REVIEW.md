@@ -9,15 +9,18 @@ flowchart LR
     Registry["规则注册表<br/>rules/registry.yaml<br/>规则的唯一结构化记录"]
     Sets["规则集合<br/>rules/rule-sets.yaml<br/>按领域和工作流分组"]
     Views["规则视图<br/>rules/rule-views.yaml<br/>按用途选择规则"]
+    Loading["加载策略<br/>rules/loading-policy.yaml<br/>按任务限制上下文"]
     Outputs["平台输出<br/>Codex / Copilot / Claude Code<br/>skills / instructions / docs"]
     Checks["校验<br/>重复 ID<br/>缺失引用<br/>受众越界"]
 
     Registry --> Sets
     Sets --> Views
-    Views --> Outputs
+    Views --> Loading
+    Loading --> Outputs
     Registry --> Checks
     Sets --> Checks
     Views --> Checks
+    Loading --> Checks
 ```
 
 审查问题：每一层是否只有一个明确职责？下游层是否重新定义了本应属于 registry 的规则？
@@ -215,4 +218,3 @@ R06/R07: 归属和自动化需要拆得更清楚。
 instruction.eframe-always-on: fullRules 太多。
 platform.codex: 应该包含 E04 summary。
 ```
-

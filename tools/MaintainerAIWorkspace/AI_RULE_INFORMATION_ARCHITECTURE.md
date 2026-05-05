@@ -8,7 +8,7 @@ This document defines the target information architecture for EFrame AI rules. I
 2. Platform outputs such as synced instructions, skills, support docs, and managed blocks render rules; they do not become independent sources of truth.
 3. Rule content is structured before wording is optimized.
 4. Layering is explicit: governance, business contract, workflow, reference, validation, and platform output concerns are not mixed.
-5. Platform output is the last step. A platform receives the smallest rule view it can reliably apply, in the file shape that platform needs.
+5. Loading policy limits context before platform output. A platform receives the smallest rule view it can reliably apply, in the file shape that platform needs.
 
 ## Target Layers
 
@@ -16,8 +16,10 @@ This document defines the target information architecture for EFrame AI rules. I
 graph TD
     A["Rule Registry<br/>canonical structured rules"] --> B["Rule Sets<br/>task/domain groupings"]
     B --> C["Rule Views<br/>purpose-specific selections"]
-    C --> D["Platform Outputs<br/>Codex, Copilot, Claude Code, maintainer docs"]
+    C --> D["Loading Policy<br/>task-driven context limits"]
+    D --> E["Platform Outputs<br/>Codex, Copilot, Claude Code, maintainer docs"]
     A --> F["Validation<br/>duplicate, dependency, audience, contradiction checks"]
+    D --> F
 ```
 
 ## Layer Definitions
@@ -27,6 +29,7 @@ graph TD
 | Rule Registry | Structured source of every AI rule | Yes | No, until generation is deliberately adopted |
 | Rule Sets | Groups rules by domain, task, or audience | No | No |
 | Rule Views | Selects rule IDs and rendering style for a purpose such as always-on boundaries, UI workflow, audit, or API lookup | No | No |
+| Loading Policy | Maps task scenarios to rule views and context limits | No | No |
 | Platform Outputs | Client-specific files, entry behavior, output paths, and activation text | No | Some outputs do |
 | Validation | Checks integrity and drift | No | No |
 
@@ -145,10 +148,11 @@ Platform outputs must not redefine EFrame business rules. They only render or po
 2. Convert the inventory into a structured registry draft at `rules/registry.yaml`.
 3. Define rule sets for common task domains in `rules/rule-sets.yaml`: UI, resources, data, directory, editor, procedure, audit, release.
 4. Define rule views for current purposes in `rules/rule-views.yaml`: always-on, workflow, API lookup, audit, release, and setup.
-5. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files through the rule views.
-6. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
-7. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
-8. Only then consider generating platform outputs.
+5. Define task-driven loading policy in `rules/loading-policy.yaml` so agents can avoid unrelated rule views.
+6. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files through the rule views.
+7. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
+8. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
+9. Only then consider generating platform outputs.
 
 ## First Architecture Milestone
 
