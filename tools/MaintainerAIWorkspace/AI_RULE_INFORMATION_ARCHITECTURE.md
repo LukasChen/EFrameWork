@@ -33,6 +33,8 @@ graph TD
 | Platform Outputs | Client-specific files, entry behavior, output paths, and activation text | No | Some outputs do |
 | Validation | Checks integrity and drift | No | No |
 
+Current validation entry: `tools/MaintainerAIWorkspace/Test-EFrameAIRuleArchitecture.ps1`.
+
 ## Canonical Rule Schema
 
 The eventual registry can be YAML or JSON. The schema should stay boring and tool-friendly.

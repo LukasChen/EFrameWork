@@ -181,7 +181,8 @@ Any change under `packages/com.eframework.core/AIWorkspace~/` must follow the re
 2. Bump `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` if synced files change.
 3. Update manifest hashes.
 4. Run `tools/Test-EFrameAIRelease.ps1`.
-5. Run project sync status/force checks when sync tooling or target layout changes.
+5. Run `tools/MaintainerAIWorkspace/Test-EFrameAIRuleArchitecture.ps1` when registry, sets, views, or loading policy changes.
+6. Run project sync status/force checks when sync tooling or target layout changes.
 
 Maintainer-only plan or inventory files do not require a manifest bump unless release tooling starts tracking them explicitly.
 
