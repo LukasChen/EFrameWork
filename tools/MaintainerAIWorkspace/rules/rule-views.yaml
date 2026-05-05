@@ -18,33 +18,36 @@ views:
       - set: governance.business-entry
         render: summary
       - set: startup.procedure-lifecycle
-        render: summary
+        render: handoff
       - set: ui.business-contract
-        render: summary
+        render: handoff
       - set: resources.asset-flow
-        render: summary
+        render: handoff
       - set: directory.ownership
-        render: summary
+        render: handoff
       - set: data.persistence
-        render: summary
+        render: handoff
       - set: editor.unity-serialization
         render: summary
     fullRules:
+      - G05
       - G10
-      - P02
       - P04
       - P05
       - U01
       - U02
-      - U06
-      - U07
       - R01
       - R06
-      - D05
       - E04
-      - E05
     exclusions:
       - maintainer.release-governance
+    handoffs:
+      - skill.feature-bootstrap
+      - skill.directory-structure
+      - skill.ui-feature
+      - skill.resource-flow
+      - skill.data-table
+      - skill.guideline-audit
 
   support-doc.api-index:
     title: EFrame AI API Index
@@ -168,10 +171,10 @@ views:
     includes:
       - set: workflow.guideline-audit
         render: checklist
-      - set: maintainer.release-governance
-        render: none
     fullRules:
       - W02
+    exclusions:
+      - maintainer.release-governance
 
   managed-block.codex:
     title: Codex Managed Block View
@@ -246,4 +249,3 @@ views:
       - platform.codex
       - platform.copilot
       - platform.claude-code
-

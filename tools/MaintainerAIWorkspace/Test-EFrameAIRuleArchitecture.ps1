@@ -100,6 +100,40 @@ function Get-YamlChildKeys {
     return @($values)
 }
 
+function Get-YamlListValuesUnderKey {
+    param(
+        [string]$Path,
+        [string]$Key,
+        [string]$ItemPattern
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return @()
+    }
+
+    $values = New-Object System.Collections.Generic.List[string]
+    $inList = $false
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        if ($line -match "^\s{4}$([regex]::Escape($Key)):\s*$") {
+            $inList = $true
+            continue
+        }
+
+        if ($inList -and $line -match "^\s{4}[A-Za-z0-9_.-]+:") {
+            $inList = $false
+        }
+
+        if ($inList) {
+            $match = [regex]::Match($line, "^\s{6}-\s*($ItemPattern)\s*$")
+            if ($match.Success) {
+                $values.Add($match.Groups[1].Value)
+            }
+        }
+    }
+
+    return @($values)
+}
+
 function Assert-NoDuplicates {
     param(
         [string[]]$Values,
@@ -165,6 +199,9 @@ Assert-AllKnown -Refs $viewSetRefs -Known $setIds -Label "rule set"
 $viewFullRuleRefs = Get-RegexValues -Path $viewsPath -Pattern '^\s{6}-\s*([A-Z][0-9][0-9])\s*$'
 Assert-AllKnown -Refs $viewFullRuleRefs -Known $ruleIds -Label "view full rule"
 
+$viewHandoffRefs = Get-YamlListValuesUnderKey -Path $viewsPath -Key "handoffs" -ItemPattern '(?:instruction|support-doc|skill|managed-block|maintainer)\.[a-z0-9.-]+'
+Assert-AllKnown -Refs $viewHandoffRefs -Known $viewIds -Label "view handoff"
+
 $loadingViewRefs = Get-RegexValues -Path $loadingPath -Pattern '^\s{6}-\s*((?:instruction|support-doc|skill|managed-block|maintainer)\.[a-z0-9.-]+)\s*$'
 Assert-AllKnown -Refs $loadingViewRefs -Known $viewIds -Label "rule view"
 
@@ -201,6 +238,7 @@ Write-Host "Rule views: $($viewIds.Count)"
 Write-Host "Loading scenarios: $($scenarioIds.Count)"
 Write-Host "Rule refs from sets: $($setRuleRefs.Count)"
 Write-Host "Set refs from views: $($viewSetRefs.Count)"
+Write-Host "Handoff refs from views: $($viewHandoffRefs.Count)"
 Write-Host "View refs from loading policy: $($loadingViewRefs.Count)"
 
 foreach ($warning in $warnings) {
