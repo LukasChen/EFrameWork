@@ -34,6 +34,7 @@ Reduce drift and ambiguity in the EFrame AI collaboration layer without changing
 | Human explanation and setup | `packages/com.eframework.core/Documentation~/maintainer/` |
 | Rule information architecture | `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md` |
 | Visual review guide | `tools/MaintainerAIWorkspace/AI_RULE_VISUAL_REVIEW.md` |
+| Output migration plan | `tools/MaintainerAIWorkspace/AI_RULE_OUTPUT_MIGRATION_PLAN.md` |
 
 ## Phase 0: Rule Information Architecture
 
@@ -195,5 +196,6 @@ Start with Phase 0 and Phase 1 only:
 3. Add `rules/registry.yaml` as the first structured registry draft.
 4. Add `rules/rule-sets.yaml` and `rules/rule-views.yaml` for layered references.
 5. Add `rules/loading-policy.yaml` to map task scenarios to minimal rule views and context limits.
-6. Do not change synced rule content while the architecture is still settling.
-7. Run release check to ensure no synced-surface regression.
+6. Add `AI_RULE_OUTPUT_MIGRATION_PLAN.md` before changing synced outputs.
+7. Do not change synced rule content while the architecture is still settling.
+8. Run release check to ensure no synced-surface regression.

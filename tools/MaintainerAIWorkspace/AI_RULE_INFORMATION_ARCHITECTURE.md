@@ -151,10 +151,11 @@ Platform outputs must not redefine EFrame business rules. They only render or po
 3. Define rule sets for common task domains in `rules/rule-sets.yaml`: UI, resources, data, directory, editor, procedure, audit, release.
 4. Define rule views for current purposes in `rules/rule-views.yaml`: always-on, workflow, API lookup, audit, release, and setup.
 5. Define task-driven loading policy in `rules/loading-policy.yaml` so agents can avoid unrelated rule views.
-6. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files through the rule views.
-7. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
-8. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
-9. Only then consider generating platform outputs.
+6. Define output migration order in `AI_RULE_OUTPUT_MIGRATION_PLAN.md`.
+7. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files through the rule views.
+8. Normalize duplicated platform outputs so they carry summaries, checklists, or handoffs instead of full duplicate wording.
+9. Add validation for duplicate full wording, dangling dependencies, wrong audience, and platform-output leakage.
+10. Only then consider generating platform outputs.
 
 ## First Architecture Milestone
 
