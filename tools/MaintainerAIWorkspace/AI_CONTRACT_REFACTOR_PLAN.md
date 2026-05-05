@@ -4,14 +4,14 @@ This plan is maintainer-only. It does not sync to business projects and must not
 
 ## Goal
 
-Reduce drift and ambiguity in the EFrame AI collaboration layer without changing business-project behavior first. The immediate target is to make rule ownership explicit, separate business-facing rules from framework-internal implementation notes, and prepare release checks for rule-level validation.
+Reduce drift and ambiguity in the EFrame AI collaboration layer without changing business-project behavior first. The immediate target is to build a stable rule information architecture: every rule is structured, every rule has one canonical definition, rendered files reference rules by layer, and platform adaptation happens only after the core rule model is stable.
 
 ## Current Baseline
 
 - EFrame `0.6.16` accepts the synced Unity serialized asset editing guidance and passes `tools/Test-EFrameAIRelease.ps1`.
 - Business-project sync still depends on `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` and file-level hashes.
 - The synced surface contains managed blocks, one always-on instruction, one API index, six `eframe-*` skills, and skill references.
-- The largest maintainability risks are repeated rule text, UI internal/business perspective mixing, and lack of rule-level ownership metadata.
+- The largest maintainability risks are repeated rule text, UI internal/business perspective mixing, lack of rule-level ownership metadata, and platform-specific entry files becoming accidental rule sources.
 
 ## Non-Goals
 
@@ -20,6 +20,7 @@ Reduce drift and ambiguity in the EFrame AI collaboration layer without changing
 - Do not move release or manifest maintenance rules into `eframe-*` skills.
 - Do not generate all instructions and skills in the first pass.
 - Do not change business-project AI behavior without a manifest bump, changelog entry, and release check.
+- Do not start platform-specific adaptation until the rule registry, rule views, and rendered-file layering are defined.
 
 ## Placement Decisions
 
@@ -31,10 +32,28 @@ Reduce drift and ambiguity in the EFrame AI collaboration layer without changing
 | Detailed workflow checklists | `packages/com.eframework.core/AIWorkspace~/skills/eframe-*/references/*.md` |
 | Rule inventory, migration notes, release hygiene | `tools/MaintainerAIWorkspace/` |
 | Human explanation and setup | `packages/com.eframework.core/Documentation~/maintainer/` |
+| Rule information architecture | `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md` |
+
+## Phase 0: Rule Information Architecture
+
+Build the architecture before tuning rule wording.
+
+Deliverables:
+
+- Add `tools/MaintainerAIWorkspace/AI_RULE_INFORMATION_ARCHITECTURE.md`.
+- Define target layers: rule registry, rule sets, rule views, rendered files, platform adapters, and validation.
+- Define the canonical rule schema and rendering levels.
+- Define the single-source ownership rule: full normative wording lives in one place, while other surfaces use summaries, checklists, handoffs, or API notes.
+
+Acceptance:
+
+- Maintainers can explain where a rule is defined, where it is rendered, and which platform activates it.
+- Platform adapters are explicitly out of scope for rule authorship.
+- No synced output changes are required for this phase.
 
 ## Phase 1: Maintainer Rule Inventory
 
-Create a maintainer-only rule inventory before changing synced outputs.
+Create a maintainer-only rule inventory before changing synced outputs. This inventory is a bridge toward the future structured registry, not the final registry format.
 
 Deliverables:
 
@@ -49,6 +68,7 @@ Deliverables:
   - `E*`: editor tooling, Unity serialization, compile validation.
   - `W*`: workflow and audit routing.
 - For each rule, record canonical target, current duplicates, audience, and whether it is synced.
+- Mark which rules are ready to become structured registry entries and which need normalization before registry migration.
 
 Acceptance:
 
@@ -56,7 +76,25 @@ Acceptance:
 - `tools/Test-EFrameAIRelease.ps1` still passes or reports no new synced-surface blocker.
 - Every high-risk repeated rule has exactly one proposed canonical target.
 
-## Phase 2: Business/Internal Contract Split
+## Phase 2: Structured Registry Draft
+
+Convert the inventory into a structured registry draft while keeping existing synced files unchanged.
+
+Deliverables:
+
+- Choose YAML or JSON for the draft registry.
+- Convert high-confidence inventory rows into structured rule records.
+- Add rule sets for UI, resources, data, directory, editor, procedure, audit, release, and platform.
+- Add rule views for the current rendered files.
+
+Acceptance:
+
+- Each migrated rule has required schema fields.
+- Every migrated rule has exactly one canonical text.
+- Rendered-file mapping uses explicit rendering levels: `full`, `summary`, `checklist`, `handoff`, `api-note`, or `none`.
+- No generated output is required.
+
+## Phase 3: Business/Internal Contract Split
 
 Normalize wording where framework internals and business usage are currently mixed.
 
@@ -78,9 +116,9 @@ Acceptance:
 - `EFRAME_AI_API_INDEX.md` and `eframe-instructions.md` do not contradict each other.
 - UI wording remains consistent across `eframe-instructions`, `eframe-ui-feature`, `eframe-guideline-audit`, and UI docs.
 
-## Phase 3: Synced Surface Cleanup
+## Phase 4: Synced Surface Cleanup
 
-Apply narrow synced changes after Phase 1 identifies canonical owners.
+Apply narrow synced changes after the registry draft identifies canonical owners and rule views.
 
 Work items:
 
@@ -96,7 +134,7 @@ Acceptance:
 - Manifest version and hashes are updated for every synced change.
 - Root and package changelogs describe the business-visible AI contract change.
 
-## Phase 4: Rule-Level Validation Pilot
+## Phase 5: Rule-Level Validation Pilot
 
 Extend validation after the inventory stabilizes.
 
@@ -115,9 +153,9 @@ Acceptance:
 - Warnings are actionable and include file paths.
 - No generated or heuristic check blocks urgent release work without a clear maintainer override path.
 
-## Phase 5: Optional Generation
+## Phase 6: Optional Generation
 
-Only consider generation after the inventory and checks have been used in at least one real AI contract release.
+Only consider generation after the registry, rule views, and checks have been used in at least one real AI contract release.
 
 Candidate generated outputs:
 
@@ -146,9 +184,9 @@ Maintainer-only plan or inventory files do not require a manifest bump unless re
 
 ## Recommended Next Patch
 
-Start with Phase 1 only:
+Start with Phase 0 and Phase 1 only:
 
-1. Add `AI_RULE_INVENTORY.md`.
-2. Seed it with governance, UI, resource, directory, data, editor, and workflow rule IDs.
-3. Mark the current UI and Unity serialized editing rules as normalization candidates.
+1. Add `AI_RULE_INFORMATION_ARCHITECTURE.md`.
+2. Keep `AI_RULE_INVENTORY.md` as the bridge inventory.
+3. Do not change synced rule content while the architecture is still settling.
 4. Run release check to ensure no synced-surface regression.
