@@ -98,10 +98,10 @@ Normalization note: `U02` and audit wording should clearly distinguish framework
 | E01 | Editor code owns generation, import, menu commands, validation, and inspector extensions; runtime code must not reference Editor assemblies. | Business | `eframe-instructions.md` | audit checklist | canonical |
 | E02 | Generators are stable, repeatable, and explicit about overwrite behavior. | Business | `eframe-guideline-audit/references/audit-checklist.md` | historical instruction wording | handoff |
 | E03 | Tool scripts validate prerequisites and produce actionable errors. | Business | `eframe-guideline-audit/references/audit-checklist.md` | historical instruction wording | handoff |
-| E04 | Unity serialized asset edits use local identity-preserving YAML only for low-risk cases; high-risk structural or reference edits use Unity Editor APIs. | Business | `eframe-instructions.md` | API index should be normalized | candidate |
+| E04 | Business AI prefers direct, narrow, reviewable Unity YAML edits; Unity Editor APIs and other fallback paths are used only when direct YAML editing cannot complete, cannot preserve references, or validation shows abnormal serialized state. | Business | `eframe-instructions.md` | API index | canonical |
 | E05 | Unity compile validation should use Unity Editor/Bee artifacts or `tools/Test-EFrameUnityCompile.ps1`, not only `.sln` or `dotnet build`. | Business | `eframe-instructions.md` | audit skill, setup docs | canonical |
 
-Normalization note: `E04` is the highest-priority contradiction cleanup candidate after the `0.6.16` release accepted the YAML-editing rule.
+Normalization note: `E04` is settled as a YAML-first business AI rule. Future checks should prevent API index or checklist text from reverting to Editor API first.
 
 ## Workflow Routing
 
@@ -118,4 +118,3 @@ Normalization note: `E04` is the highest-priority contradiction cleanup candidat
 2. Normalize `U02` wording so business-facing files describe `QUI/IUIService/UIViewHandle` as internal or advanced-only.
 3. Trim any duplicate low-level generator/tool prerequisites from always-on instructions once audit references own them.
 4. Add release-check warnings for `E04` and `U02` contradiction patterns after wording is stable.
-

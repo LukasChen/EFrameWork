@@ -66,8 +66,8 @@ Target areas:
   - Business-facing contract: `EFrame.UI`, `UIControllerBase<TGeneratedView>`, generated `CurrentView`, prefab-first static structure.
   - Internal/advanced contract: `IUIService`, `QUI`, `UIViewHandle<TView>`, lifecycle debugging, framework extensions.
 - Unity serialized assets:
-  - Low-risk local YAML edits are allowed when transparent and identity-preserving.
-  - High-risk structure, references, nested prefabs, variants, binding, or uncertain edits use Unity Editor APIs.
+  - Business AI prefers direct, narrow, reviewable Unity YAML edits.
+  - Unity Editor APIs and other fallback paths are used only when direct YAML editing cannot complete, cannot preserve references, or validation shows abnormal serialized state.
 - API index:
   - Keep API lookup factual.
   - Label avoid/recommendation notes as behavioral guidance, not alternate canonical rules.
@@ -150,6 +150,5 @@ Start with Phase 1 only:
 
 1. Add `AI_RULE_INVENTORY.md`.
 2. Seed it with governance, UI, resource, directory, data, editor, and workflow rule IDs.
-3. Mark the current UI and Unity serialized editing rules as high-risk normalization candidates.
+3. Mark the current UI and Unity serialized editing rules as normalization candidates.
 4. Run release check to ensure no synced-surface regression.
-

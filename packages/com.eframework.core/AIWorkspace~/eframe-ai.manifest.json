@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.33",
+    "version":  "0.4.34",
     "updatedAt":  "2026-05-05",
-    "notes":  "Release Unity serialized asset editing contract update.",
+    "notes":  "Align Unity serialized asset editing contract to YAML-first fallback flow.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,11 +33,11 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "265a0f71aa29a2820cc945d08c4a76f84fa0c627b2a50669a39efc0057bf8463"
+                      "sha256":  "9cadb67bbd2119601f1f95a7701415f059b4b2aa4818cc428a10ecd4847563a2"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "1ee424d9e81a610dd10d544684ca3a5d6b6decf126372e81783e931b78834b1a"
+                      "sha256":  "bd27052a4006b6caefba9c24c7cde303fef18b2c0a4693c56e83758ba280c93f"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",

@@ -108,7 +108,7 @@ Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 | Build preflight | `EFrameAddressablesBuildPreprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBuildPreprocessor.cs` | Fails builds when managed Addressables or generated paths drift. |
 | Import/move/delete auto-sync | `EFrameAppResAddressablePostprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAppResAddressablePostprocessor.cs` | Keeps managed resource changes aligned with Addressables automation. |
 
-Avoid text-rewriting Unity `.unity`, `.prefab`, or `.asset` files when Editor APIs can make narrow serialized changes.
+Prefer direct, narrow, reviewable YAML edits for Unity `.unity`, `.prefab`, and `.asset` files. Use Unity Editor APIs or other fallback paths only when direct YAML editing cannot complete, cannot preserve references, or validation shows abnormal serialized state.
 
 ## Templates And Optional Modules
 

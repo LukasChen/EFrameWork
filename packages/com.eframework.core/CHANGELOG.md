@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.6.17] - 2026-05-05
+
+### Changed
+
+- Aligned synced AI Unity serialized asset guidance to prefer direct, narrow YAML edits, using Unity Editor APIs or other fallback paths only when direct YAML editing cannot complete or validation shows abnormal serialized state.
+
 ## [0.6.16] - 2026-05-05
 
 ### Changed
