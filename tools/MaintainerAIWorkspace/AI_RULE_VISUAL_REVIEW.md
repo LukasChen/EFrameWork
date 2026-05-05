@@ -2,6 +2,8 @@
 
 这份文档是维护者专用的审查入口，用来在修改同步 AI 文件前，先用图形方式检查规则信息架构。
 
+按需加载模拟结果见 [AI_RULE_LOADING_SIMULATION.md](./AI_RULE_LOADING_SIMULATION.md)。
+
 ## 架构图
 
 ```mermaid
