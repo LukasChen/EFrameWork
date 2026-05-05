@@ -26,6 +26,15 @@
 
 新增规则或修改规则落点时，先读 `AI_RULE_ADDITION_GUIDE.md`。
 
+## 人工确认
+
+维护者已确认：
+
+- 接受三套 native skill 输出：Codex `.agents/skills`、GitHub Copilot `.github/skills`、Claude Code `.claude/skills`。
+- 确认 root entry 和 always-on instruction 不再列 skill 路由。
+- 确认 API index 只作为 API lookup cache。
+- 确认当前 rule registry 作为后续唯一规则源草案。
+
 ## 已完成范围
 
 | Phase | 版本 | Manifest | 结果 |

@@ -111,7 +111,14 @@ git log main..HEAD --oneline
 
 建议合并条件：
 
-- 维护者接受同步输出最终版本 `0.6.22`。
-- 维护者接受 manifest 最终版本 `0.4.39`。
+- 维护者接受同步输出最终版本 `0.6.23`。
+- 维护者接受 manifest 最终版本 `0.4.40`。
 - 维护者接受本分支新增 maintainer-only 规则架构作为后续规则治理基线。
 - 最终验证命令全部通过。
+
+已确认合并口径：
+
+- 接受三套 native skill 输出：Codex `.agents/skills`、GitHub Copilot `.github/skills`、Claude Code `.claude/skills`。
+- 确认 root entry 和 always-on instruction 不再列 skill 路由。
+- 确认 API index 只作为 API lookup cache。
+- 确认当前 rule registry 作为后续唯一规则源草案。
