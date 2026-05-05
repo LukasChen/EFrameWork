@@ -10,6 +10,10 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 - Added platform-native EFrame skill sync outputs for Codex `.agents/skills`, GitHub Copilot `.github/skills`, and Claude Code `.claude/skills`, while keeping always-on instructions and managed blocks free of skill routing lists.
 
+### Fixed
+
+- Fixed AI manifest file hashes for text files and made template sync checks ignore LF/CRLF-only differences on Unity text assets.
+
 ## [0.6.22] - 2026-05-05
 
 ### Fixed
