@@ -2,7 +2,7 @@
 
 This inventory is maintainer-only. It records canonical ownership for EFrame AI rules so synced instructions, skills, support docs, and managed blocks can be maintained without duplicating contradictory text.
 
-This file is a bridge inventory, not the final machine-readable registry. The target architecture is defined in `AI_RULE_INFORMATION_ARCHITECTURE.md`.
+This file is a bridge inventory, not the final machine-readable registry. The target architecture is defined in `AI_RULE_INFORMATION_ARCHITECTURE.md`, and the first structured registry draft lives at `rules/registry.yaml`.
 
 Status legend:
 

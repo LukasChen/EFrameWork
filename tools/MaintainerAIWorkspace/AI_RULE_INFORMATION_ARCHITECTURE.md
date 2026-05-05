@@ -141,8 +141,8 @@ Platform outputs must not redefine EFrame business rules. They only render or po
 
 ## Migration Sequence
 
-1. Freeze the current inventory and assign stable rule IDs.
-2. Convert the inventory into a structured registry draft.
+1. Freeze the current inventory and assign stable rule IDs in `AI_RULE_INVENTORY.md`.
+2. Convert the inventory into a structured registry draft at `rules/registry.yaml`.
 3. Define rule sets for common task domains: UI, resources, data, directory, editor, procedure, audit, release.
 4. Define rule views for current purposes: always-on, workflow, API lookup, audit, release, and setup.
 5. Define platform outputs for Codex, Copilot, Claude Code, maintainer docs, and package sync files.
