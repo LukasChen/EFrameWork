@@ -57,6 +57,11 @@ $excludedFileExtensions = @(
     ".booproj"
 )
 
+$virtualListWindowPrefabRelativePath = "Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow.prefab"
+$virtualListWindowSourceScriptMetaRelativePath = "Runtime/UI/VirtualListShowcaseWindow.cs.meta"
+$virtualListWindowTemplateScriptMetaRelativePath = "Runtime/UI/VirtualListShowcaseWindow.cs.txt.meta"
+$virtualListWindowBindingName = "Window"
+
 function Convert-ToRepoRelativePath {
     param(
         [string]$FullPath,
@@ -158,6 +163,72 @@ function Get-FileHashText {
     return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Add-VirtualListWindowPrefabReferenceErrors {
+    param(
+        [System.Collections.Generic.List[string]]$Errors,
+        [string]$RootPath,
+        [string]$ScriptMetaRelativePath,
+        [string]$Label
+    )
+
+    $prefabPath = Join-Path $RootPath ($virtualListWindowPrefabRelativePath -replace "/", [System.IO.Path]::DirectorySeparatorChar)
+    $scriptMetaPath = Join-Path $RootPath ($ScriptMetaRelativePath -replace "/", [System.IO.Path]::DirectorySeparatorChar)
+
+    if (-not (Test-Path -LiteralPath $prefabPath)) {
+        $Errors.Add("$Label missing virtual-list window prefab: $virtualListWindowPrefabRelativePath")
+        return
+    }
+
+    if (-not (Test-Path -LiteralPath $scriptMetaPath)) {
+        $Errors.Add("$Label missing virtual-list window script meta: $ScriptMetaRelativePath")
+        return
+    }
+
+    $metaText = Get-Content -LiteralPath $scriptMetaPath -Raw -Encoding UTF8
+    $metaGuidMatch = [regex]::Match($metaText, "(?m)^guid:\s*([0-9a-fA-F]{32})\s*$")
+    if (-not $metaGuidMatch.Success) {
+        $Errors.Add("$Label virtual-list window script meta does not contain a valid GUID: $ScriptMetaRelativePath")
+        return
+    }
+
+    $prefabText = Get-Content -LiteralPath $prefabPath -Raw -Encoding UTF8
+    $bindingPattern = "(?m)^\s*-\s*BindingName:\s*$([regex]::Escape($virtualListWindowBindingName))\s*[\r\n]+\s*Component:\s*\{fileID:\s*([0-9]+)\s*\}"
+    $bindingMatch = [regex]::Match($prefabText, $bindingPattern)
+    if (-not $bindingMatch.Success) {
+        $Errors.Add("$Label virtual-list window prefab does not contain binding '$virtualListWindowBindingName'.")
+        return
+    }
+
+    $componentId = $bindingMatch.Groups[1].Value
+    $componentMarker = "--- !u!114 &$componentId"
+    $componentStart = $prefabText.IndexOf($componentMarker, [System.StringComparison]::Ordinal)
+    if ($componentStart -lt 0) {
+        $Errors.Add("$Label virtual-list window binding '$virtualListWindowBindingName' points to missing component $componentId.")
+        return
+    }
+
+    $nextComponentStart = $prefabText.IndexOf("--- !u!", $componentStart + $componentMarker.Length, [System.StringComparison]::Ordinal)
+    $componentLength = if ($nextComponentStart -lt 0) {
+        $prefabText.Length - $componentStart
+    }
+    else {
+        $nextComponentStart - $componentStart
+    }
+
+    $componentText = $prefabText.Substring($componentStart, $componentLength)
+    $scriptGuidMatch = [regex]::Match($componentText, "m_Script:\s*\{fileID:\s*11500000,\s*guid:\s*([0-9a-fA-F]{32}),\s*type:\s*3\}")
+    if (-not $scriptGuidMatch.Success) {
+        $Errors.Add("$Label virtual-list window binding '$virtualListWindowBindingName' component $componentId does not contain a MonoScript reference.")
+        return
+    }
+
+    $expectedGuid = $metaGuidMatch.Groups[1].Value
+    $actualGuid = $scriptGuidMatch.Groups[1].Value
+    if ($actualGuid -ne $expectedGuid) {
+        $Errors.Add("$Label virtual-list window binding '$virtualListWindowBindingName' script GUID is $actualGuid but $ScriptMetaRelativePath is $expectedGuid.")
+    }
+}
+
 $entries = @(Get-SourceEntries)
 $sourceRootMetaPath = "$sourceFullPath.meta"
 $targetRootMetaPath = "$targetFullPath.meta"
@@ -203,6 +274,18 @@ if ($CheckOnly) {
             $errors.Add("Template root meta file differs: $targetRootMetaPath")
         }
     }
+
+    Add-VirtualListWindowPrefabReferenceErrors `
+        -Errors $errors `
+        -RootPath $sourceFullPath `
+        -ScriptMetaRelativePath $virtualListWindowSourceScriptMetaRelativePath `
+        -Label "Fixture source"
+
+    Add-VirtualListWindowPrefabReferenceErrors `
+        -Errors $errors `
+        -RootPath $targetFullPath `
+        -ScriptMetaRelativePath $virtualListWindowTemplateScriptMetaRelativePath `
+        -Label "Package template"
 
     if ($errors.Count -gt 0) {
         foreach ($errorMessage in $errors) {

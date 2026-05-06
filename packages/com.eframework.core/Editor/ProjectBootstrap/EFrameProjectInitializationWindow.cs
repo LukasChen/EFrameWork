@@ -28,7 +28,7 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string ExtensionShowcaseTemplatePath = "Packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase";
         private const string ExtensionShowcaseVirtualListWindowScriptPath = "Runtime/UI/VirtualListShowcaseWindow.cs";
         private const string ExtensionShowcaseVirtualListWindowPrefabPath = "Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow.prefab";
-        private const string ExtensionShowcaseVirtualListWindowComponentId = "114010";
+        private const string ExtensionShowcaseVirtualListWindowBindingName = "Window";
         private const string BasicStartupProcedureName = "GameApp.Procedure.ProcedureLauncher";
         private const string ExtensionShowcaseStartupProcedureName = "GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
@@ -794,6 +794,8 @@ namespace EFramework.Editor.ProjectBootstrap
             }
 
             CopyDirectory(sourceFullPath, targetFullPath);
+            // Unity may rewrite copied meta GUIDs that conflict with the package template.
+            AssetDatabase.Refresh();
             if (!TryRepairInstalledExtensionShowcaseScriptReferences(targetFullPath, out var repairMessage))
             {
                 message = repairMessage;
@@ -835,11 +837,20 @@ namespace EFramework.Editor.ProjectBootstrap
 
             var scriptGuid = guidMatch.Groups[1].Value;
             var prefab = File.ReadAllText(prefabPath);
-            var componentMarker = $"--- !u!114 &{ExtensionShowcaseVirtualListWindowComponentId}";
+            var bindingPattern = $@"-\s*BindingName:\s*{Regex.Escape(ExtensionShowcaseVirtualListWindowBindingName)}\s*\r?\n\s*Component:\s*\{{fileID:\s*([0-9]+)\s*\}}";
+            var bindingMatch = Regex.Match(prefab, bindingPattern, RegexOptions.CultureInvariant);
+            if (!bindingMatch.Success)
+            {
+                message = $"Extension Showcase virtual-list prefab does not contain binding '{ExtensionShowcaseVirtualListWindowBindingName}'.";
+                return false;
+            }
+
+            var windowComponentId = bindingMatch.Groups[1].Value;
+            var componentMarker = $"--- !u!114 &{windowComponentId}";
             var componentStart = prefab.IndexOf(componentMarker, StringComparison.Ordinal);
             if (componentStart < 0)
             {
-                message = $"Extension Showcase virtual-list prefab does not contain component {ExtensionShowcaseVirtualListWindowComponentId}.";
+                message = $"Extension Showcase virtual-list prefab binding '{ExtensionShowcaseVirtualListWindowBindingName}' points to missing component {windowComponentId}.";
                 return false;
             }
 
@@ -849,7 +860,7 @@ namespace EFramework.Editor.ProjectBootstrap
             var scriptReferencePattern = @"m_Script:\s*\{fileID:\s*11500000,\s*guid:\s*[0-9a-fA-F]{32},\s*type:\s*3\}";
             if (!Regex.IsMatch(componentText, scriptReferencePattern, RegexOptions.CultureInvariant))
             {
-                message = $"Extension Showcase virtual-list prefab component {ExtensionShowcaseVirtualListWindowComponentId} does not contain a MonoScript reference.";
+                message = $"Extension Showcase virtual-list prefab binding '{ExtensionShowcaseVirtualListWindowBindingName}' component {windowComponentId} does not contain a MonoScript reference.";
                 return false;
             }
 
