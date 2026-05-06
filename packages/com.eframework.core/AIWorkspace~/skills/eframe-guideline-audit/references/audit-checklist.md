@@ -19,6 +19,8 @@
 - 承载框架 UI overlay 的运行时场景相机是否挂载 `EFrameSceneCamera`
 - `UIController` 是否负责绑定、刷新、销毁，而不是承担全部业务逻辑
 - UI 静态结构、布局、切图组装、九宫拉伸、按钮层级和可视状态是否已落实到 Unity prefab
+- 移动端安全区、刘海屏、圆角屏适配是否使用 prefab 上的 `SafeAreaFitter` / `FullScreenFitter`，而不是业务代码直接读取 `Screen.safeArea` 或手写 offset
+- 静态 UI 标准组件是否序列化在 prefab/YAML 上，避免 runtime 为弥补配置缺失而临时 `AddComponent`
 - Runtime Controller 是否避免大规模 `new GameObject` 拼装静态 UI，只保留必要的动态列表/Item 实例化
 - 动态生成的重复元素是否优先使用 prefab 中的 Template 或独立 Widget prefab
 - `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`

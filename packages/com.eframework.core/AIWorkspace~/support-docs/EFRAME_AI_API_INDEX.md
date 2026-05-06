@@ -49,6 +49,8 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Holds binding/config data such as default layer, cache, and animation root. |
 | Advanced/internal UI host | `IUIService` / `QUI`, `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs`, `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Direct use is for framework internals, advanced managers, or lifecycle debugging. |
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to scene cameras that should host the framework UI overlay stack. |
+| Safe area content fitting | `SafeAreaFitter` | `packages/com.eframework.core/Runtime/UI/Layout/SafeAreaFitter.cs` | Put on prefab content containers that should stay inside safe areas. |
+| Full-screen background fitting | `FullScreenFitter` | `packages/com.eframework.core/Runtime/UI/Layout/FullScreenFitter.cs` | Put on prefab backgrounds or masks that should extend beyond the fitted UI area. |
 | Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Optional package for `CheckableButton`, `Tabbar`, `UIHelper`, `UIAnimation`, and related helpers. |
 | Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Optional package for pooled virtual list/grid controls. |
 

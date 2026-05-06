@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.42",
+    "version":  "0.4.44",
     "updatedAt":  "2026-05-06",
-    "notes":  "Track UI Virtual List resize and Extension Showcase popup release updates.",
+    "notes":  "Prefer prefab-authored safe-area fitters in the EFrame UI workflow.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "d317fd411996c62b575ee137ee58d66c3e4f1b986459271fd37566152067c6f5"
+                      "sha256":  "305ca0375f6ab1e303d15fa2a212afe9e8a68b2d422a33c78ba814a3ea55f589"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
@@ -111,17 +111,17 @@
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "6debcf9e92bf821893da2cc275a527fc64ab90f7f2fafb7fa7bdb7ae14f1ee9d"
+                      "sha256":  "223691e36df08423ee7cd17f47dbeaad9affe5d20661a88352928c7411670c76"
                   },
                   {
                       "path":  ".agents/skills/eframe-guideline-audit/references/audit-checklist.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "6debcf9e92bf821893da2cc275a527fc64ab90f7f2fafb7fa7bdb7ae14f1ee9d"
+                      "sha256":  "223691e36df08423ee7cd17f47dbeaad9affe5d20661a88352928c7411670c76"
                   },
                   {
                       "path":  ".claude/skills/eframe-guideline-audit/references/audit-checklist.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-guideline-audit/references/audit-checklist.md",
-                      "sha256":  "6debcf9e92bf821893da2cc275a527fc64ab90f7f2fafb7fa7bdb7ae14f1ee9d"
+                      "sha256":  "223691e36df08423ee7cd17f47dbeaad9affe5d20661a88352928c7411670c76"
                   },
                   {
                       "path":  ".github/skills/eframe-guideline-audit/SKILL.md",
@@ -181,17 +181,17 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "5f478ac56940de5ca01b26a5a1086e0e16d9500272e3f002b391f4189e368bd9"
+                      "sha256":  "97339b71817997abff3ec37217f4b06874843496fe0c7ec2e219c65091db9fbb"
                   },
                   {
                       "path":  ".agents/skills/eframe-ui-feature/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "5f478ac56940de5ca01b26a5a1086e0e16d9500272e3f002b391f4189e368bd9"
+                      "sha256":  "97339b71817997abff3ec37217f4b06874843496fe0c7ec2e219c65091db9fbb"
                   },
                   {
                       "path":  ".claude/skills/eframe-ui-feature/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "5f478ac56940de5ca01b26a5a1086e0e16d9500272e3f002b391f4189e368bd9"
+                      "sha256":  "97339b71817997abff3ec37217f4b06874843496fe0c7ec2e219c65091db9fbb"
                   }
               ]
 }

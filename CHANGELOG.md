@@ -4,6 +4,14 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.7.2] - 2026-05-06
+
+### Changed
+
+- Added synced AI guidance to prefer TextMesh Pro UI text components over legacy `UnityEngine.UI.Text` when TextMesh Pro is installed.
+- Added synced AI guidance to use prefab-authored `SafeAreaFitter` / `FullScreenFitter` for business UI safe-area fitting.
+- Updated the Extension Showcase Virtual List sample to use prefab-authored safe-area/full-screen fitters, larger controls and text, static toolbar/list templates, and explicit layout refresh after mode switches.
+
 ## [0.7.1] - 2026-05-06
 
 ### Fixed

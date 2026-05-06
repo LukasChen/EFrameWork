@@ -39,7 +39,13 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
         {
             base.OnBindingSet();
 
-            Window = gameObject.GetComponent<VirtualListShowcaseWindow>() ?? gameObject.AddComponent<VirtualListShowcaseWindow>();
+            Window = gameObject.GetComponent<VirtualListShowcaseWindow>();
+            if (Window == null)
+            {
+                Debug.LogError($"{nameof(VirtualListShowcaseWindow)} must be authored on the showcase prefab.");
+                return;
+            }
+
             Window.Build();
         }
     }
@@ -51,15 +57,19 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
         public Action CloseRequested { get; set; }
 
         private Text m_infoText;
+        private RectTransform m_contentRoot;
         private QVirtualListView m_listView;
         private QVirtualGridView m_gridView;
         private VariableListAdapter m_listAdapter;
         private GridAdapter m_gridAdapter;
         private bool m_gridMode;
         private float m_nextInfoRefresh;
+        private Vector2 m_lastContentSize = new(-1f, -1f);
 
         private void Update()
         {
+            RefreshLayoutIfContentSizeChanged();
+
             if (Time.unscaledTime < m_nextInfoRefresh)
             {
                 return;
@@ -81,10 +91,10 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             var contentRoot = panel?.Find("ContentRoot") as RectTransform;
             var toolbarRoot = panel?.Find("ToolbarRoot") as RectTransform;
             var infoTextRect = panel?.Find("InfoText") as RectTransform;
+            m_contentRoot = contentRoot;
             m_infoText = infoTextRect?.GetComponent<Text>();
 
             var closeButton = panel?.Find("CloseButton")?.GetComponent<Button>();
-            ConfigurePanelLayout(panel);
             ConfigureShellLayout(title, infoTextRect, closeButton?.transform as RectTransform, toolbarRoot, contentRoot);
             if (closeButton != null)
             {
@@ -94,6 +104,11 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             BuildToolbar(toolbarRoot);
             BuildCollections(contentRoot);
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
             SwitchMode(false);
         }
 
@@ -104,29 +119,13 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
                 return;
             }
 
-            ClearChildren(toolbar);
-            var horizontalLayout = toolbar.GetComponent<HorizontalLayoutGroup>();
-            if (horizontalLayout != null)
-            {
-                Destroy(horizontalLayout);
-            }
-
-            var gridLayout = toolbar.GetComponent<GridLayoutGroup>() ?? toolbar.gameObject.AddComponent<GridLayoutGroup>();
-            gridLayout.cellSize = new Vector2(112f, 32f);
-            gridLayout.spacing = new Vector2(8f, 8f);
-            gridLayout.startCorner = GridLayoutGroup.Corner.UpperLeft;
-            gridLayout.startAxis = GridLayoutGroup.Axis.Horizontal;
-            gridLayout.childAlignment = TextAnchor.UpperLeft;
-            gridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-            gridLayout.constraintCount = 2;
-
-            CreateButton(toolbar, "VariableListButton", "Variable List", () => SwitchMode(false));
-            CreateButton(toolbar, "GridButton", "Grid", () => SwitchMode(true));
-            CreateButton(toolbar, "TopButton", "Top", () => ScrollTo(0, QVirtualListAlign.Start));
-            CreateButton(toolbar, "CenterButton", "Center", () => ScrollTo(GetCount() / 2, QVirtualListAlign.Center));
-            CreateButton(toolbar, "EndButton", "End", () => ScrollTo(Mathf.Max(0, GetCount() - 1), QVirtualListAlign.End));
-            CreateButton(toolbar, "ReloadButton", "Reload", Reload);
-            CreateButton(toolbar, "RefreshButton", "Refresh #7", RefreshItemSeven);
+            BindButton(toolbar, "VariableListButton", () => SwitchMode(false));
+            BindButton(toolbar, "GridButton", () => SwitchMode(true));
+            BindButton(toolbar, "TopButton", () => ScrollTo(0, QVirtualListAlign.Start));
+            BindButton(toolbar, "CenterButton", () => ScrollTo(GetCount() / 2, QVirtualListAlign.Center));
+            BindButton(toolbar, "EndButton", () => ScrollTo(Mathf.Max(0, GetCount() - 1), QVirtualListAlign.End));
+            BindButton(toolbar, "ReloadButton", Reload);
+            BindButton(toolbar, "RefreshButton", RefreshItemSeven);
         }
 
         private void BuildCollections(RectTransform contentRoot)
@@ -136,88 +135,41 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
                 return;
             }
 
-            ClearChildren(contentRoot);
+            var listObject = contentRoot.Find("VariableList")?.gameObject;
+            var gridObject = contentRoot.Find("Grid")?.gameObject;
+            var listItemPrefab = contentRoot.Find("ListItemPrefab")?.gameObject;
+            var gridItemPrefab = contentRoot.Find("GridItemPrefab")?.gameObject;
 
-            var listObject = CreateScrollArea("VariableList", contentRoot, out var listContent);
-            m_listView = listObject.AddComponent<QVirtualListView>();
-            SetPrivateField(m_listView, "m_spacing", 6f);
-            SetPrivateField(m_listView, "m_padding", new RectOffset(8, 8, 8, 8));
-            SetPrivateField(m_listView, "m_overscan", 180f);
-            m_listAdapter = new VariableListAdapter(CreateItemPrefab("ListItemPrefab", contentRoot, new Vector2(0f, 56f)), 120);
+            m_listView = listObject != null ? listObject.GetComponent<QVirtualListView>() : null;
+            m_gridView = gridObject != null ? gridObject.GetComponent<QVirtualGridView>() : null;
+
+            if (m_listView == null || m_gridView == null || listItemPrefab == null || gridItemPrefab == null)
+            {
+                Debug.LogError("Virtual List showcase prefab is missing authored list/grid views or item templates.");
+                return;
+            }
+
+            listItemPrefab.SetActive(false);
+            gridItemPrefab.SetActive(false);
+
+            m_listAdapter = new VariableListAdapter(listItemPrefab, 120);
             m_listView.SetAdapter(m_listAdapter);
 
-            var gridObject = CreateScrollArea("Grid", contentRoot, out var gridContent);
-            m_gridView = gridObject.AddComponent<QVirtualGridView>();
-            SetPrivateField(m_gridView, "m_cellSize", new Vector2(118f, 76f));
-            SetPrivateField(m_gridView, "m_spacing", new Vector2(8f, 8f));
-            SetPrivateField(m_gridView, "m_constraintCount", 3);
-            SetPrivateField(m_gridView, "m_autoWrapCrossAxis", true);
-            SetPrivateField(m_gridView, "m_minAutoConstraintCount", 1);
-            SetPrivateField(m_gridView, "m_maxAutoConstraintCount", 0);
-            SetPrivateField(m_gridView, "m_padding", new RectOffset(8, 8, 8, 8));
-            SetPrivateField(m_gridView, "m_overscan", 180f);
-            m_gridAdapter = new GridAdapter(CreateItemPrefab("GridItemPrefab", contentRoot, new Vector2(118f, 76f)), 96);
+            m_gridAdapter = new GridAdapter(gridItemPrefab, 96);
             m_gridView.SetAdapter(m_gridAdapter);
-
-            listContent.name = "VariableListContent";
-            gridContent.name = "GridContent";
-        }
-
-        private GameObject CreateScrollArea(string name, Transform parent, out RectTransform content)
-        {
-            var scrollObject = CreateUIObject(name, parent);
-            var scrollRectTransform = scrollObject.GetComponent<RectTransform>();
-            Stretch(scrollRectTransform);
-
-            var background = scrollObject.AddComponent<Image>();
-            background.color = new Color32(30, 36, 46, 255);
-
-            var viewportObject = CreateUIObject("Viewport", scrollObject.transform);
-            var viewport = viewportObject.GetComponent<RectTransform>();
-            Stretch(viewport);
-            viewportObject.AddComponent<Image>().color = new Color32(22, 27, 36, 255);
-            viewportObject.AddComponent<Mask>().showMaskGraphic = false;
-
-            var contentObject = CreateUIObject("Content", viewportObject.transform);
-            content = contentObject.GetComponent<RectTransform>();
-            content.anchorMin = new Vector2(0f, 1f);
-            content.anchorMax = new Vector2(1f, 1f);
-            content.pivot = new Vector2(0.5f, 1f);
-            content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = Vector2.zero;
-
-            var scrollRect = scrollObject.AddComponent<ScrollRect>();
-            scrollRect.viewport = viewport;
-            scrollRect.content = content;
-            scrollRect.horizontal = false;
-            scrollRect.vertical = true;
-            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.scrollSensitivity = 32f;
-
-            return scrollObject;
-        }
-
-        private GameObject CreateItemPrefab(string name, Transform parent, Vector2 size)
-        {
-            var item = CreateUIObject(name, parent);
-            item.SetActive(false);
-            var rect = item.GetComponent<RectTransform>();
-            rect.sizeDelta = size;
-            item.AddComponent<QVirtualListItem>();
-            item.AddComponent<Image>().color = new Color32(51, 64, 82, 255);
-
-            var label = CreateText("Label", item.transform, string.Empty, 14, FontStyle.Normal, TextAnchor.MiddleLeft);
-            Stretch(label.rectTransform);
-            label.rectTransform.offsetMin = new Vector2(12f, 0f);
-            label.rectTransform.offsetMax = new Vector2(-12f, 0f);
-            return item;
         }
 
         private void SwitchMode(bool gridMode)
         {
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
             m_gridMode = gridMode;
             m_listView.gameObject.SetActive(!gridMode);
             m_gridView.gameObject.SetActive(gridMode);
+            RefreshActiveCollectionLayout();
             RefreshInfo();
         }
 
@@ -228,6 +180,13 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
         private void ScrollTo(int index, QVirtualListAlign align)
         {
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
+            RefreshActiveCollectionLayout();
+
             if (m_gridMode)
             {
                 m_gridView.ScrollToIndex(index, align);
@@ -242,6 +201,11 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
         private void Reload()
         {
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
             if (m_gridMode)
             {
                 m_gridAdapter.ToggleCount();
@@ -258,6 +222,11 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
         private void RefreshItemSeven()
         {
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
             if (m_gridMode)
             {
                 m_gridAdapter.MarkRefreshed(7);
@@ -284,6 +253,41 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             m_infoText.text = $"{mode} | Count {GetCount()} | Visible {range.x}-{range.y}";
         }
 
+        private void RefreshLayoutIfContentSizeChanged()
+        {
+            if (m_contentRoot == null || m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
+            var size = m_contentRoot.rect.size;
+            if ((size - m_lastContentSize).sqrMagnitude < 0.01f)
+            {
+                return;
+            }
+
+            m_lastContentSize = size;
+            RefreshActiveCollectionLayout();
+        }
+
+        private void RefreshActiveCollectionLayout()
+        {
+            if (m_listView == null || m_gridView == null)
+            {
+                return;
+            }
+
+            Canvas.ForceUpdateCanvases();
+            if (m_gridMode)
+            {
+                m_gridView.RefreshLayout();
+            }
+            else
+            {
+                m_listView.RefreshLayout();
+            }
+        }
+
         private sealed class VariableListAdapter : IQVirtualListAdapter
         {
             private readonly GameObject m_itemPrefab;
@@ -305,7 +309,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             public Vector2 GetItemSize(int index)
             {
-                return new Vector2(0f, 48f + index % 4 * 18f);
+                return new Vector2(0f, 64f + index % 4 * 22f);
             }
 
             public void Bind(QVirtualListItem item, int index)
@@ -386,65 +390,27 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             }
         }
 
-        private static GameObject CreateUIObject(string name, Transform parent)
+        private static void BindButton(Transform parent, string name, UnityEngine.Events.UnityAction onClick)
         {
-            var gameObject = new GameObject(name, typeof(RectTransform));
-            gameObject.transform.SetParent(parent, false);
-            return gameObject;
-        }
-
-        private static Text CreateText(string name, Transform parent, string text, int fontSize, FontStyle fontStyle, TextAnchor alignment)
-        {
-            var textObject = CreateUIObject(name, parent);
-            var label = textObject.AddComponent<Text>();
-            label.text = text;
-            label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf") ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-            label.fontSize = fontSize;
-            label.fontStyle = fontStyle;
-            label.alignment = alignment;
-            label.color = new Color32(235, 239, 246, 255);
-            label.raycastTarget = false;
-            return label;
-        }
-
-        private static void CreateButton(Transform parent, string name, string label, UnityEngine.Events.UnityAction onClick)
-        {
-            var buttonObject = CreateUIObject(name, parent);
-            var rectTransform = buttonObject.GetComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(112f, 32f);
-
-            var image = buttonObject.AddComponent<Image>();
-            image.color = new Color32(61, 77, 100, 255);
-
-            var button = buttonObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            button.onClick.AddListener(onClick);
-
-            var text = CreateText("Text", buttonObject.transform, label, 12, FontStyle.Bold, TextAnchor.MiddleCenter);
-            Stretch(text.rectTransform);
-        }
-
-        private static void ConfigurePanelLayout(RectTransform panel)
-        {
-            if (panel == null)
+            var button = parent.Find(name)?.GetComponent<Button>();
+            if (button == null)
             {
+                Debug.LogError($"Virtual List showcase button is missing from prefab: {name}");
                 return;
             }
 
-            panel.anchorMin = Vector2.zero;
-            panel.anchorMax = Vector2.one;
-            panel.pivot = new Vector2(0.5f, 0.5f);
-            panel.offsetMin = new Vector2(36f, 36f);
-            panel.offsetMax = new Vector2(-36f, -36f);
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(onClick);
         }
 
         private static void ConfigureShellLayout(RectTransform title, RectTransform infoText, RectTransform closeButton, RectTransform toolbar, RectTransform content)
         {
-            SetTopBand(title, 18f, 360f, 12f, 32f);
-            SetTopBand(infoText, 430f, 96f, 12f, 32f);
-            SetTopRight(closeButton, 18f, 12f, 66f, 32f);
-            SetTopBand(toolbar, 18f, 18f, 58f, 72f);
-            SetStretchOffsets(content, 18f, 18f, 144f, 18f);
+            SetTopBand(title, 24f, 420f, 20f, 44f);
+            SetTopBand(infoText, 500f, 124f, 20f, 44f);
+            SetTopRight(closeButton, 24f, 20f, 92f, 44f);
+            SetTopBand(toolbar, 24f, 24f, 82f, 116f);
+            SetStretchOffsets(content, 24f, 24f, 218f, 24f);
+            ConfigureToolbarButtons(toolbar);
         }
 
         private static void SetTopBand(RectTransform rectTransform, float left, float right, float top, float height)
@@ -489,30 +455,32 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             rectTransform.anchoredPosition = new Vector2((left - right) * 0.5f, (bottom - top) * 0.5f);
         }
 
-        private static void Stretch(RectTransform rectTransform)
+        private static void ConfigureToolbarButtons(RectTransform toolbar)
         {
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
-        }
-
-        private static void SetPrivateField(object target, string fieldName, object value)
-        {
-            var field = target.GetType().GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            field?.SetValue(target, value);
-        }
-
-        private static void ClearChildren(Transform parent)
-        {
-            if (parent == null)
+            if (toolbar == null)
             {
                 return;
             }
 
-            for (var i = parent.childCount - 1; i >= 0; i--)
+            const float buttonWidth = 148f;
+            const float buttonHeight = 48f;
+            const float spacing = 12f;
+
+            for (var i = 0; i < toolbar.childCount; i++)
             {
-                Destroy(parent.GetChild(i).gameObject);
+                var child = toolbar.GetChild(i) as RectTransform;
+                if (child == null)
+                {
+                    continue;
+                }
+
+                var row = i / 4;
+                var column = i % 4;
+                child.anchorMin = new Vector2(0f, 1f);
+                child.anchorMax = new Vector2(0f, 1f);
+                child.pivot = new Vector2(0f, 1f);
+                child.sizeDelta = new Vector2(buttonWidth, buttonHeight);
+                child.anchoredPosition = new Vector2(column * (buttonWidth + spacing), -row * (buttonHeight + spacing));
             }
         }
     }
