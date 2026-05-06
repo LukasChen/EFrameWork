@@ -124,7 +124,7 @@ EFrame treats resources under `Assets/App/Res`, `Assets/Scenes`, and `Assets/Mod
 DOTween can still be used as an optional runtime backend:
 
 - Install DOTween as a normal project plugin under `Assets`
-- Use `EFrame Tools/项目初始化向导` -> `Tween Backend` to detect DOTween and enable the adapter
+- Use `EFrame Tools/项目初始化向导` -> `Extensions` -> `DOTween Adapter` -> `Apply` to enable the adapter
 - Enabling the adapter adds `EFRAME_USE_DOTWEEN` and creates or opens `Assets/Resources/DOTweenSettings.asset`
 - Disable the adapter before removing DOTween from a project
 

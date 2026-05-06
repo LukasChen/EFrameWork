@@ -547,8 +547,10 @@ namespace EFramework.Runtime.UI
             layerNode.pivot = new Vector2(0.5f, 0.5f);
             layerNode.anchoredPosition = Vector2.zero;
 
-            var width = DesignWidth + Mathf.Max(0f, WidthDelta);
-            var height = DesignHeight + Mathf.Max(0f, HeightDelta);
+            var expandWidth = DesignWidth >= DesignHeight && EffectiveFitMode == ScreenFitMode.FitHeight;
+            var expandHeight = DesignHeight >= DesignWidth && EffectiveFitMode == ScreenFitMode.FitWidth;
+            var width = DesignWidth + (expandWidth ? Mathf.Max(0f, WidthDelta) : 0f);
+            var height = DesignHeight + (expandHeight ? Mathf.Max(0f, HeightDelta) : 0f);
             layerNode.sizeDelta = new Vector2(width, height);
         }
 

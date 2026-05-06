@@ -2,6 +2,13 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.3] - 2026-05-06
+
+### Changed
+
+- Updated `QUI` root layer sizing so portrait UI expands height only on taller screens, landscape UI expands width only on wider screens, and opposite-aspect screens keep the design root centered instead of stretching the business UI coordinate space.
+- Updated the project initialization window so `Initialize / Repair Project` syncs EFrame AI contracts, Extensions opens as an install-state checklist with a unified Apply action, DOTween Adapter is applied from Extensions, and Showcase has its own section.
+
 ## [0.7.2] - 2026-05-06
 
 ### Changed

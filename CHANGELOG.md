@@ -4,6 +4,17 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.7.3] - 2026-05-06
+
+### Changed
+
+- Updated `QUI` root layer sizing so portrait UI expands height only on taller screens, landscape UI expands width only on wider screens, and opposite-aspect screens keep the design root centered instead of stretching the business UI coordinate space.
+- Updated the project initialization window so `Initialize / Repair Project` syncs EFrame AI contracts, Extensions opens as an install-state checklist with a unified Apply action, DOTween Adapter is applied from Extensions, and Showcase has its own section.
+
+### Fixed
+
+- Fixed UI Virtual List pooled-item activation and deferred first refresh until list/grid viewports receive a valid layout size.
+
 ## [0.7.2] - 2026-05-06
 
 ### Changed

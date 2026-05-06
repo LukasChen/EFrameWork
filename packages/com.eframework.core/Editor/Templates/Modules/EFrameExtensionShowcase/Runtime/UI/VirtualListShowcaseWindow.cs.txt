@@ -1,55 +1,13 @@
 using System;
 using EFramework.Extensions.UI.VirtualList;
 using EFramework.Generated;
-using EFramework.Runtime.UI;
+using EFramework.Generated.UI;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
-    public sealed class VirtualListShowcaseController : UIControllerBase<VirtualListShowcaseView>
-    {
-        protected override string AssetPath => VirtualListShowcaseWindow.AssetPath;
-
-        protected override void OnViewCreated()
-        {
-            base.OnViewCreated();
-            if (CurrentView?.Window != null)
-            {
-                CurrentView.Window.CloseRequested = Hide;
-            }
-        }
-
-        protected override void OnViewDestroyed()
-        {
-            if (CurrentView?.Window != null)
-            {
-                CurrentView.Window.CloseRequested = null;
-            }
-
-            base.OnViewDestroyed();
-        }
-    }
-
-    public sealed class VirtualListShowcaseView : BindingViewBase
-    {
-        public VirtualListShowcaseWindow Window { get; private set; }
-
-        protected override void OnBindingSet()
-        {
-            base.OnBindingSet();
-
-            Window = gameObject.GetComponent<VirtualListShowcaseWindow>();
-            if (Window == null)
-            {
-                Debug.LogError($"{nameof(VirtualListShowcaseWindow)} must be authored on the showcase prefab.");
-                return;
-            }
-
-            Window.Build();
-        }
-    }
-
     public sealed class VirtualListShowcaseWindow : MonoBehaviour
     {
         public const string AssetPath = ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.QVirtualListShowcaseWindow;
@@ -84,26 +42,27 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             CloseRequested = null;
         }
 
-        public void Build()
+        public void Build(v_EFrameExtensionShowcaseQVirtualListShowcaseWindow view)
         {
-            var panel = transform.Find("Panel") as RectTransform;
-            var title = panel?.Find("Title") as RectTransform;
-            var contentRoot = panel?.Find("ContentRoot") as RectTransform;
-            var toolbarRoot = panel?.Find("ToolbarRoot") as RectTransform;
-            var infoTextRect = panel?.Find("InfoText") as RectTransform;
-            m_contentRoot = contentRoot;
-            m_infoText = infoTextRect?.GetComponent<Text>();
-
-            var closeButton = panel?.Find("CloseButton")?.GetComponent<Button>();
-            ConfigureShellLayout(title, infoTextRect, closeButton?.transform as RectTransform, toolbarRoot, contentRoot);
-            if (closeButton != null)
+            if (view == null)
             {
-                closeButton.onClick.RemoveAllListeners();
-                closeButton.onClick.AddListener(() => CloseRequested?.Invoke());
+                Debug.LogError("Virtual List showcase generated view is missing.");
+                return;
             }
 
-            BuildToolbar(toolbarRoot);
-            BuildCollections(contentRoot);
+            m_contentRoot = view.ContentRoot;
+            m_infoText = view.InfoText;
+
+            BindButton(view.CloseButton, () => CloseRequested?.Invoke());
+            BindButton(view.VariableListButton, () => SwitchMode(false));
+            BindButton(view.GridButton, () => SwitchMode(true));
+            BindButton(view.TopButton, () => ScrollTo(0, QVirtualListAlign.Start));
+            BindButton(view.CenterButton, () => ScrollTo(GetCount() / 2, QVirtualListAlign.Center));
+            BindButton(view.EndButton, () => ScrollTo(Mathf.Max(0, GetCount() - 1), QVirtualListAlign.End));
+            BindButton(view.ReloadButton, Reload);
+            BindButton(view.RefreshButton, RefreshItemSeven);
+
+            BuildCollections(view);
             if (m_listView == null || m_gridView == null)
             {
                 return;
@@ -112,36 +71,18 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             SwitchMode(false);
         }
 
-        private void BuildToolbar(RectTransform toolbar)
+        private void BuildCollections(v_EFrameExtensionShowcaseQVirtualListShowcaseWindow view)
         {
-            if (toolbar == null)
+            if (view.ContentRoot == null)
             {
+                Debug.LogError("Virtual List showcase prefab is missing the authored content root binding.");
                 return;
             }
 
-            BindButton(toolbar, "VariableListButton", () => SwitchMode(false));
-            BindButton(toolbar, "GridButton", () => SwitchMode(true));
-            BindButton(toolbar, "TopButton", () => ScrollTo(0, QVirtualListAlign.Start));
-            BindButton(toolbar, "CenterButton", () => ScrollTo(GetCount() / 2, QVirtualListAlign.Center));
-            BindButton(toolbar, "EndButton", () => ScrollTo(Mathf.Max(0, GetCount() - 1), QVirtualListAlign.End));
-            BindButton(toolbar, "ReloadButton", Reload);
-            BindButton(toolbar, "RefreshButton", RefreshItemSeven);
-        }
-
-        private void BuildCollections(RectTransform contentRoot)
-        {
-            if (contentRoot == null)
-            {
-                return;
-            }
-
-            var listObject = contentRoot.Find("VariableList")?.gameObject;
-            var gridObject = contentRoot.Find("Grid")?.gameObject;
-            var listItemPrefab = contentRoot.Find("ListItemPrefab")?.gameObject;
-            var gridItemPrefab = contentRoot.Find("GridItemPrefab")?.gameObject;
-
-            m_listView = listObject != null ? listObject.GetComponent<QVirtualListView>() : null;
-            m_gridView = gridObject != null ? gridObject.GetComponent<QVirtualGridView>() : null;
+            m_listView = view.VariableList;
+            m_gridView = view.Grid;
+            var listItemPrefab = view.ListItemPrefab?.gameObject;
+            var gridItemPrefab = view.GridItemPrefab?.gameObject;
 
             if (m_listView == null || m_gridView == null || listItemPrefab == null || gridItemPrefab == null)
             {
@@ -175,7 +116,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
         private int GetCount()
         {
-            return m_gridMode ? m_gridAdapter.Count : m_listAdapter.Count;
+            return m_gridMode ? m_gridAdapter?.Count ?? 0 : m_listAdapter?.Count ?? 0;
         }
 
         private void ScrollTo(int index, QVirtualListAlign align)
@@ -390,98 +331,16 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             }
         }
 
-        private static void BindButton(Transform parent, string name, UnityEngine.Events.UnityAction onClick)
+        private static void BindButton(Button button, UnityAction onClick)
         {
-            var button = parent.Find(name)?.GetComponent<Button>();
             if (button == null)
             {
-                Debug.LogError($"Virtual List showcase button is missing from prefab: {name}");
+                Debug.LogError("Virtual List showcase prefab is missing an authored button binding.");
                 return;
             }
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(onClick);
-        }
-
-        private static void ConfigureShellLayout(RectTransform title, RectTransform infoText, RectTransform closeButton, RectTransform toolbar, RectTransform content)
-        {
-            SetTopBand(title, 24f, 420f, 20f, 44f);
-            SetTopBand(infoText, 500f, 124f, 20f, 44f);
-            SetTopRight(closeButton, 24f, 20f, 92f, 44f);
-            SetTopBand(toolbar, 24f, 24f, 82f, 116f);
-            SetStretchOffsets(content, 24f, 24f, 218f, 24f);
-            ConfigureToolbarButtons(toolbar);
-        }
-
-        private static void SetTopBand(RectTransform rectTransform, float left, float right, float top, float height)
-        {
-            if (rectTransform == null)
-            {
-                return;
-            }
-
-            rectTransform.anchorMin = new Vector2(0f, 1f);
-            rectTransform.anchorMax = new Vector2(1f, 1f);
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(-left - right, height);
-            rectTransform.anchoredPosition = new Vector2((left - right) * 0.5f, -top - height * 0.5f);
-        }
-
-        private static void SetTopRight(RectTransform rectTransform, float right, float top, float width, float height)
-        {
-            if (rectTransform == null)
-            {
-                return;
-            }
-
-            rectTransform.anchorMin = Vector2.one;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(width, height);
-            rectTransform.anchoredPosition = new Vector2(-right - width * 0.5f, -top - height * 0.5f);
-        }
-
-        private static void SetStretchOffsets(RectTransform rectTransform, float left, float right, float top, float bottom)
-        {
-            if (rectTransform == null)
-            {
-                return;
-            }
-
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            rectTransform.sizeDelta = new Vector2(-left - right, -top - bottom);
-            rectTransform.anchoredPosition = new Vector2((left - right) * 0.5f, (bottom - top) * 0.5f);
-        }
-
-        private static void ConfigureToolbarButtons(RectTransform toolbar)
-        {
-            if (toolbar == null)
-            {
-                return;
-            }
-
-            const float buttonWidth = 148f;
-            const float buttonHeight = 48f;
-            const float spacing = 12f;
-
-            for (var i = 0; i < toolbar.childCount; i++)
-            {
-                var child = toolbar.GetChild(i) as RectTransform;
-                if (child == null)
-                {
-                    continue;
-                }
-
-                var row = i / 4;
-                var column = i % 4;
-                child.anchorMin = new Vector2(0f, 1f);
-                child.anchorMax = new Vector2(0f, 1f);
-                child.pivot = new Vector2(0f, 1f);
-                child.sizeDelta = new Vector2(buttonWidth, buttonHeight);
-                child.anchoredPosition = new Vector2(column * (buttonWidth + spacing), -row * (buttonHeight + spacing));
-            }
         }
     }
 }

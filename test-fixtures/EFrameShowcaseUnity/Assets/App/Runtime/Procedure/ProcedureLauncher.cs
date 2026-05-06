@@ -1,4 +1,4 @@
-﻿using EFramework.Runtime.Procedure;
+using EFramework.Runtime.Procedure;
 using UnityEngine;
 
 namespace GameApp.Procedure
@@ -10,11 +10,6 @@ namespace GameApp.Procedure
             base.OnEnter(context);
             Debug.Log("[ProcedureLauncher] Entered. Switching to ProcedureHome.");
             ChangeState<ProcedureHome>();
-        }
-
-        protected override void OnLeave(bool isShutdown)
-        {
-            base.OnLeave(isShutdown);
         }
     }
 }

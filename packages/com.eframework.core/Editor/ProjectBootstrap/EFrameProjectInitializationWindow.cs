@@ -31,6 +31,7 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
         private const string AllAiClientsArgument = "all";
         private const string AllAiClientsLabel = "Codex, GitHub Copilot, and Claude Code";
+        private const float OperationButtonHeight = 30f;
 
         private static readonly string[] ExtensionPackageNames =
         {
@@ -55,7 +56,8 @@ namespace EFramework.Editor.ProjectBootstrap
         private bool m_statusIsError;
         private bool m_aiCheckIsError;
         private bool m_aiChecksRunning;
-        private bool m_extensionsExpanded;
+        private bool m_extensionsExpanded = true;
+        private bool m_dotweenAdapterSelected;
         private bool[] m_selectedExtensionPackages;
         private Texture2D m_logoTexture;
 
@@ -80,47 +82,11 @@ namespace EFramework.Editor.ProjectBootstrap
 
             using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
             {
-                EditorGUILayout.LabelField("Actions", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Project Setup", EditorStyles.boldLabel);
 
                 if (GUILayout.Button("Initialize / Repair Project", GUILayout.Height(34f)))
                 {
                     RunFullInitialization();
-                }
-            }
-
-            EditorGUILayout.Space();
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("Tween Backend", EditorStyles.boldLabel);
-                DrawTweenBackendControls();
-            }
-
-            EditorGUILayout.Space();
-
-            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
-            {
-                EditorGUILayout.LabelField("AI Workspace", EditorStyles.boldLabel);
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Sync / Repair AI Workspace"))
-                    {
-                        RunAiSync();
-                    }
-
-                    using (new EditorGUI.DisabledScope(m_aiChecksRunning))
-                    {
-                        if (GUILayout.Button(m_aiChecksRunning ? "Checking..." : "Run AI Checks"))
-                        {
-                            RunAiChecks();
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(m_aiCheckMessage))
-                {
-                    EditorGUILayout.HelpBox(m_aiCheckMessage, m_aiCheckIsError ? MessageType.Error : MessageType.Info);
                 }
             }
 
@@ -135,6 +101,43 @@ namespace EFramework.Editor.ProjectBootstrap
 
             EditorGUILayout.Space();
 
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("Showcase", EditorStyles.boldLabel);
+
+                DrawShowcaseInstallControls();
+            }
+
+            EditorGUILayout.Space();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField("AI Workspace", EditorStyles.boldLabel);
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("Sync / Repair AI Workspace", GUILayout.Height(OperationButtonHeight)))
+                    {
+                        RunAiSync();
+                    }
+
+                    using (new EditorGUI.DisabledScope(m_aiChecksRunning))
+                    {
+                        if (GUILayout.Button(m_aiChecksRunning ? "Checking..." : "Run AI Checks", GUILayout.Height(OperationButtonHeight)))
+                        {
+                            RunAiChecks();
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(m_aiCheckMessage))
+                {
+                    EditorGUILayout.HelpBox(m_aiCheckMessage, m_aiCheckIsError ? MessageType.Error : MessageType.Info);
+                }
+            }
+
+            EditorGUILayout.Space();
+
             if (!string.IsNullOrEmpty(m_statusMessage))
             {
                 EditorGUILayout.Space();
@@ -144,16 +147,23 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void InitializeState()
         {
-            if (m_selectedExtensionPackages != null && m_selectedExtensionPackages.Length == ExtensionPackageNames.Length)
+            m_extensionsExpanded = true;
+            RefreshExtensionSelectionsFromInstallState();
+        }
+
+        private void RefreshExtensionSelectionsFromInstallState()
+        {
+            if (m_selectedExtensionPackages == null || m_selectedExtensionPackages.Length != ExtensionPackageNames.Length)
             {
-                return;
+                m_selectedExtensionPackages = new bool[ExtensionPackageNames.Length];
             }
 
-            m_selectedExtensionPackages = new bool[ExtensionPackageNames.Length];
             for (var index = 0; index < m_selectedExtensionPackages.Length; index++)
             {
-                m_selectedExtensionPackages[index] = true;
+                m_selectedExtensionPackages[index] = IsPackageDependencyPresent(ExtensionPackageNames[index]);
             }
+
+            m_dotweenAdapterSelected = EFrameDotweenBootstrapUtility.IsDotweenInstalled() && EFrameDotweenBootstrapUtility.IsDotweenAdapterEnabled();
         }
 
         private static string ProjectRootPath => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
@@ -187,60 +197,11 @@ namespace EFramework.Editor.ProjectBootstrap
             }
         }
 
-        private void DrawTweenBackendControls()
-        {
-            var dotweenInstalled = EFrameDotweenBootstrapUtility.IsDotweenInstalled();
-            var adapterEnabled = EFrameDotweenBootstrapUtility.IsDotweenAdapterEnabled();
-
-            string status;
-            string buttonLabel;
-            bool buttonEnabled;
-            Action buttonAction;
-
-            if (adapterEnabled && dotweenInstalled)
-            {
-                status = "DOTween Adapter 已启用";
-                buttonLabel = "已启用";
-                buttonEnabled = false;
-                buttonAction = null;
-            }
-            else if (adapterEnabled)
-            {
-                status = "DOTween Adapter 已启用，但未检测到 DOTween";
-                buttonLabel = "禁用失效 Adapter";
-                buttonEnabled = true;
-                buttonAction = () => DisableDotweenAdapter();
-            }
-            else if (dotweenInstalled)
-            {
-                status = "DOTween detected. Adapter not enabled.";
-                buttonLabel = "启用 DOTween Adapter";
-                buttonEnabled = true;
-                buttonAction = () => EnableDotweenAdapter();
-            }
-            else
-            {
-                status = "Fallback backend active. DOTween not detected.";
-                buttonLabel = "未检测到 DOTween";
-                buttonEnabled = false;
-                buttonAction = null;
-            }
-
-            EditorGUILayout.LabelField("Adapter", status);
-            using (new EditorGUI.DisabledScope(!buttonEnabled))
-            {
-                if (GUILayout.Button(buttonLabel))
-                {
-                    buttonAction?.Invoke();
-                }
-            }
-        }
-
         private void RunFullInitialization()
         {
             if (IsAiSyncAvailable(out _, out _))
             {
-                if (!RunToolScript("Initialize-EFrameColdStart.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Force"))
+                if (!RunToolScript("Initialize-EFrameColdStart.ps1", $"-TargetRoot \"{ProjectRootPath}\" -Force -IncludeAIWorkspace -AIClients {AllAiClientsArgument}"))
                 {
                     return;
                 }
@@ -280,7 +241,7 @@ namespace EFramework.Editor.ProjectBootstrap
 
             EnsureStartUpSceneInBuildSettings(StartUpScenePath);
             AssetDatabase.Refresh();
-            SetStatus($"Initialized or repaired Basic template and registered {StartUpScenePath}.", false);
+            SetStatus($"Initialized or repaired Basic template, synced AI workspace when available, and registered {StartUpScenePath}.", false);
         }
 
         private static void ConfigureProcedureComponent(EFrameProcedureComponent procedureComponent, bool includeExtensionShowcase, string entranceProcedureTypeName)
@@ -365,41 +326,45 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void DrawExtensionInstallControls()
         {
-            if (GUILayout.Button("Install Extensions", GUILayout.Height(28f)))
+            m_extensionsExpanded = EditorGUILayout.Foldout(m_extensionsExpanded, "Extension Packages", true);
+
+            if (!m_extensionsExpanded)
             {
-                m_extensionsExpanded = !m_extensionsExpanded;
+                return;
             }
 
-            if (m_extensionsExpanded)
+            EditorGUILayout.Space(2f);
+            for (var index = 0; index < ExtensionPackageNames.Length; index++)
             {
-                EditorGUILayout.Space(2f);
-                for (var index = 0; index < ExtensionPackageNames.Length; index++)
-                {
-                    var packageName = ExtensionPackageNames[index];
-                    var label = $"{GetExtensionPackageDisplayName(packageName)} ({packageName})";
-                    m_selectedExtensionPackages[index] = EditorGUILayout.ToggleLeft(label, m_selectedExtensionPackages[index]);
-                }
-
-                using (new EditorGUILayout.HorizontalScope())
-                {
-                    if (GUILayout.Button("Select All"))
-                    {
-                        SetAllExtensionSelections(true);
-                    }
-
-                    if (GUILayout.Button("Select None"))
-                    {
-                        SetAllExtensionSelections(false);
-                    }
-
-                    if (GUILayout.Button("Install Selected Extensions"))
-                    {
-                        InstallSelectedExtensionPackages();
-                    }
-                }
+                var packageName = ExtensionPackageNames[index];
+                var label = $"{GetExtensionPackageDisplayName(packageName)} ({packageName})";
+                m_selectedExtensionPackages[index] = EditorGUILayout.ToggleLeft(label, m_selectedExtensionPackages[index]);
             }
 
-            EditorGUILayout.Space(4f);
+            var dotweenInstalled = EFrameDotweenBootstrapUtility.IsDotweenInstalled();
+            using (new EditorGUI.DisabledScope(!dotweenInstalled))
+            {
+                m_dotweenAdapterSelected = EditorGUILayout.ToggleLeft("DOTween Adapter (EFRAME_USE_DOTWEEN)", dotweenInstalled && m_dotweenAdapterSelected);
+            }
+
+            EditorGUILayout.LabelField(EFrameDotweenBootstrapUtility.GetTweenBackendStatus(), EditorStyles.wordWrappedLabel);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Refresh", GUILayout.Height(OperationButtonHeight)))
+                {
+                    RefreshExtensionSelectionsFromInstallState();
+                }
+
+                if (GUILayout.Button("Apply", GUILayout.Height(OperationButtonHeight)))
+                {
+                    ApplySelectedExtensions();
+                }
+            }
+        }
+
+        private void DrawShowcaseInstallControls()
+        {
             if (GUILayout.Button("Install Showcase", GUILayout.Height(28f)))
             {
                 InstallExtensionShowcaseModule();
@@ -435,23 +400,55 @@ namespace EFramework.Editor.ProjectBootstrap
             SetStatus($"{packageMessage} {copyMessage} {startupMessage}".Trim(), false);
         }
 
-        private void InstallSelectedExtensionPackages()
+        private void ApplySelectedExtensions()
         {
+            var messages = new List<string>();
+            var hasError = false;
             var selectedPackages = GetSelectedExtensionPackageNames();
-            if (selectedPackages.Count == 0)
+            if (selectedPackages.Count > 0)
             {
-                SetStatus("Select at least one extension package to install.", true);
-                return;
-            }
-
-            if (TryInstallExtensionPackages(selectedPackages, out var message))
-            {
-                SetStatus(message, false);
+                if (TryInstallExtensionPackages(selectedPackages, out var packageMessage))
+                {
+                    messages.Add(packageMessage);
+                }
+                else
+                {
+                    messages.Add(packageMessage);
+                    hasError = true;
+                }
             }
             else
             {
-                SetStatus(message, true);
+                messages.Add("No extension package dependency was selected. Existing package dependencies were left unchanged.");
             }
+
+            var adapterChanged = m_dotweenAdapterSelected != EFrameDotweenBootstrapUtility.IsDotweenAdapterEnabled();
+            if (m_dotweenAdapterSelected)
+            {
+                if (EnableDotweenAdapter())
+                {
+                    messages.Add(adapterChanged ? "Applied DOTween Adapter selection." : "DOTween Adapter was already enabled.");
+                }
+                else
+                {
+                    messages.Add("DOTween Adapter could not be enabled.");
+                    hasError = true;
+                }
+            }
+            else
+            {
+                if (DisableDotweenAdapter())
+                {
+                    messages.Add(adapterChanged ? "Applied DOTween Adapter selection." : "DOTween Adapter was already disabled.");
+                }
+                else
+                {
+                    messages.Add("DOTween Adapter could not be disabled.");
+                    hasError = true;
+                }
+            }
+
+            SetStatus(string.Join(" ", messages), hasError);
         }
 
         private void RefreshExtensionShowcaseModuleFromTemplate()
@@ -913,14 +910,6 @@ namespace EFramework.Editor.ProjectBootstrap
             }
 
             return selectedPackages;
-        }
-
-        private void SetAllExtensionSelections(bool selected)
-        {
-            for (var index = 0; index < m_selectedExtensionPackages.Length; index++)
-            {
-                m_selectedExtensionPackages[index] = selected;
-            }
         }
 
         private static string GetExtensionPackageDisplayName(string packageName)

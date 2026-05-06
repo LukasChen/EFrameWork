@@ -8,10 +8,6 @@ namespace EFramework.Generated
     {
         public static class Generated
         {
-            public static class Bootstrap
-            {
-                public const string README = "Bootstrap/README";
-            }
             public static class Modules
             {
                 public static class EFrameExtensionShowcase
@@ -35,7 +31,6 @@ namespace EFramework.Generated
             public static class Scenes
             {
                 public const string StartUp = "Scenes/StartUp";
-                public const string StartUpSETUP = "Scenes/StartUp_SETUP";
             }
             public static class UI
             {

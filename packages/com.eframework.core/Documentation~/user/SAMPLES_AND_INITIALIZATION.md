@@ -17,7 +17,7 @@ EFrame Tools/项目初始化向导
 -> Initialize / Repair Project
 ```
 
-The initializer copies the package Basic template and then repairs Addressables, UI sorting layers, audio, fallback tween readiness, and build settings.
+The initializer copies the package Basic template, syncs the EFrame AI workspace for all supported clients, installs the project AI updater when available, and then repairs Addressables, UI sorting layers, audio, fallback tween readiness, and build settings.
 
 Basic creates or prepares:
 
@@ -45,11 +45,11 @@ Install it from Unity:
 
 ```text
 EFrame Tools/项目初始化向导
--> Install Extensions
--> Install Showcase
+-> Extensions -> Apply
+-> Showcase -> Install Showcase
 ```
 
-`Install Extensions` expands a default-selected checklist for UI Virtual List, UI Extras, Effects, and Debug Console. It writes selected extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. If package sources cannot be inferred, the project can still install extensions manually from git or UPM.
+`Extensions` opens expanded and scans the current project package state into the checkboxes for UI Virtual List, UI Extras, Effects, and Debug Console. `Apply` writes checked extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. Unchecking an already installed package does not remove it. The same list includes `DOTween Adapter`, which applies or removes the `EFRAME_USE_DOTWEEN` scripting define instead of adding a package dependency.
 
 `Install Showcase` first installs `com.eframework.ui.virtual-list` and `com.eframework.debug-console`, then copies the module template, refreshes assets, syncs managed Addressables, and sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`.
 

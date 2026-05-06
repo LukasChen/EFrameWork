@@ -89,7 +89,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecf82b34b2d4b1a47b1d3fc0bcf1f342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_bindingItems: []
+  m_bindingItems:
+  - BindingName: BackButton
+    Component: {fileID: 1140025}
+    DisplayName: BackButton
+  - BindingName: DebugConsoleButton
+    Component: {fileID: 1140021}
+    DisplayName: DebugConsoleButton
+  - BindingName: DebugConsoleLabelText
+    Component: {fileID: 1140022}
+    DisplayName: LabelText
+  - BindingName: DetailText
+    Component: {fileID: 1140023}
+    DisplayName: DetailText
+  - BindingName: VirtualListButton
+    Component: {fileID: 1140007}
+    DisplayName: VirtualListButton
+  - BindingName: VirtualListLabelText
+    Component: {fileID: 1140008}
+    DisplayName: LabelText
   m_accessClassName: v_EFrameExtensionShowcaseView
   m_accessClassNamespace: EFramework.Generated.UI
   m_viewConfig:

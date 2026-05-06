@@ -47,6 +47,7 @@ namespace EFramework.Extensions.UI.VirtualList
             }
 
             item.SetSourcePrefab(prefab);
+            itemObject.SetActive(true);
             return item;
         }
 

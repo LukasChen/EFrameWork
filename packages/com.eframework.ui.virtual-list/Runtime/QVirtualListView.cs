@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,6 +45,8 @@ namespace EFramework.Extensions.UI.VirtualList
         private float m_contentLength;
         private bool m_initialized;
         private bool m_ignoreScrollEvent;
+        private bool m_deferredRefreshQueued;
+        private int m_deferredRefreshAttempts;
 
         public ScrollRect ScrollRect
         {
@@ -98,6 +101,8 @@ namespace EFramework.Extensions.UI.VirtualList
 
         private void OnDisable()
         {
+            m_deferredRefreshQueued = false;
+
             if (m_scrollRect != null)
             {
                 m_scrollRect.onValueChanged.RemoveListener(OnScrollChanged);
@@ -194,6 +199,13 @@ namespace EFramework.Extensions.UI.VirtualList
             }
 
             var viewportLength = GetViewportLength();
+            if (viewportLength <= 0.01f)
+            {
+                RequestDeferredRefresh();
+                return;
+            }
+
+            m_deferredRefreshAttempts = 0;
             var scrollOffset = GetScrollOffset();
             var min = Mathf.Max(0f, scrollOffset - Mathf.Max(0f, m_overscan));
             var max = Mathf.Min(m_contentLength, scrollOffset + viewportLength + Mathf.Max(0f, m_overscan));
@@ -516,6 +528,32 @@ namespace EFramework.Extensions.UI.VirtualList
             }
 
             return Mathf.Max(0f, IsVertical ? m_viewport.rect.height : m_viewport.rect.width);
+        }
+
+        private void RequestDeferredRefresh()
+        {
+            if (m_deferredRefreshQueued || !isActiveAndEnabled || m_deferredRefreshAttempts >= 8)
+            {
+                return;
+            }
+
+            m_deferredRefreshQueued = true;
+            m_deferredRefreshAttempts++;
+            StartCoroutine(RefreshAfterLayoutPass());
+        }
+
+        private IEnumerator RefreshAfterLayoutPass()
+        {
+            yield return null;
+
+            if (!isActiveAndEnabled)
+            {
+                yield break;
+            }
+
+            Canvas.ForceUpdateCanvases();
+            m_deferredRefreshQueued = false;
+            RefreshLayout();
         }
 
         private float GetStartPadding()

@@ -46,13 +46,13 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 - 目录骨架内容以 `packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md` 为基准
 - 复制 Basic 模板，包括 `StartUp.unity`、最小启动代码、`Assets/App/Res/Bootstrap/README.md`、`HomeView.prefab` 和 `Assets/Scenes/StartUp_SETUP.md`
 
-冷启动默认不自动同步 AI 契约。脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、项目 updater 和 Basic template 的状态；AI 相关项默认显示 `SKIP`，由 Unity 初始化窗口或 `EFrame Tools/AI` 菜单同步全部支持的 AI 客户端。状态含义：
+命令行冷启动默认不自动同步 AI 契约。脚本完成后会输出 cold-start summary，逐项报告目录骨架、AI workspace、项目 updater 和 Basic template 的状态；AI 相关项默认显示 `SKIP`，由 Unity 初始化窗口的 `Initialize / Repair Project` 或 `EFrame Tools/AI` 菜单同步全部支持的 AI 客户端。状态含义：
 
 - `OK`：本次已生成或目标项目中已存在。
 - `SKIP`：用户通过 `-Skip...` 参数主动跳过。
 - `WARN`：预期产物不存在，需要检查前面的脚本输出。
 
-如果你确实希望命令行冷启动同时同步 AI，可以显式传入 `-IncludeAIWorkspace -AIClients all`；否则推荐在 Unity 初始化窗口里手动同步。
+如果你确实希望命令行冷启动同时同步 AI，可以显式传入 `-IncludeAIWorkspace -AIClients all`；Unity 初始化窗口的 `Initialize / Repair Project` 会自动传入这组参数。
 
 如果你只想复制 Basic 启动模板，可以单独执行：
 
@@ -74,7 +74,7 @@ AI 工作区层是 EFrame 的一级框架能力。修改 Runtime、Editor、启�
 
 默认范例流程为：`ProcedureLauncher -> ProcedureHome -> HomeUI`。HomeUI 只显示初始化完成信息，不再包含示例模块入口。
 
-在 Unity 初始化窗口里执行 `Initialize / Repair Project`，会一次性从 EFrame package 导入 Basic 模板，包括：
+在 Unity 初始化窗口里执行 `Initialize / Repair Project`，会一次性同步 AI 契约并从 EFrame package 导入 Basic 模板，包括：
 
 - `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
 
@@ -94,7 +94,9 @@ EFrame Tools/项目初始化向导
 
 窗口支持：
 
-- `Initialize / Repair Project`：执行标准初始化链路，包括冷启动、Basic 模板复制、Addressables/ResPath、Audio、DOTween、StartUp 场景与 Home UI 导入
+- `Initialize / Repair Project`：执行标准初始化链路，包括冷启动、AI 契约同步、项目 updater 安装、Basic 模板复制、Addressables/ResPath、Audio、DOTween、StartUp 场景与 Home UI 导入
+- `Extensions` / `Apply`：默认展开并按当前安装状态同步勾选框，安装勾选的扩展包，并用 `DOTween Adapter` 勾选项启用或禁用 `EFRAME_USE_DOTWEEN`
+- `Showcase` / `Install Showcase`：独立安装 Extension Showcase 模块；它不是 extension checkbox
 - `Sync / Repair AI Workspace`：运行 `Initialize-EFrameAI.ps1 -Clients all -Force`，覆盖框架托管 `eframe-*` 文件，并在项目 AI 入口文件中注入或更新 EFrame managed block；同时安装项目侧 updater
 - `Run AI Checks`：依次运行 `Initialize-EFrameAI.ps1 -Clients all -StatusOnly` 和 `Test-EFrameAIProject.ps1`，检查 manifest 差异、manifest-tracked 文件漂移、managed block 和常见运行时代码风险
 

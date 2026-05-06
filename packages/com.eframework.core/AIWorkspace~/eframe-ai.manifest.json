@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.44",
+    "version":  "0.4.45",
     "updatedAt":  "2026-05-06",
-    "notes":  "Prefer prefab-authored safe-area fitters in the EFrame UI workflow.",
+    "notes":  "Align initialization-window AI sync and extension Apply guidance.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "305ca0375f6ab1e303d15fa2a212afe9e8a68b2d422a33c78ba814a3ea55f589"
+                      "sha256":  "70e121d5e7f1cc2ccc5b13ae7142e27c554a6a2aa7973d269ce31f7ca8e8813b"
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",

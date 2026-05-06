@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,6 +40,8 @@ namespace EFramework.Extensions.UI.VirtualList
         private float m_contentLength;
         private bool m_initialized;
         private bool m_ignoreScrollEvent;
+        private bool m_deferredRefreshQueued;
+        private int m_deferredRefreshAttempts;
 
         public ScrollRect ScrollRect
         {
@@ -100,6 +103,8 @@ namespace EFramework.Extensions.UI.VirtualList
 
         private void OnDisable()
         {
+            m_deferredRefreshQueued = false;
+
             if (m_scrollRect != null)
             {
                 m_scrollRect.onValueChanged.RemoveListener(OnScrollChanged);
@@ -194,6 +199,13 @@ namespace EFramework.Extensions.UI.VirtualList
                 return;
             }
 
+            if (GetViewportLength() <= 0.01f)
+            {
+                RequestDeferredRefresh();
+                return;
+            }
+
+            m_deferredRefreshAttempts = 0;
             var firstLine = GetFirstVisibleLine();
             var lastLine = GetLastVisibleLine();
             var firstIndex = GetFirstIndexOnLine(firstLine);
@@ -568,6 +580,32 @@ namespace EFramework.Extensions.UI.VirtualList
             }
 
             return Mathf.Max(0f, IsVertical ? m_viewport.rect.width : m_viewport.rect.height);
+        }
+
+        private void RequestDeferredRefresh()
+        {
+            if (m_deferredRefreshQueued || !isActiveAndEnabled || m_deferredRefreshAttempts >= 8)
+            {
+                return;
+            }
+
+            m_deferredRefreshQueued = true;
+            m_deferredRefreshAttempts++;
+            StartCoroutine(RefreshAfterLayoutPass());
+        }
+
+        private IEnumerator RefreshAfterLayoutPass()
+        {
+            yield return null;
+
+            if (!isActiveAndEnabled)
+            {
+                yield break;
+            }
+
+            Canvas.ForceUpdateCanvases();
+            m_deferredRefreshQueued = false;
+            RefreshLayout();
         }
 
         private float GetStartPadding()

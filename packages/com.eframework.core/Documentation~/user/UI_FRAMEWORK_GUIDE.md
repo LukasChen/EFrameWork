@@ -121,6 +121,8 @@ Current runtime UI folders under `packages/com.eframework.core/Runtime/UI/`:
 
 `CheckableButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation` live in the optional `com.eframework.ui-extras` package under `EFramework.Extensions.UI.Extras.*`. `QVirtualListView` and `QVirtualGridView` live in the optional `com.eframework.ui.virtual-list` package under `EFramework.Extensions.UI.VirtualList`.
 
+Virtual list/grid item templates may be inactive; pooled instances are activated internally. When a template is authored inside the view hierarchy, keep the source template inactive or outside the viewport, because the controls manage pooled instances rather than the template object itself. If external layout code changes the viewport size without triggering Unity RectTransform dimension callbacks, call `RefreshLayout()`.
+
 ## 3. Recommended Flow
 
 The normal runtime flow is:

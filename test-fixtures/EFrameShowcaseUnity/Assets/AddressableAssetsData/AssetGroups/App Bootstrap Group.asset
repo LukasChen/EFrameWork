@@ -13,17 +13,11 @@ MonoBehaviour:
   m_Name: App Bootstrap Group
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: App Bootstrap Group
-  m_GUID: 5df715d9a9f30364a9870c7c1ec99564
-  m_SerializeEntries:
-  - m_GUID: 881223b1b9d00d7488ba8ff4b8e3ec37
-    m_Address: Bootstrap/README
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - eframe-managed
-    FlaggedDuringContentUpdateRestriction: 0
+  m_GUID: 29f31181e2af4bb4eb35d47ed4890cae
+  m_SerializeEntries: []
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
+  m_Settings: {fileID: 11400000, guid: c2ecb8c4c3efab341ad607052278b0d8, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 011d785a309b7ac44a9b7212b00beaa6, type: 2}
-    - {fileID: 11400000, guid: 6be1a3b6d034f3341beb8ebf03b3cac5, type: 2}
+    - {fileID: 11400000, guid: 54f48056ad1d2064ead0d064ba3a3774, type: 2}
+    - {fileID: 11400000, guid: 997dc223c44c42844951c6141ee64739, type: 2}

@@ -2,7 +2,12 @@
 
 All notable changes to the `com.eframework.ui.virtual-list` Unity package are documented in this file.
 
-## [Unreleased]
+## [0.1.3] - 2026-05-06
+
+### Fixed
+
+- Activated newly cloned pooled items even when the source template object is inactive.
+- Deferred list and grid visible-item refresh when the viewport has not received its first valid layout size yet.
 
 ## [0.1.2] - 2026-05-06
 

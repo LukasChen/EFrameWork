@@ -1,13 +1,14 @@
 using System;
 using GameApp.Modules.EFrameExtensionShowcase.Demos;
 using EFramework.Generated;
+using EFramework.Generated.UI;
 using EFramework.Extensions.DebugConsole;
 using EFramework.Runtime.UI;
 using UnityEngine.UI;
 
 namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
-    public sealed class EFrameExtensionShowcaseController : UIControllerBase<EFrameExtensionShowcaseView>
+    public sealed class EFrameExtensionShowcaseController : UIControllerBase<v_EFrameExtensionShowcaseView>
     {
         private const string VirtualListPackageName = "com.eframework.ui.virtual-list";
         private const string DebugConsolePackageName = "com.eframework.debug-console";
@@ -22,8 +23,16 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             base.OnViewCreated();
 
             var demos = EFrameExtensionShowcaseRegistry.Demos;
-            var buttons = CurrentView?.DemoButtons ?? Array.Empty<UnityEngine.UI.Button>();
-            var labels = CurrentView?.DemoLabels ?? Array.Empty<Text>();
+            var buttons = new[]
+            {
+                CurrentView?.VirtualListButton,
+                CurrentView?.DebugConsoleButton
+            };
+            var labels = new[]
+            {
+                CurrentView?.VirtualListLabelText,
+                CurrentView?.DebugConsoleLabelText
+            };
             var count = Math.Min(demos.Count, buttons.Length);
             for (var i = 0; i < count; i++)
             {
@@ -32,7 +41,10 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             for (var i = count; i < buttons.Length; i++)
             {
-                buttons[i].gameObject.SetActive(false);
+                if (buttons[i] != null)
+                {
+                    buttons[i].gameObject.SetActive(false);
+                }
             }
 
             AddButtonClickListener(CurrentView?.BackButton, OnBackClicked, true);

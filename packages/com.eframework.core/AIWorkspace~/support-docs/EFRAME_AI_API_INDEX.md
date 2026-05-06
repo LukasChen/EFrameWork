@@ -52,7 +52,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | Safe area content fitting | `SafeAreaFitter` | `packages/com.eframework.core/Runtime/UI/Layout/SafeAreaFitter.cs` | Put on prefab content containers that should stay inside safe areas. |
 | Full-screen background fitting | `FullScreenFitter` | `packages/com.eframework.core/Runtime/UI/Layout/FullScreenFitter.cs` | Put on prefab backgrounds or masks that should extend beyond the fitted UI area. |
 | Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Optional package for `CheckableButton`, `Tabbar`, `UIHelper`, `UIAnimation`, and related helpers. |
-| Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Optional package for pooled virtual list/grid controls. |
+| Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Optional package for pooled virtual list/grid controls. Keep source item templates inactive or outside the viewport when they live in the authored hierarchy; call `RefreshLayout()` after external layout changes that bypass RectTransform dimension callbacks. |
 
 Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal View wrappers, and direct business `UIViewHandle` ownership.
 
@@ -63,7 +63,7 @@ Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written n
 | Framework-owned simple tweens | `EFrameTween` | `packages/com.eframework.core/Runtime/Tween/EFrameTween.cs` | Core runtime tween entry. |
 | Configure a tween | `EFrameTweenOptions` | `packages/com.eframework.core/Runtime/Tween/EFrameTweenOptions.cs` | Supports target binding, update mode, ease, ignore-time-scale, and callbacks. |
 | Track or cancel a tween | `IEFrameTweenHandle` | `packages/com.eframework.core/Runtime/Tween/IEFrameTweenHandle.cs` | Kill or await at the owner lifecycle boundary. |
-| Optional DOTween backend | `EFRAME_USE_DOTWEEN` + initialization-window `Tween Backend` controls | `packages/com.eframework.core/Runtime/Tween/Dotween`, `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameDotweenBootstrapUtility.cs` | Enable only after DOTween is installed; DOTween is not a core dependency. |
+| Optional DOTween backend | `EFRAME_USE_DOTWEEN` + initialization-window `Extensions` Apply controls | `packages/com.eframework.core/Runtime/Tween/Dotween`, `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameDotweenBootstrapUtility.cs` | Enable only after DOTween is installed; DOTween is not a core dependency. |
 
 Avoid referencing `DG.Tweening` from core-owned runtime code outside the optional adapter assembly.
 
@@ -102,8 +102,8 @@ Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 | Need | Use | Source | Note |
 | --- | --- | --- | --- |
 | Full project initialization | `EFrameProjectInitializationWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Main Unity Editor entry for EFrame project setup and repair. |
-| Install minimal startup skeleton | `Initialize / Repair Project` | `packages/com.eframework.core/Editor/Templates/Basic` | Installs the Basic template; use the initialization window rather than manual template copying. |
-| Install optional extension packages | `Install Extensions` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Adds selected optional EFrame packages and resolves dependencies. |
+| Install minimal startup skeleton | `Initialize / Repair Project` | `packages/com.eframework.core/Editor/Templates/Basic` | Installs the Basic template and syncs EFrame AI contracts; use the initialization window rather than manual template copying. |
+| Install optional extension packages | `Extensions` + `Apply` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Adds checked optional EFrame packages, resolves dependencies, and applies the DOTween Adapter checkbox. |
 | Install optional extension demos | `Install Showcase` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Adds the optional Showcase module and required extension packages. |
 | Addressables groups and ResPath generation | `EFrameAddressablesBootstrapUtility` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBootstrapUtility.cs` | Owns managed group sync and `ResPath.Generated`. |
 | Managed resource report UI | `EFrameAddressablesReportWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesReportWindow.cs` | Select generated ResPath directories and inspect managed resource issues. |

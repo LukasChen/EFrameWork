@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: App SceneAssets Group
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: App SceneAssets Group
-  m_GUID: fe1180f383c024545a2f6d045d365eb9
+  m_GUID: e5488e2659102144583a672daa990482
   m_SerializeEntries: []
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
+  m_Settings: {fileID: 11400000, guid: c2ecb8c4c3efab341ad607052278b0d8, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: f89265b2626b75d408ffef8bdc23fbc5, type: 2}
-    - {fileID: 11400000, guid: 36afd48a21783984aa0aaf132ac66e8e, type: 2}
+    - {fileID: 11400000, guid: 46cb57d6dec9bd848971244560774c84, type: 2}
+    - {fileID: 11400000, guid: 3b45e450df9b3144bbeb7ef69e6fd5bf, type: 2}

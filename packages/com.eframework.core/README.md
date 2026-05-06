@@ -121,7 +121,7 @@ DOTween remains supported as an optional adapter:
 - This package does not bundle DOTween, DOTweenPro, or DemiLib
 - Do not add an unresolvable DOTween package name to `dependencies`; Unity package dependencies must resolve through the Unity registry, a configured scoped registry, or an explicit package source in the consuming project
 - Keep DOTween as a normal project plugin under `Assets`
-- Use `EFrame Tools/项目初始化向导` -> `Tween Backend` to detect DOTween and enable the adapter
+- Use `EFrame Tools/项目初始化向导` -> `Extensions` -> `DOTween Adapter` -> `Apply` to enable the adapter
 - Enabling the adapter adds the `EFRAME_USE_DOTWEEN` scripting define and initializes `Assets/Resources/DOTweenSettings.asset` when DOTween is present
 - Disable the adapter before removing DOTween from a project
 - Do not expect DOTween Utility Panel module management to work against a package-local copy
