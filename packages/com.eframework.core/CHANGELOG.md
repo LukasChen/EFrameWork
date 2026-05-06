@@ -2,6 +2,13 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.4] - 2026-05-06
+
+### Fixed
+
+- Fixed the project initialization window so Extensions automatically syncs installed package state, provides an explicit Select All action, and waits for required Showcase extension packages to be available before copying the Showcase module.
+- Fixed Extension Showcase installation so the installed `QVirtualListShowcaseWindow.prefab` resolves its `VirtualListShowcaseWindow` component against the script GUID that actually landed in the business project.
+
 ## [0.7.3] - 2026-05-06
 
 ### Changed

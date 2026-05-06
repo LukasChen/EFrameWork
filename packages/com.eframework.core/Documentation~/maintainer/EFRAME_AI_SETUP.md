@@ -95,8 +95,8 @@ EFrame Tools/项目初始化向导
 窗口支持：
 
 - `Initialize / Repair Project`：执行标准初始化链路，包括冷启动、AI 契约同步、项目 updater 安装、Basic 模板复制、Addressables/ResPath、Audio、DOTween、StartUp 场景与 Home UI 导入
-- `Extensions` / `Apply`：默认展开并按当前安装状态同步勾选框，安装勾选的扩展包，并用 `DOTween Adapter` 勾选项启用或禁用 `EFRAME_USE_DOTWEEN`
-- `Showcase` / `Install Showcase`：独立安装 Extension Showcase 模块；它不是 extension checkbox
+- `Extensions` / `Apply`：默认展开并自动同步已安装状态，可用 `Select All` 一次性全选扩展包；安装勾选的扩展包，并用 `DOTween Adapter` 勾选项启用或禁用 `EFRAME_USE_DOTWEEN`
+- `Showcase` / `Install Showcase`：独立安装 Extension Showcase 模块；它不是 extension checkbox；安装前会先确保 `com.eframework.ui.virtual-list` 和 `com.eframework.debug-console` 已导入，复制后按业务侧落地的脚本 `.meta` 修复虚拟列表示例 prefab 引用
 - `Sync / Repair AI Workspace`：运行 `Initialize-EFrameAI.ps1 -Clients all -Force`，覆盖框架托管 `eframe-*` 文件，并在项目 AI 入口文件中注入或更新 EFrame managed block；同时安装项目侧 updater
 - `Run AI Checks`：依次运行 `Initialize-EFrameAI.ps1 -Clients all -StatusOnly` 和 `Test-EFrameAIProject.ps1`，检查 manifest 差异、manifest-tracked 文件漂移、managed block 和常见运行时代码风险
 

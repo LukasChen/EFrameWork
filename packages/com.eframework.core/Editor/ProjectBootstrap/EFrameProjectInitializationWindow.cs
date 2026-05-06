@@ -26,6 +26,9 @@ namespace EFramework.Editor.ProjectBootstrap
         private const string BasicTemplatePath = "Packages/com.eframework.core/Editor/Templates/Basic/Assets";
         private const string ExtensionShowcaseTargetPath = "Assets/Modules/EFrameExtensionShowcase";
         private const string ExtensionShowcaseTemplatePath = "Packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase";
+        private const string ExtensionShowcaseVirtualListWindowScriptPath = "Runtime/UI/VirtualListShowcaseWindow.cs";
+        private const string ExtensionShowcaseVirtualListWindowPrefabPath = "Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow.prefab";
+        private const string ExtensionShowcaseVirtualListWindowComponentId = "114010";
         private const string BasicStartupProcedureName = "GameApp.Procedure.ProcedureLauncher";
         private const string ExtensionShowcaseStartupProcedureName = "GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry";
         private const string AutoPopupSessionKey = "EFrame.ProjectInitializationWindow.AutoPopupShown";
@@ -153,16 +156,36 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void RefreshExtensionSelectionsFromInstallState()
         {
-            if (m_selectedExtensionPackages == null || m_selectedExtensionPackages.Length != ExtensionPackageNames.Length)
-            {
-                m_selectedExtensionPackages = new bool[ExtensionPackageNames.Length];
-            }
+            EnsureExtensionSelectionState();
 
             for (var index = 0; index < m_selectedExtensionPackages.Length; index++)
             {
                 m_selectedExtensionPackages[index] = IsPackageDependencyPresent(ExtensionPackageNames[index]);
             }
 
+            RefreshDotweenAdapterSelectionFromInstallState();
+        }
+
+        private void SelectAllExtensionPackages()
+        {
+            EnsureExtensionSelectionState();
+
+            for (var index = 0; index < m_selectedExtensionPackages.Length; index++)
+            {
+                m_selectedExtensionPackages[index] = true;
+            }
+        }
+
+        private void EnsureExtensionSelectionState()
+        {
+            if (m_selectedExtensionPackages == null || m_selectedExtensionPackages.Length != ExtensionPackageNames.Length)
+            {
+                m_selectedExtensionPackages = new bool[ExtensionPackageNames.Length];
+            }
+        }
+
+        private void RefreshDotweenAdapterSelectionFromInstallState()
+        {
             m_dotweenAdapterSelected = EFrameDotweenBootstrapUtility.IsDotweenInstalled() && EFrameDotweenBootstrapUtility.IsDotweenAdapterEnabled();
         }
 
@@ -351,9 +374,9 @@ namespace EFramework.Editor.ProjectBootstrap
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Refresh", GUILayout.Height(OperationButtonHeight)))
+                if (GUILayout.Button("Select All", GUILayout.Height(OperationButtonHeight)))
                 {
-                    RefreshExtensionSelectionsFromInstallState();
+                    SelectAllExtensionPackages();
                 }
 
                 if (GUILayout.Button("Apply", GUILayout.Height(OperationButtonHeight)))
@@ -373,10 +396,25 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private void InstallExtensionShowcaseModule()
         {
-            if (!TryInstallExtensionPackages(ExtensionShowcaseRequiredPackageNames, out var packageMessage))
+            var unavailablePackages = GetUnavailableExtensionPackageNames(ExtensionShowcaseRequiredPackageNames);
+            var packageMessage = "Required Showcase extension packages are already available.";
+            if (unavailablePackages.Count > 0 && !TryInstallExtensionPackages(ExtensionShowcaseRequiredPackageNames, out packageMessage))
             {
                 SetStatus($"Install required Showcase extensions first. {packageMessage}", true);
                 return;
+            }
+
+            if (unavailablePackages.Count > 0)
+            {
+                unavailablePackages = GetUnavailableExtensionPackageNames(ExtensionShowcaseRequiredPackageNames);
+                if (unavailablePackages.Count > 0)
+                {
+                    Client.Resolve();
+                    SetStatus(
+                        $"{packageMessage} Unity Package Manager is resolving required Showcase extensions ({string.Join(", ", unavailablePackages)}). Wait for package import and script compilation to finish, then click Install Showcase again.",
+                        false);
+                    return;
+                }
             }
 
             if (!CopyExtensionShowcaseTemplate(out var copyMessage))
@@ -750,7 +788,78 @@ namespace EFramework.Editor.ProjectBootstrap
 
             var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
             CopyDirectory(sourceFullPath, targetFullPath);
-            message = $"Installed Extension Showcase module at {ExtensionShowcaseTargetPath}.";
+            if (!TryRepairInstalledExtensionShowcaseScriptReferences(targetFullPath, out var repairMessage))
+            {
+                message = repairMessage;
+                return false;
+            }
+
+            message = $"Installed Extension Showcase module at {ExtensionShowcaseTargetPath}. {repairMessage}";
+            return true;
+        }
+
+        private static bool TryRepairInstalledExtensionShowcaseScriptReferences(string targetFullPath, out string message)
+        {
+            var scriptMetaPath = Path.Combine(
+                targetFullPath,
+                $"{ExtensionShowcaseVirtualListWindowScriptPath}.meta".Replace('/', Path.DirectorySeparatorChar));
+            var prefabPath = Path.Combine(
+                targetFullPath,
+                ExtensionShowcaseVirtualListWindowPrefabPath.Replace('/', Path.DirectorySeparatorChar));
+
+            if (!File.Exists(scriptMetaPath))
+            {
+                message = $"Extension Showcase script meta was not found after template copy: {scriptMetaPath}.";
+                return false;
+            }
+
+            if (!File.Exists(prefabPath))
+            {
+                message = $"Extension Showcase virtual-list prefab was not found after template copy: {prefabPath}.";
+                return false;
+            }
+
+            var scriptMeta = File.ReadAllText(scriptMetaPath);
+            var guidMatch = Regex.Match(scriptMeta, @"^guid:\s*([0-9a-fA-F]{32})\s*$", RegexOptions.Multiline | RegexOptions.CultureInvariant);
+            if (!guidMatch.Success)
+            {
+                message = $"Extension Showcase script meta does not contain a valid GUID: {scriptMetaPath}.";
+                return false;
+            }
+
+            var scriptGuid = guidMatch.Groups[1].Value;
+            var prefab = File.ReadAllText(prefabPath);
+            var componentMarker = $"--- !u!114 &{ExtensionShowcaseVirtualListWindowComponentId}";
+            var componentStart = prefab.IndexOf(componentMarker, StringComparison.Ordinal);
+            if (componentStart < 0)
+            {
+                message = $"Extension Showcase virtual-list prefab does not contain component {ExtensionShowcaseVirtualListWindowComponentId}.";
+                return false;
+            }
+
+            var nextComponentStart = prefab.IndexOf("--- !u!", componentStart + componentMarker.Length, StringComparison.Ordinal);
+            var componentLength = nextComponentStart < 0 ? prefab.Length - componentStart : nextComponentStart - componentStart;
+            var componentText = prefab.Substring(componentStart, componentLength);
+            var scriptReferencePattern = @"m_Script:\s*\{fileID:\s*11500000,\s*guid:\s*[0-9a-fA-F]{32},\s*type:\s*3\}";
+            if (!Regex.IsMatch(componentText, scriptReferencePattern, RegexOptions.CultureInvariant))
+            {
+                message = $"Extension Showcase virtual-list prefab component {ExtensionShowcaseVirtualListWindowComponentId} does not contain a MonoScript reference.";
+                return false;
+            }
+
+            var repairedComponentText = Regex.Replace(
+                componentText,
+                scriptReferencePattern,
+                $"m_Script: {{fileID: 11500000, guid: {scriptGuid}, type: 3}}",
+                RegexOptions.CultureInvariant);
+
+            if (!string.Equals(componentText, repairedComponentText, StringComparison.Ordinal))
+            {
+                prefab = prefab.Substring(0, componentStart) + repairedComponentText + prefab.Substring(componentStart + componentLength);
+                File.WriteAllText(prefabPath, prefab, new UTF8Encoding(false));
+            }
+
+            message = $"Repaired QVirtualListShowcaseWindow script reference to GUID {scriptGuid}.";
             return true;
         }
 
@@ -910,6 +1019,25 @@ namespace EFramework.Editor.ProjectBootstrap
             }
 
             return selectedPackages;
+        }
+
+        private static List<string> GetUnavailableExtensionPackageNames(IReadOnlyList<string> packageNames)
+        {
+            var unavailablePackages = new List<string>();
+            foreach (var packageName in packageNames)
+            {
+                if (!IsPackageAvailable(packageName))
+                {
+                    unavailablePackages.Add(packageName);
+                }
+            }
+
+            return unavailablePackages;
+        }
+
+        private static bool IsPackageAvailable(string packageName)
+        {
+            return UnityEditor.PackageManager.PackageInfo.FindForAssetPath($"Packages/{packageName}") != null;
         }
 
         private static string GetExtensionPackageDisplayName(string packageName)

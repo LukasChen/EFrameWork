@@ -111,8 +111,8 @@
                             </thead>
                             <tbody>
                                 <tr><td>全新项目接入</td><td>`Initialize / Repair Project`</td><td>一次同步 AI 契约，复制 Basic 模板，并补齐场景、目录、资源、UI layer、Audio、DOTween。</td></tr>
-                                <tr><td>安装扩展包</td><td>`Extensions` -> `Apply`</td><td>打开窗口时按当前安装状态同步勾选框，按 Core 包来源写入本地 `file:` 或同仓库 git 扩展包依赖，并统一处理 `DOTween Adapter`。</td></tr>
-                                <tr><td>安装扩展示例模块</td><td>`Showcase` -> `Install Showcase`</td><td>复制 Showcase 模块、同步资源，并自动设置 StartUp。</td></tr>
+                                <tr><td>安装扩展包</td><td>`Extensions` -> `Apply`</td><td>打开窗口时自动同步已安装状态，也可用 `Select All` 一次性全选；按 Core 包来源写入本地 `file:` 或同仓库 git 扩展包依赖，并统一处理 `DOTween Adapter`。</td></tr>
+                                <tr><td>安装扩展示例模块</td><td>`Showcase` -> `Install Showcase`</td><td>先确保 Showcase 依赖扩展包已导入，再复制 Showcase 模块，按业务侧落地的脚本 `.meta` 修复示例 prefab 引用，同步资源，并自动设置 StartUp。</td></tr>
                                 <tr><td>资源移动后重新整理地址</td><td>Auto-sync, or `Sync Groups And Generate ResPath` for repair</td><td>托管目录变化会自动同步；菜单入口保留给手动修复和验证。</td></tr>
                             </tbody>
                         </table>

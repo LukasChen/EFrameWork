@@ -15,14 +15,14 @@ MonoBehaviour:
   m_GroupName: Module EFrameExtensionShowcase Assets Group
   m_GUID: 9bfb7ffdb0d0ea645b0aab3a03a0bb05
   m_SerializeEntries:
-  - m_GUID: ad469d404422cf4419e2aef0603e96d8
-    m_Address: Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow
+  - m_GUID: 6be46f2b61d447ec9a8d4c9f627c7c5d
+    m_Address: Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView
     m_ReadOnly: 0
     m_SerializedLabels:
     - eframe-managed
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e638ccbb9244b704abecee7d674aafb3
-    m_Address: Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView
+  - m_GUID: c63873e1dad3b344a949798b1f431ad9
+    m_Address: Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow
     m_ReadOnly: 0
     m_SerializedLabels:
     - eframe-managed
