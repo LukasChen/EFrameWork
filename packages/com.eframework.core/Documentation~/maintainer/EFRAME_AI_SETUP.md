@@ -252,10 +252,11 @@ Copilot 会读取业务项目 `.github` 下的 instructions；Codex 和 Claude C
 ```
 
 6. 用实际项目做一次小范围验证，并运行 `Test-EFrameAIProject.ps1`，确认同步后的 AI 文件没有漂移。
-7. 确认 AI 能按新规范生成或修改代码。
-8. 将这套 `.github` 同步到其他项目。
+7. 如果这是正式 package release，先创建测试预览入口：优先使用 `preview/<package>-<version>-rc.N` 分支，也可以使用不可变 commit SHA；业务项目通过 Unity Package Manager Git URL 的 `#preview/...` 或 `#<commit-sha>` 引入真实环境验证。预览验证不要复用正式 `vX.Y.Z` tag，也不建议直接指向 `main`。
+8. 确认 AI 能按新规范生成或修改代码。
+9. 将这套 `.github` 同步到其他项目。
 
-`Test-EFrameAIRelease.ps1` 会检查 AI 影响文件是否伴随 manifest 变更、manifest 版本是否真实递增、manifest-tracked 文件清单和 hash 是否匹配、instruction/skill frontmatter 是否有效、`eframe-*` skill 是否带有机器可读能力元数据、synced instruction 是否过长、同步脚本是否误纳入 `maintainer-*`，并报告 `eframe-*` / `maintainer-*` instruction 和 skill 数量。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
+`Test-EFrameAIRelease.ps1` 会报告 AI / release 影响文件，并检查同步层或项目侧同步工具变更是否伴随 manifest 变更、manifest 版本是否真实递增、manifest-tracked 文件清单和 hash 是否匹配、instruction/skill frontmatter 是否有效、`eframe-*` skill 是否带有机器可读能力元数据、synced instruction 是否过长、同步脚本是否误纳入 `maintainer-*`，并报告 `eframe-*` / `maintainer-*` instruction 和 skill 数量。发布前如果希望 warning 也阻断流程，可以加 `-FailOnWarning`。
 
 版本号建议：
 

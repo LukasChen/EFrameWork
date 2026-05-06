@@ -22,6 +22,7 @@ forbiddenPatterns:
   - syncing maintainer-only rules into business projects
   - placing manifest or release maintenance in eframe-* skills
   - publishing synced AI files without manifest and release-check review
+  - creating formal release tags before preview package validation in a real business project
   - turning synced instructions into long workflow checklists
   - committing, tagging, or pushing framework releases without maintainer confirmation
 ---
@@ -56,7 +57,8 @@ forbiddenPatterns:
 2. 决定承载位置：长期边界优先 instruction，查询型内容优先 support-doc，常用多步骤流程优先 synced skill，维护流程优先 maintainer skill 或 maintainer doc。
 3. 保持 synced `eframe-*` skill 面向业务项目；不要把 manifest 版本递增、release checklist、同步脚本维护或框架内部维护步骤塞进去。
 4. 需要详细审查时，优先扩展 maintainer skill 或 reference，而不是扩大每次都会触发的 instruction 上下文。
-5. 进入发布或同步发布流程时，按 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 执行验证；release commit/tag/push 前必须先向维护者确认。
+5. 进入正式 package 发布流程时，先按 `preview/<package>-<version>-rc.N` 分支或不可变 commit SHA 提供测试预览入口，让真实业务项目通过 Unity Package Manager Git URL 引入验证；不要直接用正式 `vX.Y.Z` tag 或 `main` 承担预览验证。
+6. 进入发布或同步发布流程时，按 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 执行验证；release commit/tag/push 前必须先向维护者确认版本号、tag、预览验证结论和目标远端。
 
 ## Instruction Quality Checks
 
@@ -77,6 +79,7 @@ forbiddenPatterns:
 
 - 说明哪些规则属于 instructions，哪些属于 skills，哪些属于 maintainer-only。
 - 指出本次是否进入 release checklist 覆盖的发布或同步发布流程。
+- 如果这是正式 package release，指出测试预览入口、真实业务项目验证方式和验证结论是否已满足。
 - 如果发现 `eframe-*` skill 混入 maintainer 事项，建议移到 `maintainer-*` skill。
 - 如果发现内容更适合 support-doc、managed block 或 maintainer doc，要直接指出替代落点。
 - 如果 release check 未通过，先列出阻塞项，再给出修复建议。

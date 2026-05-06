@@ -131,6 +131,8 @@ Recommended release sequence:
 6. Run `tools/Test-EFrameAIRelease.ps1`.
 7. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
 8. Verify cold-start or editor bootstrap paths affected by the change.
+9. For a formal package release, create a preview entry before the formal tag: prefer a `preview/<package>-<version>-rc.N` branch, or record an immutable commit SHA.
+10. Import that preview entry into a real business project through the Unity Package Manager Git URL, using `#preview/...` or `#<commit-sha>`, and validate the project before creating the official `vX.Y.Z` tag.
 
 ## 6. Naming Boundary
 

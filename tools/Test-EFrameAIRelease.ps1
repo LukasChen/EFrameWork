@@ -292,13 +292,35 @@ try {
         $aiImpactPatterns | Where-Object { $path -match $_ } | Select-Object -First 1
     } | Sort-Object -Unique)
 
+    $manifestRequiredPatterns = @(
+        "^AGENTS\.md$",
+        "^CLAUDE\.md$",
+        "^\.github/copilot-instructions\.md$",
+        "^packages/com\.eframework\.core/AIWorkspace~/managed-blocks/eframe-.*\.md$",
+        "^packages/com\.eframework\.core/AIWorkspace~/instructions/eframe-.*\.md$",
+        "^packages/com\.eframework\.core/AIWorkspace~/skills/eframe-.*",
+        "^packages/com\.eframework\.core/AIWorkspace~/support-docs/.*\.md$",
+        "^packages/com\.eframework\.core/AIWorkspace~/eframe-ai\.manifest\.json$",
+        "^packages/com\.eframework\.core/Tools~/.*\.ps1$",
+        "^tools/Initialize-EFrameAI\.ps1$",
+        "^tools/New-EFrameProjectAIOverlay\.ps1$",
+        "^tools/Install-EFrameAIProjectUpdater\.ps1$",
+        "^tools/Initialize-EFrameColdStart\.ps1$",
+        "^tools/Initialize-EFrameBootstrapCode\.ps1$"
+    )
+
+    $manifestRequiredChanges = @($changedPaths | Where-Object {
+        $path = $_
+        $manifestRequiredPatterns | Where-Object { $path -match $_ } | Select-Object -First 1
+    } | Sort-Object -Unique)
+
     $manifestChanged = $changedPaths -contains $manifestPath
 
     $errors = New-Object System.Collections.Generic.List[string]
     $warnings = New-Object System.Collections.Generic.List[string]
 
-    if ($aiImpactChanges.Count -gt 0 -and -not $manifestChanged) {
-        $errors.Add("AI-impacting files changed, but $manifestPath is not changed. Bump the manifest version.")
+    if ($manifestRequiredChanges.Count -gt 0 -and -not $manifestChanged) {
+        $errors.Add("Synced AI-impacting files changed, but $manifestPath is not changed. Bump the manifest version.")
     }
 
     if ($manifestChanged) {
@@ -539,6 +561,10 @@ try {
     Write-Host "Framework root: $frameworkRoot"
     Write-Host "Changed AI-impacting files: $($aiImpactChanges.Count)"
     foreach ($path in $aiImpactChanges) {
+        Write-Host "  - $path"
+    }
+    Write-Host "Manifest-required changes: $($manifestRequiredChanges.Count)"
+    foreach ($path in $manifestRequiredChanges) {
         Write-Host "  - $path"
     }
     Write-Host "Manifest changed: $manifestChanged"

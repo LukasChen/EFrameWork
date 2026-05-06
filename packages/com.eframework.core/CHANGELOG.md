@@ -2,6 +2,17 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.6] - 2026-05-06
+
+### Changed
+
+- Formalized the pre-release preview package gate in maintainer release documentation and release checks.
+- Clarified release validation so maintainer-only AI/release documentation changes do not force a business-project manifest bump.
+
+### Fixed
+
+- Fixed first-time Extension Showcase installation so Unity can resolve copied `.meta` GUID conflicts before `QVirtualListShowcaseWindow.prefab` is repaired against the final project-local `VirtualListShowcaseWindow.cs.meta` GUID.
+
 ## [0.7.5] - 2026-05-06
 
 ### Fixed
