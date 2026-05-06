@@ -12,7 +12,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
         private const string VirtualListPackageName = "com.eframework.ui.virtual-list";
         private const string DebugConsolePackageName = "com.eframework.debug-console";
 
-        private UnityEngine.GameObject m_virtualListWindow;
+        private VirtualListShowcaseController m_virtualListController;
         public Action BackRequested { get; set; }
 
         protected override string AssetPath => ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView;
@@ -108,16 +108,18 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             }
 
             HideVirtualListSample();
-            m_virtualListWindow = VirtualListShowcaseWindow.Show(Context, CurrentView.transform);
-            SetDetail($"{demo.Title}\nPackage: {demo.PackageName}\nStatus: installed\nOpened prefab window.");
+            m_virtualListController = new VirtualListShowcaseController();
+            m_virtualListController.BindContext(Context);
+            m_virtualListController.Show(UILayer.QuiPopUp);
+            SetDetail($"{demo.Title}\nPackage: {demo.PackageName}\nStatus: installed\nOpened popup window.");
         }
 
         private void HideVirtualListSample()
         {
-            if (m_virtualListWindow != null)
+            if (m_virtualListController != null)
             {
-                VirtualListShowcaseWindow.Close(Context, m_virtualListWindow);
-                m_virtualListWindow = null;
+                m_virtualListController.Dispose();
+                m_virtualListController = null;
             }
         }
 

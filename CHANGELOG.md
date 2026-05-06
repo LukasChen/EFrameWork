@@ -4,6 +4,13 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.7.1] - 2026-05-06
+
+### Fixed
+
+- Fixed UI Virtual List resize handling so list and grid views clamp stale scroll offsets and refresh visible items after viewport size changes.
+- Updated the Extension Showcase Virtual List sample to open as a standard `QuiPopUp` UIController popup with adaptive panel sizing and viewport-driven grid wrapping.
+
 ## [0.7.0] - 2026-05-05
 
 ### Changed

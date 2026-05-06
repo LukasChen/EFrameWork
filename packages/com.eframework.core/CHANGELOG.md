@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.1] - 2026-05-06
+
+### Fixed
+
+- Updated the Extension Showcase Virtual List sample to open as a standard `QuiPopUp` UIController popup with adaptive panel sizing and viewport-driven grid wrapping.
+
 ## [0.7.0] - 2026-05-05
 
 ### Changed

@@ -1,53 +1,62 @@
+using System;
 using EFramework.Extensions.UI.VirtualList;
 using EFramework.Generated;
-using EFramework.Runtime;
+using EFramework.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
+    public sealed class VirtualListShowcaseController : UIControllerBase<VirtualListShowcaseView>
+    {
+        protected override string AssetPath => VirtualListShowcaseWindow.AssetPath;
+
+        protected override void OnViewCreated()
+        {
+            base.OnViewCreated();
+            if (CurrentView?.Window != null)
+            {
+                CurrentView.Window.CloseRequested = Hide;
+            }
+        }
+
+        protected override void OnViewDestroyed()
+        {
+            if (CurrentView?.Window != null)
+            {
+                CurrentView.Window.CloseRequested = null;
+            }
+
+            base.OnViewDestroyed();
+        }
+    }
+
+    public sealed class VirtualListShowcaseView : BindingViewBase
+    {
+        public VirtualListShowcaseWindow Window { get; private set; }
+
+        protected override void OnBindingSet()
+        {
+            base.OnBindingSet();
+
+            Window = gameObject.GetComponent<VirtualListShowcaseWindow>() ?? gameObject.AddComponent<VirtualListShowcaseWindow>();
+            Window.Build();
+        }
+    }
+
     public sealed class VirtualListShowcaseWindow : MonoBehaviour
     {
         public const string AssetPath = ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.QVirtualListShowcaseWindow;
+
+        public Action CloseRequested { get; set; }
 
         private Text m_infoText;
         private QVirtualListView m_listView;
         private QVirtualGridView m_gridView;
         private VariableListAdapter m_listAdapter;
         private GridAdapter m_gridAdapter;
-        private EFrameContext m_context;
         private bool m_gridMode;
         private float m_nextInfoRefresh;
-
-        public static GameObject Show(EFrameContext context, Transform parent)
-        {
-            if (context == null || parent == null)
-            {
-                return null;
-            }
-
-            var window = context.Assets.Instantiate(AssetPath, parent);
-            var component = window.GetComponent<VirtualListShowcaseWindow>() ?? window.AddComponent<VirtualListShowcaseWindow>();
-            component.Build(context);
-            return window;
-        }
-
-        public static void Close(EFrameContext context, GameObject window)
-        {
-            if (window == null)
-            {
-                return;
-            }
-
-            if (context?.Assets != null)
-            {
-                context.Assets.ReleaseInstantiatedObject(window);
-            }
-            else
-            {
-                Destroy(window);
-            }
-        }
 
         private void Update()
         {
@@ -60,9 +69,13 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             RefreshInfo();
         }
 
-        private void Build(EFrameContext context)
+        private void OnDestroy()
         {
-            m_context = context;
+            CloseRequested = null;
+        }
+
+        public void Build()
+        {
             var panel = transform.Find("Panel") as RectTransform;
             var title = panel?.Find("Title") as RectTransform;
             var contentRoot = panel?.Find("ContentRoot") as RectTransform;
@@ -71,11 +84,12 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             m_infoText = infoTextRect?.GetComponent<Text>();
 
             var closeButton = panel?.Find("CloseButton")?.GetComponent<Button>();
+            ConfigurePanelLayout(panel);
             ConfigureShellLayout(title, infoTextRect, closeButton?.transform as RectTransform, toolbarRoot, contentRoot);
             if (closeButton != null)
             {
                 closeButton.onClick.RemoveAllListeners();
-                closeButton.onClick.AddListener(() => Close(m_context, gameObject));
+                closeButton.onClick.AddListener(() => CloseRequested?.Invoke());
             }
 
             BuildToolbar(toolbarRoot);
@@ -137,6 +151,9 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             SetPrivateField(m_gridView, "m_cellSize", new Vector2(118f, 76f));
             SetPrivateField(m_gridView, "m_spacing", new Vector2(8f, 8f));
             SetPrivateField(m_gridView, "m_constraintCount", 3);
+            SetPrivateField(m_gridView, "m_autoWrapCrossAxis", true);
+            SetPrivateField(m_gridView, "m_minAutoConstraintCount", 1);
+            SetPrivateField(m_gridView, "m_maxAutoConstraintCount", 0);
             SetPrivateField(m_gridView, "m_padding", new RectOffset(8, 8, 8, 8));
             SetPrivateField(m_gridView, "m_overscan", 180f);
             m_gridAdapter = new GridAdapter(CreateItemPrefab("GridItemPrefab", contentRoot, new Vector2(118f, 76f)), 96);
@@ -405,6 +422,20 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             var text = CreateText("Text", buttonObject.transform, label, 12, FontStyle.Bold, TextAnchor.MiddleCenter);
             Stretch(text.rectTransform);
+        }
+
+        private static void ConfigurePanelLayout(RectTransform panel)
+        {
+            if (panel == null)
+            {
+                return;
+            }
+
+            panel.anchorMin = Vector2.zero;
+            panel.anchorMax = Vector2.one;
+            panel.pivot = new Vector2(0.5f, 0.5f);
+            panel.offsetMin = new Vector2(36f, 36f);
+            panel.offsetMax = new Vector2(-36f, -36f);
         }
 
         private static void ConfigureShellLayout(RectTransform title, RectTransform infoText, RectTransform closeButton, RectTransform toolbar, RectTransform content)

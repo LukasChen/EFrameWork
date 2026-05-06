@@ -4,6 +4,13 @@ All notable changes to the `com.eframework.ui.virtual-list` Unity package are do
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-05-06
+
+### Fixed
+
+- Fixed `QVirtualListView` resize handling so stale content offsets are clamped back into the resized viewport before visible items refresh.
+- Added explicit `RefreshLayout()` methods for list and grid views so callers can request a layout refresh after external layout changes.
+
 ## [0.1.1] - 2026-05-03
 
 ### Added

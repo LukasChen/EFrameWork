@@ -115,10 +115,7 @@ namespace EFramework.Extensions.UI.VirtualList
         {
             if (m_initialized && isActiveAndEnabled)
             {
-                var offset = GetScrollOffset();
-                RebuildContentSize();
-                SetScrollOffset(offset);
-                RefreshVisibleItems();
+                RefreshLayout();
             }
         }
 
@@ -221,6 +218,20 @@ namespace EFramework.Extensions.UI.VirtualList
                     ApplyItemTransform(m_visibleItems[i], i);
                 }
             }
+        }
+
+        public void RefreshLayout()
+        {
+            EnsureInitialized();
+            if (!m_initialized)
+            {
+                return;
+            }
+
+            var offset = GetScrollOffset();
+            RebuildContentSize();
+            SetScrollOffset(offset);
+            RefreshVisibleItems();
         }
 
         public void ScrollToIndex(int index, QVirtualListAlign align = QVirtualListAlign.Start)
