@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.46",
+    "version":  "0.4.47",
     "updatedAt":  "2026-05-06",
-    "notes":  "Align initialization-window extension state sync and Showcase install-time prefab script repair.",
+    "notes":  "Repair existing Showcase module prefab script references during Install Showcase.",
     "clients":  [
                     "codex",
                     "copilot",

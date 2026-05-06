@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [0.7.5] - 2026-05-06
+
+### Fixed
+
+- Fixed `Install Showcase` so rerunning it on an existing Showcase module repairs `QVirtualListShowcaseWindow.prefab` against the installed `VirtualListShowcaseWindow.cs.meta` GUID.
+
 ## [0.7.4] - 2026-05-06
 
 ### Fixed

@@ -773,9 +773,16 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private bool CopyExtensionShowcaseTemplate(out string message)
         {
-            if (AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath) || Directory.Exists(Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath)))
+            var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
+            if (AssetDatabase.IsValidFolder(ExtensionShowcaseTargetPath) || Directory.Exists(targetFullPath))
             {
-                message = $"Extension Showcase module already exists at {ExtensionShowcaseTargetPath}.";
+                if (!TryRepairInstalledExtensionShowcaseScriptReferences(targetFullPath, out var existingRepairMessage))
+                {
+                    message = existingRepairMessage;
+                    return false;
+                }
+
+                message = $"Extension Showcase module already exists at {ExtensionShowcaseTargetPath}. {existingRepairMessage}";
                 return true;
             }
 
@@ -786,7 +793,6 @@ namespace EFramework.Editor.ProjectBootstrap
                 return false;
             }
 
-            var targetFullPath = Path.Combine(ProjectRootPath, ExtensionShowcaseTargetPath.Replace('/', Path.DirectorySeparatorChar));
             CopyDirectory(sourceFullPath, targetFullPath);
             if (!TryRepairInstalledExtensionShowcaseScriptReferences(targetFullPath, out var repairMessage))
             {

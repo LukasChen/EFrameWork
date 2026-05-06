@@ -4,6 +4,12 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [0.7.5] - 2026-05-06
+
+### Fixed
+
+- Fixed `Install Showcase` so rerunning it on an existing Showcase module repairs `QVirtualListShowcaseWindow.prefab` against the installed `VirtualListShowcaseWindow.cs.meta` GUID.
+
 ## [0.7.4] - 2026-05-06
 
 ### Fixed
