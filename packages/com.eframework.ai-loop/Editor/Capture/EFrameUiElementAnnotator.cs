@@ -173,11 +173,9 @@ namespace EFramework.Editor.AILoop
 
         private static T[] FindObjectsByTypeCompat<T>() where T : Object
         {
-#if UNITY_6000_0_OR_NEWER
-            return Object.FindObjectsByType<T>();
-#else
+#pragma warning disable 0618
             return Object.FindObjectsByType<T>(FindObjectsSortMode.None);
-#endif
+#pragma warning restore 0618
         }
 
         private static void CreateAnnotation(

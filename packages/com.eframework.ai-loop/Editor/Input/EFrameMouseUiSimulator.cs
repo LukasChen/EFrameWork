@@ -372,11 +372,9 @@ namespace EFramework.Editor.AILoop
 
         private static T[] FindObjectsByTypeCompat<T>() where T : UnityEngine.Object
         {
-#if UNITY_6000_0_OR_NEWER
-            return UnityEngine.Object.FindObjectsByType<T>();
-#else
+#pragma warning disable 0618
             return UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.None);
-#endif
+#pragma warning restore 0618
         }
 
         private static EFrameMouseUiResult Fail(string message)
