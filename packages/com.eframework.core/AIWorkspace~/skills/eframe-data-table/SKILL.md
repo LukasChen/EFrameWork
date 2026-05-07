@@ -1,6 +1,6 @@
 ---
 name: eframe-data-table
-description: 'Create, refactor, or audit EFrame persistent data tables, StorageKey values, dirty tracking, save/load behavior, migrations, LastLoadResult, and LastSaveResult usage. Use when adding gameplay settings, player progress, inventory, options, or other persistent runtime data.'
+description: 'Create, refactor, or audit EFrame persistent data tables, StorageKey values, dirty tracking, save/load behavior, migrations, LastLoadResult, and LastSaveResult usage. Use when adding gameplay settings, player progress, inventory, options, other persistent runtime data, or when the task mentions 数据表接入, 存档接入, 设置数据, 玩家进度, or 数据迁移.'
 argument-hint: 'Describe the data shape, storage key, load/save timing, and whether migration from old data is needed.'
 user-invocable: true
 capabilities:

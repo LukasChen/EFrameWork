@@ -37,3 +37,8 @@
 - Saving or driving `UIViewHandle` directly from business code
 - View constructors that load prefab assets directly from an `assetPath`
 - Reintroducing a controller `View` facade instead of using `CurrentView`
+
+## PlayMode AI Validation
+
+- If `com.eframework.ai-loop` is installed and PlayMode UI validation is needed, load `eframe-ai-loop-validation`.
+- AI Loop can support UI smoke checks, but it does not replace authored prefabs, UI Binding generation, controller lifecycle cleanup, or visible Unity acceptance.

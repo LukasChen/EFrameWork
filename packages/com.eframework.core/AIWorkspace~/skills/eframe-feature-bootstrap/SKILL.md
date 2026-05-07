@@ -1,6 +1,6 @@
 ---
 name: eframe-feature-bootstrap
-description: 'Plan and assemble Unity EFrame feature scaffolding across Procedure, UI, data, resources, startup flow, popup flow, or MiniGame modules. Use as the top-level coordinator when a feature spans multiple EFrame concerns; delegate detailed UI, data-table, or resource work to the specialized eframe skills.'
+description: 'Plan and assemble Unity EFrame feature scaffolding across Procedure, UI, data, resources, startup flow, popup flow, or MiniGame modules. Use as the top-level coordinator when a feature spans multiple EFrame concerns, or when the task mentions 功能接入, 功能骨架, 新功能规划, 流程接入, or 模块接入.'
 argument-hint: 'Describe the feature, target state, and whether it is a Procedure, popup, page, or MiniGame.'
 user-invocable: true
 capabilities:

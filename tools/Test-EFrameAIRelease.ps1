@@ -110,6 +110,10 @@ function Convert-AIWorkspacePathToManifestPath {
         return ".github/skills/" + $repoPath.Substring("$aiWorkspaceRoot/skills/".Length)
     }
 
+    if ($repoPath -like "$aiSupportDocsRoot/*") {
+        return ".github/eframe/" + $repoPath.Substring("$aiSupportDocsRoot/".Length)
+    }
+
     return $repoPath
 }
 
@@ -151,8 +155,10 @@ function Get-ExpectedManifestFilePaths {
         $paths.Add(".github/copilot-instructions.md")
     }
 
-    if (Test-Path "$aiSupportDocsRoot/EFRAME_AI_API_INDEX.md") {
-        $paths.Add(".github/eframe/EFRAME_AI_API_INDEX.md")
+    if (Test-Path $aiSupportDocsRoot) {
+        foreach ($file in Get-ChildItem -Path $aiSupportDocsRoot -Filter "*.md" -File) {
+            $paths.Add((Convert-AIWorkspacePathToManifestPath -Path $file.FullName))
+        }
     }
 
     $workspaceInstructionsPath = Join-Path $aiWorkspaceRoot "instructions"

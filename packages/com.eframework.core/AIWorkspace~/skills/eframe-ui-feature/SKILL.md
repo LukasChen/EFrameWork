@@ -1,6 +1,6 @@
 ---
 name: eframe-ui-feature
-description: 'Build or refactor EFrame UI pages, popups, tooltips, View prefabs, UIController classes, QUIBinding usage, UI layer placement, and UI lifecycle wiring. Use when adding or fixing EFrame runtime UI features in a business project.'
+description: 'Build or refactor EFrame UI pages, popups, tooltips, View prefabs, UIController classes, QUIBinding usage, UI layer placement, and UI lifecycle wiring. Use when adding or fixing EFrame runtime UI features, or when the task mentions UI 接入, 页面接入, 弹窗接入, UI 重构, or UI 规范.'
 argument-hint: 'Describe the UI feature, target layer, prefab/controller names, and whether it is a page, popup, tooltip, or top-layer UI.'
 user-invocable: true
 capabilities:

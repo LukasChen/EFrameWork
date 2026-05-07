@@ -53,3 +53,4 @@
 - 是否存在成对清理
 - 是否能收敛到标准目录
 - 是否避免在 bootstrap skill 中复制 specialized skill 的细节规则
+- 如果功能需要 AI-assisted PlayMode smoke validation，是否已交给 `eframe-ai-loop-validation`

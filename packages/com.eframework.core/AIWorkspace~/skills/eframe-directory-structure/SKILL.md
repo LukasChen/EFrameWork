@@ -1,6 +1,6 @@
 ---
 name: eframe-directory-structure
-description: 'Classify and validate EFrame Unity project file placement. Use before creating, moving, or reviewing business runtime code, editor tooling, UI prefabs, generated files, scenes, resources, FX, materials, or module-owned files in an EFrame business project.'
+description: 'Classify and validate EFrame Unity project file placement. Use before creating, moving, or reviewing business runtime code, editor tooling, UI prefabs, generated files, scenes, resources, FX, materials, module-owned files, or when the task mentions 目录归位, 文件放哪, 模块归属, 目录审查, or 资源放哪.'
 argument-hint: 'Describe the file, feature, resource, module, or directory change to place or audit.'
 user-invocable: true
 capabilities:

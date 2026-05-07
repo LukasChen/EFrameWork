@@ -1,6 +1,6 @@
 ---
 name: eframe-guideline-audit
-description: 'Review Unity EFrame changes for compliance. Use when auditing startup scene, Procedure lifecycle, QUI usage, UIController structure, directory layout, naming, resource paths, or AI customization sync.'
+description: 'Review Unity EFrame changes for compliance. Use when auditing startup scene, Procedure lifecycle, QUI usage, UIController structure, directory layout, naming, resource paths, AI customization sync, or when the task mentions 规范审查, EFrame 审查, 接入审查, 合规检查, or 改动体检.'
 argument-hint: 'Describe the change set or module to audit.'
 user-invocable: true
 capabilities:

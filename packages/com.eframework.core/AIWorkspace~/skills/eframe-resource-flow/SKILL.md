@@ -1,6 +1,6 @@
 ---
 name: eframe-resource-flow
-description: 'Set up, refactor, or audit EFrame resource loading through Addressables, generated ResPath.Generated ids, editor-authored AssetReference fields, App/Res and Modules/Res directories, async asset handles, and release/dispose paths. Use when adding prefabs, UI assets, scene assets, audio, or module resources.'
+description: 'Set up, refactor, or audit EFrame resource loading through Addressables, generated ResPath.Generated ids, editor-authored AssetReference fields, App/Res and Modules/Res directories, async asset handles, and release/dispose paths. Use when adding prefabs, UI assets, scene assets, audio, module resources, or when the task mentions 资源接入, 资源加载, ResPath 接入, Addressables 接入, or 资源释放.'
 argument-hint: 'Describe the resource, expected directory, loading caller, and whether Addressables/ResPath generation is involved.'
 user-invocable: true
 capabilities:

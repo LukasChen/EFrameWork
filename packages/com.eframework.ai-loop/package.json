@@ -1,0 +1,24 @@
+{
+  "name": "com.eframework.ai-loop",
+  "displayName": "EFrame AI Loop",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Editor-only visual capture and PlayMode input simulation tools for EFrame AI-assisted development loops.",
+  "keywords": [
+    "unity",
+    "eframework",
+    "ai",
+    "editor",
+    "playmode",
+    "automation"
+  ],
+  "author": {
+    "name": "Ethan Hubin"
+  },
+  "dependencies": {
+    "com.eframework.core": "0.7.6",
+    "com.unity.ugui": "2.0.0",
+    "com.unity.inputsystem": "1.19.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}

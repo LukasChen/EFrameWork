@@ -4,6 +4,12 @@ All notable changes to EFrame are documented in this file.
 
 EFrame uses semantic versioning for framework releases. The release version is recorded in `packages/com.eframework.core/package.json` and summarized here. Unity code, AI collaboration rules, bootstrap tools, sync scripts, and documentation are treated as one EFrame release surface. `.github/eframe-ai.manifest.json` is only an internal sync marker for business projects.
 
+## [Unreleased]
+
+### Added
+
+- Added the optional `com.eframework.ai-loop` package with Editor-only Game/Editor screenshot capture, EFrame-aware UI element annotation, uGUI PlayMode mouse simulation, Input System keyboard simulation, and JSON input recording/replay APIs for AI-assisted development loops.
+
 ## [0.7.6] - 2026-05-06
 
 ### Changed

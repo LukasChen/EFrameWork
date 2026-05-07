@@ -54,7 +54,7 @@ package-only 消费者可从已安装 package 根目录运行等价脚本：
 - [packages/com.eframework.core/AIWorkspace~](packages/com.eframework.core/AIWorkspace~)：随 package 发布的 AI 协作源，包含 `eframe-*` instructions/skills、managed blocks、manifest 和 AI 支持文档。
 - [packages/com.eframework.core/Tools~](packages/com.eframework.core/Tools~)：随 package 发布的项目初始化、AI 同步和健康检查脚本。
 - [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~)：给人看的用户文档、维护者文档和 HTML 文档站点。
-- [packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list)、[packages/com.eframework.ui-extras](packages/com.eframework.ui-extras)、[packages/com.eframework.effects](packages/com.eframework.effects)、[packages/com.eframework.debug-console](packages/com.eframework.debug-console)：可选扩展 package。
+- [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop)、[packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list)、[packages/com.eframework.ui-extras](packages/com.eframework.ui-extras)、[packages/com.eframework.effects](packages/com.eframework.effects)、[packages/com.eframework.debug-console](packages/com.eframework.debug-console)：可选扩展 package。
 - [test-fixtures](test-fixtures)：用于 Basic 模板、Showcase 模块和 package 消费路径验证的 Unity fixture。
 - [tools](tools)：框架仓库维护脚本和 package 脚本包装器。业务项目优先使用 package 内的 `Tools~/`。
 - [AGENTS.md](AGENTS.md)、[CLAUDE.md](CLAUDE.md)、[.github/copilot-instructions.md](.github/copilot-instructions.md)：框架仓库内 AI 客户端入口，只做分流，不复制业务规则全文。

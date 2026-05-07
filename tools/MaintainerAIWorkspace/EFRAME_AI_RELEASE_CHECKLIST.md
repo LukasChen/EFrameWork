@@ -84,6 +84,14 @@
 - UI 主链路调整时，`UI_FRAMEWORK_GUIDE.md`、`eframe-instructions`、`eframe-ui-feature`、`eframe-guideline-audit`、bootstrap 脚本和编辑器初始化模板保持同一套 `QUI` / `UIViewHandle` / `UIControllerBase` 契约。
 - 新增 `eframe-*` skill 时，确认它面向业务项目常用 workflow，而不是 maintainer-only 发布或同步流程；`eframe-feature-bootstrap` 保持总控职责，避免与 specialized skill 重复。
 
+### 3.7 AI Loop PlayMode 验收
+
+- 修改 `packages/com.eframework.ai-loop/` 或业务 AI 中依赖 AI Loop 的测试机制时，先运行 editor assembly compile check。
+- 在 `test-fixtures/EFrameConsumerUnity` 或真实业务项目中安装 `com.eframework.ai-loop`，并按 `packages/com.eframework.ai-loop/Documentation~/manual-test-checklist.md` 完成 visible Editor PlayMode 验收。
+- 验收记录必须覆盖 screenshot annotation、`ElementsOnly` 坐标、cancelled mouse/keyboard input、`StopReplay` mid-input、record/replay PlayMode exit cleanup。
+- 如果 AI Loop 测试机制会同步给业务项目，优先放在 `eframe-ai-loop-validation`；其他 synced skill 只保留必要 handoff，避免复制 PlayMode 验收细节。
+- 如果这是正式 package release，仍需按发布阻塞项创建预览分支或不可变 commit SHA，并在真实业务项目中用 Unity Package Manager Git URL 引入验证。
+
 ## 4. 业务项目同步流程
 
 业务项目拉取新的框架版本后：
