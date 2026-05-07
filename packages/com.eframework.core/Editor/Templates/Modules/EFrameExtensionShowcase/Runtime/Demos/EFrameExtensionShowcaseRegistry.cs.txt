@@ -8,8 +8,9 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Demos
     {
         private static readonly EFrameExtensionShowcaseDemo[] s_demos =
         {
-            Create("UI Virtual List", "com.eframework.ui-extras", "EFrame.UI.Extras", "Virtual list and grid controls for large scrollable data sets."),
-            Create("Debug Console", "com.eframework.debug-console", "IngameDebugConsole.Runtime", "Runtime debug console integration.")
+            Create(EFrameExtensionShowcaseDemoKind.Feedback, "UI Interaction Feedback", "com.eframework.ui-extras", "EFrame.UI.Extras", "Target based hover, pressed, selected, disabled and tween feedback."),
+            Create(EFrameExtensionShowcaseDemoKind.VirtualList, "UI Virtual List", "com.eframework.ui-extras", "EFrame.UI.Extras", "Virtual list and grid controls for large scrollable data sets."),
+            Create(EFrameExtensionShowcaseDemoKind.DebugConsole, "Debug Console", "com.eframework.debug-console", "IngameDebugConsole.Runtime", "Runtime debug console integration.")
         };
 
         public static IReadOnlyList<EFrameExtensionShowcaseDemo> Demos => s_demos;
@@ -25,9 +26,10 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Demos
                 .Any(assembly => string.Equals(assembly.GetName().Name, demo.AssemblyName, StringComparison.Ordinal));
         }
 
-        private static EFrameExtensionShowcaseDemo Create(string title, string packageName, string assemblyName, string description)
+        private static EFrameExtensionShowcaseDemo Create(EFrameExtensionShowcaseDemoKind kind, string title, string packageName, string assemblyName, string description)
         {
             return new EFrameExtensionShowcaseDemo(
+                kind,
                 title,
                 packageName,
                 assemblyName,

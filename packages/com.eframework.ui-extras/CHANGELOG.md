@@ -1,9 +1,11 @@
 # Changelog
 
-## 0.3.0 - 2026-05-07
+## 0.3.1 - 2026-05-07
 
 - Merged virtual list/grid controls into UI Extras while keeping the `EFramework.Extensions.UI.VirtualList` namespace.
 - Replaced legacy button/toggle helpers with `UIInteractionGuard`, `UIInteractionReporter`, and `UIInteractionFeedback`.
+- Refactored `UIInteractionFeedback` into a compact setting-node Inspector: target tree dropdown, state tabs, action dropdown, action parameters, and optional tween timing for supported actions; removed the old per-state legacy feedback model.
+- Fixed duplicate target tween restore, disable-time tween cleanup, and active-state restore during Unity deactivate callbacks.
 - Replaced `SmoothFillController` with `UISmoothFill`.
 - Removed TextPro curved text helpers and legacy `UIBuilder` / local UI animation helper components.
 

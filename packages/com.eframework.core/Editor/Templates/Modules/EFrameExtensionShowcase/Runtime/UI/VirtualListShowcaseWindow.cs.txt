@@ -329,6 +329,8 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             {
                 label.text = refreshed ? $"{text}\nrefreshed" : text;
             }
+
+            ShowcaseFeedbackInstaller.InstallItem(item.gameObject);
         }
 
         private static void BindButton(Button button, UnityAction onClick)
@@ -341,6 +343,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(onClick);
+            ShowcaseFeedbackInstaller.InstallButton(button);
         }
     }
 }

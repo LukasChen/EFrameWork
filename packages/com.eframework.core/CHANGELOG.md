@@ -4,8 +4,12 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.7.7] - 2026-05-07
+
 ### Added
 
+- Aligned `EFrameEase` names and numeric order with DOTween `Ease`, expanded common easing variants, and updated the DOTween adapter to use native DOTween ease mapping when no custom curve is supplied.
+- Updated the Extension Showcase module with a UI Interaction Feedback demo entry and applied the feedback behavior to showcase buttons and virtual-list item bindings.
 - Added a maintainer prompt-routing audit document for reviewing natural user requests against EFrame AI contract layers, made it a required validation step when AI contract trigger behavior changes, and expanded the synced skill trigger guide with natural prompt phrases for main-screen entries, EFrame convention checks, and record/replay validation.
 
 ## [0.7.6] - 2026-05-06

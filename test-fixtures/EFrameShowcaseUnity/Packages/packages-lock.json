@@ -37,7 +37,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.eframework.core": "0.7.6",
+        "com.eframework.core": "0.7.7",
         "com.unity.ugui": "2.0.0"
       }
     },

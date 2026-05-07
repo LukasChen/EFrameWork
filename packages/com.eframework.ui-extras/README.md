@@ -9,7 +9,7 @@ Optional EFrame UI extension package for reusable controls that are useful in pr
 - `Components/EmptyRayCasterGraphic`: invisible raycast target graphic.
 - `Interaction/UIInteractionGuard`: prevents repeated Button/Toggle interaction through cooldown or one-shot locking.
 - `Interaction/UIInteractionReporter`: dispatches `UIInteractionEvent` for Button and Toggle analytics hooks.
-- `Interaction/UIInteractionFeedback`: handles normal, hover, focus, pressed, checked, disabled, and enable-time visual feedback.
+- `Interaction/UIInteractionFeedback`: follows Button/Toggle state and applies a compact setting-node flow: select a child target from a hierarchy menu, choose a state tab, then choose one action such as Scale, Offset, Color, or Material. Supported actions can apply immediately or through an `EFrameTween` ease/duration.
 - `Graphics/UISmoothFill`: smooth `Image.fillAmount` transitions.
 - `Graphics/UIRoundedRectImage`: rounded rectangle mesh effect for UGUI Images.
 - `VirtualList/QVirtualListView`: variable-size single-axis virtual list.

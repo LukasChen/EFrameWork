@@ -1,0 +1,20 @@
+{
+    "name": "EFrame.UI.Extras.Editor",
+    "rootNamespace": "",
+    "references": [
+        "EFrame",
+        "EFrame.UI.Extras",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -16,7 +16,7 @@
     "name": "Ethan Hubin"
   },
   "dependencies": {
-    "com.eframework.core": "0.7.6",
+    "com.eframework.core": "0.7.7",
     "com.unity.ugui": "2.0.0",
     "com.unity.inputsystem": "1.19.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1"

@@ -92,7 +92,7 @@ namespace EFramework.Runtime.Tween.Dotween
                 return DotweenTweenHandle.Completed;
             }
 
-            tween.SetEase(Ease.Linear);
+            tween.SetEase(options.Curve != null ? Ease.Linear : ToDotweenEase(options.Ease));
 
             if (options.Target != null)
             {
@@ -114,9 +114,12 @@ namespace EFramework.Runtime.Tween.Dotween
 
         private static float EvaluateProgress(EFrameTweenOptions options, float progress)
         {
-            return options.Curve != null
-                ? options.Curve.Evaluate(progress)
-                : EFrameEaseUtility.Evaluate(options.Ease, progress);
+            return options.Curve != null ? options.Curve.Evaluate(progress) : progress;
+        }
+
+        private static Ease ToDotweenEase(EFrameEase ease)
+        {
+            return ease == EFrameEase.Unset ? Ease.Linear : (Ease)ease;
         }
     }
 

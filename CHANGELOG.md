@@ -6,14 +6,23 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.7.7] - 2026-05-07
+
 ### Added
 
 - Added the optional `com.eframework.ai-loop` package with Editor-only Game/Editor screenshot capture, EFrame-aware UI element annotation, uGUI PlayMode mouse simulation, Input System keyboard simulation, and JSON input recording/replay APIs for AI-assisted development loops.
 - Added a maintainer prompt-routing audit document for reviewing natural user requests against EFrame AI contract layers, made it a required validation step when AI contract trigger behavior changes, and expanded the synced skill trigger guide with natural prompt phrases for main-screen entries, EFrame convention checks, and record/replay validation.
+- Added a compact `UIInteractionFeedback` Inspector and showcase demo entry for target-based hover, pressed, selected, disabled, and tween feedback.
 
 ### Changed
 
 - Added `com.eframework.ai-loop` to the project initialization window Extensions list as an optional editor validation package.
+- Aligned `EFrameEase` names and numeric order with DOTween `Ease` for direct DOTween adapter mapping.
+- Updated the Extension Showcase module and templates so showcase buttons and virtual-list items apply the new interaction feedback behavior.
+
+### Fixed
+
+- Fixed `UIInteractionFeedback` tween restore behavior for duplicate targets and disabled objects, including avoiding `SetActive` during Unity deactivate callbacks.
 
 ## [0.7.6] - 2026-05-06
 

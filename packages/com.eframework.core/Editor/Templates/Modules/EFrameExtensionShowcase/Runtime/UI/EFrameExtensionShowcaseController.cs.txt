@@ -10,9 +10,6 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
     public sealed class EFrameExtensionShowcaseController : UIControllerBase<v_EFrameExtensionShowcaseView>
     {
-        private const string VirtualListPackageName = "com.eframework.ui-extras";
-        private const string DebugConsolePackageName = "com.eframework.debug-console";
-
         private VirtualListShowcaseController m_virtualListController;
         public Action BackRequested { get; set; }
 
@@ -25,11 +22,13 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             var demos = EFrameExtensionShowcaseRegistry.Demos;
             var buttons = new[]
             {
+                CurrentView?.FeedbackButton,
                 CurrentView?.VirtualListButton,
                 CurrentView?.DebugConsoleButton
             };
             var labels = new[]
             {
+                CurrentView?.FeedbackLabelText,
                 CurrentView?.VirtualListLabelText,
                 CurrentView?.DebugConsoleLabelText
             };
@@ -48,6 +47,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             }
 
             AddButtonClickListener(CurrentView?.BackButton, OnBackClicked, true);
+            ShowcaseFeedbackInstaller.InstallButton(CurrentView?.BackButton);
         }
 
         protected override void OnViewOpened()
@@ -73,11 +73,14 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
             }
 
             AddButtonClickListener(button, () => OnDemoSelected(demo), true);
+            ShowcaseFeedbackInstaller.InstallButton(button);
         }
 
         private void OnDemoSelected(EFrameExtensionShowcaseDemo demo)
         {
             var state = EFrameExtensionShowcaseRegistry.IsInstalled(demo) ? "installed" : "not installed";
+            SetSelectedDemo(demo);
+
             if (!EFrameExtensionShowcaseRegistry.IsInstalled(demo))
             {
                 HideVirtualListSample();
@@ -85,13 +88,20 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
                 return;
             }
 
-            if (demo.PackageName == VirtualListPackageName)
+            if (demo.Kind == EFrameExtensionShowcaseDemoKind.Feedback)
+            {
+                HideVirtualListSample();
+                SetDetail($"{demo.Title}\nPackage: {demo.PackageName}\nStatus: installed\nHover scales the button, pressed offsets the text target, and selection keeps the active entry marked.");
+                return;
+            }
+
+            if (demo.Kind == EFrameExtensionShowcaseDemoKind.VirtualList)
             {
                 ShowVirtualListSample(demo);
                 return;
             }
 
-            if (demo.PackageName == DebugConsolePackageName)
+            if (demo.Kind == EFrameExtensionShowcaseDemoKind.DebugConsole)
             {
                 HideVirtualListSample();
                 ShowDebugConsole(demo);
@@ -139,6 +149,18 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
         {
             EFrameDebugConsole.Show();
             SetDetail($"{demo.Title}\nPackage: {demo.PackageName}\nStatus: installed\nDebug console panel is visible.");
+        }
+
+        private void SetSelectedDemo(EFrameExtensionShowcaseDemo demo)
+        {
+            SetChecked(CurrentView?.FeedbackButton, demo?.Kind == EFrameExtensionShowcaseDemoKind.Feedback);
+            SetChecked(CurrentView?.VirtualListButton, demo?.Kind == EFrameExtensionShowcaseDemoKind.VirtualList);
+            SetChecked(CurrentView?.DebugConsoleButton, demo?.Kind == EFrameExtensionShowcaseDemoKind.DebugConsole);
+        }
+
+        private static void SetChecked(Button button, bool isChecked)
+        {
+            ShowcaseFeedbackInstaller.SetChecked(button, isChecked);
         }
 
         private void OnBackClicked()
