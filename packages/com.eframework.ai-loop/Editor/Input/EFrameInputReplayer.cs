@@ -29,6 +29,7 @@ namespace EFramework.Editor.AILoop
         private static bool s_wasLeftHeld;
         private static bool s_isDragging;
         private static Vector2 s_pressPosition;
+        private static string s_inputPath = "";
 
         public static bool IsReplaying { get; private set; }
         public static int CurrentFrame { get; private set; }
@@ -84,19 +85,23 @@ namespace EFramework.Editor.AILoop
             CurrentFrame = 0;
             s_eventIndex = 0;
             s_loop = request.Loop;
+            s_inputPath = inputPath;
             IsReplaying = true;
 
             InputSystem.onAfterUpdate -= OnAfterUpdate;
             InputSystem.onAfterUpdate += OnAfterUpdate;
 
-            return Task.FromResult(new EFrameReplayInputResult
+            EFrameReplayInputResult result = new()
             {
                 Success = true,
                 Message = $"Input replay started: {inputPath}",
                 InputPath = inputPath,
                 TotalFrames = TotalFrames,
+                Progress = 0f,
                 IsReplaying = true
-            });
+            };
+            result.ReportPath = EFrameAiLoopReport.WriteReplayReport(result, "AI Loop 输入回放报告");
+            return Task.FromResult(result);
         }
 
         public static EFrameReplayInputResult Stop()
@@ -108,14 +113,20 @@ namespace EFramework.Editor.AILoop
 
             int stoppedFrame = CurrentFrame;
             int totalFrames = TotalFrames;
+            string inputPath = s_inputPath;
             StopInternal(true);
-            return new EFrameReplayInputResult
+            EFrameReplayInputResult result = new()
             {
                 Success = true,
                 Message = $"Input replay stopped at frame {stoppedFrame}/{totalFrames}.",
+                InputPath = inputPath,
                 CurrentFrame = stoppedFrame,
-                TotalFrames = totalFrames
+                TotalFrames = totalFrames,
+                Progress = totalFrames > 0 ? (float)stoppedFrame / totalFrames : 0f,
+                IsReplaying = false
             };
+            result.ReportPath = EFrameAiLoopReport.WriteReplayReport(result, "AI Loop 输入回放停止报告");
+            return result;
         }
 
         private static void OnAfterUpdate()
@@ -405,6 +416,7 @@ namespace EFramework.Editor.AILoop
 
             ReleaseAllInputs();
             s_data = null;
+            s_inputPath = "";
             CurrentFrame = 0;
             s_eventIndex = 0;
             ResetUiState();

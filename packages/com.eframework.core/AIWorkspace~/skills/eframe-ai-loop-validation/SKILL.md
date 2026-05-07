@@ -18,6 +18,7 @@ delegatesTo:
 outputs:
   - PlayMode validation steps and results
   - AI Loop screenshot/input/replay usage notes
+  - Markdown report, screenshot, and JSON artifact paths for chat review
   - residual validation risks
 forbiddenPatterns:
   - treating AI Loop as a replacement for authored UI prefabs
@@ -52,12 +53,16 @@ forbiddenPatterns:
 5. Use `simulate-keyboard` for Unity Input System key press, key down, and key up checks.
 6. Use `record-input` / `replay-input` only after the flow can start from a stable state.
 7. For flows that hold pointer or keyboard state, verify cancellation, `StopReplay`, and PlayMode exit cleanup.
-8. Report what was validated, what was not validated, and any remaining manual visible-Editor checks.
+8. Collect returned artifact paths: `ReportPath`, screenshot `Path`, recording `OutputPath`, and replay `InputPath`.
+9. In the AI chat response, list the Markdown report, screenshot, and JSON files. When a screenshot file exists, embed it directly so the user can review the UI without opening the file manually.
+10. Report what was validated, what was not validated, and any remaining manual visible-Editor checks.
 
 ## Output Checks
 
 - Screenshot results include whether annotations align with visible UI and whether `ElementsOnly` coordinates can drive mouse simulation.
+- Screenshot results include `ReportPath`; reports should embed the PNG and list discovered UI elements when available.
 - Mouse UI results include whether pointer up, drop, and end drag are observed after cancel or stop paths.
 - Keyboard results include whether held keys are released after cancellation and PlayMode exit.
-- Record/replay results include the recording path, replay progress, stop behavior, and any nondeterministic scene assumptions.
+- Record/replay results include the Markdown report path, JSON path, replay progress, stop behavior, and any nondeterministic scene assumptions.
+- Final chat output should include a compact artifact list, for example `报告`, `截图`, `录制 JSON`, or `回放 JSON`.
 - If the project is missing AI Loop, say so and fall back to the nearest available manual or Unity Test Framework validation path.

@@ -33,6 +33,7 @@ Internal uGUI event dispatch still uses Unity screen coordinates with origin at 
 | Annotated screenshot | Call `CaptureGameViewAsync(new EFrameScreenshotOptions { AnnotateElements = true })`. | PNG contains visible labels and boxes over interactable uGUI elements. Labels match `Elements`. Boxes are not vertically flipped. |
 | Elements only | Call `CaptureGameViewAsync(new EFrameScreenshotOptions { AnnotateElements = true, ElementsOnly = true })`. | No PNG is written. `Elements` contains top-left coordinates that can be passed directly to mouse simulation. |
 | Editor window screenshot | Call `EFrameScreenshot.CaptureAsync` with `CaptureMode = EditorWindow` and `WindowName = "Game"`. | Result succeeds when the target EditorWindow is open, and fails cleanly when the name is invalid. |
+| Markdown report | Inspect `result.ReportPath` after a successful screenshot or elements-only capture. | A Markdown file exists under `.eframe/outputs/Reports`. Screenshot reports embed the PNG and list the same UI elements returned to the agent. |
 
 ## Mouse UI Simulation
 
@@ -58,6 +59,7 @@ Internal uGUI event dispatch still uses Unity screen coordinates with origin at 
 | Case | Steps | Expected Result |
 | --- | --- | --- |
 | Start/stop recording | Call `StartRecordingInputAsync`, perform keyboard and mouse actions, then `StopRecordingInputAsync`. | JSON is saved under `.eframe/outputs/InputRecordings` by default. Metadata and frame events are populated. |
+| Recording report | Inspect `result.ReportPath` after stopping recording. | A Markdown file exists under `.eframe/outputs/Reports` and links the saved JSON recording. |
 | Already active guard | Call start twice. | Second start fails with an already-active message. |
 | Replay conflict guard | Start replay, then attempt recording. | Recording fails while replay is active. |
 | PlayMode exit while recording | Start recording, exit PlayMode without stop. | Recorder unsubscribes from `InputSystem.onAfterUpdate`; next PlayMode can start recording. |
@@ -67,6 +69,7 @@ Internal uGUI event dispatch still uses Unity screen coordinates with origin at 
 | Case | Steps | Expected Result |
 | --- | --- | --- |
 | Replay saved file | Start replay with a saved JSON path. | Keyboard/mouse snapshots are injected frame by frame and UI events are dispatched for left mouse input. |
+| Replay report | Inspect `result.ReportPath` after starting or stopping replay. | A Markdown file exists under `.eframe/outputs/Reports` and links the replay input JSON. |
 | Stop mid-press | Replay a file that holds left mouse down, then call `StopReplayInput`. | Input System buttons/keys are released and uGUI receives pointer up. No pressed UI state remains. |
 | Stop mid-drag | Replay a file that starts drag, then call `StopReplayInput`. | UI receives pointer up, optional drop, and end drag. Next replay/click works. |
 | Loop replay | Start replay with `loop = true`. | Replay resets to frame zero after `TotalFrames`, releases held input between loops, and continues. |

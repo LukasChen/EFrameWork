@@ -7,6 +7,7 @@ namespace EFramework.Editor.AILoop
         public bool Success { get; set; }
         public string Message { get; set; } = "";
         public string Path { get; set; } = "";
+        public string ReportPath { get; set; } = "";
         public long FileSizeBytes { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }

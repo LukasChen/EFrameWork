@@ -11,6 +11,7 @@ namespace EFramework.Editor.AILoop
         public bool Success { get; set; }
         public string Message { get; set; } = "";
         public string InputPath { get; set; } = "";
+        public string ReportPath { get; set; } = "";
         public int CurrentFrame { get; set; }
         public int TotalFrames { get; set; }
         public float Progress { get; set; }

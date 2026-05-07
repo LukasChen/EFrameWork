@@ -53,7 +53,9 @@ namespace EFramework.Editor.AILoop
                 };
             }
 
-            return SaveTexture(texture, ResolveOutputPath(options.OutputDirectory, options.WindowName));
+            EFrameScreenshotResult result = SaveTexture(texture, ResolveOutputPath(options.OutputDirectory, options.WindowName));
+            result.ReportPath = EFrameAiLoopReport.WriteScreenshotReport(result, $"EditorWindow 截图：{options.WindowName}");
+            return result;
         }
 
         private static async Task<EFrameScreenshotResult> CaptureGameRenderingAsync(
@@ -82,12 +84,14 @@ namespace EFramework.Editor.AILoop
                 if (options.ElementsOnly)
                 {
                     EFrameUiElementAnnotator.ConvertToTopLeftCoordinates(elements, GetGameViewHeight());
-                    return new EFrameScreenshotResult
+                    EFrameScreenshotResult elementsResult = new()
                     {
                         Success = true,
                         Message = $"Collected {elements.Count} interactive UI elements.",
                         Elements = elements
                     };
+                    elementsResult.ReportPath = EFrameAiLoopReport.WriteScreenshotReport(elementsResult, "Game View UI 元素报告");
+                    return elementsResult;
                 }
 
                 if (options.AnnotateElements)
@@ -113,12 +117,13 @@ namespace EFramework.Editor.AILoop
                     };
                 }
 
-                EFrameScreenshotResult result =
+                EFrameScreenshotResult screenshotResult =
                     SaveTexture(texture, ResolveOutputPath(options.OutputDirectory, "GameRendering"));
                 EFrameUiElementAnnotator.ConvertToTopLeftCoordinates(elements, GetGameViewHeight());
-                result.Elements = elements;
-                result.YOffset = yOffset;
-                return result;
+                screenshotResult.Elements = elements;
+                screenshotResult.YOffset = yOffset;
+                screenshotResult.ReportPath = EFrameAiLoopReport.WriteScreenshotReport(screenshotResult, "Game View 截图报告");
+                return screenshotResult;
             }
             finally
             {

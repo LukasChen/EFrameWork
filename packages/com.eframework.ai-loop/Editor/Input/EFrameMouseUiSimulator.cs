@@ -353,9 +353,12 @@ namespace EFramework.Editor.AILoop
                 }
             }
 
-            return best == null
-                ? null
-                : new RaycastResult { gameObject = best.gameObject, sortingOrder = bestSortingOrder };
+            if (best == null)
+            {
+                return null;
+            }
+
+            return new RaycastResult { gameObject = best.gameObject, sortingOrder = bestSortingOrder };
         }
 
         private static bool IsRaycastCandidate(Graphic graphic, Vector2 screenPosition, Camera camera)

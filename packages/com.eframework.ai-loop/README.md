@@ -9,6 +9,7 @@ This package currently provides:
 - PlayMode uGUI mouse event simulation through `EventSystem` / `ExecuteEvents`.
 - PlayMode keyboard simulation through Unity Input System state injection.
 - PlayMode keyboard and mouse input recording/replay through JSON recordings.
+- Markdown result reports under `.eframe/outputs/Reports` that embed screenshots and link JSON artifacts for AI/chat review.
 
 The package is intentionally separate from `com.eframework.core` so business runtime UI remains routed through `EFrame.UI` and `UIControllerBase<TView>`. These APIs are for editor automation, AI diagnostics, and PlayMode test harnesses.
 
@@ -29,6 +30,8 @@ await EFrameAiLoop.StartRecordingInputAsync();
 var saved = await EFrameAiLoop.StopRecordingInputAsync();
 await EFrameAiLoop.StartReplayInputAsync(saved.OutputPath);
 ```
+
+Successful screenshot, recording, and replay results expose `ReportPath`. Screenshot results also expose `Path`; recording and replay results expose `OutputPath` or `InputPath`. Agents should list these paths in chat, and can render screenshot artifacts directly when the returned file path is available.
 
 ## Notes
 

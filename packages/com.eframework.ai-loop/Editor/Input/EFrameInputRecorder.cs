@@ -125,7 +125,7 @@ namespace EFramework.Editor.AILoop
             string resolvedPath = EFrameInputRecordingFileStore.ResolveOutputPath(outputPath);
             EFrameInputRecordingFileStore.Save(data, resolvedPath);
 
-            return Task.FromResult(new EFrameRecordInputResult
+            EFrameRecordInputResult result = new()
             {
                 Success = true,
                 Message = $"Input recording saved: {resolvedPath}",
@@ -133,7 +133,9 @@ namespace EFramework.Editor.AILoop
                 TotalFrames = data.metadata.totalFrames,
                 DurationSeconds = data.metadata.durationSeconds,
                 EventCount = data.GetTotalEventCount()
-            });
+            };
+            result.ReportPath = EFrameAiLoopReport.WriteInputRecordingReport(result);
+            return Task.FromResult(result);
         }
 
         internal static void CancelActiveRecording()

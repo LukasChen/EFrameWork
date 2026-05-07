@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.51",
+    "version":  "0.4.52",
     "updatedAt":  "2026-05-07",
-    "notes":  "Document AI Loop as an optional extension-managed validation package.",
+    "notes":  "Document AI Loop Markdown reports and chat artifact output.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -46,17 +46,17 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ai-loop-validation/SKILL.md",
-                      "sha256":  "55c185ad9725d3a6b9b49d56a18a8829764d2cc74ec2e426a2e849790b870353"
+                      "sha256":  "5c2f7f4cfb629063b8b700500c7b7fa7d2a620cdf19119c8e80837ce4f6e2f96"
                   },
                   {
                       "path":  ".agents/skills/eframe-ai-loop-validation/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ai-loop-validation/SKILL.md",
-                      "sha256":  "55c185ad9725d3a6b9b49d56a18a8829764d2cc74ec2e426a2e849790b870353"
+                      "sha256":  "5c2f7f4cfb629063b8b700500c7b7fa7d2a620cdf19119c8e80837ce4f6e2f96"
                   },
                   {
                       "path":  ".claude/skills/eframe-ai-loop-validation/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ai-loop-validation/SKILL.md",
-                      "sha256":  "55c185ad9725d3a6b9b49d56a18a8829764d2cc74ec2e426a2e849790b870353"
+                      "sha256":  "5c2f7f4cfb629063b8b700500c7b7fa7d2a620cdf19119c8e80837ce4f6e2f96"
                   },
                   {
                       "path":  ".github/skills/eframe-data-table/references/data-table-checklist.md",
