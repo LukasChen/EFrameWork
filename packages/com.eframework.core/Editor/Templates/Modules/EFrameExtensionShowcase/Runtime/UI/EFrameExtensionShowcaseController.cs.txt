@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using GameApp.Modules.EFrameExtensionShowcase.Demos;
 using EFramework.Generated;
 using EFramework.Generated.UI;
@@ -13,7 +13,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
         private VirtualListShowcaseController m_virtualListController;
         public Action BackRequested { get; set; }
 
-        protected override string AssetPath => ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView;
+        protected override string AssetPath => ResPath.Modules.EFrameExtensionShowcase.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView;
 
         protected override void OnViewCreated()
         {
@@ -131,7 +131,6 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 
             HideVirtualListSample();
             m_virtualListController = new VirtualListShowcaseController();
-            m_virtualListController.BindContext(Context);
             m_virtualListController.Show(UILayer.QuiPopUp);
             SetDetail($"{demo.Title}\nPackage: {demo.PackageName}\nStatus: installed\nOpened popup window.");
         }

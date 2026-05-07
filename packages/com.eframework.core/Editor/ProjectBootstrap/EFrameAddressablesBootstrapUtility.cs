@@ -453,7 +453,6 @@ namespace EFramework.Editor.ProjectBootstrap
                 "Assets/App/Res/Audios",
                 "Assets/App/Res/Config",
                 "Assets/App/Res/Fonts",
-                "Assets/App/Res/FX",
                 "Assets/App/Res/Materials",
                 "Assets/App/Res/SceneAssets",
                 "Assets/App/Res/Shaders",
@@ -933,7 +932,7 @@ namespace EFramework.Editor.ProjectBootstrap
             var scope = segments[3];
             if (string.Equals(scope, "Res", StringComparison.OrdinalIgnoreCase))
             {
-                binding = new GroupBinding($"Module {moduleName} Assets Group", BuildRelativeAddress(assetPath, "Assets"));
+                binding = new GroupBinding($"Module {moduleName} Assets Group", BuildModuleResourceAddress(assetPath, moduleName));
                 return true;
             }
 
@@ -1044,7 +1043,8 @@ namespace EFramework.Editor.ProjectBootstrap
                 {
                     AppBootstrapRootPath,
                     "Assets/App/Res/Config",
-                    "Assets/App/Res/FX",
+                    "Assets/App/Res/SceneAssets/Common/FX",
+                    "Assets/App/Res/UI/Common/FX",
                     "Assets/App/Res/UI/Panels",
                     "Assets/App/Res/UI/Popups",
                     "Assets/App/Res/UI/Widgets",
@@ -1155,7 +1155,7 @@ namespace EFramework.Editor.ProjectBootstrap
             }
 
             var lookup = new Dictionary<string, string>(StringComparer.Ordinal);
-            AppendResPathLookup(lookup, root, "ResPath.Generated", null);
+            AppendResPathLookup(lookup, root, "ResPath", null);
             return lookup;
         }
 
@@ -1339,6 +1339,12 @@ namespace EFramework.Editor.ProjectBootstrap
             return relativePath.Replace('\\', '/');
         }
 
+        private static string BuildModuleResourceAddress(string assetPath, string moduleName)
+        {
+            var moduleResRoot = $"{ModulesRootPath}/{moduleName}/Res";
+            return $"Modules/{moduleName}/{BuildRelativeAddress(assetPath, moduleResRoot)}";
+        }
+
         private static void EnsureFolderExists(string assetPath)
         {
             if (AssetDatabase.IsValidFolder(assetPath))
@@ -1406,19 +1412,16 @@ namespace EFramework.Editor.ProjectBootstrap
             builder.AppendLine("{");
             builder.AppendLine("    public static partial class ResPath");
             builder.AppendLine("    {");
-            builder.AppendLine("        public static class Generated");
-            builder.AppendLine("        {");
 
             if (root.Children.Count == 0)
             {
-                builder.AppendLine("            // No managed Addressables entries were found.");
+                builder.AppendLine("        // No managed Addressables entries were found.");
             }
             else
             {
-                AppendNodeMembers(builder, root, 3);
+                AppendNodeMembers(builder, root, 2);
             }
 
-            builder.AppendLine("        }");
             builder.AppendLine("    }");
             builder.AppendLine("}");
             return builder.ToString();

@@ -1,4 +1,4 @@
-# EFrame AI API Index
+﻿# EFrame AI API Index
 
 This index is a compact map of stable EFrame APIs for business-project AI. Use it to choose framework entry points before generating or refactoring code. It is not a workflow checklist.
 
@@ -11,6 +11,7 @@ After AI sync, business projects receive this document at `.github/eframe/EFRAME
 | Access initialized framework services | `EFrame.UI`, `EFrame.Assets`, `EFrame.Data`, `EFrame.Events`, `EFrame.Audio` | `packages/com.eframework.core/Runtime/EFrame.cs` | Use only after `EFrame.Initialize(...)`; inside framework-aware types prefer injected `Context`. |
 | Read the full initialized service bundle | `EFrame.Current` | `packages/com.eframework.core/Runtime/EFrame.cs` | Use when a caller needs the whole `EFrameContext`. |
 | Read service bundle from injected code | `EFrameContext` | `packages/com.eframework.core/Runtime/EFrameContext.cs` | Owns common services, cameras, coroutine host, and FPS. |
+| Read framework/game time | `EFrame.Time` / `Context.Time` | `packages/com.eframework.core/Runtime/Time/ITimeService.cs` | Uses local time by default; configure server time URLs and call `SyncAsync()` only when a project needs network time. |
 | Receive context in framework-aware objects | `IEFrameContextAware.BindContext(...)` | `packages/com.eframework.core/Runtime/EFrameBehaviour.cs` | Avoid repeated global service lookup after context injection. |
 
 Avoid calling `EFrame.*` shortcuts from constructors or code that can run before initialization.
@@ -31,10 +32,10 @@ Avoid adding a new procedure for simple page, popup, or prompt changes.
 | Need | Use | Source | Note |
 | --- | --- | --- | --- |
 | Runtime asset service | `IAssetService` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Access through `Context.Assets` or `EFrame.Assets`. |
-| Use generated managed asset ids | `ResPath.Generated` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Use generated ids instead of handwritten Addressables strings in business runtime code. |
+| Use generated managed asset ids | `ResPath` | `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` | Use generated ids instead of handwritten Addressables strings in business runtime code. |
 | Procedure-owned preload scope | `IAssetPreloadScope` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Releases when the owning procedure leaves. |
 | Load an asset with explicit ownership | `LoadAsync<T>(assetId)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Dispose the returned `AssetHandle<T>` at the owner lifecycle boundary. |
-| Instantiate by generated id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use `ResPath.Generated` for managed resource ids. |
+| Instantiate by generated id | `Instantiate(assetId, parent)` / `InstantiateAsync(assetId, parent)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use `ResPath` for managed resource ids. |
 | Reuse pooled prefabs | `GetFromPool(...)` / `RecycleToPool(...)` | `packages/com.eframework.core/Runtime/Services/IAssetService.cs` | Use for repeated runtime objects after preload. |
 
 Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and passing `AssetReference` through business runtime logic.
@@ -43,8 +44,9 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 
 | Need | Use | Source | Note |
 | --- | --- | --- | --- |
-| Business UI entry | `EFrame.UI`, `UIControllerBase<TGeneratedView>` | `packages/com.eframework.core/Runtime/EFrame.cs`, `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Business code should write controllers and call `Show()` / `Hide()`. |
+| Business UI entry | `EFrame.UI`, `UIControllerBase<TGeneratedView>` | `packages/com.eframework.core/Runtime/EFrame.cs`, `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Business code should write controllers and call `Show()` / `Hide()`; controllers bind `EFrame.Current` by default. |
 | Access the live generated view | `CurrentView` | `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Use inside controllers instead of touching `UIViewHandle`. |
+| Sequential UI display | `EFrame.UI.Queue`, `UIControllerBase.EnqueueToShow(...)`, `EnqueueToShowAsync(...)` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/UIQueue.cs`, `packages/com.eframework.core/Runtime/UI/UIControllerBase.cs` | Use for popups, tutorials, rewards, or prompts that must display one after another and wait until each UI closes. Use `Pause()` before flow transitions when pending UI should be preserved. |
 | Generated View access class | UI Binding generated class under `EFramework.Generated.UI` | `packages/com.eframework.core/Editor/UI/UIAutoBindingEditor.cs`, `packages/com.eframework.core/Runtime/UI/BindingViewBase.cs` | Generated from prefab `QUIBinding`; normal business UI should not hand-write View wrappers. |
 | Prefab binding component | `QUIBinding` | `packages/com.eframework.core/Runtime/UI/QUIBinding.cs` | Holds binding/config data such as default layer, cache, and animation root. |
 | Advanced/internal UI host | `IUIService` / `QUI`, `UIViewHandle<TView>` | `packages/com.eframework.core/Runtime/Services/IUIService.cs`, `packages/com.eframework.core/Runtime/UI/QUI.cs`, `packages/com.eframework.core/Runtime/UI/Handles/UIViewHandle.cs` | Direct use is for framework internals, advanced managers, or lifecycle debugging. |
@@ -105,7 +107,7 @@ Keep framework-owned audio mixer config under `Assets/Resources/Audio`.
 | Install minimal startup skeleton | `Initialize / Repair Project` | `packages/com.eframework.core/Editor/Templates/Basic` | Installs the Basic template and syncs EFrame AI contracts; use the initialization window rather than manual template copying. |
 | Install optional extension packages | `Extensions` + `Apply` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameProjectInitializationWindow.cs` | Adds checked optional EFrame packages, resolves dependencies, and applies the DOTween Adapter checkbox. |
 | Install optional extension demos | `Install Showcase` | `packages/com.eframework.core/Editor/Templates/Modules/EFrameExtensionShowcase` | Adds the optional Showcase module and required extension packages. |
-| Addressables groups and ResPath generation | `EFrameAddressablesBootstrapUtility` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBootstrapUtility.cs` | Owns managed group sync and `ResPath.Generated`. |
+| Addressables groups and ResPath generation | `EFrameAddressablesBootstrapUtility` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBootstrapUtility.cs` | Owns managed group sync and `ResPath`. |
 | Managed resource report UI | `EFrameAddressablesReportWindow` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesReportWindow.cs` | Select generated ResPath directories and inspect managed resource issues. |
 | Build preflight | `EFrameAddressablesBuildPreprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAddressablesBuildPreprocessor.cs` | Fails player builds when managed Addressables or generated paths drift. |
 | Import/move/delete auto-sync | `EFrameAppResAddressablePostprocessor` | `packages/com.eframework.core/Editor/ProjectBootstrap/EFrameAppResAddressablePostprocessor.cs` | Keeps managed resource changes aligned after asset changes. |

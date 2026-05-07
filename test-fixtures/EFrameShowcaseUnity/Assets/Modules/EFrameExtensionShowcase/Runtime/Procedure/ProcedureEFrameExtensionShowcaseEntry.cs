@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using EFramework.Generated;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.Procedure;
@@ -14,7 +14,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Procedure
 
         protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
         {
-            await assets.PreloadAsync<GameObject>(ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView);
+            await assets.PreloadAsync<GameObject>(ResPath.Modules.EFrameExtensionShowcase.UI.Panels.EFrameExtensionShowcase.EFrameExtensionShowcaseView);
             await assets.PreloadAsync<GameObject>(VirtualListShowcaseWindow.AssetPath);
         }
 

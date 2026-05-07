@@ -3,6 +3,7 @@ using EFramework.Runtime.Asset;
 using EFramework.Runtime.Audio;
 using EFramework.Runtime.DataStorage;
 using EFramework.Runtime.Event;
+using EFramework.Runtime.Time;
 using EFramework.Runtime.UI;
 using UnityEngine;
 
@@ -19,7 +20,8 @@ namespace EFramework.Runtime
             IAudioService audio,
             IDataService data,
             IEventService events,
-            ICoroutineService coroutine)
+            ICoroutineService coroutine,
+            ITimeService time)
         {
             Component = component;
             Assets = assets;
@@ -28,6 +30,7 @@ namespace EFramework.Runtime
             Data = data;
             Events = events;
             Coroutine = coroutine;
+            Time = time;
         }
 
         public EFrameComponent Component { get; }
@@ -37,6 +40,7 @@ namespace EFramework.Runtime
         public IDataService Data { get; }
         public IEventService Events { get; }
         public ICoroutineService Coroutine { get; }
+        public ITimeService Time { get; }
 
         public Camera SceneCamera => Component != null ? Component.SceneCamera : null;
         public Camera UICamera => Component != null ? Component.UICamera : null;
@@ -66,6 +70,7 @@ namespace EFramework.Runtime
             Assets?.Dispose();
             Data?.Dispose();
             Coroutine?.Dispose();
+            Time?.Dispose();
             Events?.ClearAll();
         }
     }

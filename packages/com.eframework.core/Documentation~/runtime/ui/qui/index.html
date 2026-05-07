@@ -1,132 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / UI / QUI - EFrame Docs</title>
-    <link rel="stylesheet" href="../../../assets/style.css">
-    <script defer src="../../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / UI / QUI - EFrame 文档</title>
+  <link rel="stylesheet" href="../../../assets/style.css">
+  <script defer src="../../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / UI / QUI</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../../index.html">首页</a>
-                        <a href="../../../quickstart/index.html">快速开始</a>
-                        <a href="../../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>UI 子页</h2>
-                    <nav class="nav-links">
-                        <a href="../index.html">Runtime / UI</a>
-                        <a href="index.html">QUI</a>
-                        <a href="../binding-view/index.html">BindingViewBase</a>
-                        <a href="../view-handle/index.html">UIViewHandle</a>
-                        <a href="../controller/index.html">UIControllerBase</a>
-                        <a href="../lifecycle/index.html">Lifecycle</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>UI</span><span>QUI</span></div>
-                    <div class="eyebrow">UI Host</div>
-                    <h1>`QUI` 是 UI 宿主、缓存池、层级容器和过渡调度者，不只是一个 service 门面。</h1>
-                    <p class="lead">当 Controller 或 ViewHandle 说“打开一个 View”时，真正负责实例化 prefab、注入上下文、选择层级、播放过渡、回收缓存和维护场景相机绑定的，是 `QUI`。</p>
-                    <div class="meta-list">
-                        <div><dt>主要接口</dt><dd>`IUIService`</dd></div>
-                        <div><dt>典型实现</dt><dd>`QUI`</dd></div>
-                        <div><dt>相关类型</dt><dd>`QUIBinding` / `UILayer` / `EFrameSceneCamera`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / UI / QUI</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../../index.html">首页</a><a href="../../../quickstart/index.html">快速开始</a><a href="../../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../core/index.html">Core</a><a href="../../assets/index.html">Assets</a><a href="../index.html">UI</a><a href="../../data/index.html">Data</a><a href="../../audio/index.html">Audio</a><a href="../../events/index.html">Events</a><a href="../../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../../extensions/index.html">扩展包总览</a><a href="../../../extensions/ui-extras/index.html">UI Extras</a><a href="../../../extensions/effects/index.html">Effects</a><a href="../../../extensions/debug-console/index.html">Debug Console</a><a href="../../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../../examples/ui-page/index.html">UI 页面</a><a href="../../../examples/popup/index.html">Popup</a><a href="../../../examples/data-table/index.html">DataTable</a><a href="../../../examples/resource-preload/index.html">资源预加载</a><a href="../../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../../editor/bootstrap/index.html">Bootstrap</a><a href="../../../editor/ui-tools/index.html">UI 工具</a><a href="../../../editor/audio-tools/index.html">音频工具</a><a href="../../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../../index.html">文档</a></span><span>运行时</span><span>UI</span><span>QUI</span></div>
+          <div class="eyebrow">UI Detail</div>
+          <h1>UI / QUI</h1>
+          <p class="lead">UI 宿主、缓存池、层级容器和 transition 调度者。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Responsibilities</div><h2>它直接负责的四件事</h2></div></div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>实例创建</strong>
-                            <p>`CreateBinding()` 用 Addressables 实例化 prefab，注入 `EFrameContext`，并要求根节点必须带 `QUIBinding`。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>View 构造</strong>
-                            <p>`CreateView&lt;TView&gt;()` / `CreateViewHandle&lt;TView&gt;()` 负责把 binding 变成强类型 View 或 Handle。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>缓存复用</strong>
-                            <p>`TakeBindingFromCache()`、`RecycleBindingToCache()`、`ClearViewCache()` 管理同资源路径下的复用池。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>宿主环境</strong>
-                            <p>维护 `RootCanvas`、`UICamera`、`UILayer(...)`、过渡动画和 `EFrameSceneCamera` 绑定。</p>
-                        </div>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>职责</strong><p>UI 宿主、缓存池、层级容器和 transition 调度者。</p></div><div class="module-row"><strong>业务使用</strong><p>常规业务页面优先通过 <code>UIControllerBase&lt;TView&gt;</code> 间接使用。</p></div><div class="module-row"><strong>高级使用</strong><p>自定义宿主、transition、缓存或导航时才直接接触该层类型。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>QUI 使用位置</h3>
+    <ul><li>页面 prefab 先配置 <code>QUIBinding</code>。</li><li>Controller 通过 <code>CurrentView</code> 消费 View。</li><li>生命周期操作由 Controller/Handle 触发。</li></ul>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>关键 API</h2></div></div>
-                    <div class="panel">
-                        <h3>`CreateBinding(string assetPath, UILayer? layer = null)`</h3>
-                        <table>
-                            <thead><tr><th>参数</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`assetPath`</td><td>UI prefab 地址。推荐使用 `ResPath` 或生成常量。</td></tr>
-                                <tr><td>`layer`</td><td>可选父层级；不传时只创建 binding，后续由 View/Handle 挂到实际层级。</td></tr>
-                            </tbody>
-                        </table>
-                        <p>如果 prefab 根节点没有 `QUIBinding`，`QUI` 会立即释放实例并抛异常。这是框架用来约束 UI prefab 结构的硬边界。</p>
-                    </div>
-                    <div class="panel section">
-                        <h3>`CreateViewHandle&lt;TView&gt;(string assetPath, UILayer? layer = null)`</h3>
-                        <p>内部流程是：`CreateBinding` -> `CreateView&lt;TView&gt;` -> `new UIViewHandle&lt;TView&gt;(assetPath, view)`。也就是说，Handle 只是生命周期包装器，实例来源仍由 `QUI` 控制。</p>
-                    </div>
-                    <div class="panel section">
-                        <h3>缓存与释放</h3>
-                        <table>
-                            <thead><tr><th>方法</th><th>含义</th></tr></thead>
-                            <tbody>
-                                <tr><td>`ReleaseBinding(assetPath, binding, useCache)`</td><td>统一决定回收到缓存还是直接 `AssetManager.ReleaseInstance`。</td></tr>
-                                <tr><td>`ClearViewCache(assetPath = null)`</td><td>清空单个资源或全部缓存池。</td></tr>
-                                <tr><td>`MaxCachedViewsPerAsset`</td><td>单个资源路径的缓存上限，默认 8。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Camera & Layers</div><h2>层级和场景相机</h2></div></div>
-                    <div class="panel">
-                        <p>`UILayer` 决定 View 被挂到哪一层节点；`OpenBindingView()` 的职责就是把 View 挂到正确的层级 Transform。`RegisterSceneCamera()`、`UnregisterSceneCamera()`、`RefreshSceneCameraBindings()` 则把运行时场景相机接入 UI overlay 体系。</p>
-                        <p>这也是为什么框架明确要求承载 UI overlay 的运行时场景相机挂 `EFrameSceneCamera`，而不是在业务代码里手工拼 camera stack。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Boundary</div><h2>适合放在 `QUI` 的内容</h2></div></div>
-                    <div class="callout-grid">
-                        <div class="callout">
-                            <h3>应该放这里</h3>
-                            <p>实例创建、binding 释放、缓存池、层级容器、默认 transition 和场景相机桥接。</p>
-                        </div>
-                        <div class="callout">
-                            <h3>不该放这里</h3>
-                            <p>页面业务状态刷新、按钮响应、弹窗结果判断。这些仍然属于 Controller 或更上层业务流程。</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>CreateBinding(assetPath)</code></td><td>实例化 prefab 并注入 Context</td><td>根节点必须有 QUIBinding。</td></tr><tr><td><code>CreateViewHandle&lt;TView&gt;()</code></td><td>创建 View + Handle</td><td>业务通常不直接调用。</td></tr><tr><td><code>PushView/PopView</code></td><td>导航栈</td><td>handle-first。</td></tr><tr><td><code>RegisterSceneCamera</code></td><td>绑定 URP overlay UI camera</td><td>场景相机挂 EFrameSceneCamera。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EFramework.Runtime;
 using EFramework.Runtime.UI;
 using EFramework.Runtime.UI.Handles;
+using EFramework.Runtime.UI.Interactions;
 using EFramework.Runtime.UI.Transitions;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace EFramework.Runtime.UI
         float ScaleFactor { get; }
         int DesignWidth { get; }
         int DesignHeight { get; }
+        IUIQueue Queue { get; }
+        IUIDismissDispatcher Dismiss { get; }
         RectTransform UILayer(UILayer layer);
         void Init(Camera uiCamera, int designWidth, int designHeight, ScreenFitMode fitMode, bool enableScreenFitDebugLog = false);
         void RefreshScreenFit();

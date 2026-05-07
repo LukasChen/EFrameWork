@@ -63,7 +63,7 @@ Framework-created views, controllers, and `EFrameBehaviour` components receive t
 ```csharp
 public sealed class HomeController : UIControllerBase<HomeView>
 {
-    protected override string AssetPath => ResPath.Generated.UI.HomeView;
+    protected override string AssetPath => ResPath.UI.HomeView;
 
     protected override void OnViewOpened()
     {
@@ -81,7 +81,7 @@ Resources placed under the EFrame managed directories are synchronized automatic
 - `Assets/Modules/<ModuleName>/Res/...`
 - `Assets/Modules/<ModuleName>/Scenes/...`
 
-Do not manually maintain Addressables entries for those assets. EFrame editor automation owns the group, address, and `eframe-managed` label. `ResPath.Generated` is generated from the directory subtrees selected in the managed resource report window, so it can stay focused on code-driven load entry points instead of every dependency asset. Builds run a preflight sync/validation pass before the player is created.
+Do not manually maintain Addressables entries for those assets. EFrame editor automation owns the group, address, and `eframe-managed` label. `ResPath` is generated from the directory subtrees selected in the managed resource report window, so it can stay focused on code-driven load entry points instead of every dependency asset. Builds run a preflight sync/validation pass before the player is created.
 
 Use `EFrame Tools/Addressables/Sync Groups And Generate ResPath` to open the managed resource report window when you want to choose ResPath directories, inspect Addressables entries, generated ResPath members, sync status, and directory convention hints.
 

@@ -64,7 +64,7 @@
 
 - 初始化窗口能按目录创建默认 Addressables 组，并将 `Assets/App/Res`、`Assets/Scenes`、`Assets/Modules/*` 资源同步进对应组。
 - 初始化窗口或 Addressables 同步流程能按 ResPath 目录选择生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。
-- 托管资源目录导入、移动、删除后会自动同步 Addressables；Player Build 前会执行同步与校验；如果 `ResPath.Generated` 在构建前被刷新，构建会中止并提示等待 Unity 重新编译。
+- 托管资源目录导入、移动、删除后会自动同步 Addressables；Player Build 前会执行同步与校验；如果生成的 `ResPath` 在构建前被刷新，构建会中止并提示等待 Unity 重新编译。
 
 ### 3.5 Basic 与 Extension Showcase 模板
 

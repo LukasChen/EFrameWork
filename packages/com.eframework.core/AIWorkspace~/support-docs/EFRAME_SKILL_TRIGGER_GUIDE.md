@@ -1,4 +1,4 @@
-# EFrame Skill 触发指南
+﻿# EFrame Skill 触发指南
 
 当你希望业务项目 AI 加载某个 EFrame workflow skill 时，可以直接使用下面这些短语。短语只是便捷触发词；正常描述需求也仍然有效。
 
@@ -24,7 +24,7 @@
 | `设置数据` | `eframe-data-table` | 新增持久化选项/设置数据。 |
 | `玩家进度` | `eframe-data-table` | 新增持久化玩家进度数据。 |
 | `数据迁移` | `eframe-data-table` | 新增或审查数据 schema 版本迁移。 |
-| `资源接入` | `eframe-resource-flow` | 接入资源、Addressables 和生成的 `ResPath.Generated` id。 |
+| `资源接入` | `eframe-resource-flow` | 接入资源、Addressables 和生成的 `ResPath` id。 |
 | `资源加载` | `eframe-resource-flow` | 规划 load、preload、instantiate、pooling 和 release 归属。 |
 | `ResPath 接入` | `eframe-resource-flow` | 对齐运行时资源 id 和生成的 ResPath 流程。 |
 | `Addressables 接入` | `eframe-resource-flow` | 同步托管资源目录、组、地址和 label。 |

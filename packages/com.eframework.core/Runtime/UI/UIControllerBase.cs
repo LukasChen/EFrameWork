@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using EFramework.Runtime;
 using EFramework.Runtime.UI.Handles;
+using EFramework.Runtime.UI.Interactions;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,55 +9,6 @@ using UnityEngine.UI;
 
 namespace EFramework.Runtime.UI
 {
-    #region Queueable Task Wrapper
-
-    /// <summary>
-    /// UI 控制器的队列任务包装器
-    /// 将 UIControllerBase 包装为 IQueueableTask
-    /// </summary>
-    internal class UIControllerQueueableTask : IQueueableTask
-    {
-        private readonly UIControllerBase m_controller;
-        private readonly int m_priority;
-        private readonly UILayer? m_layer;
-        private readonly string m_taskName;
-        private UniTaskCompletionSource m_completionSource;
-
-        public int Priority => m_priority;
-        public string TaskName => m_taskName;
-
-        public UIControllerQueueableTask(UIControllerBase controller, int priority, UILayer? layer = null, string taskName = null)
-        {
-            m_controller = controller;
-            m_priority = priority;
-            m_layer = layer;
-            m_taskName = taskName ?? controller.GetType().Name;
-        }
-
-        public async UniTask ExecuteAsync()
-        {
-            m_completionSource = new UniTaskCompletionSource();
-
-            m_controller.OnClosed += OnControllerClosed;
-            try
-            {
-                await m_controller.ShowAsync(m_layer);
-                await m_completionSource.Task;
-            }
-            finally
-            {
-                m_controller.OnClosed -= OnControllerClosed;
-            }
-        }
-
-        private void OnControllerClosed()
-        {
-            m_completionSource?.TrySetResult();
-        }
-    }
-
-    #endregion
-
     /// <summary>
     /// UI 控制器基类
     /// - 管理 View 的生命周期
@@ -69,7 +21,20 @@ namespace EFramework.Runtime.UI
 
         private bool m_disposed = false;
         private bool m_initialized = false;
-        protected EFrameContext Context { get; private set; }
+        private readonly List<UIDismissScope> m_dismissScopes = new();
+        private EFrameContext m_context;
+        protected EFrameContext Context
+        {
+            get
+            {
+                if (m_context == null)
+                {
+                    BindContext(EFrame.Current);
+                }
+
+                return m_context;
+            }
+        }
 
         /// <summary>
         /// 控制器是否存活
@@ -162,30 +127,32 @@ namespace EFramework.Runtime.UI
         protected UIControllerBase()
         {
             RegisterInstance();
+            BindContext(EFrame.Current);
         }
 
         public void BindContext(EFrameContext context)
         {
-            if (context == null) return;
-            if (ReferenceEquals(Context, context)) return;
-            Context = context;
+            if (context == null)
+            {
+                throw new InvalidOperationException($"{GetType().Name} requires EFrame.Initialize() before using UIController context.");
+            }
+
+            if (ReferenceEquals(m_context, context)) return;
+            m_context = context;
             OnContextBound(context);
         }
 
         protected EFrameContext RequireContext()
         {
-            if (Context == null)
-            {
-                BindContext(EFrame.Current);
-            }
+            var context = Context;
 
-            if (Context == null)
+            if (context == null)
             {
                 throw new InvalidOperationException($"{GetType().Name} requires EFrame.Initialize() to complete before showing UI.");
             }
 
             EnsureInitialized();
-            return Context;
+            return context;
         }
 
         private void EnsureInitialized()
@@ -323,39 +290,51 @@ namespace EFramework.Runtime.UI
         #region Queue Support
 
         /// <summary>
-        /// 将此控制器包装为可排队任务
+        /// 将此控制器加入 UI 展示队列，按顺序显示，并等待关闭后继续下一个 UI。
         /// </summary>
         /// <param name="priority">优先级（数值越小越优先）</param>
         /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
-        /// <param name="taskName">任务名称（调试用，默认使用类名）</param>
-        /// <returns>可排队任务实例</returns>
-        public IQueueableTask ToQueueableTask(int priority = 0, UILayer? layer = null, string taskName = null)
+        /// <param name="name">任务名称（调试用）</param>
+        /// <returns>队列票据，可 await Completion 等待此 UI 关闭</returns>
+        public UIQueueTicket EnqueueToShow(int priority = 0, UILayer? layer = null, string name = null)
         {
-            return new UIControllerQueueableTask(this, priority, layer, taskName);
+            return RequireContext().UI.Queue.Enqueue(this, layer, priority, name);
         }
 
         /// <summary>
-        /// 将此控制器加入全局队列
+        /// 将此控制器加入 UI 展示队列，并等待其显示后关闭。
         /// </summary>
-        /// <param name="priority">优先级（数值越小越优先）</param>
-        /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
-        /// <param name="taskName">任务名称（调试用）</param>
-        public void EnqueueToShow(int priority = 0, UILayer? layer = null, string taskName = null)
+        public UniTask EnqueueToShowAsync(int priority = 0, UILayer? layer = null, string name = null)
         {
-            var task = ToQueueableTask(priority, layer, taskName);
-            TaskQueue.Enqueue(task);
+            return EnqueueToShow(priority, layer, name).Completion;
         }
 
-        /// <summary>
-        /// 将此控制器作为子任务加入队列
-        /// </summary>
-        /// <param name="blocking">是否阻塞主队列</param>
-        /// <param name="priority">优先级</param>
-        /// <param name="layer">UI 层级（null 表示使用 View 配置的默认层级）</param>
-        public void EnqueueAsChild(bool blocking = true, int priority = 0, UILayer? layer = null)
+        #endregion
+
+        #region Dismiss
+
+        protected UIDismissScope RegisterDismissScope(Action<UIDismissTrigger> onDismiss, params RectTransform[] insideAreas)
         {
-            var task = ToQueueableTask(priority, layer);
-            TaskQueue.EnqueueChild(task, blocking);
+            var scope = RequireContext().UI.Dismiss.Register(onDismiss, true, insideAreas);
+            m_dismissScopes.Add(scope);
+            return scope;
+        }
+
+        protected UIDismissScope RegisterDismissScope(IEnumerable<RectTransform> insideAreas, Action<UIDismissTrigger> onDismiss, bool ignoreCurrentFrame = true)
+        {
+            var scope = RequireContext().UI.Dismiss.Register(insideAreas, onDismiss, ignoreCurrentFrame);
+            m_dismissScopes.Add(scope);
+            return scope;
+        }
+
+        protected void ClearDismissScopes()
+        {
+            for (int i = m_dismissScopes.Count - 1; i >= 0; i--)
+            {
+                m_dismissScopes[i]?.Dispose();
+            }
+
+            m_dismissScopes.Clear();
         }
 
         #endregion
@@ -375,6 +354,7 @@ namespace EFramework.Runtime.UI
             {
                 if (disposing)
                 {
+                    ClearDismissScopes();
                     Hide();
                     OnDestroy();
                     UnregisterInstance();
@@ -503,6 +483,7 @@ namespace EFramework.Runtime.UI
                 if (wasShowing)
                 {
                     OnViewClosed();
+                    ClearDismissScopes();
                 }
 
                 if (willRelease)
@@ -542,6 +523,7 @@ namespace EFramework.Runtime.UI
                 if (wasShowing)
                 {
                     OnViewClosed();
+                    ClearDismissScopes();
                 }
 
                 if (willRelease)
@@ -605,6 +587,7 @@ namespace EFramework.Runtime.UI
                 if (wasShowing)
                 {
                     OnViewClosed();
+                    ClearDismissScopes();
                 }
 
                 OnViewDestroyed();

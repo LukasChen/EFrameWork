@@ -1,4 +1,4 @@
-# EFrame AI rule registry draft.
+﻿# EFrame AI rule registry draft.
 # Maintainer-only. Do not sync this file to business projects.
 
 schemaVersion: 0.1
@@ -533,7 +533,7 @@ rules:
     domain: resources
     layer: business-contract
     status: stable
-    canonicalText: Runtime resource IDs come from generated ResPath.Generated; do not scatter Addressables address strings or handwritten path centers.
+    canonicalText: Runtime resource IDs come from generated ResPath; do not scatter Addressables address strings or handwritten path centers.
     currentLocations:
       - packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md
       - packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md

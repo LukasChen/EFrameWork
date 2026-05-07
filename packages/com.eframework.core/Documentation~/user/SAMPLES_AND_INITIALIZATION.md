@@ -1,25 +1,25 @@
-# EFrame Samples And Initialization
+# EFrame 示例与初始化
 
-EFrame uses three layers:
+EFrame 使用三层结构：
 
-- Core: `com.eframework.core`, stable runtime/editor infrastructure and the minimal startup skeleton.
-- Extension: optional packages such as `com.eframework.ui-extras`, `com.eframework.effects`, `com.eframework.debug-console`, and `com.eframework.ai-loop`.
-- Samples: project skeletons or modules installed into a consuming Unity project when they are useful.
+- Core：`com.eframework.core`，稳定的 runtime/editor 基础设施和最小启动骨架。
+- Extension：可选 package，例如 `com.eframework.ui-extras`、`com.eframework.effects`、`com.eframework.debug-console` 和 `com.eframework.ai-loop`。
+- Samples：在有用时安装到消费端 Unity 项目的项目骨架或模块。
 
 ## Basic
 
-Basic is the core-owned minimal runnable project skeleton. It is the maintained version of the current initialization template and does not reference optional extension packages.
+Basic 是 Core 拥有的最小可运行项目骨架。它是当前初始化模板的维护版本，不引用可选 extension package。
 
-Install it from Unity:
+从 Unity 安装：
 
 ```text
 EFrame Tools/项目初始化向导
 -> Initialize / Repair Project
 ```
 
-The initializer copies the package Basic template, syncs the EFrame AI workspace for all supported clients, installs the project AI updater when available, and then repairs Addressables, UI sorting layers, audio, fallback tween readiness, and build settings.
+初始化器会复制 package Basic 模板，为所有受支持客户端同步 EFrame AI 工作区，在可用时安装项目 AI updater，然后修复 Addressables、UI sorting layers、音频、fallback tween 准备状态和 build settings。
 
-Basic creates or prepares:
+Basic 会创建或准备：
 
 - `Assets/Scenes/StartUp.unity`
 - `Assets/App/Runtime/Procedure/ProcedureLauncher.cs`
@@ -27,21 +27,21 @@ Basic creates or prepares:
 - `Assets/App/Runtime/UI/Views/HomeView.cs`
 - `Assets/App/Runtime/UI/Controllers/HomeViewController.cs`
 - `Assets/App/Res/UI/Panels/Home/HomeView.prefab`
-- Addressables groups and generated `ResPath`
-- UI sorting layers
-- basic audio resources and fallback tween backend readiness
+- Addressables groups 和生成的 `ResPath`
+- UI sorting layers 配置
+- 基础音频资源和 fallback tween 后端准备状态
 
-The editable Basic source is a full Unity fixture under `test-fixtures/EFrameBasicTemplate`; maintainers sync its `Assets` folder into `Editor/Templates/Basic` with `tools/Sync-EFrameBasicTemplate.ps1`.
+可编辑的 Basic 源是 `test-fixtures/EFrameBasicTemplate` 下的完整 Unity fixture；维护者通过 `tools/Sync-EFrameBasicTemplate.ps1` 将其 `Assets` 文件夹同步到 `Editor/Templates/Basic`。
 
-## Extension Showcase Module
+## Extension Showcase 模块
 
-Extension Showcase is an optional Project Module installed to:
+Extension Showcase 是可选 Project Module，安装到：
 
 ```text
 Assets/Modules/EFrameExtensionShowcase/
 ```
 
-Install it from Unity:
+从 Unity 安装：
 
 ```text
 EFrame Tools/项目初始化向导
@@ -49,16 +49,12 @@ EFrame Tools/项目初始化向导
 -> Showcase -> Install Showcase
 ```
 
-`Extensions` opens expanded and automatically scans the current project package state into the checkboxes for UI Extras, Effects, Debug Console, and AI Loop. `Select All` selects every extension package so a new project can install all extensions in one pass. `Apply` writes checked extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. Unchecking an already installed package does not remove it. The same list includes `DOTween Adapter`, which applies or removes the `EFRAME_USE_DOTWEEN` scripting define instead of adding a package dependency.
+`Extensions` 会展开并自动扫描当前项目 package 状态，写入 UI Extras、Effects、Debug Console 和 AI Loop 的复选框。`Select All` 会选择所有 extension package，便于新项目一次性安装全部 extensions。`Apply` 会把已勾选的 extension packages 写入 `Packages/manifest.json`；在本地框架 checkout 中使用同级 `file:` package 引用，当 Core 通过带 `?path=/packages/com.eframework.core` 的 git URL 安装时，会为每个选中的 extension package 推导匹配的 git dependency。取消勾选已安装 package 不会移除它。同一列表还包含 `DOTween Adapter`，它会应用或移除 `EFRAME_USE_DOTWEEN` scripting define，而不是添加 package dependency。
 
-`AI Loop` installs `com.eframework.ai-loop`, an editor-only PlayMode validation package for Game View screenshots, uGUI input simulation, keyboard simulation, and input record/replay. It is not part of the Basic startup skeleton and should be installed only when the project needs AI-assisted validation such as `UI 自动验收`, `截图验收`, or `录制回放验收`.
+`AI Loop` 安装 `com.eframework.ai-loop`，这是一个 editor-only PlayMode 验证 package，用于 Game View 截图、uGUI 输入模拟、键盘模拟和输入录制/回放。它不是 Basic 启动骨架的一部分，只应在项目需要 AI 辅助验证时安装，例如 `UI 自动验收`、`截图验收` 或 `录制回放验收`。
 
-`Install Showcase` first installs `com.eframework.ui-extras` and `com.eframework.debug-console`. If those packages were just added to the manifest or are still resolving, wait for Unity Package Manager import and script compilation to finish, then click `Install Showcase` again. Once the required packages are available, the action copies the module template when missing, repairs the installed virtual-list prefab script reference against the copied `VirtualListShowcaseWindow.cs.meta`, refreshes assets, syncs managed Addressables, and sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`. Rerunning `Install Showcase` on an existing module keeps local files in place and still performs the prefab script-reference repair.
+`Install Showcase` 会先安装 `com.eframework.ui-extras` 和 `com.eframework.debug-console`。如果这些 package 刚被加入 manifest 或仍在解析，请等待 Unity Package Manager 导入和脚本编译完成，然后再次点击 `Install Showcase`。当所需 package 可用后，该动作会在模块模板缺失时复制模板，使用复制出的 `VirtualListShowcaseWindow.cs.meta` 修复已安装 virtual-list prefab 的脚本引用，刷新 assets，同步托管 Addressables，并将 StartUp 入口设置为 `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`。在已有模块上重复运行 `Install Showcase` 会保留本地文件，同时仍执行 prefab 脚本引用修复。
 
-For framework template maintenance, open `test-fixtures/EFrameShowcaseUnity` directly in Unity and edit `Assets/Modules/EFrameExtensionShowcase/` there. Run `tools/Sync-EFrameShowcaseTemplate.ps1` before release to generate the package template; the script converts `.cs` to `.cs.txt` while preserving module resources and `.meta` files.
+维护框架模板时，直接用 Unity 打开 `test-fixtures/EFrameShowcaseUnity` 并编辑其中的 `Assets/Modules/EFrameExtensionShowcase/`。Release 前运行 `tools/Sync-EFrameShowcaseTemplate.ps1` 生成 package 模板；该脚本会把 `.cs` 转换为 `.cs.txt`，同时保留模块资源和 `.meta` 文件。
 
-The current showcase UI is backed by `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` and lists only UI Virtual List and Debug Console entries. UI Virtual List is provided by `com.eframework.ui-extras` and opens the module-owned `QVirtualListShowcaseWindow.prefab` sample window, covering variable-size lists, grids, scrolling, reload, refresh, pooling, and visible-range reporting. Debug Console opens the runtime console panel.
-
-## Simple Game Demo
-
-The Simple Game Demo is planned as a separate git repository. Do not add a full game demo to `com.eframework.core`.
+当前 showcase UI 由 `Assets/Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView.prefab` 支撑，并且只列出 UI Virtual List 和 Debug Console 入口。UI Virtual List 由 `com.eframework.ui-extras` 提供，会打开模块自有的 `QVirtualListShowcaseWindow.prefab` 示例窗口，覆盖可变尺寸列表、网格、滚动、重新加载、刷新、池化和可见范围报告。Debug Console 会打开运行时控制台面板。

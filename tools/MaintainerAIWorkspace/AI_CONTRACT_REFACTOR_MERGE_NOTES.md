@@ -1,4 +1,4 @@
-# EFrame AI 契约重构合并说明
+﻿# EFrame AI 契约重构合并说明
 
 这份文档用于合并 `codex/ai-contract-refactor-plan` 前的人工审查。它是 maintainer-only 文档，不同步到业务项目。
 
@@ -40,7 +40,7 @@
 - Unity YAML 编辑口径为业务 AI 优先直接编辑 YAML，Editor API 只作为异常 fallback。
 - UI 业务入口统一为 `EFrame.UI` + `UIControllerBase<TGeneratedView>`。
 - `QUI`、`IUIService`、`UIViewHandle` 明确不是普通业务入口。
-- `ResPath.Generated` 和托管 Addressables 边界保留为常驻高风险规则。
+- `ResPath` 和托管 Addressables 边界保留为常驻高风险规则。
 
 ## Maintainer-only 新增内容
 

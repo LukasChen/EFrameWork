@@ -1461,7 +1461,7 @@ namespace EFramework.Editor.ProjectBootstrap
                 return false;
             }
 
-            var procedureComponent = UnityEngine.Object.FindFirstObjectByType<EFrameProcedureComponent>();
+            var procedureComponent = UnityEngine.Object.FindAnyObjectByType<EFrameProcedureComponent>();
             if (procedureComponent == null)
             {
                 message = "StartUp scene does not contain an EFrameProcedureComponent on the Boot object.";

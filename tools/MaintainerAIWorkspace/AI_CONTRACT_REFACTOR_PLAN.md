@@ -1,4 +1,4 @@
-# EFrame AI Contract Refactor Plan
+﻿# EFrame AI Contract Refactor Plan
 
 This plan is maintainer-only. It does not sync to business projects and must not be added to the AI workspace manifest.
 
@@ -65,7 +65,7 @@ Deliverables:
   - `G*`: governance and sync boundaries.
   - `P*`: startup, procedure, context, lifecycle.
   - `U*`: UI business contract.
-  - `R*`: resources, Addressables, `ResPath.Generated`.
+  - `R*`: resources, Addressables, `ResPath`.
   - `D*`: directory ownership.
   - `T*`: data tables and events.
   - `E*`: editor tooling, Unity serialization, compile validation.

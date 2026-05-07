@@ -11,4 +11,4 @@ All notable changes to the `com.eframework.debug-console` Unity package are docu
 
 ### Changed
 
-- Replaced vendored Ingame Debug Console TextMeshPro UI fields, input fields, and prefab components with standard UGUI `Text` and `InputField` components.
+- Declared TextMeshPro as an external dependency supplied by `com.unity.ugui`; this package does not redistribute TextMeshPro plugin files.

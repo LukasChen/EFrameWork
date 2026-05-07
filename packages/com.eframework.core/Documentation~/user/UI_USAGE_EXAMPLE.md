@@ -1,4 +1,4 @@
-# EFrame UI 使用范例
+﻿# EFrame UI 使用范例
 
 这份范例演示如何在业务项目里接入一个首页和一个确认弹窗。使用者只需要按下面这条路径工作：
 
@@ -46,8 +46,8 @@ Assets/
 资源同步后，代码里使用生成路径：
 
 ```csharp
-ResPath.Generated.UI.Panels.Home.HomeView
-ResPath.Generated.UI.Popups.ConfirmExit.ConfirmExitPopup
+ResPath.UI.Panels.Home.HomeView
+ResPath.UI.Popups.ConfirmExit.ConfirmExitPopup
 ```
 
 不要在业务代码里散写 Addressables 字符串。
@@ -161,7 +161,7 @@ namespace Game.App.UI.Controllers
         public Action ShopRequested { get; set; }
         public Action ExitConfirmed { get; set; }
 
-        protected override string AssetPath => ResPath.Generated.UI.Panels.Home.HomeView;
+        protected override string AssetPath => ResPath.UI.Panels.Home.HomeView;
 
         protected override void OnViewCreated()
         {
@@ -240,10 +240,42 @@ namespace Game.App.UI.Controllers
 使用规则：
 
 - 用 `CurrentView` 访问绑定组件。
+- `UIControllerBase` 默认绑定当前框架上下文，普通业务代码创建 Controller 后直接 `Show()`，不需要手写 `BindContext(Context)`。
 - 在 `OnViewCreated()` 里绑定按钮。
 - 在 `OnViewOpened()` 里刷新每次打开都需要更新的数据。
 - 在 `OnViewClosed()` 里释放本次打开期间的订阅或异步任务。
 - 在 `OnViewDestroyed()` 里清理 Controller 持有的实例级引用。
+
+### 顺序展示多个 UI
+
+多个弹窗、引导、奖励提示需要依次展示时，不要在业务侧手写 bool 锁或递归回调链。Controller 可以直接进入 `EFrame.UI.Queue` 管理的 UI 展示队列；队列会自动启动，并在当前 UI 关闭后继续下一个。
+
+```csharp
+rewardPopup.EnqueueToShow(priority: 0, layer: UILayer.QuiPopUp);
+tutorialPopup.EnqueueToShow(priority: 10, layer: UILayer.QuiPopUp);
+```
+
+需要等待某一个 UI 展示完成时：
+
+```csharp
+await rewardPopup.EnqueueToShowAsync(priority: 0, layer: UILayer.QuiPopUp);
+```
+
+`EnqueueToShow(...)` 返回 `UIQueueTicket`，可用于检查状态或等待 `Completion`。数值更小的 priority 会更早执行；相同 priority 按入队顺序执行。
+
+流程切换时，如果希望保留剩余队列但暂时不要继续弹窗，暂停队列：
+
+```csharp
+EFrame.UI.Queue.Pause();
+```
+
+回到可以继续展示 UI 的流程后恢复：
+
+```csharp
+EFrame.UI.Queue.Resume();
+```
+
+`ClearPending()` 会丢弃尚未展示的 UI；`CancelCurrent()` 会关闭当前正在展示的队列 UI；`Reset()` 会取消当前项并清空等待队列。
 
 ## 6. 编写弹窗 Controller
 
@@ -264,7 +296,7 @@ namespace Game.App.UI.Controllers
 
     public sealed class ConfirmExitPopupController : UIPopupController<v_ConfirmExitPopup, ConfirmExitResult>
     {
-        protected override string AssetPath => ResPath.Generated.UI.Popups.ConfirmExit.ConfirmExitPopup;
+        protected override string AssetPath => ResPath.UI.Popups.ConfirmExit.ConfirmExitPopup;
 
         protected override void OnViewCreated()
         {
@@ -317,8 +349,8 @@ namespace Game.App.Procedure
 
         protected internal override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
         {
-            await assets.PreloadAsync<GameObject>(ResPath.Generated.UI.Panels.Home.HomeView);
-            await assets.PreloadAsync<GameObject>(ResPath.Generated.UI.Popups.ConfirmExit.ConfirmExitPopup);
+            await assets.PreloadAsync<GameObject>(ResPath.UI.Panels.Home.HomeView);
+            await assets.PreloadAsync<GameObject>(ResPath.UI.Popups.ConfirmExit.ConfirmExitPopup);
         }
 
         protected internal override void OnEnter(ProcedureEnterContext context)
@@ -372,6 +404,8 @@ var controller = new HomeViewController();
 controller.Show();
 ```
 
+显式 `BindContext(...)` 只用于测试、框架内部或需要覆盖特殊 `EFrameContext` 的高级场景。
+
 需要等待动画完成时：
 
 ```csharp
@@ -392,6 +426,6 @@ await controller.HideAsync();
 - 业务没有手写继承 `BindingViewBase` 的 View 类。
 - Controller 继承 `UIControllerBase<TGeneratedView>` 或 `UIPopupController<TGeneratedView, TResult>`。
 - Controller 通过 `CurrentView` 访问组件。
-- 资源路径使用 `ResPath.Generated`。
+- 资源路径使用 `ResPath`。
 - `Procedure` 退出时关闭或 `Dispose()` Controller。
 - 场景里没有手工创建绕过框架的常驻顶层 Canvas 或 EventSystem。

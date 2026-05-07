@@ -1,4 +1,4 @@
-# EFrame Unity 目录结构规范
+﻿# EFrame Unity 目录结构规范
 
 这份文档定义 EFrame 推荐的 Unity 项目基础目录结构，用于统一运行时代码、资源、编辑器工具、启动场景和业务模块的落点。
 
@@ -19,7 +19,6 @@ Assets/
 |  |  |- Audios/
 |  |  |- Config/
 |  |  |- Fonts/
-|  |  |- FX/
 |  |  |- Materials/
 |  |  |- SceneAssets/
 |  |  |- Shaders/
@@ -94,7 +93,7 @@ Assets/
 
 - 固定生成代码目录。
 - 生成物不要散落到业务手写目录。
-- Addressables 自动生成的 `ResPath.Generated.cs` 固定放在 `Assets/App/Runtime/Generated/Res/`，命名空间为 `EFramework.Generated`。
+- Addressables 自动生成的 `ResPath.cs` 固定放在 `Assets/App/Runtime/Generated/Res/`，命名空间为 `EFramework.Generated`。
 - App 级 UI binding 生成代码放在 `Assets/App/Runtime/Generated/UI/`；模块 UI binding 生成代码放在 `Assets/Modules/<Name>/Runtime/Generated/UI/`。
 
 `Assets/App/Runtime/Procedure`
@@ -177,6 +176,7 @@ Assets/App/Res/UI/Widgets/<WidgetName>/
 Assets/App/Res/UI/Common/
 |- Sprites/
 |- Atlases/
+|- FX/
 |- Fonts/
 |- Materials/
 |- Transitions/
@@ -189,6 +189,7 @@ UI 资源归属判断：
 - 只被一个复用组件使用：放 `Assets/App/Res/UI/Widgets/<WidgetName>/...`。
 - 被多个 UI 复用：放 `Assets/App/Res/UI/Common/...`。
 - UI 专用材质优先放 UI 目录内，不放到全局 `Assets/App/Res/Materials`。
+- UI 特效跟随 UI 页面、弹窗、Widget 或 `UI/Common/FX`。
 
 `Assets/App/Res/SceneAssets`
 
@@ -200,6 +201,7 @@ UI 资源归属判断：
 ```text
 Assets/App/Res/SceneAssets/<SceneName>/
 |- Prefabs/
+|- FX/
 |- Sprites/
 |- Textures/
 |- Materials/
@@ -208,6 +210,7 @@ Assets/App/Res/SceneAssets/<SceneName>/
 
 Assets/App/Res/SceneAssets/Common/
 |- Prefabs/
+|- FX/
 |- Textures/
 |- Materials/
 ```
@@ -216,7 +219,7 @@ Assets/App/Res/SceneAssets/Common/
 
 - `.unity` 场景文件本体：放 `Assets/Scenes/...`。
 - 某个场景专属图片、贴图、材质、灯光、配置：放 `Assets/App/Res/SceneAssets/<SceneName>/...`。
-- 多个场景复用的场景片段、贴图、材质：放 `Assets/App/Res/SceneAssets/Common/...`。
+- 多个场景复用的场景片段、特效、贴图、材质：放 `Assets/App/Res/SceneAssets/Common/...`。
 - 多个系统都复用、且不依附具体场景的材质：放 `Assets/App/Res/Materials/...`。
 
 `Assets/App/Res/Materials`
@@ -225,58 +228,13 @@ Assets/App/Res/SceneAssets/Common/
 - 不放某个 UI 页面专用材质；这类资源应跟随 UI 页面、弹窗、Widget 或 `UI/Common`。
 - 不放某个场景专用材质；这类资源应放 `Assets/App/Res/SceneAssets/<SceneName>/Materials`。
 
-`Assets/App/Res/FX`
-
-- 放主应用共享特效资源，不承担所有业务特效的集中收纳职责。
-- 特效应按“业务拥有者”和“复用范围”归属：模块私有特效放模块内，跨模块共享特效才上移到这里。
-- 一个特效通常是 Prefab、Materials、Textures、Shaders、Animations、VFXGraph 或粒子配置的组合，应以特效 Prefab 为中心组织私有依赖。
-- 推荐结构：
-
-```text
-Assets/App/Res/FX/
-|- Common/
-|  |- Materials/
-|  |- Textures/
-|  |- Shaders/
-|  |- Animations/
-|  |- Prefabs/
-|- UI/
-|  |- Common/
-|  |- Reward/
-|  |- Transition/
-|- Scene/
-|  |- Common/
-|  |- <SceneName>/
-|- Gameplay/
-|  |- Common/
-|  |- Skill/
-|  |- Hit/
-|  |- Projectile/
-|  |- Buff/
-```
-
-单个特效推荐结构：
-
-```text
-Assets/App/Res/FX/Gameplay/Skill/Fireball/
-|- Fireball.prefab
-|- Materials/
-|- Textures/
-|- Shaders/
-|- Animations/
-```
-
 FX 资源归属判断：
 
-- 只服务某个具体特效的材质、贴图、Shader、动画：跟随这个特效目录。
-- 多个特效复用、但仍属于特效体系的资源：放 `Assets/App/Res/FX/Common/...`。
-- 跨模块共享的 UI 特效：放 `Assets/App/Res/FX/UI/...`。
-- 跨模块共享的场景表现特效：放 `Assets/App/Res/FX/Scene/...`。
-- 跨模块共享的技能、受击、投射物、Buff 等玩法特效：放 `Assets/App/Res/FX/Gameplay/...`。
-- 某个模块私有特效：放 `Assets/Modules/<ModuleName>/Res/FX/...`。
+- UI 特效：跟随 UI 页面、弹窗、Widget，或放 `Assets/App/Res/UI/Common/FX/...`。
+- 场景或玩法表现特效：跟随具体场景放 `Assets/App/Res/SceneAssets/<SceneName>/FX/...`。
+- 跨场景复用的场景或玩法表现特效：放 `Assets/App/Res/SceneAssets/Common/FX/...`。
+- 某个模块私有特效：放 `Assets/Modules/<ModuleName>/Res/UI/.../FX` 或 `Assets/Modules/<ModuleName>/Res/SceneAssets/.../FX`。
 - 真正跨 UI、场景、FX、系统复用的材质或 Shader：放 `Assets/App/Res/Materials` 或 `Assets/App/Res/Shaders`。
-- 只属于某个 UI 页面或弹窗的动效资源，如果不需要作为独立 FX 复用，可以跟随 UI 放 `Assets/App/Res/UI/.../Animations` 或 `Transitions`。
-- 只属于某个场景的环境表现资源，如果不需要作为独立 FX 复用，可以跟随场景放 `Assets/App/Res/SceneAssets/<SceneName>/FX`。
 
 ## 6. 场景与设置
 
@@ -301,7 +259,6 @@ Assets/Modules/<Name>/
 |- Res/
 |  |- UI/
 |  |- SceneAssets/
-|  |- FX/
 |  |- ...
 |- Runtime/
 |  |- Common/
@@ -319,9 +276,9 @@ Basic 初始化不再生成示例模块；后续新模块按同样结构直接�
 - 只有跨模块共享的内容才回收到 `Assets/App/...`。
 - 如果模块还不成熟，也不要先扔到临时目录，优先在 `Assets/Modules/<Name>` 内演进。
 - 如果业务项目确实是多玩法合集，可以在项目自有 instruction 中把 `Modules` 进一步细化为 `MiniGames`，但框架层默认保持抽象命名。
-- 模块内资源可复用主应用的细分规则，例如 `Res/UI/Panels`、`Res/UI/Common`、`Res/SceneAssets/<SceneName>`、`Res/FX/Gameplay`。
+- 模块内资源可复用主应用的细分规则，例如 `Res/UI/Panels`、`Res/UI/Common`、`Res/SceneAssets/<SceneName>`。
 - 模块私有图片、材质、特效不要提前放入 `Assets/App/Res`；确认跨模块共享后再上移。
-- 模块私有 FX 以 `Assets/Modules/<Name>/Res/FX` 为入口，并按照 UI、Scene、Gameplay、Common 等复用范围继续细分。
+- 模块私有 FX 跟随模块内 UI 或 SceneAssets。
 
 ### EFrame Extension Showcase
 
@@ -350,7 +307,7 @@ Showcase 模块安装后会自动设置为 StartUp 入口，用于查看 UI Virt
 
 ResPath 约束：
 
-- 业务代码优先使用 `ResPath.Generated.*` 常量访问“代码主动加载”的 Addressables 地址。
+- 业务代码优先使用 `ResPath.*` 常量访问“代码主动加载”的 Addressables 地址。
 - 手写 `ResPath.cs` 负责稳定 API，不承担整表手工维护。
 - 详细规范见 [RESPATH_CONVENTION.md](RESPATH_CONVENTION.md)。
 
@@ -371,24 +328,24 @@ EFrame 的资源自动化建立在严格目录规范之上：资源放入约定�
 - `Assets/App/Res/SceneAssets/...` -> `App SceneAssets Group`，地址相对 `Assets/App/Res` 生成
 - `Assets/App/Res/...` -> `App Shared Group`，地址相对 `Assets/App/Res` 生成
 - `Assets/Scenes/...` -> `App Scenes Group`，地址相对 `Assets` 生成，例如 `Scenes/StartUp`
-- `Assets/Modules/<Name>/Res/...` -> `Module <Name> Assets Group`，地址相对 `Assets` 生成
+- `Assets/Modules/<Name>/Res/...` -> `Module <Name> Assets Group`，地址以 `Modules/<Name>/...` 生成，省略物理 `Res` 根
 - `Assets/Modules/<Name>/Scenes/...` -> `Module <Name> Scenes Group`，地址相对 `Assets` 生成
 
 生成物：
 
 - `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs` 由 Addressables 同步工具按“已选择的 ResPath 目录”生成，不要手动编辑，命名空间固定为 `EFramework.Generated`。
 - UI binding 生成物按 prefab 归属落在 `Assets/App/Runtime/Generated/UI/` 或 `Assets/Modules/<Name>/Runtime/Generated/UI/`，命名空间固定为 `EFramework.Generated.UI`。
-- 业务代码优先使用 `ResPath.Generated.*` 或 inspector-authored `AssetReference`，不要散写裸 Addressables 字符串。
-- `ResPath.Generated` 是代码加载入口清单，不是完整资源总账。只被 prefab、材质、配置或其他 asset 引用的依赖资源可以继续由 Addressables 作为依赖收集，不必生成 ResPath 常量。
+- 业务代码优先使用 `ResPath.*` 或 inspector-authored `AssetReference`，不要散写裸 Addressables 字符串。
+- `ResPath` 是代码加载入口清单，不是完整资源总账。只被 prefab、材质、配置或其他 asset 引用的依赖资源可以继续由 Addressables 作为依赖收集，不必生成 ResPath 常量。
 
 编辑器工具：
 
 - `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 打开托管资源窗口。
-- 窗口可以选择哪些目录根下的直接文件参与 `ResPath.Generated`；子目录不会继承父目录选择，需要单独勾选。窗口也可查看当前 Addressables entry、期望目录映射、生成地址和 ResPath 成员之间的对应关系。
+- 窗口可以选择哪些目录根下的直接文件参与 `ResPath`；子目录不会继承父目录选择，需要单独勾选。窗口也可查看当前 Addressables entry、期望目录映射、生成地址和 ResPath 成员之间的对应关系。
 - 窗口会标记 `Synced`、`Needs Sync`、`Stale` 项，并显示目录结构检查结果。
 - 导入、移动、删除托管目录资源时会自动同步；Player Build 前会执行同步与校验。
 
-目录规范和自动化必须一起维护：如果项目把资源放到约定目录之外，框架不会把它纳入自动 Addressables 管线；如果项目确实需要额外目录，应在项目自有 instruction 中声明差异，并补充等价的路径中心和同步规则。是否进入 `ResPath.Generated` 则由同步工具中的目录选择决定。
+目录规范和自动化必须一起维护：如果项目把资源放到约定目录之外，框架不会把它纳入自动 Addressables 管线；如果项目确实需要额外目录，应在项目自有 instruction 中声明差异，并补充等价的路径中心和同步规则。是否进入 `ResPath` 则由同步工具中的目录选择决定。
 
 ## 10. 禁止事项
 
@@ -397,8 +354,3 @@ EFrame 的资源自动化建立在严格目录规范之上：资源放入约定�
 - 不要把 UI 预制体、音频、配置资源散写到多个随机目录。
 - 不要把生成代码写进手写业务目录。
 - 不要把完整 Simple Game Demo 放进 core package；该方向后续作为独立仓库处理。
-## 11. 迁移原则
-
-- 如果项目仍处于过渡结构，新增功能优先收敛到上述标准目录。
-- 旧目录可以逐步迁移，但新代码不要继续扩散旧结构。
-- 项目若确有特殊目录约束，应写在项目自己的 `project-*.instructions.md` 中，只记录差异。

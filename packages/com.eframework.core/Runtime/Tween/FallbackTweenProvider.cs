@@ -242,8 +242,8 @@ namespace EFramework.Runtime.Tween
 
         private void Update()
         {
-            var deltaTime = Time.deltaTime;
-            var unscaledDeltaTime = Time.unscaledDeltaTime;
+            var deltaTime = UnityEngine.Time.deltaTime;
+            var unscaledDeltaTime = UnityEngine.Time.unscaledDeltaTime;
             for (var index = m_handles.Count - 1; index >= 0; index--)
             {
                 var handle = m_handles[index];

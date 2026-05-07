@@ -1,4 +1,4 @@
-# EFrame AI 规则按需加载模拟
+﻿# EFrame AI 规则按需加载模拟
 
 这份文档是维护者专用的模拟结果，用来验证 `rules/loading-policy.yaml` 是否能减少上下文过载和规则污染。
 
@@ -245,7 +245,7 @@
 
 - `E04` YAML-first：优先直接、局部、透明、可审查地编辑 Unity YAML
 - `U01/U02/U05`：业务 UI 入口、内部 UI 边界、`CurrentView`
-- `R01/R06`：需要资源路径时使用 `ResPath.Generated`，不手改托管 Addressables 条目
+- `R01/R06`：需要资源路径时使用 `ResPath`，不手改托管 Addressables 条目
 
 污染风险：低。资产编辑触发 always-on 后能拿到 YAML-first 和 fallback-only 口径；只有 UI/资源相关 skill 会按需进入。
 

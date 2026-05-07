@@ -6,6 +6,31 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.7.9] - 2026-05-08
+
+### Changed
+
+- Reorganized runtime helpers out of `Runtime/Utils` into explicit Time, Networking, Rendering, Math, Pooling, Algorithms, Extensions, and UI areas.
+- Added framework-level `EFrame.Time` / `Context.Time` service access backed by `GameTimeManager`.
+- Added the `UIDismiss` dispatcher/scope/trigger flow for outside-click and cancel-key dismissal handling.
+- Split UI helper APIs into `UIPositionUtils` and `UITransformUtils` under `Runtime/UI`.
+- Reworked the coroutine HTTP helper under `Runtime/Networking`, including safer request disposal, query building, timeout handling, and callback semantics.
+- Unified `RandomHelper` / `ListUtils` random source behavior under `Runtime/Math`.
+- Changed `UIControllerBase` to bind `EFrame.Current` by default so normal business controllers no longer need repeated `BindContext(Context)` calls, and updated synced AI/UI guidance to avoid recommending that pattern.
+- Generated resource constants now use `ResPath.*`; module resource addresses use `Modules/<Name>/...` while physical assets remain under `Assets/Modules/<Name>/Res/...`.
+- Simplified the standard FX directory guidance so UI effects live under `Res/UI/.../FX` and scene or gameplay effects live under `Res/SceneAssets/.../FX`.
+- Synchronized Basic template and fixture metadata after Unity validation.
+
+### Removed
+
+- Removed legacy utility classes that no longer belong in the framework surface: `QInput`, `PooledList`, `PriorityQueue`, `UIUtils`, `ActionQueue`, and `GameObjectExtends`.
+
+### Fixed
+
+- Fixed Unity compile errors from `Time` and `Math` namespace collisions after the runtime helper split.
+- Fixed the Effects package fly animation assembly after the `Runtime/Utils` namespace removal.
+- Fixed template sync boundaries so external TextMeshPro resources can remain in Unity fixtures without being copied into packaged EFrame templates.
+
 ## [0.7.8] - 2026-05-07
 
 ### Changed

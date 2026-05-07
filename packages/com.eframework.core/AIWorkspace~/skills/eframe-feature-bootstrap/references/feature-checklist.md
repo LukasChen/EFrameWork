@@ -1,4 +1,4 @@
-# EFrame Feature Checklist
+﻿# EFrame Feature Checklist
 
 ## 1. 决策
 
@@ -19,7 +19,7 @@
 - `ProcedureXxx`
 - `XxxViewController`
 - `XxxView.prefab`
-- `ResPath.Generated` 自动生成资源 id
+- `ResPath` 自动生成资源 id
 
 ## 4. 生命周期模板
 

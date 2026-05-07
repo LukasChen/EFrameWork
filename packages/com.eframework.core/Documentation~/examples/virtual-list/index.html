@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>示例 / 虚拟列表 - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>示例 / 虚拟列表</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../ui-page/index.html">UI 页面</a><a href="../popup/index.html">Popup</a><a href="../data-table/index.html">DataTable</a><a href="../resource-preload/index.html">资源预加载</a><a class="is-active" href="index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>示例</span><span>虚拟列表</span></div>
+          <div class="eyebrow">UI Extras Example</div>
+          <h1>虚拟列表示例</h1>
+          <p class="lead">虚拟列表把 item 创建限制在可见范围内。模板可以 inactive，adapter 只绑定当前 index 的数据。</p>
+
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>背包列表 adapter</h3>
+    <ul><li>安装 <code>com.eframework.ui-extras</code>。</li><li>Prefab 上配置 <code>QVirtualListView</code> 和 item template。</li><li>adapter 只负责 Count 和 BindItem。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">using EFramework.Extensions.UI.VirtualList;
+
+public sealed class InventoryAdapter : IQVirtualListAdapter
+{
+    public int Count =&gt; Items.Count;
+
+    public void BindItem(QVirtualListItem item, int index)
+    {
+        item.GetComponent&lt;InventoryItemView&gt;().SetData(Items[index]);
+    }
+}</code></pre></div>
+  </div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

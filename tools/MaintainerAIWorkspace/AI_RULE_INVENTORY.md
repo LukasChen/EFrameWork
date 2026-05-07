@@ -1,4 +1,4 @@
-# EFrame AI Rule Inventory
+﻿# EFrame AI Rule Inventory
 
 This inventory is maintainer-only. It records canonical ownership for EFrame AI rules so synced instructions, skills, support docs, and managed blocks can be maintained without duplicating contradictory text.
 
@@ -60,7 +60,7 @@ Normalization note: `U02` and audit wording should clearly distinguish framework
 
 | ID | Rule | Audience | Canonical Owner | Current Supporting Locations | Status |
 | --- | --- | --- | --- | --- | --- |
-| R01 | Runtime resource IDs come from generated `ResPath.Generated`; do not scatter Addressables address strings or handwritten path centers. | Business | `eframe-instructions.md` | API index, resource skill, managed blocks | canonical |
+| R01 | Runtime resource IDs come from generated `ResPath`; do not scatter Addressables address strings or handwritten path centers. | Business | `eframe-instructions.md` | API index, resource skill, managed blocks | canonical |
 | R02 | `AssetReference` is allowed for editor authoring fields, but runtime business logic should receive generated asset IDs. | Business | `eframe-resource-flow/SKILL.md` | instruction, resource checklist | canonical |
 | R03 | Procedure hot paths preload resources and instantiate/load through `Context.Assets` or framework asset services. | Business | `eframe-resource-flow/SKILL.md` | instruction, API index | canonical |
 | R04 | Asset handles and instances must have an owner-specific release path. | Business | `eframe-resource-flow/references/resource-checklist.md` | API index, resource skill | canonical |

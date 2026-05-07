@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>扩展包 / AI Loop - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>扩展包 / AI Loop</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../index.html">扩展包总览</a><a href="../ui-extras/index.html">UI Extras</a><a href="../effects/index.html">Effects</a><a href="../debug-console/index.html">Debug Console</a><a class="is-active" href="index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>扩展包</span><span>AI Loop</span></div>
+          <div class="eyebrow">Editor-only AI Validation</div>
+          <h1>AI Loop 扩展包</h1>
+          <p class="lead">AI Loop 是 Editor-only 工具包，用于 AI/测试流程产出截图、JSON artifact 和 Markdown report。</p>
+
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>截图与标注</strong><p>捕获 Game View / Editor Window，并可标注 EFrame UI 元素。</p></div><div class="module-row"><strong>输入模拟</strong><p>通过 uGUI ExecuteEvents 和 Input System 注入鼠标、键盘输入。</p></div><div class="module-row"><strong>录制回放</strong><p>将输入序列保存为 JSON，并在 PlayMode 中回放。</p></div><div class="module-row"><strong>报告产物</strong><p>输出 Markdown report、截图和 JSON artifact，便于 AI/测试审查。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>截图并点击 UI</h3>
+    <ul><li>进入 PlayMode 并确保 Game View 可渲染。</li><li>截图可选择标注可交互 UI。</li><li>鼠标模拟走 uGUI event handlers，不移动 OS cursor。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">using EFramework.Editor.AILoop;
+
+var shot = await EFrameAiLoop.CaptureGameViewAsync(new EFrameScreenshotOptions
+{
+    AnnotateElements = true
+});
+
+await EFrameAiLoop.ClickUiAsync(640, 360);</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>CaptureGameViewAsync(options)</code></td><td>Game View 截图和标注</td><td>结果含 <code>Path</code> / <code>ReportPath</code>。</td></tr><tr><td><code>ClickUiAsync(x, y)</code></td><td>uGUI 鼠标事件模拟</td><td>不移动 OS cursor。</td></tr><tr><td><code>PressKeyAsync(key, duration)</code></td><td>Input System 键盘模拟</td><td>不影响 legacy Input。</td></tr><tr><td><code>Start/StopRecordingInputAsync</code></td><td>录制 JSON 输入</td><td>可用于 replay。</td></tr><tr><td><code>StartReplayInputAsync(path)</code></td><td>回放输入</td><td>稳定性依赖场景和帧时序。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -6,40 +6,34 @@ namespace EFramework.Generated
 {
     public static partial class ResPath
     {
-        public static class Generated
+        public static class Modules
         {
-            public static class Modules
+            public static class EFrameExtensionShowcase
             {
-                public static class EFrameExtensionShowcase
+                public static class UI
                 {
-                    public static class Res
+                    public static class Panels
                     {
-                        public static class UI
+                        public static class EFrameExtensionShowcase
                         {
-                            public static class Panels
-                            {
-                                public static class EFrameExtensionShowcase
-                                {
-                                    public const string EFrameExtensionShowcaseView = "Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView";
-                                    public const string QVirtualListShowcaseWindow = "Modules/EFrameExtensionShowcase/Res/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow";
-                                }
-                            }
+                            public const string EFrameExtensionShowcaseView = "Modules/EFrameExtensionShowcase/UI/Panels/EFrameExtensionShowcase/EFrameExtensionShowcaseView";
+                            public const string QVirtualListShowcaseWindow = "Modules/EFrameExtensionShowcase/UI/Panels/EFrameExtensionShowcase/QVirtualListShowcaseWindow";
                         }
                     }
                 }
             }
-            public static class Scenes
+        }
+        public static class Scenes
+        {
+            public const string StartUp = "Scenes/StartUp";
+        }
+        public static class UI
+        {
+            public static class Panels
             {
-                public const string StartUp = "Scenes/StartUp";
-            }
-            public static class UI
-            {
-                public static class Panels
+                public static class Home
                 {
-                    public static class Home
-                    {
-                        public const string HomeView = "UI/Panels/Home/HomeView";
-                    }
+                    public const string HomeView = "UI/Panels/Home/HomeView";
                 }
             }
         }

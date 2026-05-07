@@ -1,4 +1,4 @@
-# EFrame AI 规则可视化审查
+﻿# EFrame AI 规则可视化审查
 
 这份文档是维护者专用的审查入口，用来在修改同步 AI 文件前，先用图形方式检查规则信息架构。
 
@@ -50,7 +50,7 @@ mindmap
       U05 CurrentView
       U06 Prefab-first 静态 UI
     R 资源
-      R01 ResPath.Generated
+      R01 ResPath
       R04 Handle 释放
       R06 托管 Addressables
       R08 构建预检
