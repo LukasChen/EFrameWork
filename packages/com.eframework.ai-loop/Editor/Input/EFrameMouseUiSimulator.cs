@@ -322,7 +322,7 @@ namespace EFramework.Editor.AILoop
             Graphic best = null;
             int bestSortingOrder = int.MinValue;
             int bestDepth = int.MinValue;
-            Canvas[] canvases = UnityEngine.Object.FindObjectsByType<Canvas>();
+            Canvas[] canvases = FindObjectsByTypeCompat<Canvas>();
 
             foreach (Canvas canvas in canvases)
             {
@@ -368,6 +368,15 @@ namespace EFramework.Editor.AILoop
                    !graphic.canvasRenderer.cull &&
                    RectTransformUtility.RectangleContainsScreenPoint(graphic.rectTransform, screenPosition, camera) &&
                    graphic.Raycast(screenPosition, camera);
+        }
+
+        private static T[] FindObjectsByTypeCompat<T>() where T : UnityEngine.Object
+        {
+#if UNITY_6000_0_OR_NEWER
+            return UnityEngine.Object.FindObjectsByType<T>();
+#else
+            return UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.None);
+#endif
         }
 
         private static EFrameMouseUiResult Fail(string message)

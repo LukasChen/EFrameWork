@@ -29,7 +29,7 @@ namespace EFramework.Editor.AILoop
                 TryAddElement(elements, selectable.gameObject, ClassifySelectable(selectable));
             }
 
-            MonoBehaviour[] behaviours = Object.FindObjectsByType<MonoBehaviour>();
+            MonoBehaviour[] behaviours = FindObjectsByTypeCompat<MonoBehaviour>();
             foreach (MonoBehaviour behaviour in behaviours)
             {
                 if (behaviour == null || !behaviour.isActiveAndEnabled || processed.Contains(behaviour.gameObject))
@@ -169,6 +169,15 @@ namespace EFramework.Editor.AILoop
 
             GameObject hit = RaycastResults[0].gameObject;
             return hit == target || hit.transform.IsChildOf(target.transform) || target.transform.IsChildOf(hit.transform);
+        }
+
+        private static T[] FindObjectsByTypeCompat<T>() where T : Object
+        {
+#if UNITY_6000_0_OR_NEWER
+            return Object.FindObjectsByType<T>();
+#else
+            return Object.FindObjectsByType<T>(FindObjectsSortMode.None);
+#endif
         }
 
         private static void CreateAnnotation(
