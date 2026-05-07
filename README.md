@@ -2,7 +2,9 @@
 
 中文 | [English](README.en.md)
 
-EFrame 是一个轻量级 Unity 游戏框架，同时内置可同步的 AI 协作层。它把运行时代码、编辑器工具、项目初始化模板、AI instruction/skill、同步脚本和维护检查放在同一个发布面里，目标是让新业务项目既能快速得到标准 Unity 工程结构，也能得到匹配 EFrame 约定的 AI 编码指导。
+EFrame 是一个轻量级 Unity 游戏框架，为业务项目提供标准启动模板、运行时基础设施、编辑器初始化工具和可同步的 AI 协作层。
+
+框架维护流程见 [README.maintainer.md](README.maintainer.md)。
 
 当前框架版本以 [packages/com.eframework.core/package.json](packages/com.eframework.core/package.json) 为准。
 
@@ -35,29 +37,31 @@ EFrame Tools/项目初始化向导
 .\tools\Initialize-EFrameColdStart.ps1 -TargetRoot "D:\YourUnityProject" -Force -IncludeAIWorkspace -AIClients all
 ```
 
-只同步或检查 AI workspace：
-
-```powershell
-.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -StatusOnly
-.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
-```
-
-package-only 消费者可从已安装 package 根目录运行等价脚本：
+仅通过 package 接入时，可从已安装 package 根目录运行等价脚本：
 
 ```powershell
 .\Packages\com.eframework.core\Tools~\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
 ```
 
+同步完成后，可以在 Codex、GitHub Copilot 或 Claude Code 中直接用业务需求触发 EFrame AI workflow。AI 会从项目入口的 EFrame managed block 进入 `eframe-*` instruction、skill 和 API index，再按框架约定修改代码或给出审查结果。
+
+常用提示词示例：
+
+- `做一个 EFrame Settings 弹窗。`
+  执行效果：生成弹窗 View、Controller 和绑定代码，并按 `QUI` 生命周期打开关闭。
+- `接入 PlayerProfile 数据表。`
+  执行效果：生成数据表接入代码，加载、变更标记和保存流程按 EFrame 约定处理。
+- `把头像改成 EFrame 托管资源，用 ResPath 加载。`
+  执行效果：整理资源目录、提示同步 Addressables / `ResPath.Generated`，并改为生成入口加载。
+- `做一次 EFrame 规范审查。`
+  执行效果：审查 UI、资源、数据表和 AI 同步常见问题，并给出需要修改的位置。
+
 ## 仓库结构
 
 - [packages/com.eframework.core](packages/com.eframework.core)：Core runtime/editor package，包含 `EFrame`、`Procedure`、`QUI`、UI controller/handle、资源、音频、数据、事件和项目初始化工具。
-- [packages/com.eframework.core/AIWorkspace~](packages/com.eframework.core/AIWorkspace~)：随 package 发布的 AI 协作源，包含 `eframe-*` instructions/skills、managed blocks、manifest 和 AI 支持文档。
 - [packages/com.eframework.core/Tools~](packages/com.eframework.core/Tools~)：随 package 发布的项目初始化、AI 同步和健康检查脚本。
-- [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~)：给人看的用户文档、维护者文档和 HTML 文档站点。
+- [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~)：给人看的使用文档、维护文档和 HTML 文档站点。
 - [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop)、[packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list)、[packages/com.eframework.ui-extras](packages/com.eframework.ui-extras)、[packages/com.eframework.effects](packages/com.eframework.effects)、[packages/com.eframework.debug-console](packages/com.eframework.debug-console)：可选扩展 package。
-- [test-fixtures](test-fixtures)：用于 Basic 模板、Showcase 模块和 package 消费路径验证的 Unity fixture。
-- [tools](tools)：框架仓库维护脚本和 package 脚本包装器。业务项目优先使用 package 内的 `Tools~/`。
-- [AGENTS.md](AGENTS.md)、[CLAUDE.md](CLAUDE.md)、[.github/copilot-instructions.md](.github/copilot-instructions.md)：框架仓库内 AI 客户端入口，只做分流，不复制业务规则全文。
 
 ## Core 能力
 
@@ -99,7 +103,7 @@ EFrame 将以下目录视为框架托管资源目录：
 EFrame Tools/Addressables/Sync Groups And Generate ResPath
 ```
 
-## Basic 与 Showcase
+## Basic 与可选 Showcase
 
 Basic 是 Core 维护的最小可运行项目模板，会创建或修复：
 
@@ -110,29 +114,18 @@ Basic 是 Core 维护的最小可运行项目模板，会创建或修复：
 - Addressables groups 和 `ResPath.Generated`
 - UI sorting layers、基础音频资源和 fallback tween 准备状态
 
-维护 Basic 模板时，编辑 [test-fixtures/EFrameBasicTemplate](test-fixtures/EFrameBasicTemplate)，再同步回 package template：
-
-```powershell
-.\tools\Sync-EFrameBasicTemplate.ps1
-.\tools\Sync-EFrameBasicTemplate.ps1 -CheckOnly
-```
-
-Extension Showcase 是可选业务模块，安装到 `Assets/Modules/EFrameExtensionShowcase/`，用于演示 UI Virtual List 和 Debug Console。维护 Showcase 时编辑 [test-fixtures/EFrameShowcaseUnity](test-fixtures/EFrameShowcaseUnity)，再同步回 package template：
-
-```powershell
-.\tools\Sync-EFrameShowcaseTemplate.ps1
-.\tools\Sync-EFrameShowcaseTemplate.ps1 -CheckOnly
-```
+Extension Showcase 是可选业务模块，安装到 `Assets/Modules/EFrameExtensionShowcase/`，用于演示 UI Virtual List 和 Debug Console。
 
 ## AI 协作层
 
-EFrame 的 AI 协作层是框架发布契约的一部分，不是额外文档包。
+EFrame 的 AI 协作层会把框架约定同步到业务项目的 AI 客户端入口，让 Codex、GitHub Copilot、Claude Code 获得一致的 EFrame 编码指导。
 
-- 业务项目同步源位于 [packages/com.eframework.core/AIWorkspace~](packages/com.eframework.core/AIWorkspace~)。
-- 同步到业务项目的框架托管文件使用 `eframe-*` 前缀。
-- Codex、GitHub Copilot、Claude Code 的项目入口文件由业务项目拥有；EFrame 只更新入口文件中的 EFrame managed block。
-- AI-facing 支持文档位于 `AIWorkspace~/support-docs/`，当前 API 索引为 [EFRAME_AI_API_INDEX.md](packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md)。
-- 框架维护专用规则位于 [tools/MaintainerAIWorkspace](tools/MaintainerAIWorkspace)，不会同步到业务项目。
+只同步或检查 AI workspace：
+
+```powershell
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -StatusOnly
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
+```
 
 安装项目侧 updater：
 
@@ -145,12 +138,6 @@ EFrame 的 AI 协作层是框架发布契约的一部分，不是额外文档包
 ```powershell
 .\tools\Sync-EFrameAIFromFramework.ps1 -Clients all -StatusOnly
 .\tools\Sync-EFrameAIFromFramework.ps1 -Clients all -Force
-```
-
-检查已同步项目：
-
-```powershell
-.\tools\Test-EFrameAIProject.ps1 -TargetRoot "D:\YourUnityProject" -FrameworkRoot "."
 ```
 
 ## 依赖与扩展
@@ -178,32 +165,13 @@ EFrame Tools/项目初始化向导
 
 启用 adapter 会添加 `EFRAME_USE_DOTWEEN` scripting define，并创建或打开 `Assets/Resources/DOTweenSettings.asset`。移除 DOTween 前先禁用 adapter。
 
-## 维护检查
-
-发布前至少运行：
-
-```powershell
-.\tools\Test-EFrameAIRelease.ps1
-```
-
-涉及 Basic、Showcase、AI 同步、资源目录、启动流程、UI runtime contract 或 manifest 的变更，还应按影响面运行对应同步脚本和项目检查。
-
-AI release 与 manifest 规则见 [tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md](tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md)。
-
 ## 文档入口
 
-- 用户文档：[packages/com.eframework.core/Documentation~/user](packages/com.eframework.core/Documentation~/user)
+- 使用文档：[packages/com.eframework.core/Documentation~/user](packages/com.eframework.core/Documentation~/user)
 - UI 框架指南：[UI_FRAMEWORK_GUIDE.md](packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md)
 - 目录结构约定：[UNITY_DIRECTORY_STRUCTURE.md](packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md)
 - 样例与初始化：[SAMPLES_AND_INITIALIZATION.md](packages/com.eframework.core/Documentation~/user/SAMPLES_AND_INITIALIZATION.md)
 - 资源路径约定：[RESPATH_CONVENTION.md](packages/com.eframework.core/Documentation~/user/RESPATH_CONVENTION.md)
-- AI 架构说明：[EFRAME_AI_ARCHITECTURE.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md)
-- AI setup 说明：[EFRAME_AI_SETUP.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md)
 - API HTML 索引：[Documentation~/api/index.html](packages/com.eframework.core/Documentation~/api/index.html)
 - 文档站点入口：[Documentation~/index.html](packages/com.eframework.core/Documentation~/index.html)
-
-## 版本规则
-
-EFrame 使用语义化版本。正式起始版本为 `0.1.0`，当前发布版本记录在 [packages/com.eframework.core/package.json](packages/com.eframework.core/package.json)，仓库级发布记录在 [CHANGELOG.md](CHANGELOG.md)。
-
-Unity code、AI collaboration rules、bootstrap tools、sync scripts 和 docs 视为同一个 EFrame release surface。`AIWorkspace~/eframe-ai.manifest.json` 只是业务项目检测同步文件漂移的内部标记，不是单独产品版本。
+- 维护者入口：[README.maintainer.md](README.maintainer.md)

@@ -7,9 +7,11 @@
 | `UI 自动验收` | `eframe-ai-loop-validation` | 通过 AI Loop 输入模拟做 PlayMode UI smoke 验收。 |
 | `截图验收` | `eframe-ai-loop-validation` | 做 Game View 截图、UI 标注元素检查和坐标验证。 |
 | `录制回放验收` | `eframe-ai-loop-validation` | 验证输入录制、回放和回放停止后的状态清理。 |
+| `录制并回放` | `eframe-ai-loop-validation` | 录制一段输入流程并在稳定 PlayMode 状态下回放验证。 |
 | `UI 接入` | `eframe-ui-feature` | 接入或调整 EFrame 页面、弹窗、View、Controller、绑定和 UI 层级。 |
 | `页面接入` | `eframe-ui-feature` | 新增或重构页面/Panel 流程。 |
 | `弹窗接入` | `eframe-ui-feature` | 新增或重构弹窗流程。 |
+| `主界面入口` | `eframe-ui-feature` | 在主界面、首页或已有页面中新增入口按钮、入口卡片或跳转 UI。 |
 | `UI 重构` | `eframe-ui-feature` | 重构 UI prefab、Controller、生成 View 使用方式或生命周期绑定。 |
 | `UI 规范` | `eframe-ui-feature` | 检查 UI 层级、Controller、绑定、prefab 和生命周期规则。 |
 | `功能接入` | `eframe-feature-bootstrap` | 协调跨 Procedure、UI、数据、资源或模块的功能接入。 |
@@ -34,6 +36,7 @@
 | `资源放哪` | `eframe-directory-structure` | 在 Addressables 工作前先判断资源 owner 和目录。 |
 | `规范审查` | `eframe-guideline-audit` | 审查已实现改动是否符合 EFrame 规范。 |
 | `EFrame 审查` | `eframe-guideline-audit` | 审查 runtime、UI、资源、数据、目录或 AI 同步使用方式。 |
+| `EFrame 约定检查` | `eframe-guideline-audit` | 检查当前分支或改动是否符合 EFrame 约定。 |
 | `接入审查` | `eframe-guideline-audit` | 审查新功能接入是否符合 EFrame 边界。 |
 | `合规检查` | `eframe-guideline-audit` | 检查规范违规和缺失验证。 |
 | `改动体检` | `eframe-guideline-audit` | 汇总本地改动集的风险。 |

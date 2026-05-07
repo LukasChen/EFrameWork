@@ -2,7 +2,9 @@
 
 [中文](README.md) | English
 
-EFrame is a lightweight Unity game framework with a synchronized AI collaboration layer. It keeps runtime code, editor tooling, project initialization templates, AI instructions and skills, sync scripts, and maintenance checks in one release surface so new business projects can start with both a standard Unity project structure and AI coding guidance that matches EFrame conventions.
+EFrame is a lightweight Unity game framework that provides business projects with a standard startup template, runtime infrastructure, editor initialization tooling, and a synchronized AI collaboration layer.
+
+Framework maintenance flow: [README.maintainer.en.md](README.maintainer.en.md).
 
 The current framework version is defined in [packages/com.eframework.core/package.json](packages/com.eframework.core/package.json).
 
@@ -35,29 +37,31 @@ Command-line cold start creates the directory scaffold and Basic template by def
 .\tools\Initialize-EFrameColdStart.ps1 -TargetRoot "D:\YourUnityProject" -Force -IncludeAIWorkspace -AIClients all
 ```
 
-To check or sync only the AI workspace:
-
-```powershell
-.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -StatusOnly
-.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
-```
-
-Package-only consumers can run the equivalent script from the installed package root:
+When using only the installed package, run the equivalent script from the package root:
 
 ```powershell
 .\Packages\com.eframework.core\Tools~\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
 ```
 
+After sync, Codex, GitHub Copilot, and Claude Code can trigger EFrame AI workflows directly from business requests. The AI follows the EFrame managed block into the synced `eframe-*` instructions, skills, and API index, then edits code or reports review findings according to framework conventions.
+
+Example prompts:
+
+- `Build an EFrame Settings popup.`
+  Result: the AI creates the popup View, Controller, and binding code, then wires open and close through the `QUI` lifecycle.
+- `Add a PlayerProfile data table.`
+  Result: the AI creates the table integration, with load, change tracking, and save flow handled by EFrame conventions.
+- `Make the avatar an EFrame-managed resource and load it through ResPath.`
+  Result: the AI places the asset, prompts Addressables / `ResPath.Generated` sync, and switches code to the generated load entry.
+- `Run an EFrame guideline audit.`
+  Result: the AI checks common UI, resource, data table, and AI sync issues, then points to the needed fixes.
+
 ## Repository Structure
 
 - [packages/com.eframework.core](packages/com.eframework.core): Core runtime/editor package, including `EFrame`, `Procedure`, `QUI`, UI controllers and handles, assets, audio, data, events, and project initialization tooling.
-- [packages/com.eframework.core/AIWorkspace~](packages/com.eframework.core/AIWorkspace~): Package-shipped AI collaboration source, including `eframe-*` instructions and skills, managed blocks, manifest, and AI support docs.
 - [packages/com.eframework.core/Tools~](packages/com.eframework.core/Tools~): Package-shipped project initialization, AI sync, and health check scripts.
-- [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~): Human-facing user docs, maintainer docs, and HTML docs site.
+- [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~): Human-facing usage docs, maintainer docs, and HTML docs site.
 - [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop), [packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list), [packages/com.eframework.ui-extras](packages/com.eframework.ui-extras), [packages/com.eframework.effects](packages/com.eframework.effects), [packages/com.eframework.debug-console](packages/com.eframework.debug-console): Optional extension packages.
-- [test-fixtures](test-fixtures): Unity fixtures used to validate the Basic template, Showcase module, and package consumer paths.
-- [tools](tools): Framework repository maintenance scripts and wrappers around package scripts. Business projects should prefer package-local `Tools~/`.
-- [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [.github/copilot-instructions.md](.github/copilot-instructions.md): AI client entries for this framework repository. They only route to the right contracts and do not duplicate business rules.
 
 ## Core Capabilities
 
@@ -99,7 +103,7 @@ Open this menu for manual resource checks or repair:
 EFrame Tools/Addressables/Sync Groups And Generate ResPath
 ```
 
-## Basic And Showcase
+## Basic And Optional Showcase
 
 Basic is the Core-owned minimal runnable project template. It creates or repairs:
 
@@ -110,29 +114,18 @@ Basic is the Core-owned minimal runnable project template. It creates or repairs
 - Addressables groups and `ResPath.Generated`
 - UI sorting layers, basic audio resources, and fallback tween readiness
 
-To maintain the Basic template, edit [test-fixtures/EFrameBasicTemplate](test-fixtures/EFrameBasicTemplate), then sync it back into the package template:
-
-```powershell
-.\tools\Sync-EFrameBasicTemplate.ps1
-.\tools\Sync-EFrameBasicTemplate.ps1 -CheckOnly
-```
-
-Extension Showcase is an optional business module installed to `Assets/Modules/EFrameExtensionShowcase/`. It demonstrates UI Virtual List and Debug Console. To maintain Showcase, edit [test-fixtures/EFrameShowcaseUnity](test-fixtures/EFrameShowcaseUnity), then sync it back into the package template:
-
-```powershell
-.\tools\Sync-EFrameShowcaseTemplate.ps1
-.\tools\Sync-EFrameShowcaseTemplate.ps1 -CheckOnly
-```
+Extension Showcase is an optional business module installed to `Assets/Modules/EFrameExtensionShowcase/`. It demonstrates UI Virtual List and Debug Console.
 
 ## AI Collaboration Layer
 
-EFrame's AI collaboration layer is part of the framework release contract, not a separate documentation bundle.
+EFrame's AI collaboration layer syncs framework conventions into business project AI client entries, giving Codex, GitHub Copilot, and Claude Code consistent EFrame coding guidance.
 
-- The business-project sync source lives in [packages/com.eframework.core/AIWorkspace~](packages/com.eframework.core/AIWorkspace~).
-- Framework-managed files synced into business projects use the `eframe-*` prefix.
-- Project entry files for Codex, GitHub Copilot, and Claude Code are owned by the business project; EFrame only updates the EFrame managed block inside those entries.
-- AI-facing support docs live in `AIWorkspace~/support-docs/`; the current API index is [EFRAME_AI_API_INDEX.md](packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md).
-- Framework maintainer-only rules live in [tools/MaintainerAIWorkspace](tools/MaintainerAIWorkspace) and are not synced into business projects.
+To check or sync only the AI workspace:
+
+```powershell
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -StatusOnly
+.\tools\Initialize-EFrameAI.ps1 -TargetRoot "D:\YourUnityProject" -Clients all -Force
+```
 
 Install the project-side updater:
 
@@ -145,12 +138,6 @@ After sync, a business project can continue updating itself with:
 ```powershell
 .\tools\Sync-EFrameAIFromFramework.ps1 -Clients all -StatusOnly
 .\tools\Sync-EFrameAIFromFramework.ps1 -Clients all -Force
-```
-
-Check a synced project:
-
-```powershell
-.\tools\Test-EFrameAIProject.ps1 -TargetRoot "D:\YourUnityProject" -FrameworkRoot "."
 ```
 
 ## Dependencies And Extensions
@@ -178,32 +165,13 @@ EFrame Tools/项目初始化向导
 
 Enabling the adapter adds the `EFRAME_USE_DOTWEEN` scripting define and creates or opens `Assets/Resources/DOTweenSettings.asset`. Disable the adapter before removing DOTween.
 
-## Maintenance Checks
-
-Before release, run at least:
-
-```powershell
-.\tools\Test-EFrameAIRelease.ps1
-```
-
-Changes touching Basic, Showcase, AI sync, resource directories, startup flow, UI runtime contract, or manifest should also run the matching sync scripts and project checks according to their impact.
-
-AI release and manifest rules are documented in [tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md](tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md).
-
 ## Documentation
 
-- User docs: [packages/com.eframework.core/Documentation~/user](packages/com.eframework.core/Documentation~/user)
+- Usage docs: [packages/com.eframework.core/Documentation~/user](packages/com.eframework.core/Documentation~/user)
 - UI framework guide: [UI_FRAMEWORK_GUIDE.md](packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md)
 - Directory structure convention: [UNITY_DIRECTORY_STRUCTURE.md](packages/com.eframework.core/Documentation~/user/UNITY_DIRECTORY_STRUCTURE.md)
 - Samples and initialization: [SAMPLES_AND_INITIALIZATION.md](packages/com.eframework.core/Documentation~/user/SAMPLES_AND_INITIALIZATION.md)
 - Resource path convention: [RESPATH_CONVENTION.md](packages/com.eframework.core/Documentation~/user/RESPATH_CONVENTION.md)
-- AI architecture: [EFRAME_AI_ARCHITECTURE.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_ARCHITECTURE.md)
-- AI setup: [EFRAME_AI_SETUP.md](packages/com.eframework.core/Documentation~/maintainer/EFRAME_AI_SETUP.md)
 - API HTML index: [Documentation~/api/index.html](packages/com.eframework.core/Documentation~/api/index.html)
 - Docs site entry: [Documentation~/index.html](packages/com.eframework.core/Documentation~/index.html)
-
-## Versioning
-
-EFrame uses semantic versioning. The formal starting version is `0.1.0`; the current release version is recorded in [packages/com.eframework.core/package.json](packages/com.eframework.core/package.json), and repository-level releases are recorded in [CHANGELOG.md](CHANGELOG.md).
-
-Unity code, AI collaboration rules, bootstrap tools, sync scripts, and docs are treated as one EFrame release surface. `AIWorkspace~/eframe-ai.manifest.json` is only an internal marker used by business projects to detect synced file drift; it is not a separate product version.
+- Maintainer entry: [README.maintainer.en.md](README.maintainer.en.md)

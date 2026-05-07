@@ -2,6 +2,12 @@
 
 All notable changes to the `com.eframework.core` Unity package are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Added a maintainer prompt-routing audit document for reviewing natural user requests against EFrame AI contract layers, made it a required validation step when AI contract trigger behavior changes, and expanded the synced skill trigger guide with natural prompt phrases for main-screen entries, EFrame convention checks, and record/replay validation.
+
 ## [0.7.6] - 2026-05-06
 
 ### Changed

@@ -9,6 +9,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 ### Added
 
 - Added the optional `com.eframework.ai-loop` package with Editor-only Game/Editor screenshot capture, EFrame-aware UI element annotation, uGUI PlayMode mouse simulation, Input System keyboard simulation, and JSON input recording/replay APIs for AI-assisted development loops.
+- Added a maintainer prompt-routing audit document for reviewing natural user requests against EFrame AI contract layers, made it a required validation step when AI contract trigger behavior changes, and expanded the synced skill trigger guide with natural prompt phrases for main-screen entries, EFrame convention checks, and record/replay validation.
 
 ### Changed
 
