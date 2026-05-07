@@ -1,4 +1,4 @@
----
+﻿---
 name: eframe-guideline-audit
 description: 'Review Unity EFrame changes for compliance. Use when auditing startup scene, Procedure lifecycle, QUI usage, UIController structure, directory layout, naming, resource paths, AI customization sync, or when the task mentions 规范审查, EFrame 审查, 接入审查, 合规检查, or 改动体检.'
 argument-hint: 'Describe the change set or module to audit.'
@@ -38,7 +38,7 @@ forbiddenPatterns:
 ## Audit Flow
 
 1. Classify the changed surface: startup, Procedure, UI, directory, resources, data/events, AI config, or Unity compile validation.
-2. Review business-facing EFrame boundaries first: initialization, injected `Context`, `EFrame.UI/UIControllerBase`, `ResPath.Generated`, managed Addressables, data table entry, and generated View access.
+2. Review business-facing EFrame boundaries first: initialization, injected `Context`, `EFrame.UI/UIControllerBase`, `ResPath`, managed Addressables, data table entry, and generated View access.
 3. Delegate detailed checks to the owning skill when a surface dominates the review:
    - Directory and ownership: `eframe-directory-structure`.
    - UI lifecycle, binding, layer, overlay camera, or prefab structure: `eframe-ui-feature`.

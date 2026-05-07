@@ -1,4 +1,4 @@
-# EFrame Audit Checklist
+﻿# EFrame Audit Checklist
 
 ## 启动场景
 
@@ -23,6 +23,7 @@
 - 静态 UI 标准组件是否序列化在 prefab/YAML 上，避免 runtime 为弥补配置缺失而临时 `AddComponent`
 - Runtime Controller 是否避免大规模 `new GameObject` 拼装静态 UI，只保留必要的动态列表/Item 实例化
 - 动态生成的重复元素是否优先使用 prefab 中的 Template 或独立 Widget prefab
+- 普通业务 Controller 创建后是否直接 `Show()` / `Hide()`，避免重复手写 `BindContext(Context)`；显式绑定只用于测试、框架内部或特殊 `EFrameContext` 覆盖
 - `UIController` 是否区分实例级 `OnViewCreated()` / `OnViewDestroyed()` 与每次打开关闭的 `OnViewOpened()` / `OnViewClosed()`
 - View 是否保持无参构造并通过 `OnBindingSet()` 接入 `QUIBinding`
 - Controller 是否通过 `CurrentView` 访问生成 View，而不是直接保存/驱动 `UIViewHandle` 或回退到旧 `View` facade
@@ -41,7 +42,7 @@
 
 - 是否集中管理路径
 - 是否出现重复硬编码字符串
-- 是否使用 `ResPath.Generated` 或明确资源 id 入口
+- 是否使用 `ResPath` 或明确资源 id 入口
 
 ## Unity 编译验证
 

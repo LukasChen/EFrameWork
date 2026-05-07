@@ -1,103 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / Events - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / Events - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / Events</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>Runtime</h2>
-                    <nav class="nav-links">
-                        <a href="../core/index.html">Core</a>
-                        <a href="../ui/index.html">UI</a>
-                        <a href="../data/index.html">Data</a>
-                        <a href="../assets/index.html">Assets</a>
-                        <a href="../audio/index.html">Audio</a>
-                        <a href="index.html">Events</a>
-                        <a href="../utils/index.html">Utils</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Events</span></div>
-                    <div class="eyebrow">Event Bus</div>
-                    <h1>事件系统是框架内解耦的基础，但更重要的是订阅生命周期必须跟对象生命周期对齐。</h1>
-                    <p class="lead">EFrame 的事件系统以结构体事件和泛型订阅为主，框架层已经内置了启动、暂停、恢复、退出和逐帧更新事件。更推荐使用 `SubscribeScoped<T>()`，减少 UI、Controller 和短生命周期对象的泄漏风险。</p>
-                    <div class="meta-list">
-                        <div><dt>服务接口</dt><dd>`IEventService`</dd></div>
-                        <div><dt>核心总线</dt><dd>`EventBus`</dd></div>
-                        <div><dt>事件约束</dt><dd>`struct` + `IEvent`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / Events</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../core/index.html">Core</a><a href="../assets/index.html">Assets</a><a href="../ui/index.html">UI</a><a href="../data/index.html">Data</a><a href="../audio/index.html">Audio</a><a class="is-active" href="index.html">Events</a><a href="../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>运行时</span><span>Events</span></div>
+          <div class="eyebrow">Struct Event Bus</div>
+          <h1>Events 事件总线</h1>
+          <p class="lead"><code>EventBus</code> 适合 App 状态广播、UI 行为通知和轻量模块通信。事件 payload 建议保持轻量。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>关键 API 参数与返回值</h2></div></div>
-                    <div class="panel">
-                        <h3>`Subscribe<T>(Action<T> handler)`</h3>
-                        <table>
-                            <thead><tr><th>项</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>泛型约束</td><td>`T : struct, IEvent`，事件保持轻量值类型。</td></tr>
-                                <tr><td>责任</td><td>调用者自己管理取消订阅，适合生命周期长且明确的对象。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`SubscribeScoped<T>(Action<T> handler)`</h3>
-                        <table>
-                            <thead><tr><th>项</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>返回值</td><td>`IDisposable`。释放该对象即可取消订阅。</td></tr>
-                                <tr><td>推荐场景</td><td>UI 控制器、视图、临时流程、测试工具等与对象生命周期强绑定的订阅。</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="api-signature"><pre><code class="language-csharp">var subscription = EFrame.Current.Events.SubscribeScoped&lt;AppPausedEvent&gt;(evt =&gt;
-{
-    Debug.Log(evt.Duration);
-});</code></pre></div>
-                    </div>
-                    <div class="panel section">
-                        <h3>`Dispatch<T>(T evt)`</h3>
-                        <p>分发一个结构体事件。适合应用状态广播、UI 行为通知和轻量模块通信，不适合承载大型对象图或复杂异步协议。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Built-in Events</div><h2>框架内置事件</h2></div></div>
-                    <div class="card-grid">
-                        <article class="feature-card"><h3>`AppStartedEvent`</h3><p>框架初始化完成、流程启动后广播。</p></article>
-                        <article class="feature-card"><h3>`AppPausedEvent`</h3><p>应用进入后台时广播，包含当前累计时长 `Duration`。</p></article>
-                        <article class="feature-card"><h3>`AppResumedEvent`</h3><p>应用从后台恢复时广播。</p></article>
-                        <article class="feature-card"><h3>`AppQuitEvent`</h3><p>应用退出前广播。</p></article>
-                        <article class="feature-card"><h3>`AppUpdateEvent`</h3><p>每帧广播，包含 `DeltaTime` 和 `UnscaledDeltaTime`。</p></article>
-                        <article class="feature-card"><h3>`AppUpdatePerSecondEvent`</h3><p>每秒广播一次，适合轻量定时刷新。</p></article>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>结构体事件</strong><p>事件类型以结构体为主，适合轻量广播。</p></div><div class="module-row"><strong>Scoped 订阅</strong><p>短生命周期对象可以持有可释放订阅。</p></div><div class="module-row"><strong>内置 App 事件</strong><p>框架提供 started、paused、resumed、quit、update 等生命周期事件。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>Scoped 订阅</h3>
+    <ul><li>短生命周期对象使用 scoped 订阅。</li><li>在销毁或关闭时释放 scope。</li><li>事件 payload 用结构体。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">m_subscription = Context.Events.SubscribeScoped&lt;CurrencyChangedEvent&gt;(OnCurrencyChanged);</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>Dispatch&lt;T&gt;(eventData)</code></td><td>广播结构体事件</td><td>payload 保持轻量。</td></tr><tr><td><code>Subscribe&lt;T&gt;(handler)</code></td><td>普通订阅</td><td>调用方负责取消。</td></tr><tr><td><code>SubscribeScoped&lt;T&gt;(handler)</code></td><td>返回可释放订阅</td><td>UI/Controller 首选。</td></tr><tr><td><code>AppStarted/Paused/Resumed/Quit/UpdateEvent</code></td><td>框架内置事件</td><td>用于应用生命周期感知。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

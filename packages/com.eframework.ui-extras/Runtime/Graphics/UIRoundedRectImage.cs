@@ -30,8 +30,9 @@ namespace EFramework.Extensions.UI.Extras.Graphics
             }
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             m_radius = Mathf.Max(0f, m_radius);
             m_cornerSegments = Mathf.Clamp(m_cornerSegments, 2, 12);
             graphic?.SetVerticesDirty();

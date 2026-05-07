@@ -1,4 +1,4 @@
----
+﻿---
 name: "EFrame 规则"
 description: "编辑 EFrame 项目中的 runtime、editor tooling、Procedure、QUI、UIController、启动流程、玩法功能代码、资源加载或生成工具时使用。"
 applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.eframework.core/Editor/**/*.cs,**/Assets/App/Runtime/**/*.cs,**/Assets/Modules/**/*.cs,**/Assets/Scripts/**/*.cs,**/Assets/**/Editor/**/*.cs,**/Assets/Scripts/Editor/**/*.cs,**/Assets/**/*.prefab,**/Assets/**/*.unity,**/Assets/**/*.asset}"
@@ -22,12 +22,14 @@ applyTo: "{**/packages/com.eframework.core/Runtime/**/*.cs,**/packages/com.efram
 ## UI 常驻边界
 
 - 业务 UI 推荐入口只暴露一条路径：通过 `EFrame.UI` 和 `UIControllerBase<TGeneratedView>` 管理页面、弹窗和提示。
+- 普通业务 `UIControllerBase` 会默认绑定 `EFrame.Current`；不要在 Procedure 或父 controller 中重复手写 `BindContext(Context)`，除非是测试、框架内部或明确需要覆盖特殊 `EFrameContext`。
+- 多个弹窗、引导、奖励提示需要顺序展示时，使用 `EFrame.UI.Queue` 或 `UIControllerBase.EnqueueToShow(...)` / `EnqueueToShowAsync(...)`；流程切换但希望保留剩余窗口时先 `EFrame.UI.Queue.Pause()`，回到可展示流程后 `Resume()`。
 - `QUI`、`IUIService`、`UIViewHandle` 是框架内部或进阶扩展概念，不作为普通业务代码的直接入口。
 - Controller 内访问生成 View 时使用 `CurrentView`；不要让业务逻辑直接保存或驱动 `UIViewHandle`。
 
 ## 资源常驻边界
 
-- 运行时资源 id 应来自自动生成的 `ResPath.Generated`；不要在业务代码中手写 Addressables address 字符串或维护自定义路径中心类。
+- 运行时资源 id 应来自自动生成的 `ResPath`；不要在业务代码中手写 Addressables address 字符串或维护自定义路径中心类。
 - `AssetReference` 可作为 Editor 配置字段，但进入运行时前应解析为 generated asset id。
 - `Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的框架托管资源由 EFrame editor automation 维护 Addressables group、address、label 和 generated path；不要手动编辑这些托管条目。
 

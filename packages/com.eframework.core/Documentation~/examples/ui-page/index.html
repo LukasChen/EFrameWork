@@ -1,108 +1,94 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>示例 / 创建一个 UI 页面 - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>示例 / UI 页面 - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Example / UI Page</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>示例</h2>
-                    <nav class="nav-links">
-                        <a href="index.html">创建一个 UI 页面</a>
-                        <a href="../data-table/index.html">创建一个 DataTable</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Examples</span><span>UI Page</span></div>
-                    <div class="eyebrow">Workflow Example</div>
-                    <h1>创建一个 UI 页面时，先搭 Controller 和 Binding，而不是先把业务逻辑塞进 View。</h1>
-                    <p class="lead">这条示例以当前 handle-first UI 契约为准。目标是从资源路径、View wrapper、Controller、按钮绑定到显示调用，串出一条最小可用链路。</p>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>示例 / UI 页面</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a class="is-active" href="index.html">UI 页面</a><a href="../popup/index.html">Popup</a><a href="../data-table/index.html">DataTable</a><a href="../resource-preload/index.html">资源预加载</a><a href="../virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>示例</span><span>UI 页面</span></div>
+          <div class="eyebrow">UI Workflow</div>
+          <h1>UI 页面示例</h1>
+          <p class="lead">示例覆盖资源路径、View 访问类、Controller、按钮绑定和显示调用。页面生命周期通过 Controller/Handle 进入。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 1</div><h2>准备资源入口</h2></div></div>
-                    <div class="panel">
-                        <p>先保证 UI prefab 有稳定资源路径，并通过 `ResPath` 或生成常量暴露给代码层。不要在 Controller 里散写裸字符串。</p>
-                        <div class="api-signature"><pre><code class="language-csharp">protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;</code></pre></div>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 2</div><h2>写一个轻量 View wrapper</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">public sealed class HomeView : BindingViewBase
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>Home 页面</h3>
+    <ul><li>Prefab 放 <code>Assets/App/Res/UI/Panels/Home/HomeView.prefab</code>。</li><li>根节点挂 <code>QUIBinding</code>，默认层级 <code>QuiPanel</code>。</li><li>生成 View 访问类。</li><li>Controller 通过 <code>CurrentView</code> 绑定按钮。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeView&gt;
 {
-    public Button StartButton { get; private set; }
-
-    protected override void OnBindingSet()
-    {
-        StartButton = Binding.transform.Find("Panel/StartButton")?.GetComponent&lt;Button&gt;();
-    }
-}</code></pre>
-                        <p>View 只负责把 `QUIBinding` 包装成强类型访问入口。不要让它重新承担公开生命周期或控制器职责。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 3</div><h2>在 Controller 里绑定实例级行为</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">public sealed class HomeController : UIControllerBase&lt;HomeView&gt;
-{
-    protected override string AssetPath =&gt; ResPath.Generated.UI.HomeView;
+    protected override string AssetPath =&gt; ResPath.UI.Panels.Home.HomeView;
 
     protected override void OnViewCreated()
     {
-        base.OnViewCreated();
         AddButtonClickListener(CurrentView.StartButton, OnStartClicked);
     }
+}</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>常见扩展</h2></div></div>
+    <div class="card-grid"><article class="article-card">
+        <div class="eyebrow">Refresh</div>
+        <h3>每次打开刷新状态</h3>
+        <p>把金币、红点、按钮状态放进 <code>OnViewOpened()</code>，构造函数保持无业务刷新。</p>
 
-    protected override void OnViewOpened()
-    {
-        Context.Audio.PlaySfx("Audio/UI/Open");
-    }
+      </article><article class="article-card">
+        <div class="eyebrow">Cleanup</div>
+        <h3>实例释放清理</h3>
+        <p>实例级订阅、回调和持有资源在 <code>OnViewDestroyed()</code> 释放。</p>
 
-    private void OnStartClicked()
-    {
-    }
-}</code></pre>
-                        <p>实例级监听放 `OnViewCreated()`，每次打开的刷新放 `OnViewOpened()`。缓存复用时，这两个时机的区别非常重要。</p>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">Safe Area</div>
+        <h3>安全区</h3>
+        <p>移动端使用 prefab-authored <code>SafeAreaFitter</code>，业务代码保持布局无关。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 4</div><h2>显示页面</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">var controller = UIControllerBase.GetOrCreateInstance&lt;HomeController&gt;();
-await controller.ShowAsync();</code></pre>
-                        <p>页面显示的公开入口应该在 Controller，而不是直接对 View 或 `QUIBinding` 做 open/close 操作。</p>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+      </article></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

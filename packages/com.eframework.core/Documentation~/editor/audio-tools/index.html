@@ -1,97 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Editor / Audio Tools - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>编辑器 / 音频工具 - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Editor / Audio Tools</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>Editor</h2>
-                    <nav class="nav-links">
-                        <a href="../bootstrap/index.html">Bootstrap</a>
-                        <a href="../ui-tools/index.html">UI Tools</a>
-                        <a href="index.html">Audio Tools</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Editor</span><span>Audio Tools</span></div>
-                    <div class="eyebrow">Audio Authoring</div>
-                    <h1>Audio 编辑器工具负责把基础音频资产组织成可维护的音频工作流。</h1>
-                    <p class="lead">当前核心能力保留 `AudioClipAssetEditor` 和 Audio Setup；事件式音频映射与触觉反馈不再属于 core。</p>
-                    <div class="meta-list">
-                        <div><dt>资产编辑</dt><dd>`AudioClipAssetEditor`</dd></div>
-                        <div><dt>Mixer 配置</dt><dd>`EFrameAudioMixerSettings`</dd></div>
-                        <div><dt>资源入口</dt><dd>`AudioResourcePaths`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>编辑器 / 音频工具</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../bootstrap/index.html">Bootstrap</a><a href="../ui-tools/index.html">UI 工具</a><a class="is-active" href="index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>编辑器</span><span>音频工具</span></div>
+          <div class="eyebrow">Audio Authoring</div>
+          <h1>音频编辑器工具</h1>
+          <p class="lead"><code>AudioClipAssetEditor</code> 和 Audio Bootstrap 负责资产包装、Mixer 准备和基础资源落地。运行时仍通过 <code>EFrame.Audio</code> 消费。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Main Tool</div><h2>`AudioClipAsset` 工作流</h2></div></div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>整理音频片段</strong>
-                            <p>`AudioClipAsset` 可以把一个或多个音频片段包装成运行时播放入口。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>配置随机参数</strong>
-                            <p>音量、音调和最小播放间隔由资产维护，运行时通过 `EFrame.Audio` 消费。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Bootstrap Mixer</strong>
-                            <p>Audio Setup 和项目初始化向导负责创建 `EFrameAudioMixerSettings.mixer`。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>运行时播放</strong>
-                            <p>`AudioManager` 负责 Music/SFX、Mixer 音量、SFX 池、防抖和音乐 crossfade。</p>
-                        </div>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>AudioClipAsset</strong><p>把一个或多个 clip 和播放参数包装为运行时入口。</p></div><div class="module-row"><strong>Mixer 初始化</strong><p>Audio Bootstrap 准备基础 mixer 和资源路径。</p></div><div class="module-row"><strong>运行时消费</strong><p>业务通过 <code>EFrame.Audio</code> 播放，不直接依赖 Editor 配置。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>创建一个 AudioClipAsset</h3>
+    <ul><li>完成 Audio Bootstrap。</li><li>创建或选择 <code>AudioClipAsset</code>。</li><li>配置 clips、volume、pitch、min interval。</li><li>运行时用 <code>PlayAudioClipAsset</code> 或 <code>PlaySfx</code>。</li></ul>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Recommended Usage</div><h2>推荐工作流</h2></div></div>
-                    <div class="panel">
-                        <ol>
-                            <li>先确保项目已经完成 Audio Bootstrap，Mixer 资源已经就位。</li>
-                            <li>为常用 SFX 创建 `AudioClipAsset`。</li>
-                            <li>在资产上配置音频片段、随机音量/音调和最小播放间隔。</li>
-                            <li>运行时通过 `EFrame.Audio.PlayAudioClipAsset(...)` 或 `EFrame.Audio.PlaySfx(...)` 播放。</li>
-                        </ol>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Related Tools</div><h2>相关 Editor 能力</h2></div></div>
-                    <div class="card-grid">
-                        <article class="feature-card"><h3>`AudioClipAssetEditor`</h3><p>用于维护 `AudioClipAsset`，把一个或多个音频片段整理成运行时可消费的资产入口。</p></article>
-                        <article class="feature-card"><h3>Bootstrap 协作</h3><p>Audio Tools 不是孤立的。它依赖 Bootstrap 先把 Mixer 和 Resources 路径准备好。</p></article>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>AudioClipAssetEditor</code></td><td>维护音频片段集合和播放参数</td><td>适合 UI 音效、随机短音频。</td></tr><tr><td>Audio Bootstrap</td><td>Mixer 和基础资源准备</td><td>项目初始化会处理。</td></tr><tr><td><code>AudioResourcePaths</code></td><td>框架音频资源路径</td><td>Resources 侧入口。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

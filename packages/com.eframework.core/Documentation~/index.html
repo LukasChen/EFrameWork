@@ -1,330 +1,113 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>EFrame Docs</title>
-    <meta name="description" content="EFrame 框架文档站，包含 Runtime、Editor、示例、AI 协作层和 API 参考入口。">
-    <link rel="stylesheet" href="assets/style.css">
-    <script defer src="assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>首页 - EFrame 文档</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script defer src="assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Unity 轻量框架 + 可同步 AI 协作层</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="index.html">首页</a>
-                        <a href="quickstart/index.html">快速开始</a>
-                        <a href="api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>核心模块</h2>
-                    <nav class="nav-links">
-                        <a href="runtime/core/index.html">Runtime / Core</a>
-                        <a href="runtime/ui/index.html">Runtime / UI</a>
-                        <a href="runtime/data/index.html">Runtime / Data</a>
-                        <a href="runtime/assets/index.html">Runtime / Assets</a>
-                        <a href="runtime/audio/index.html">Runtime / Audio</a>
-                        <a href="runtime/events/index.html">Runtime / Events</a>
-                        <a href="runtime/effects/index.html">Runtime / Effects</a>
-                        <a href="runtime/utils/index.html">Runtime / Utils</a>
-                        <a href="editor/bootstrap/index.html">Editor / Bootstrap</a>
-                        <a href="editor/ui-tools/index.html">Editor / UI Tools</a>
-                        <a href="editor/audio-tools/index.html">Editor / Audio Tools</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>协作层</h2>
-                    <nav class="nav-links">
-                        <a href="ai/index.html">AI 协作层</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>示例</h2>
-                    <nav class="nav-links">
-                        <a href="examples/ui-page/index.html">创建一个 UI 页面</a>
-                        <a href="examples/data-table/index.html">创建一个 DataTable</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs">
-                        <span>Docs</span>
-                        <span>Home</span>
-                    </div>
-                    <div class="eyebrow">Framework Documentation</div>
-                    <h1>把 EFrame 的框架规则、模块设计和 API 使用路径放到同一个可浏览入口里。</h1>
-                    <p class="lead">这不是把 Markdown 原样搬进网页，而是围绕“如何接入、如何实现、如何维护、如何升级”组织的第一版站点骨架。当前版本先落首页、快速开始、Runtime/UI、Runtime/Data、Editor/Bootstrap 和 AI 协作层示范页。</p>
-                    <div class="hero-actions">
-                        <a class="cta is-primary" href="quickstart/index.html">
-                            <strong>先走快速开始</strong>
-                            <p>从启动场景、EFrameComponent、UI 控制器到 DataTable 的最短路径。</p>
-                        </a>
-                        <a class="cta" href="runtime/ui/index.html">
-                            <strong>看 UI 主链</strong>
-                            <p>面向当前 handle-first UI 契约，梳理 Controller、Handle、QUI 之间的职责。</p>
-                        </a>
-                        <a class="cta" href="ai/index.html">
-                            <strong>看 AI 协作层</strong>
-                            <p>厘清 `eframe-*`、`project-*`、`maintainer-*` 的边界和同步方式。</p>
-                        </a>
-                    </div>
-                    <div class="chip-row">
-                        <div class="chip"><strong>中文优先</strong><span>面向框架维护者和业务项目使用者。</span></div>
-                        <div class="chip"><strong>纯静态站点</strong><span>无需 Node 工具链，兼容 GitHub Pages。</span></div>
-                        <div class="chip"><strong>模块化阅读</strong><span>不再把 API、指南和示例挤在一个 md 文件里。</span></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>文档首页</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a class="is-active" href="index.html">首页</a><a href="quickstart/index.html">快速开始</a><a href="api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="runtime/core/index.html">Core</a><a href="runtime/assets/index.html">Assets</a><a href="runtime/ui/index.html">UI</a><a href="runtime/data/index.html">Data</a><a href="runtime/audio/index.html">Audio</a><a href="runtime/events/index.html">Events</a><a href="runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="extensions/index.html">扩展包总览</a><a href="extensions/ui-extras/index.html">UI Extras</a><a href="extensions/effects/index.html">Effects</a><a href="extensions/debug-console/index.html">Debug Console</a><a href="extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="examples/ui-page/index.html">UI 页面</a><a href="examples/popup/index.html">Popup</a><a href="examples/data-table/index.html">DataTable</a><a href="examples/resource-preload/index.html">资源预加载</a><a href="examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="editor/bootstrap/index.html">Bootstrap</a><a href="editor/ui-tools/index.html">UI 工具</a><a href="editor/audio-tools/index.html">音频工具</a><a href="ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="index.html">文档</a></span></div>
+          <div class="eyebrow">Unity 轻量框架 + 可同步 AI 协作层</div>
+          <h1>EFrame 文档入口</h1>
+          <p class="lead">这里汇总 Core 模块、可选扩展包、初始化样板、常用示例和 AI 协作层。模块页提供用途、最小样板和精简 API 表。</p>
+          <div class="meta-list"><div><dt>Core</dt><dd>com.eframework.core 0.7.8</dd></div><div><dt>Unity</dt><dd>6000.0 + URP + Addressables</dd></div><div><dt>文档原则</dt><dd>模块先行，API 精简</dd></div></div>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><div class="eyebrow">Start Here</div><h2>先选你的任务</h2></div></div>
+    <div class="card-grid"><article class="article-card">
+        <div class="eyebrow">新项目</div>
+        <h3><a href="quickstart/index.html">初始化一个 EFrame 项目</a></h3>
+        <p>用项目初始化向导复制 Basic 模板，同步 AI 工作区，补齐 Addressables、UI 层级、音频和 build settings。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">阅读入口</div>
-                            <h2>按照你的任务来读，而不是按照仓库文件名来读</h2>
-                        </div>
-                        <p class="section-intro">第一版优先把最容易用到的路径做顺：接入、UI、Data、Bootstrap、AI 同步。</p>
-                    </div>
-                    <div class="card-grid">
-                        <article class="article-card">
-                            <div class="eyebrow">Start Here</div>
-                            <h3><a href="quickstart/index.html">快速开始</a></h3>
-                            <p>面向第一次接入框架的人，先讲启动入口、基本调用链和最小示例。</p>
-                            <ul>
-                                <li>EFrame 初始化链</li>
-                                <li>服务访问模型</li>
-                                <li>最短接入清单</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/core/index.html">Runtime / Core</a></h3>
-                            <p>先厘清 `EFrame`、`EFrameContext`、`EFrameComponent` 和注入链，避免后续把服务访问方式写散。</p>
-                            <ul>
-                                <li>初始化时序</li>
-                                <li>服务上下文</li>
-                                <li>Coroutine 与注入入口</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/ui/index.html">Runtime / UI</a></h3>
-                            <p>重点模块示范页，覆盖 `QUI`、`BindingViewBase`、`UIControllerBase`、`UIViewHandle`、时序图和场景相机约束。</p>
-                            <ul>
-                                <li>模块职责</li>
-                                <li>方法参数表</li>
-                                <li>显示/关闭时序</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/data/index.html">Runtime / Data</a></h3>
-                            <p>围绕 `IDataService`、`DataTable&lt;T&gt;`、脏标记、加载结果、存储回退和迁移策略组织，并已拆出细分子页。</p>
-                            <ul>
-                                <li>表注册流程</li>
-                                <li>保存/加载状态</li>
-                                <li>数据表写法范式</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/assets/index.html">Runtime / Assets</a></h3>
-                            <p>聚焦 Addressables 句柄、实例化、路径校验与释放责任，避免资源生命周期失控。</p>
-                            <ul>
-                                <li>AssetHandle 与 InstanceHandle</li>
-                                <li>Load / Instantiate 语义</li>
-                                <li>路径中心约束</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/audio/index.html">Runtime / Audio</a></h3>
-                            <p>讲音频池、Mixer、Music/SFX 分工和运行期兜底行为。</p>
-                            <ul>
-                                <li>音量控制</li>
-                                <li>Crossfade</li>
-                                <li>Audio 资源入口</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/effects/index.html">Runtime / Effects</a></h3>
-                            <p>飞行动画、图标回弹和相机抖动已迁入可选 `com.eframework.effects` 扩展包。</p>
-                            <ul>
-                                <li>FlyAnimationSystem</li>
-                                <li>IconBounceEffect</li>
-                                <li>表现资源与释放策略</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Extension</div>
-                            <h3>UI Extras</h3>
-                            <p>`CheckableButton`、`Tabbar`、`EmptyRayCasterGraphic`、交互反馈、图形辅助和虚拟列表已归入可选 `com.eframework.ui-extras` 扩展包。</p>
-                            <ul>
-                                <li>辅助 UI 控件</li>
-                                <li>交互 Guard / Reporter / Feedback</li>
-                                <li>虚拟列表与图形辅助组件</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Editor</div>
-                            <h3><a href="editor/bootstrap/index.html">Editor / Bootstrap</a></h3>
-                            <p>聚焦 Unity 初始化窗口、Addressables 同步、模板复制和日常维护入口。</p>
-                            <ul>
-                                <li>菜单入口</li>
-                                <li>冷启动覆盖面</li>
-                                <li>升级时的检查点</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Editor</div>
-                            <h3><a href="editor/ui-tools/index.html">Editor / UI Tools</a></h3>
-                            <p>围绕 `QUIBinding`、ViewConfig、访问类生成和滚动组件编辑，整理 UI authoring 工作流。</p>
-                            <ul>
-                                <li>UIAutoBindingEditor</li>
-                                <li>Generate Class</li>
-                                <li>Binding 验证</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Editor</div>
-                            <h3><a href="editor/audio-tools/index.html">Editor / Audio Tools</a></h3>
-                            <p>围绕 `AudioClipAsset` 和基础音频资源整理音频 authoring 工作流。</p>
-                            <ul>
-                                <li>AudioClipAssetEditor</li>
-                                <li>基础音频资源</li>
-                                <li>AudioClipAsset 工具</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/events/index.html">Runtime / Events</a></h3>
-                            <p>讲事件订阅生命周期、内置应用事件和 `SubscribeScoped&lt;T&gt;()` 的使用边界。</p>
-                            <ul>
-                                <li>结构体事件</li>
-                                <li>Scoped 订阅</li>
-                                <li>App 生命周期广播</li>
-                            </ul>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Runtime</div>
-                            <h3><a href="runtime/utils/index.html">Runtime / Utils</a></h3>
-                            <p>整理最常见工具类，明确哪些可以直接用，哪些应优先被服务层替代。</p>
-                            <ul>
-                                <li>QInput</li>
-                                <li>对象池与队列</li>
-                                <li>通用工具边界</li>
-                            </ul>
-                        </article>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">UI</div>
+        <h3><a href="examples/ui-page/index.html">创建一个 UI 页面</a></h3>
+        <p>按资源路径、生成 View、Controller 和 Show/Hide 生命周期落地，不直接操作 BindingViewBase 生命周期。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Why This Site</div>
-                            <h2>第一版站点解决的不是“能不能看”，而是“能不能快速定位”</h2>
-                        </div>
-                    </div>
-                    <div class="info-grid">
-                        <div class="metric-card">
-                            <div class="caption">Docs Goal</div>
-                            <strong>任务导向</strong>
-                            <p>把“如何接入一个页面”“如何注册 DataTable”“如何同步 AI 规则”这类实际问题变成稳定入口。</p>
-                        </div>
-                        <div class="metric-card">
-                            <div class="caption">API Goal</div>
-                            <strong>参数可查</strong>
-                            <p>关键服务和核心类型的参数、返回值、生命周期和调用上下文放到同一页里，不再跨文件拼图。</p>
-                        </div>
-                        <div class="metric-card">
-                            <div class="caption">Maintenance Goal</div>
-                            <strong>容易跟版本</strong>
-                            <p>站点仍然依托仓库内原始文档和代码接口，后续能随着 Runtime、Editor 和 AI contract 同步迭代。</p>
-                        </div>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">Data</div>
+        <h3><a href="examples/data-table/index.html">接入一张 DataTable</a></h3>
+        <p>用稳定 StorageKey、受控修改和 LastLoadResult/LastSaveResult 组织持久化数据。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Examples</div>
-                            <h2>除了模块说明，也开始补可照着走的范例路径</h2>
-                        </div>
-                    </div>
-                    <div class="card-grid">
-                        <article class="article-card">
-                            <div class="eyebrow">Workflow</div>
-                            <h3><a href="examples/ui-page/index.html">创建一个 UI 页面</a></h3>
-                            <p>从资源路径、View wrapper、Controller、按钮绑定到显示调用，串起当前 UI 主链。</p>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Workflow</div>
-                            <h3><a href="examples/data-table/index.html">创建一个 DataTable</a></h3>
-                            <p>从模型、表定义、注册、改值到保存结果，串起当前持久化主链。</p>
-                        </article>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">Resource</div>
+        <h3><a href="examples/resource-preload/index.html">梳理资源预加载</a></h3>
+        <p>资源放进托管目录，通过 ResPath 和显式 handle 管理加载与释放。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Current Coverage</div>
-                            <h2>本轮已开始站点化的内容</h2>
-                        </div>
-                    </div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>首页与导航骨架</strong>
-                            <p>完成基础站点布局、响应式侧栏、页面头图和统一视觉语言，先保证页面之间能顺畅跳转。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Quickstart</strong>
-                            <p>把 `EFrameComponent`、`EFrame.Initialize()`、`EFrame.Current` 服务访问模型转成接入向导，而不是零散知识点。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Runtime / UI 与 Data</strong>
-                            <p>先落最核心的两条业务开发链路：UI 生命周期和持久化数据表。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Runtime 主干补全</strong>
-                            <p>新增 Core、Assets、Audio、Events、Utils 五类页面，开始把运行时主模块串成完整地图。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Effect 与 Editor 子模块</strong>
-                            <p>Runtime/Effects 现在记录可选 `com.eframework.effects` 扩展包，core 文档只保留入口说明。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>UI Extras 扩展包</strong>
-                            <p>交互辅助、图形辅助、虚拟列表和轻量 extra controls 归入可选 `com.eframework.ui-extras`，core UI 文档只保留主链路与 `QScroller`。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>示例路径</strong>
-                            <p>开始用“创建一个 UI 页面”和“创建一个 DataTable”两条路径承接实际使用场景。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>Editor / Bootstrap 与 AI</strong>
-                            <p>把初始化窗口、冷启动脚本和 AI 同步边界从 README 级描述提升到专门的浏览入口。</p>
-                        </div>
-                    </div>
-                </section>
+      </article></div>
+  </section><section class="section">
+    <div class="section-header"><div><div class="eyebrow">Core Modules</div><h2>核心模块</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>Core</strong><p>启动、<code>EFrameContext</code>、Procedure、协程服务和上下文注入。</p></div><div class="module-row"><strong>Assets</strong><p>托管 Addressables、<code>ResPath</code>、异步句柄和资源释放责任。</p></div><div class="module-row"><strong>UI</strong><p>handle-first UI 主链：Controller -&gt; Handle -&gt; QUI -&gt; BindingViewBase。</p></div><div class="module-row"><strong>Data</strong><p><code>DataTable&lt;T&gt;</code>、稳定 <code>StorageKey</code>、dirty、迁移和结构化结果。</p></div><div class="module-row"><strong>Audio</strong><p>Music/SFX、Mixer、<code>AudioClipAsset</code>、池化、防抖和音乐 crossfade。</p></div><div class="module-row"><strong>Events</strong><p>结构体事件总线、Scoped 订阅和 App 生命周期广播。</p></div><div class="module-row"><strong>Utils</strong><p>输入、对象池、时间、HTTP、集合和低层辅助工具。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><div class="eyebrow">Extensions</div><h2>可选扩展包</h2></div></div>
+    <div class="card-grid"><article class="article-card">
+        <div class="eyebrow">UI</div>
+        <h3><a href="extensions/ui-extras/index.html">UI Extras</a></h3>
+        <p>把复用控件、交互反馈、图形辅助和虚拟列表从 Core 主链中拆出。</p>
 
-                <footer class="site-footer">
-                    文档源仍来自仓库中的 Markdown 与代码接口定义。第一版站点以纯静态页面为主，后续可继续补搜索、模块索引和自动生成流程。
-                </footer>
-            </div>
-        </main>
-    </div>
+      </article><article class="article-card">
+        <div class="eyebrow">FX</div>
+        <h3><a href="extensions/effects/index.html">Effects</a></h3>
+        <p>承载飞行动画、图标弹跳和轻量 CameraShake，业务项目按需安装。</p>
+
+      </article><article class="article-card">
+        <div class="eyebrow">Debug</div>
+        <h3><a href="extensions/debug-console/index.html">Debug Console</a></h3>
+        <p>运行时日志与命令控制台，适合开发包和测试环境。</p>
+
+      </article><article class="article-card">
+        <div class="eyebrow">AI</div>
+        <h3><a href="extensions/ai-loop/index.html">AI Loop</a></h3>
+        <p>Editor-only 截图、标注、输入模拟、录制和回放，服务 AI 辅助验收。</p>
+
+      </article></div>
+  </section><section class="section">
+    <div class="section-header"><div><div class="eyebrow">Coverage</div><h2>包版本速览</h2></div></div>
+    <div class="panel"><table><thead><tr><th>Package</th><th>Version</th><th>定位</th><th>说明</th></tr></thead><tbody><tr><td>com.eframework.core</td><td>0.7.8</td><td>必装核心</td><td>Runtime、Editor bootstrap、Basic 模板、AI 同步源。</td></tr><tr><td>com.eframework.ui-extras</td><td>0.3.1</td><td>可选 UI 扩展</td><td>CheckableButton、Tabbar、交互反馈、图形辅助、虚拟列表/网格。</td></tr><tr><td>com.eframework.effects</td><td>0.1.1</td><td>可选表现扩展</td><td>飞行动画、图标弹跳、CameraShake 和配套 Editor。</td></tr><tr><td>com.eframework.debug-console</td><td>0.1.0</td><td>可选调试扩展</td><td>运行时日志面板和命令控制台。</td></tr><tr><td>com.eframework.ai-loop</td><td>0.1.0</td><td>可选 Editor 自动化</td><td>截图、UI 元素标注、输入模拟、录制和回放。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

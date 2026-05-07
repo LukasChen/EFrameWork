@@ -4,8 +4,8 @@ using EFramework.Runtime.Asset;
 using EFramework.Runtime.Audio;
 using EFramework.Runtime.DataStorage;
 using EFramework.Runtime.Event;
+using EFramework.Runtime.Time;
 using EFramework.Runtime.UI;
-using EFramework.Runtime.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -28,6 +28,7 @@ namespace EFramework.Runtime
         public static IDataService Data => RequireInitializedContext().Data;
         public static IEventService Events => RequireInitializedContext().Events;
         public static ICoroutineService Coroutine => RequireInitializedContext().Coroutine;
+        public static ITimeService Time => RequireInitializedContext().Time;
         public static Camera SceneCamera => RequireInitializedContext().SceneCamera;
         public static Camera UICamera => RequireInitializedContext().UICamera;
 
@@ -65,6 +66,7 @@ namespace EFramework.Runtime
             var dataService = new DataManager(new JsonFileStorage());
             var eventService = new EventService();
             var uiService = new QUI();
+            var timeService = new GameTimeManager();
             EFrameContext context = null;
 
             DefaultFrameData defaultFrameData = null;
@@ -75,11 +77,9 @@ namespace EFramework.Runtime
             {
                 LastInitializationResult = EFrameInitializationResult.Failure("Addressables initialization failed.", EFrameInitializationStage.Assets);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
-                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService);
+                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService, timeService);
                 yield break;
             }
-
-            GameTimeService.Init();
 
             dataService.RegisterTable<DefaultFrameData>();
             defaultFrameData = dataService.GetTable<DefaultFrameData>();
@@ -87,7 +87,7 @@ namespace EFramework.Runtime
             {
                 LastInitializationResult = EFrameInitializationResult.Failure("DefaultFrameData registration failed.", EFrameInitializationStage.Data);
                 Debug.LogError($"[EFrame] {LastInitializationResult.Message}");
-                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService);
+                DisposeCreatedServices(audioService, uiService, assetService, dataService, coroutineService, eventService, timeService);
                 yield break;
             }
 
@@ -101,7 +101,8 @@ namespace EFramework.Runtime
                 audioService,
                 dataService,
                 eventService,
-                coroutineService);
+                coroutineService,
+                timeService);
 
             Current = context;
             component.BindContext(context);
@@ -130,13 +131,15 @@ namespace EFramework.Runtime
             AssetManager assetService,
             DataManager dataService,
             CoroutineManager coroutineService,
-            EventService eventService)
+            EventService eventService,
+            GameTimeManager timeService)
         {
             audioService?.Dispose();
             uiService?.Dispose();
             assetService?.Dispose();
             dataService?.Dispose();
             coroutineService?.Dispose();
+            timeService?.Dispose();
             eventService?.ClearAll();
         }
 
@@ -145,7 +148,7 @@ namespace EFramework.Runtime
             if (!Initialized) return;
 
             s_frameCount++;
-            s_timePassed += Time.unscaledDeltaTime;
+            s_timePassed += unscaledDeltaTime;
             if (s_timePassed >= SampleDuration)
             {
                 s_averageFPS = s_frameCount / s_timePassed;
@@ -157,8 +160,6 @@ namespace EFramework.Runtime
 
         public static void Dispose()
         {
-            TaskQueue.Reset();
-
             Current?.Dispose();
             Current = null;
             LastInitializationResult = default;

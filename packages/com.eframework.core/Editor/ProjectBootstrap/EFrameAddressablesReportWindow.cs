@@ -160,7 +160,7 @@ namespace EFramework.Editor.ProjectBootstrap
         {
             EditorGUILayout.LabelField("ResPath Directory Selection", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "Addressables owns every managed resource directory. Check directory trees whose managed resources should generate ResPath.Generated entries for code-driven loading.",
+                "Addressables owns every managed resource directory. Check directory trees whose managed resources should generate ResPath entries for code-driven loading.",
                 MessageType.Info);
 
             using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))

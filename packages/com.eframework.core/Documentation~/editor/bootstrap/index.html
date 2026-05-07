@@ -1,171 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Editor / Bootstrap - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>编辑器 / Bootstrap - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Editor / Bootstrap</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>模块页</h2>
-                    <nav class="nav-links">
-                        <a href="../../runtime/ui/index.html">Runtime / UI</a>
-                        <a href="../../runtime/data/index.html">Runtime / Data</a>
-                        <a href="../../runtime/effects/index.html">Runtime / Effects</a>
-                        <a href="index.html">Editor / Bootstrap</a>
-                        <a href="../ui-tools/index.html">Editor / UI Tools</a>
-                        <a href="../audio-tools/index.html">Editor / Audio Tools</a>
-                        <a href="../../ai/index.html">AI 协作层</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs">
-                        <span><a href="../../index.html">Docs</a></span>
-                        <span>Editor</span>
-                        <span>Bootstrap</span>
-                    </div>
-                    <div class="eyebrow">Project Bootstrap</div>
-                    <h1>Editor 侧最有价值的不是零散菜单，而是把冷启动和升级动作收敛成稳定入口。</h1>
-                    <p class="lead">EFrame 当前已经把项目初始化、Addressables 同步、模板复制、Audio 初始化、DOTween 前置条件整理成 Editor 工具链。文档页要做的是告诉你每个入口负责什么，而不是只罗列菜单名。</p>
-                    <div class="meta-list">
-                        <div><dt>主入口</dt><dd>`EFrame Tools/项目初始化向导`</dd></div>
-                        <div><dt>日常同步</dt><dd>Managed directory auto-sync + build preflight</dd></div>
-                        <div><dt>目标</dt><dd>让新项目和升级项目都走统一路径</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>编辑器 / Bootstrap</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a class="is-active" href="index.html">Bootstrap</a><a href="../ui-tools/index.html">UI 工具</a><a href="../audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>编辑器</span><span>Bootstrap</span></div>
+          <div class="eyebrow">Project Bootstrap</div>
+          <h1>Bootstrap 初始化工具</h1>
+          <p class="lead">项目初始化向导负责 Basic、扩展包、Showcase、Addressables、Audio、DOTween Adapter、StartUp 和 build settings。模板复制由该工具统一执行。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Strong Resource Convention</div>
-                            <h2>Managed resources should be placed, not hand-wired.</h2>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <p>`Assets/App/Res`, `Assets/Scenes`, and `Assets/Modules` are EFrame-managed Addressables roots. The framework owns group selection, generated address, `eframe-managed` label, and stale entry cleanup for those directories.</p>
-                        <p>`Sync Groups And Generate ResPath` opens the report window where projects choose which directory subtrees generate `ResPath.Generated`; import/move/delete automation and build preflight handle normal Addressables correctness.</p>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>Basic 模板</strong><p>创建 StartUp 场景、Procedure、Home UI、音频资源和基础目录。</p></div><div class="module-row"><strong>资源同步</strong><p>修复托管 Addressables entries，并生成 <code>ResPath</code>。</p></div><div class="module-row"><strong>扩展安装</strong><p>按 Core 来源写入本地 file 或 git package 依赖。</p></div><div class="module-row"><strong>Showcase 模块</strong><p>安装可选扩展示范模块并设置 StartUp 入口。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>新项目 / 修复项目</h3>
+    <ul><li>打开 <code>EFrame Tools/项目初始化向导</code>。</li><li>先执行 <code>Initialize / Repair Project</code>。</li><li>再按需勾选 Extensions 并 Apply。</li><li>需要扩展示范时安装 Showcase。</li></ul>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Tool Map</div>
-                            <h2>核心入口怎么分工</h2>
-                        </div>
-                    </div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>`EFrameProjectInitializationWindow`</strong>
-                            <p>项目初始化总入口，负责冷启动、Addressables/ResPath、Audio、DOTween、StartUp 场景和 Basic 模板复制。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`EFrameAddressablesSyncMenu`</strong>
-                            <p>作为资源地址修复/验证入口，重新同步托管 Addressables 分组，并按窗口中选择的目录生成 `ResPath.Generated.cs`，不触发完整初始化流程。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`EFrameUIBootstrapUtility` / Basic template copy</strong>
-                            <p>负责 UI sorting layer、Basic prefab、运行时必需资源模板的落地。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`EFrameAudioBootstrapUtility` / `EFrameDotweenBootstrapUtility`</strong>
-                            <p>负责运行前置资产和框架依赖的初始化，不建议让业务项目自己重复手工搭。</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Recommended Usage</div>
-                            <h2>什么时候用哪个入口</h2>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <table>
-                            <thead>
-                                <tr><th>场景</th><th>推荐入口</th><th>原因</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>全新项目接入</td><td>`Initialize / Repair Project`</td><td>一次同步 AI 契约，复制 Basic 模板，并补齐场景、目录、资源、UI layer、Audio、DOTween。</td></tr>
-                                <tr><td>安装扩展包</td><td>`Extensions` -> `Apply`</td><td>打开窗口时自动同步已安装状态，也可用 `Select All` 一次性全选；按 Core 包来源写入本地 `file:` 或同仓库 git 扩展包依赖，并统一处理 `DOTween Adapter`。</td></tr>
-                                <tr><td>安装扩展示例模块</td><td>`Showcase` -> `Install Showcase`</td><td>先确保 Showcase 依赖扩展包已导入，再复制 Showcase 模块，按业务侧落地的脚本 `.meta` 修复示例 prefab 引用，同步资源，并自动设置 StartUp。</td></tr>
-                                <tr><td>资源移动后重新整理地址</td><td>Auto-sync, or `Sync Groups And Generate ResPath` for repair</td><td>托管目录变化会自动同步；菜单入口保留给手动修复和验证。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Related Editor Flows</div>
-                            <h2>Bootstrap 之外的编辑器工作流</h2>
-                        </div>
-                    </div>
-                    <div class="card-grid">
-                        <article class="feature-card">
-                            <h3><a href="../ui-tools/index.html">Editor / UI Tools</a></h3>
-                            <p>当项目已经完成基础初始化后，日常 UI 维护更多发生在 `QUIBinding`、访问类生成和组件绑定编辑器里。</p>
-                        </article>
-                        <article class="feature-card">
-                            <h3><a href="../audio-tools/index.html">Editor / Audio Tools</a></h3>
-                            <p>音频资源和事件映射在初始化后继续演进，应通过专用音频工具维护而不是回到脚本硬编码。</p>
-                        </article>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Bootstrap Checklist</div>
-                            <h2>这条链实际会补哪些东西</h2>
-                        </div>
-                    </div>
-                    <div class="card-grid">
-                        <article class="feature-card">
-                            <h3>StartUp 场景</h3>
-                            <p>包含 `Boot`、`EFrameComponent`、`EFrameProcedureComponent` 等启动期核心对象关系。</p>
-                        </article>
-                        <article class="feature-card">
-                            <h3>SortingLayer</h3>
-                            <p>自动补齐 `QuiBackground`、`QuiPanel`、`QuiPopUp`、`QuiTooltip`、`QuiEffect`、`QuiTop`。</p>
-                        </article>
-                        <article class="feature-card">
-                            <h3>模板与资源</h3>
-                            <p>复制 Basic 模板中的 `HomeView.prefab`、Audio 配置和相关资源约束。</p>
-                        </article>
-                        <article class="feature-card">
-                            <h3>Addressables / ResPath</h3>
-                            <p>把新增资源纳入分组，并生成稳定的代码入口，避免业务手写裸地址。</p>
-                        </article>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td>Initialize / Repair Project</td><td>复制 Basic 并修复项目结构</td><td>首选冷启动入口。</td></tr><tr><td>Extensions -&gt; Apply</td><td>写入可选 package 依赖和 DOTween define</td><td>取消勾选不删除已安装包。</td></tr><tr><td>Showcase -&gt; Install Showcase</td><td>安装扩展示范模块</td><td>依赖导入完成后可重复点击修复。</td></tr><tr><td>Addressables Sync</td><td>托管目录和 ResPath</td><td>build 前会 preflight。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

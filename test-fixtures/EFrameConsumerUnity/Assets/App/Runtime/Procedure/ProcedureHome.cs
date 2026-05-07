@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using EFramework.Generated;
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.Procedure;
@@ -13,7 +13,7 @@ namespace GameApp.Procedure
 
         protected override async UniTask OnPreloadAsync(IAssetPreloadScope assets, ProcedureEnterContext context)
         {
-            await assets.PreloadAsync<GameObject>(ResPath.Generated.UI.Panels.Home.HomeView);
+            await assets.PreloadAsync<GameObject>(ResPath.UI.Panels.Home.HomeView);
         }
 
         protected override void OnEnter(ProcedureEnterContext context)

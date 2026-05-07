@@ -1,6 +1,7 @@
 using EFramework.Runtime.Asset;
 using EFramework.Runtime.UI.Layout;
 using EFramework.Runtime.UI.Handles;
+using EFramework.Runtime.UI.Interactions;
 using EFramework.Runtime.UI.Transitions;
 using Cysharp.Threading.Tasks;
 using System;
@@ -64,7 +65,10 @@ namespace EFramework.Runtime.UI
         public int DesignWidth { get; private set; }
         public int DesignHeight { get; private set; }
         public bool EnableScreenFitDebugLog { get; private set; }
+        public IUIQueue Queue { get; } = new UIQueue();
+        public IUIDismissDispatcher Dismiss { get; private set; }
         private UISceneCameraBinder m_sceneCameraBinder;
+        private UIDismissDispatcher m_dismissDispatcher;
         private GameObject m_backgroundCanvasObject;
         private RectTransform m_backgroundCanvasRect;
         private RectTransform m_backgroundNode;
@@ -356,6 +360,9 @@ namespace EFramework.Runtime.UI
             RootCanvas = rootObject.AddComponent<Canvas>();
             EventSystem = rootObject.AddComponent<EventSystem>();
             AddInputModule(rootObject);
+            m_dismissDispatcher = rootObject.AddComponent<UIDismissDispatcher>();
+            m_dismissDispatcher.Initialize(UICamera);
+            Dismiss = m_dismissDispatcher;
 
             RootCanvas.renderMode = RenderMode.ScreenSpaceCamera;
             RootCanvas.worldCamera = UICamera;
@@ -704,6 +711,8 @@ namespace EFramework.Runtime.UI
 
         public void Dispose()
         {
+            Dismiss?.Clear();
+            Queue.Reset();
             ClearViewCache();
             PopAll();
             if (Root != null)
@@ -720,6 +729,8 @@ namespace EFramework.Runtime.UI
             m_transitionCache.Clear();
             m_sceneCameraBinder?.Dispose();
             m_sceneCameraBinder = null;
+            m_dismissDispatcher = null;
+            Dismiss = null;
             m_backgroundCanvasObject = null;
             m_backgroundCanvasRect = null;
             m_backgroundNode = null;

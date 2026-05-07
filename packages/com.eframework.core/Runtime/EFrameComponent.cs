@@ -80,8 +80,8 @@ namespace EFramework.Runtime
             // 启动流程组件
             m_procedureComponent.Initialize(EFrame.Current);
             m_procedureComponent.StartProcedure();
-            float startupDeadline = Time.realtimeSinceStartup + 5f;
-            while (!m_procedureComponent.IsRunning && Time.realtimeSinceStartup < startupDeadline)
+            float startupDeadline = UnityEngine.Time.realtimeSinceStartup + 5f;
+            while (!m_procedureComponent.IsRunning && UnityEngine.Time.realtimeSinceStartup < startupDeadline)
             {
                 yield return null;
             }
@@ -103,14 +103,14 @@ namespace EFramework.Runtime
         private void Update()
         {
             if (!m_initialized) return;
-            EFrame.Update(Time.deltaTime, Time.unscaledDeltaTime);
-            m_procedureComponent.Tick(Time.deltaTime, Time.unscaledDeltaTime);
-            EventBus.Dispatch(new AppUpdateEvent { DeltaTime = Time.deltaTime, UnscaledDeltaTime = Time.unscaledDeltaTime });
+            EFrame.Update(UnityEngine.Time.deltaTime, UnityEngine.Time.unscaledDeltaTime);
+            m_procedureComponent.Tick(UnityEngine.Time.deltaTime, UnityEngine.Time.unscaledDeltaTime);
+            EventBus.Dispatch(new AppUpdateEvent { DeltaTime = UnityEngine.Time.deltaTime, UnscaledDeltaTime = UnityEngine.Time.unscaledDeltaTime });
 
             // 每秒触发一次事件            
-            if (Time.time - m_lastTimeTick >= 1f)
+            if (UnityEngine.Time.time - m_lastTimeTick >= 1f)
             {
-                m_lastTimeTick = Time.time;
+                m_lastTimeTick = UnityEngine.Time.time;
                 EventBus.Dispatch(new AppUpdatePerSecondEvent());
             }
         }

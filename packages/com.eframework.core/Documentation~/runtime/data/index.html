@@ -1,214 +1,102 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / Data - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / Data - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / Data</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>模块页</h2>
-                    <nav class="nav-links">
-                        <a href="../ui/index.html">Runtime / UI</a>
-                        <a href="index.html">Runtime / Data</a>
-                        <a href="service/index.html">Data Service</a>
-                        <a href="table/index.html">DataTable</a>
-                        <a href="storage/index.html">Storage & Results</a>
-                        <a href="../../editor/bootstrap/index.html">Editor / Bootstrap</a>
-                        <a href="../../ai/index.html">AI 协作层</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs">
-                        <span><a href="../../index.html">Docs</a></span>
-                        <span>Runtime</span>
-                        <span>Data</span>
-                    </div>
-                    <div class="eyebrow">Persistence</div>
-                    <h1>Data 模块真正要解决的问题不是“怎么存”，而是“怎么稳定地知道这次存取发生了什么”。</h1>
-                    <p class="lead">EFrame 的数据层围绕 `IDataService`、`IDataTable`、`DataTable&lt;T&gt;`、`IDataStorage` 和结构化结果对象组织。它不鼓励业务直接拿裸对象随意改值，而是要求通过表自身的 dirty 语义和版本迁移入口来维护状态。</p>
-                    <div class="meta-list">
-                        <div><dt>服务入口</dt><dd>`IDataService` / `DataManager`</dd></div>
-                        <div><dt>表基类</dt><dd>`DataTable&lt;T&gt;`</dd></div>
-                        <div><dt>结果诊断</dt><dd>`LastLoadResult` / `LastSaveResult`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / Data</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../core/index.html">Core</a><a href="../assets/index.html">Assets</a><a href="../ui/index.html">UI</a><a class="is-active" href="index.html">Data</a><a href="../audio/index.html">Audio</a><a href="../events/index.html">Events</a><a href="../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>运行时</span><span>Data</span></div>
+          <div class="eyebrow">Persistence</div>
+          <h1>Data 持久化数据</h1>
+          <p class="lead"><code>DataTable&lt;T&gt;</code> 统一数据模型、StorageKey、dirty、迁移和结果对象。业务修改通过表的公开属性或方法进入。</p>
+          <div class="meta-list"><div><dt>服务</dt><dd><code>IDataService</code></dd></div><div><dt>表</dt><dd><code>DataTable&lt;T&gt;</code></dd></div><div><dt>结果</dt><dd><code>LastLoadResult</code> / <code>LastSaveResult</code></dd></div></div>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>稳定 StorageKey</strong><p>存档身份由表声明，不依赖可变类名或命名空间。</p></div><div class="module-row"><strong>受控修改</strong><p><code>SetValue</code> / <code>Mutate</code> 只在值变化时标记 dirty。</p></div><div class="module-row"><strong>版本迁移</strong><p><code>CurrentVersion</code> 和 <code>Migrate</code> 支持旧存档升级。</p></div><div class="module-row"><strong>结构化结果</strong><p><code>LastLoadResult</code> / <code>LastSaveResult</code> 供 UI、遥测和恢复逻辑使用。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>子页面</h2></div></div>
+    <div class="card-grid"><article class="article-card">
+        <div class="eyebrow">Service</div>
+        <h3><a href="service/index.html">Data Service</a></h3>
+        <p>注册、获取、批量加载保存和 App 生命周期接线。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Sub Pages</div>
-                            <h2>按职责继续下钻</h2>
-                        </div>
-                    </div>
-                    <div class="card-grid">
-                        <article class="article-card">
-                            <div class="eyebrow">Orchestration</div>
-                            <h3><a href="service/index.html">Data Service</a></h3>
-                            <p>`IDataService` / `DataManager` 的注册、批量加载保存和应用事件接线。</p>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Model Boundary</div>
-                            <h3><a href="table/index.html">DataTable</a></h3>
-                            <p>`DataTable&lt;T&gt;` 的 dirty、迁移、默认数据和受控修改模式。</p>
-                        </article>
-                        <article class="article-card">
-                            <div class="eyebrow">Persistence Backend</div>
-                            <h3><a href="storage/index.html">Storage &amp; Results</a></h3>
-                            <p>`JsonFileStorage` 的备份回退，以及 `DataLoadResult` / `DataSaveResult` 的可读诊断面。</p>
-                        </article>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">Table</div>
+        <h3><a href="table/index.html">DataTable</a></h3>
+        <p>StorageKey、dirty、迁移、默认数据和受控修改。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Core Types</div>
-                            <h2>模块职责分工</h2>
-                        </div>
-                    </div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>`IDataService` / `DataManager`</strong>
-                            <p>负责注册表、统一加载保存、在应用暂停或退出时触发保存链。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`IDataTable`</strong>
-                            <p>定义持久化表的稳定契约，包括 `StorageKey`、脏状态、加载状态以及最近一次保存/加载结果。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`DataTable&lt;T&gt;`</strong>
-                            <p>业务最常用扩展点。负责默认数据、迁移、脏标记和面向业务的安全修改入口。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`IDataStorage` / `JsonFileStorage`</strong>
-                            <p>底层存储实现。当前默认实现带备份和容错路径，支持结构化结果回传。</p>
-                        </div>
-                    </div>
-                </section>
+      </article><article class="article-card">
+        <div class="eyebrow">Storage</div>
+        <h3><a href="storage/index.html">Storage & Results</a></h3>
+        <p>JsonFileStorage、备份回退和结构化诊断结果。</p>
 
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Key APIs</div>
-                            <h2>关键 API 参数与返回值</h2>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <h3>`IDataService.RegisterTable&lt;T&gt;()`</h3>
-                        <table>
-                            <thead>
-                                <tr><th>项</th><th>说明</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>泛型约束</td><td>`T : IDataTable, new()`。表必须可无参构造，并实现数据表契约。</td></tr>
-                                <tr><td>返回值</td><td>注册后的表实例。通常注册后立刻可以 `GetTable&lt;T&gt;()` 再次取得。</td></tr>
-                                <tr><td>使用时机</td><td>推荐在框架初始化后的启动流程中统一注册，而不是业务散点懒注册。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`DataTable&lt;T&gt;.Save(bool forceFlush = false)`</h3>
-                        <table>
-                            <thead>
-                                <tr><th>参数</th><th>类型</th><th>说明</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>`forceFlush`</td><td>`bool`</td><td>即使表当前不是 dirty，也强制执行一次保存流程。</td></tr>
-                                <tr><td>结果</td><td>`LastSaveResult`</td><td>保存后通过表状态读取。包含状态、原因码、版本号和消息，不依赖日志猜测。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`DataTable&lt;T&gt;.Load()`</h3>
-                        <table>
-                            <thead>
-                                <tr><th>结果分支</th><th>说明</th></tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>正常加载</td><td>直接设置 `Data`，更新 `LoadedVersion`，记录 `LastLoadResult`。</td></tr>
-                                <tr><td>旧版本迁移</td><td>调用 `Migrate()`，迁移成功后标记 dirty，等待后续写回。</td></tr>
-                                <tr><td>失败回退</td><td>使用默认数据，保留结构化失败原因，避免只靠日志排查。</td></tr>
-                                <tr><td>无存档</td><td>创建默认数据，状态记为 `DefaultDataCreated`。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Recommended Pattern</div>
-                            <h2>推荐表写法</h2>
-                        </div>
-                    </div>
-                    <div class="panel">
-<pre><code class="language-csharp">public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsModel&gt;
+      </article></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>一张设置表</h3>
+    <ul><li>模型可序列化。</li><li>表声明稳定 <code>StorageKey</code>。</li><li>所有修改走表的属性或方法。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">[Serializable]
+public sealed class PlayerSettingsData
 {
-    protected override int CurrentVersion =&gt; 2;
+    public bool MusicOn = true;
+}
 
-    public bool MusicOn
-    {
-        get =&gt; Data.MusicOn;
-        set =&gt; SetValue(ref Data.MusicOn, value);
-    }
-
-    protected override PlayerSettingsModel GetDefaultData()
-    {
-        return new PlayerSettingsModel
-        {
-            MusicOn = true,
-            SfxOn = true
-        };
-    }
-}</code></pre>
-                        <p>关键点是把改值动作包进表内部，让 dirty 语义、版本迁移和结果对象都保留在统一模型里，而不是让外部直接随意改 `Data`。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header">
-                        <div>
-                            <div class="eyebrow">Diagnostics</div>
-                            <h2>为什么这里专门强调结果对象</h2>
-                        </div>
-                    </div>
-                    <div class="callout-grid">
-                        <div class="callout">
-                            <h3>`DataLoadResult`</h3>
-                            <p>说明数据来自主文件、备份、旧版原始数据还是回退默认值，并给出原因码，适合 UI 和调试工具直接展示。</p>
-                        </div>
-                        <div class="callout">
-                            <h3>`DataSaveResult`</h3>
-                            <p>说明这次是实际写入、跳过未脏数据还是保存失败，避免“看起来没报错但其实没写文件”的灰区。</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsData&gt;
+{
+    public override string StorageKey =&gt; &quot;player.settings&quot;;
+    public bool MusicOn { get =&gt; Data.MusicOn; set =&gt; SetValue(ref Data.MusicOn, value); }
+}</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>RegisterTable&lt;T&gt;()</code></td><td>创建、注入 storage、立即加载</td><td>启动流程集中注册。</td></tr><tr><td><code>GetTable&lt;T&gt;()</code></td><td>获取已注册表</td><td>同一状态只保留 DataService 注册表实例。</td></tr><tr><td><code>SaveAll(forceFlush)</code></td><td>批量保存</td><td>pause/quit 会自动接线。</td></tr><tr><td><code>LastLoadResult/LastSaveResult</code></td><td>可读诊断</td><td>状态判断使用结构化结果对象。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

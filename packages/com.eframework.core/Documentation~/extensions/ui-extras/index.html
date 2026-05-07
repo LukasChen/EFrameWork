@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>扩展包 / UI Extras - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
+</head>
+<body>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>扩展包 / UI Extras</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../index.html">扩展包总览</a><a class="is-active" href="index.html">UI Extras</a><a href="../effects/index.html">Effects</a><a href="../debug-console/index.html">Debug Console</a><a href="../ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>扩展包</span><span>UI Extras</span></div>
+          <div class="eyebrow">Controls / Interaction / Virtual List</div>
+          <h1>UI Extras 扩展包</h1>
+          <p class="lead">这里的组件用于 prefab authoring 和局部交互增强。页面打开关闭仍然走 <code>UIControllerBase&lt;TView&gt;</code>。</p>
+
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>Components</strong><p><code>CheckableButton</code>、<code>Tabbar</code>、<code>EmptyRayCasterGraphic</code>。</p></div><div class="module-row"><strong>Interaction</strong><p><code>UIInteractionGuard</code>、<code>UIInteractionReporter</code>、<code>UIInteractionFeedback</code>。</p></div><div class="module-row"><strong>Graphics</strong><p><code>UISmoothFill</code>、<code>UIRoundedRectImage</code>。</p></div><div class="module-row"><strong>VirtualList</strong><p><code>QVirtualListView</code>、<code>QVirtualGridView</code>、<code>QVirtualListItem</code>、adapter contracts。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>虚拟列表接入</h3>
+    <ul><li>模板 item 可以 inactive。</li><li>adapter 只绑定可见项。</li><li>外部改变 viewport 尺寸后调用 <code>RefreshLayout()</code>。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">using EFramework.Extensions.UI.VirtualList;
+
+public sealed class InventoryAdapter : IQVirtualListAdapter
+{
+    public int Count =&gt; m_items.Count;
+    public void BindItem(QVirtualListItem item, int index) { }
+}</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>CheckableButton</code></td><td>带 checked/toggle 语义的按钮</td><td>适合 tab、开关型按钮。</td></tr><tr><td><code>Tabbar</code></td><td>基于 CheckableButton 的标签选择器</td><td>适合少量固定页签。</td></tr><tr><td><code>UIInteractionFeedback</code></td><td>按钮/Toggle 状态反馈</td><td>支持 scale、offset、color、material 等动作。</td></tr><tr><td><code>QVirtualListView</code></td><td>单轴虚拟列表</td><td>适合可变尺寸列表。</td></tr><tr><td><code>QVirtualGridView</code></td><td>固定尺寸虚拟网格</td><td>支持 cross-axis auto wrap。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

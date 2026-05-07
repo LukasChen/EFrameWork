@@ -1,145 +1,145 @@
-# EFrame AI Architecture
+# EFrame AI 架构
 
-EFrame is maintained as a Unity framework plus a synchronized AI collaboration layer. The AI layer is part of the framework contract: it carries the coding rules, project structure rules, skills, and upgrade flow that let Copilot work inside EFrame projects without rediscovering the conventions every time.
+EFrame 作为 Unity 框架和同步的 AI 协作层一起维护。AI 层是框架契约的一部分：它承载编码规则、项目结构规则、skills 和升级流程，让 Copilot 在 EFrame 项目中工作时不需要每次重新发现约定。
 
-## 1. Design Goal
+## 1. 设计目标
 
-The goal is to make every new EFrame project start with a copied Basic Unity template, then let the user sync the supported AI clients from the Unity Editor or package tools.
+目标是让每个新的 EFrame 项目都从复制 Basic Unity 模板开始，然后让用户通过 Unity Editor 或 package 工具同步受支持的 AI 客户端。
 
-Cold-start and upgrade flows must keep these parts aligned:
+冷启动和升级流程必须保持以下部分一致：
 
-- Unity package code under `packages/com.eframework.core/`
-- Synced AI workspace source under `packages/com.eframework.core/AIWorkspace~/`
-- System-required framework AI entry files such as `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md`
-- Sync and bootstrap scripts under `tools/`
-- Human-facing docs under `packages/com.eframework.core/Documentation~/`
+- `packages/com.eframework.core/` 下的 Unity package 代码
+- `packages/com.eframework.core/AIWorkspace~/` 下的已同步 AI 工作区源
+- 系统要求的框架 AI 入口文件，例如 `AGENTS.md`、`CLAUDE.md` 和 `.github/copilot-instructions.md`
+- `tools/` 下的同步和引导脚本
+- `packages/com.eframework.core/Documentation~/` 下给人看的文档
 
-When one part changes the expected project shape, the matching AI guidance must be reviewed in the same change set.
+当其中一部分改变预期的项目形态时，匹配的 AI 指引必须在同一个变更集中一起审查。
 
-## 2. Layer Responsibilities
+## 2. 层职责
 
 `packages/com.eframework.core/`
 
-- Provides the runtime and editor implementation.
-- Owns framework services such as `EFrame`, `EFrameContext`, `QUI`, asset loading, audio, data, events, and editor bootstrap utilities.
-- Should not rely on project-specific AI rules.
+- 提供 Runtime 和 Editor 实现。
+- 拥有 `EFrame`、`EFrameContext`、`QUI`、资源加载、音频、数据、事件和 Editor 引导工具等框架服务。
+- 不应依赖项目私有 AI 规则。
 
 `.github/`
 
-- Contains only files that must live under `.github` to work in the framework repository, such as `copilot-instructions.md`.
-- Is not the source directory for synced EFrame AI workspace files.
+- 只包含必须位于 `.github` 下才能在框架仓库生效的文件，例如 `copilot-instructions.md`。
+- 不是已同步 EFrame AI 工作区文件的源目录。
 
 `packages/com.eframework.core/AIWorkspace~/`
 
-- Provides the framework-managed AI collaboration source layer.
-- `managed-blocks/eframe-*.md` contains the EFrame blocks injected into project-owned AI entry files.
-- `instructions/eframe-instructions.md` contains the short, stable framework usage rules that are part of the synced business-project contract.
-- `skills/eframe-*` contains on-demand business-project workflows that are synced into business projects.
-- `eframe-ai.manifest.json` declares the synced AI layer version and file hashes for framework-managed AI files; business projects still receive this file at `.github/eframe-ai.manifest.json`.
-- `support-docs/` contains AI-facing support documents that must sync to business projects but should not live under human documentation directories.
+- 提供框架托管的 AI 协作源层。
+- `managed-blocks/eframe-*.md` 包含注入到项目自有 AI 入口文件中的 EFrame block。
+- `instructions/eframe-instructions.md` 包含短小、稳定的框架使用规则，是同步到业务项目的契约的一部分。
+- `skills/eframe-*` 包含按需触发的业务项目工作流，会同步到业务项目。
+- `eframe-ai.manifest.json` 声明已同步 AI 层版本和框架托管 AI 文件的哈希；业务项目仍会在 `.github/eframe-ai.manifest.json` 接收此文件。
+- `support-docs/` 包含面向 AI 的支持文档，必须同步到业务项目，但不应放在人类文档目录下。
 
 `AGENTS.md`
 
-- Provides the framework repo-root Codex entry point for maintainers.
-- Directs Codex to synced or maintainer workflow files when a task matches them.
-- Is not copied wholesale into business projects. Business projects own their `AGENTS.md`; EFrame sync only injects or updates the marked EFrame managed block.
+- 提供框架仓库根目录的 Codex 维护者入口。
+- 当任务匹配时，引导 Codex 读取同步工作流或维护者工作流文件。
+- 不会整份复制到业务项目。业务项目拥有自己的 `AGENTS.md`；EFrame 同步只注入或更新标记出的 EFrame managed block。
 
 `CLAUDE.md`
 
-- Provides the framework repo-root Claude Code entry point.
-- Points Claude Code at the same shared EFrame API index, synced workspace source, and naming boundaries instead of duplicating the full contract.
-- Is not copied wholesale into business projects. Business projects own their `CLAUDE.md`; EFrame sync only injects or updates the marked EFrame managed block.
+- 提供框架仓库根目录的 Claude Code 入口。
+- 指向同一套共享的 EFrame API 索引、同步工作区源和命名边界，而不是重复完整契约。
+- 不会整份复制到业务项目。业务项目拥有自己的 `CLAUDE.md`；EFrame 同步只注入或更新标记出的 EFrame managed block。
 
 `packages/com.eframework.core/AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md`
 
-- Provides a compact AI-oriented map of stable Runtime, Editor bootstrap, and AI tooling APIs.
-- Is an AI-facing support document for business-project AI, not a release or manifest maintenance guide.
-- Is synced into business projects as `.github/eframe/EFRAME_AI_API_INDEX.md` so selected AI clients can read the API map from the project workspace.
-- Should favor stable project-facing entry points over internal implementation details.
+- 提供紧凑的、面向 AI 的稳定 Runtime、Editor bootstrap 和 AI tooling API 地图。
+- 是面向业务项目 AI 的支持文档，不是 release 或 manifest 维护指南。
+- 会作为 `.github/eframe/EFRAME_AI_API_INDEX.md` 同步到业务项目，让选定的 AI 客户端可以从项目工作区读取 API 地图。
+- 应优先记录稳定的项目侧入口点，而不是内部实现细节。
 
 `tools/`
 
-- Imports and updates the AI layer in business projects.
-- Creates cold-start project structure and copies the Basic startup template.
-- Installs project-side sync scripts.
-- Injects or updates EFrame managed blocks in project-owned AI entry files without overwriting local project rules.
-- Checks business-project AI workspace health after sync or framework upgrades.
-- Lets Unity Editor users sync the supported AI clients instead of coupling AI contract sync to cold-start.
+- 在业务项目中导入和更新 AI 层。
+- 创建冷启动项目结构并复制 Basic 启动模板。
+- 安装项目侧同步脚本。
+- 在项目自有 AI 入口文件中注入或更新 EFrame managed block，同时不覆盖本地项目规则。
+- 在同步或框架升级后检查业务项目 AI 工作区健康状态。
+- 允许 Unity Editor 用户同步受支持的 AI 客户端，而不是把 AI 契约同步绑定到冷启动流程。
 
-Business project `.github/`
+业务项目 `.github/`
 
-- Receives synced `eframe-*` files from the framework.
-- Receives `.github/eframe/EFRAME_AI_API_INDEX.md` as a framework-managed support document.
-- Owns root AI entry files and any local project rule files.
-- Must not manually fork framework-managed `eframe-*` files.
-- Receives EFrame managed blocks inside selected AI entry files; only text between the EFrame markers is framework-owned.
-- Does not receive framework maintainer-only `maintainer-*` skills.
-- Does not receive package human docs or maintainer AI workspace files such as `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
+- 接收从框架同步过来的 `eframe-*` 文件。
+- 接收 `.github/eframe/EFRAME_AI_API_INDEX.md` 作为框架托管支持文档。
+- 拥有根 AI 入口文件和所有本地项目规则文件。
+- 不得手动 fork 框架托管的 `eframe-*` 文件。
+- 在选定的 AI 入口文件中接收 EFrame managed block；只有 EFrame 标记之间的文本由框架拥有。
+- 不接收只供框架维护者使用的 `maintainer-*` skills。
+- 不接收 package 人类文档，也不接收 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 等维护者 AI 工作区文件。
 
-## 3. Required Sync Rule
+## 3. 必须执行的同步规则
 
-Any change in the following areas must include an AI layer impact check:
+以下区域的任何变更都必须包含 AI 层影响检查：
 
-- Startup scene structure, `Boot`, or `EFrameComponent` initialization
-- `Procedure` lifecycle templates or responsibilities
-- `QUI`, `UIController`, UI prefab, or layer management rules
-- `ResPath`, Addressables group rules, or resource directory conventions
-- Cold-start scripts, Basic/Showcase templates, optional modules, or editor initialization windows
-- Directory structure docs or release/setup docs
+- 启动场景结构、`Boot` 或 `EFrameComponent` 初始化
+- `Procedure` 生命周期模板或职责
+- `QUI`、`UIController`、UI prefab 或层级管理规则
+- `ResPath`、Addressables group 规则或资源目录约定
+- 冷启动脚本、Basic/Showcase 模板、可选模块或 Editor 初始化窗口
+- 目录结构文档或 release/setup 文档
 
-If the change affects how Copilot, Codex, or Claude Code should generate, refactor, or audit EFrame projects, update the relevant `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, or `packages/com.eframework.core/AIWorkspace~` instruction/skill in the same change set. Keep always-on boundaries in instructions; put multi-step workflows, audits, and detailed checklists in skills or skill references.
+如果变更会影响 Copilot、Codex 或 Claude Code 应如何生成、重构或审计 EFrame 项目，请在同一个变更集中更新相关的 `AGENTS.md`、`CLAUDE.md`、`.github/copilot-instructions.md` 或 `packages/com.eframework.core/AIWorkspace~` instruction/skill。常驻边界放在 instructions 中；多步骤工作流、审计和详细清单放在 skills 或 skill references 中。
 
-## 4. UI Runtime Contract
+## 4. UI Runtime 契约
 
-The UI runtime contract is handle-first:
+UI Runtime 契约以 handle 为先：
 
-- Runtime UI lifecycle flows through `IUIService/QUI` and `UIViewHandle<TView>`.
-- View wrappers stay thin, use parameterless construction, and receive prefab state through `SetBinding()` / `OnBindingSet()`.
-- Controllers access live views through `CurrentView`; generated code does not use the old `UIControllerBase<TView>.View` facade.
-- Controller lifecycle hooks are split by scope: `OnViewCreated()` / `OnViewDestroyed()` are instance-level, while `OnViewOpened()` / `OnViewClosed()` are per-open/per-close.
-- Host-owned transitions must tolerate interruption so old open/close completions cannot overwrite the active handle state.
+- Runtime UI 生命周期通过 `IUIService/QUI` 和 `UIViewHandle<TView>` 流转。
+- View wrapper 保持轻量，使用无参构造，并通过 `SetBinding()` / `OnBindingSet()` 接收 prefab 状态。
+- Controller 通过 `CurrentView` 访问当前存活的 view；生成代码不使用旧的 `UIControllerBase<TView>.View` 门面。
+- Controller 生命周期钩子按作用域拆分：`OnViewCreated()` / `OnViewDestroyed()` 是实例级，`OnViewOpened()` / `OnViewClosed()` 是每次打开/关闭级。
+- 宿主拥有的 transition 必须容忍中断，避免旧的 open/close 完成回调覆盖当前活动 handle 状态。
 
-Any framework change that alters this UI contract must update the same contract surface in one change set:
+任何改变此 UI 契约的框架变更，都必须在同一个变更集中更新同一契约面：
 
 - `packages/com.eframework.core/Documentation~/user/UI_FRAMEWORK_GUIDE.md`
 - `packages/com.eframework.core/AIWorkspace~/instructions/eframe-instructions.md`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-ui-feature`
 - `packages/com.eframework.core/AIWorkspace~/skills/eframe-guideline-audit`
-- bootstrap/editor template generators under `tools/` and `packages/com.eframework.core/Editor/`
-- root and package changelogs
+- `tools/` 和 `packages/com.eframework.core/Editor/` 下的 bootstrap/editor 模板生成器
+- 根 changelog 和 package changelog
 
-## 5. Unified Versioning Contract
+## 5. 统一版本契约
 
-EFrame should be maintained as one product surface, not as a Unity framework plus a second AI product. The AI collaboration layer, bootstrap tools, and sync scripts are part of the framework release contract.
+EFrame 应作为一个产品面维护，而不是拆成一个 Unity 框架加第二个 AI 产品。AI 协作层、bootstrap 工具和同步脚本都是框架 release 契约的一部分。
 
-- EFrame release version: stored in `packages/com.eframework.core/package.json` and recorded in the root `CHANGELOG.md`.
-- AI workspace manifest version: stored in `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` only as a sync marker so business projects can detect framework-managed AI file drift.
+- EFrame release version：存储在 `packages/com.eframework.core/package.json`，并记录在根 `CHANGELOG.md` 中。
+- AI workspace manifest version：只作为同步标记存储在 `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json`，让业务项目可以检测框架托管 AI 文件漂移。
 
-Think in terms of the EFrame release first. Bump the package version when publishing a framework/package release. Treat the manifest as a sync marker, not a separate product version.
+优先按 EFrame release 思考。发布 framework/package release 时提升 package version。将 manifest 视为同步标记，而不是单独的产品版本。
 
-Manifest update rules are defined in `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
+Manifest 更新规则定义在 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`。
 
-The manifest version is the broad signal business projects use to detect AI layer drift. Manifest file hashes provide a narrower integrity check for local edits, missing files, or partial syncs.
+Manifest version 是业务项目用来检测 AI 层漂移的宽信号。Manifest file hashes 则提供更窄的完整性检查，用于发现本地编辑、缺失文件或部分同步。
 
-Recommended release sequence:
+推荐 release 顺序：
 
-1. Update the framework implementation or docs.
-2. Update matching instructions and skills.
-3. Bump `packages/com.eframework.core/package.json` if this is a framework/package release.
-4. Update the root `CHANGELOG.md`; update `packages/com.eframework.core/CHANGELOG.md` if package code changed.
-5. Update `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json` according to `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md`.
-6. Run `tools/Test-EFrameAIRelease.ps1`.
-7. Verify `Initialize-EFrameAI.ps1 -StatusOnly` and `-Force`.
-8. Verify cold-start or editor bootstrap paths affected by the change.
-9. For a formal package release, create a preview entry before the formal tag: prefer a `preview/<package>-<version>-rc.N` branch, or record an immutable commit SHA.
-10. Import that preview entry into a real business project through the Unity Package Manager Git URL, using `#preview/...` or `#<commit-sha>`, and validate the project before creating the official `vX.Y.Z` tag.
+1. 更新框架实现或文档。
+2. 更新匹配的 instructions 和 skills。
+3. 如果这是 framework/package release，提升 `packages/com.eframework.core/package.json`。
+4. 更新根 `CHANGELOG.md`；如果 package 代码发生变化，也更新 `packages/com.eframework.core/CHANGELOG.md`。
+5. 按 `tools/MaintainerAIWorkspace/EFRAME_AI_RELEASE_CHECKLIST.md` 更新 `packages/com.eframework.core/AIWorkspace~/eframe-ai.manifest.json`。
+6. 运行 `tools/Test-EFrameAIRelease.ps1`。
+7. 验证 `Initialize-EFrameAI.ps1 -StatusOnly` 和 `-Force`。
+8. 验证受变更影响的冷启动或 Editor bootstrap 路径。
+9. 对正式 package release，在正式 tag 前创建 preview entry：优先使用 `preview/<package>-<version>-rc.N` 分支，或记录不可变 commit SHA。
+10. 通过 Unity Package Manager Git URL 把该 preview entry 导入真实业务项目，使用 `#preview/...` 或 `#<commit-sha>`，并在创建官方 `vX.Y.Z` tag 前验证项目。
 
-## 6. Naming Boundary
+## 6. 命名边界
 
-- `eframe-*` is reserved for framework-managed instructions and skills.
-- `maintainer-*` is reserved for framework-repository-only skills and is not part of the sync surface.
-- Business projects own their root AI entry files and may organize local AI rules however they choose.
-- Framework sync scripts may overwrite drifted `eframe-*` files when `-Force` is used.
-- Framework sync scripts must preserve project-owned instruction text and only update the EFrame managed block inside selected AI entry files.
+- `eframe-*` 保留给框架托管的 instructions 和 skills。
+- `maintainer-*` 保留给只在框架仓库使用的 skills，不属于同步面。
+- 业务项目拥有自己的根 AI 入口文件，并可以按需组织本地 AI 规则。
+- 使用 `-Force` 时，框架同步脚本可以覆盖已漂移的 `eframe-*` 文件。
+- 框架同步脚本必须保留项目自有 instruction 文本，只更新选定 AI 入口文件中的 EFrame managed block。
 
-This boundary keeps framework upgrades repeatable while still allowing each business project to add local rules.
+这条边界让框架升级保持可重复，同时仍允许每个业务项目添加本地规则。

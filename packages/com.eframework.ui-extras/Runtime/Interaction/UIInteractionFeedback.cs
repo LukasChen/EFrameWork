@@ -1226,8 +1226,17 @@ namespace EFramework.Extensions.UI.Extras.Interaction
         {
             unchecked
             {
-                return ((m_target != null ? m_target.GetInstanceID() : 0) * 397) ^ (int)m_property;
+                return ((m_target != null ? GetTargetHashCode(m_target) : 0) * 397) ^ (int)m_property;
             }
+        }
+
+        private static int GetTargetHashCode(UnityEngine.Object target)
+        {
+#if UNITY_6000_3_OR_NEWER
+            return target.GetEntityId().GetHashCode();
+#else
+            return target.GetInstanceID();
+#endif
         }
     }
 

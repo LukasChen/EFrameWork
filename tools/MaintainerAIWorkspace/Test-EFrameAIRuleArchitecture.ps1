@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$Root = $PSScriptRoot
 )
 
@@ -286,7 +286,7 @@ if (Test-Path -LiteralPath $managedBlockRoot) {
     $managedBlockDetailTerms = @(
         "EFrameProcedure",
         "UIControllerBase",
-        "ResPath.Generated",
+        "ResPath",
         "StorageKey",
         "YAML-first",
         "Unity YAML",

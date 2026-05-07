@@ -1,4 +1,4 @@
-# EFrame ResPath 规范
+﻿# EFrame ResPath 规范
 
 这份文档定义 EFrame 的资源地址使用规范，用于统一手写路径中心类、Addressables 自动生成代码以及运行时代码的调用边界。
 
@@ -22,7 +22,7 @@
 优先级建议如下：
 
 1. 编辑器可直接拖拽绑定的静态依赖，优先使用 `AssetReference`。
-2. 代码显式加载或实例化的动态资源，优先使用 `ResPath.Generated.*` 常量。
+2. 代码显式加载或实例化的动态资源，优先使用 `ResPath.*` 常量。
 3. 需要根据业务参数动态组合地址时，在业务代码中提供项目自有辅助方法，但底层仍应返回 EFrame 规范地址。
 4. 不要在业务代码中直接调用 `AssetManager.LoadAsset("...")` 或 `AssetManager.Instantiate("...")` 并写裸字符串。
 
@@ -34,7 +34,7 @@ Addressables 地址由目录规则推导，约束如下：
 - `Assets/App/Res/Bootstrap/...` 生成地址如 `Bootstrap/LoadingView`
 - `Assets/App/Res/SceneAssets/...` 生成地址如 `SceneAssets/MainLighting`
 - `Assets/Scenes/...` 生成地址如 `Scenes/StartUp`
-- `Assets/Modules/<Name>/Res/...` 生成地址如 `Modules/<Name>/Res/UI/Panels/Main/MainView`
+- `Assets/Modules/<Name>/Res/...` 生成地址如 `Modules/<Name>/UI/Panels/Main/MainView`
 - `Assets/Modules/<Name>/Scenes/...` 生成地址如 `Modules/<Name>/Scenes/Main`
 
 目录加细后，地址继续按资源相对路径生成，不额外折叠目录层级。例如：
@@ -44,10 +44,10 @@ Addressables 地址由目录规则推导，约束如下：
 - `Assets/App/Res/UI/Common/Atlases/CommonUI.spriteatlas` 生成 `UI/Common/Atlases/CommonUI`
 - `Assets/App/Res/SceneAssets/BattleScene/Textures/Ground.png` 生成 `SceneAssets/BattleScene/Textures/Ground`
 - `Assets/App/Res/SceneAssets/Common/Materials/SharedGround.mat` 生成 `SceneAssets/Common/Materials/SharedGround`
-- `Assets/App/Res/FX/Gameplay/Skill/Fireball/Fireball.prefab` 生成 `FX/Gameplay/Skill/Fireball/Fireball`
-- `Assets/App/Res/FX/UI/Common/ButtonClick/ButtonClick.prefab` 生成 `FX/UI/Common/ButtonClick/ButtonClick`
-- `Assets/Modules/Shop/Res/UI/Panels/ShopMain/ShopMainView.prefab` 生成 `Modules/Shop/Res/UI/Panels/ShopMain/ShopMainView`
-- `Assets/Modules/Battle/Res/FX/Skill/Fireball/Fireball.prefab` 生成 `Modules/Battle/Res/FX/Skill/Fireball/Fireball`
+- `Assets/App/Res/SceneAssets/Common/FX/Fireball/Fireball.prefab` 生成 `SceneAssets/Common/FX/Fireball/Fireball`
+- `Assets/App/Res/UI/Common/FX/ButtonClick/ButtonClick.prefab` 生成 `UI/Common/FX/ButtonClick/ButtonClick`
+- `Assets/Modules/Shop/Res/UI/Panels/ShopMain/ShopMainView.prefab` 生成 `Modules/Shop/UI/Panels/ShopMain/ShopMainView`
+- `Assets/Modules/Battle/Res/SceneAssets/Common/FX/Fireball/Fireball.prefab` 生成 `Modules/Battle/SceneAssets/Common/FX/Fireball/Fireball`
 
 命名建议：
 
@@ -58,20 +58,20 @@ Addressables 地址由目录规则推导，约束如下：
 
 ## 5. 代码风格
 
-- 生成代码统一挂在 `ResPath.Generated` 下，避免和手写 API 混在一起。
+- 生成代码统一挂在 `ResPath` 下，避免和手写 API 混在一起。
 - 模块内部若需要本地别名，可以提供模块级 `XxxResPath`，但底层地址仍应对齐框架规范。
 
 ## 6. 示例
 
 ```csharp
-var panelPath = ResPath.Generated.UI.Panels.Home.HomeView;
-var homeBannerPath = ResPath.Generated.UI.Panels.Home.Sprites.Banner;
-var commonAtlasPath = ResPath.Generated.UI.Common.Atlases.CommonUI;
-var battleGroundPath = ResPath.Generated.SceneAssets.BattleScene.Textures.Ground;
-var sharedFireballFxPath = ResPath.Generated.FX.Gameplay.Skill.Fireball.Fireball;
-var moduleFireballFxPath = ResPath.Generated.Modules.Battle.Res.FX.Skill.Fireball.Fireball;
-var startupScenePath = ResPath.Generated.Scenes.StartUp;
-var shopMainView = ResPath.Generated.Modules.Shop.Res.UI.Panels.ShopMain.ShopMainView;
+var panelPath = ResPath.UI.Panels.Home.HomeView;
+var homeBannerPath = ResPath.UI.Panels.Home.Sprites.Banner;
+var commonAtlasPath = ResPath.UI.Common.Atlases.CommonUI;
+var battleGroundPath = ResPath.SceneAssets.BattleScene.Textures.Ground;
+var sharedFireballFxPath = ResPath.SceneAssets.Common.FX.Fireball.Fireball;
+var moduleFireballFxPath = ResPath.Modules.Battle.SceneAssets.Common.FX.Fireball.Fireball;
+var startupScenePath = ResPath.Scenes.StartUp;
+var shopMainView = ResPath.Modules.Shop.UI.Panels.ShopMain.ShopMainView;
 ```
 
 ## 7. 禁止事项

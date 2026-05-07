@@ -1,123 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / UI / UIViewHandle - EFrame Docs</title>
-    <link rel="stylesheet" href="../../../assets/style.css">
-    <script defer src="../../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / UI / UIViewHandle - EFrame 文档</title>
+  <link rel="stylesheet" href="../../../assets/style.css">
+  <script defer src="../../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / UI / UIViewHandle</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../../index.html">首页</a>
-                        <a href="../../../quickstart/index.html">快速开始</a>
-                        <a href="../../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>UI 子页</h2>
-                    <nav class="nav-links">
-                        <a href="../index.html">Runtime / UI</a>
-                        <a href="../qui/index.html">QUI</a>
-                        <a href="../binding-view/index.html">BindingViewBase</a>
-                        <a href="index.html">UIViewHandle</a>
-                        <a href="../controller/index.html">UIControllerBase</a>
-                        <a href="../lifecycle/index.html">Lifecycle</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>UI</span><span>UIViewHandle</span></div>
-                    <div class="eyebrow">State Machine</div>
-                    <h1>`UIViewHandle&lt;TView&gt;` 把 View 从“一个对象”提升成“一个有状态的生命周期单元”。</h1>
-                    <p class="lead">Controller 不直接和 prefab 生命周期打交道，而是通过 Handle 驱动 `Created -> Opening -> Open -> Closing -> Closed / Released`。缓存复用、过渡打断和强制销毁都在这一层体现。</p>
-                    <div class="meta-list">
-                        <div><dt>核心类型</dt><dd>`UIViewHandle&lt;TView&gt;`</dd></div>
-                        <div><dt>状态枚举</dt><dd>`UIViewHandleState`</dd></div>
-                        <div><dt>底层视图</dt><dd>`TypedView : TView`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / UI / UIViewHandle</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../../index.html">首页</a><a href="../../../quickstart/index.html">快速开始</a><a href="../../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../core/index.html">Core</a><a href="../../assets/index.html">Assets</a><a href="../index.html">UI</a><a href="../../data/index.html">Data</a><a href="../../audio/index.html">Audio</a><a href="../../events/index.html">Events</a><a href="../../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../../extensions/index.html">扩展包总览</a><a href="../../../extensions/ui-extras/index.html">UI Extras</a><a href="../../../extensions/effects/index.html">Effects</a><a href="../../../extensions/debug-console/index.html">Debug Console</a><a href="../../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../../examples/ui-page/index.html">UI 页面</a><a href="../../../examples/popup/index.html">Popup</a><a href="../../../examples/data-table/index.html">DataTable</a><a href="../../../examples/resource-preload/index.html">资源预加载</a><a href="../../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../../editor/bootstrap/index.html">Bootstrap</a><a href="../../../editor/ui-tools/index.html">UI 工具</a><a href="../../../editor/audio-tools/index.html">音频工具</a><a href="../../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../../index.html">文档</a></span><span>运行时</span><span>UI</span><span>UIViewHandle</span></div>
+          <div class="eyebrow">UI Detail</div>
+          <h1>UI / UIViewHandle</h1>
+          <p class="lead">把 View 变成有状态生命周期单元。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">State</div><h2>状态迁移</h2></div></div>
-                    <div class="panel">
-                        <table>
-                            <thead><tr><th>状态</th><th>含义</th></tr></thead>
-                            <tbody>
-                                <tr><td>`Created`</td><td>刚创建 Handle 和 View，但还未真正打开。</td></tr>
-                                <tr><td>`Opening`</td><td>正在执行打开流程或打开过渡。</td></tr>
-                                <tr><td>`Open`</td><td>已经可见且处于活动状态。</td></tr>
-                                <tr><td>`Closing`</td><td>正在执行关闭流程或关闭过渡。</td></tr>
-                                <tr><td>`Closed`</td><td>关闭后保留实例，用于缓存复用。</td></tr>
-                                <tr><td>`Released`</td><td>实例已释放，不可再使用。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>职责</strong><p>把 View 变成有状态生命周期单元。</p></div><div class="module-row"><strong>业务使用</strong><p>常规业务页面优先通过 <code>UIControllerBase&lt;TView&gt;</code> 间接使用。</p></div><div class="module-row"><strong>高级使用</strong><p>自定义宿主、transition、缓存或导航时才直接接触该层类型。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>UIViewHandle 使用位置</h3>
+    <ul><li>页面 prefab 先配置 <code>QUIBinding</code>。</li><li>Controller 通过 <code>CurrentView</code> 消费 View。</li><li>生命周期操作由 Controller/Handle 触发。</li></ul>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>打开、关闭和销毁</h2></div></div>
-                    <div class="panel">
-                        <h3>`Open(UILayer? layer = null)` / `OpenAsync(UILayer? layer = null)`</h3>
-                        <p>两者都会先 `KillTransition()`，然后调用 `TypedView.PrepareForOpen(layer)`。异步版本会等待 `PlayOpenTransitionAsync()`，并通过内部 `m_operationVersion` 防止旧操作在竞态下覆盖新状态。</p>
-                    </div>
-                    <div class="panel section">
-                        <h3>`Close()` / `CloseAsync()`</h3>
-                        <p>关闭前都会进入 `Closing`，调用 `PrepareForClose(...)`。差异只在于是否等待关闭过渡。最终如果 `UsingCache` 为真，则 `DeactivateForReuse()` 并进入 `Closed`；否则 `Release()` 并进入 `Released`。</p>
-                    </div>
-                    <div class="panel section">
-                        <h3>`CloseAndDestroy()`</h3>
-                        <p>无论 View 配置是否启用缓存，都会强制释放实例。这是“这次就是要丢掉实例”的显式语义，不要和普通 `Close()` 混用。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Properties</div><h2>最常用的属性</h2></div></div>
-                    <div class="panel">
-                        <table>
-                            <thead><tr><th>属性</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`TypedView`</td><td>强类型 View 实例，也是 Controller 应优先访问的 View 入口。</td></tr>
-                                <tr><td>`View`</td><td>非泛型 `BindingViewBase` 视图，给统一抽象或接口消费。</td></tr>
-                                <tr><td>`IsAlive`</td><td>只要没进入 `Released` 且 View 未处于 disposed 状态，就为真。</td></tr>
-                                <tr><td>`IsShowing`</td><td>要求状态为 `Open/Opening` 且 GameObject 当前激活。</td></tr>
-                                <tr><td>`UsingCache`</td><td>从底层 View 推导出来，决定关闭后是否进入 `Closed`。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Usage</div><h2>Controller 为什么应该依赖 Handle</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">var handle = Context.UI.CreateViewHandle&lt;HomeView&gt;(ResPath.Generated.UI.HomeView);
-await handle.OpenAsync();
-
-if (handle.IsShowing)
-{
-    handle.TypedView.RefreshComponents();
-}
-
-await handle.CloseAsync();</code></pre>
-                        <p>Controller 关注的是“何时创建”“何时打开”“何时回收”，而不是 prefab 是否在场景里。Handle 正是把这层时序收束起来的对象。</p>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>Open/OpenAsync</code></td><td>进入 Opening/Open</td><td>会处理 transition 竞态。</td></tr><tr><td><code>Close/CloseAsync</code></td><td>进入 Closed 或 Released</td><td>取决于 UsingCache。</td></tr><tr><td><code>CloseAndDestroy</code></td><td>强制释放</td><td>不保留缓存。</td></tr><tr><td><code>State/IsShowing/IsAlive</code></td><td>状态查询</td><td>以 handle state 为准。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

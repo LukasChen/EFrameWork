@@ -1,105 +1,86 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>示例 / 创建一个 DataTable - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>示例 / DataTable - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Example / DataTable</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>示例</h2>
-                    <nav class="nav-links">
-                        <a href="../ui-page/index.html">创建一个 UI 页面</a>
-                        <a href="index.html">创建一个 DataTable</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Examples</span><span>DataTable</span></div>
-                    <div class="eyebrow">Workflow Example</div>
-                    <h1>创建一个 DataTable 的关键不是定义模型，而是把改值入口、版本和结果诊断都留在表内。</h1>
-                    <p class="lead">这条示例覆盖默认数据、注册、读取、改值和保存。目标是让业务代码只依赖表的公共 API，而不是直接碰底层存储结构。</p>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>示例 / DataTable</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../runtime/core/index.html">Core</a><a href="../../runtime/assets/index.html">Assets</a><a href="../../runtime/ui/index.html">UI</a><a href="../../runtime/data/index.html">Data</a><a href="../../runtime/audio/index.html">Audio</a><a href="../../runtime/events/index.html">Events</a><a href="../../runtime/utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../ui-page/index.html">UI 页面</a><a href="../popup/index.html">Popup</a><a class="is-active" href="index.html">DataTable</a><a href="../resource-preload/index.html">资源预加载</a><a href="../virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>示例</span><span>DataTable</span></div>
+          <div class="eyebrow">Persistence Workflow</div>
+          <h1>DataTable 示例</h1>
+          <p class="lead">示例展示稳定 StorageKey、受控修改入口、注册、保存和结果读取。业务修改回到表内部，让 dirty、迁移和保存结果保持一致。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 1</div><h2>定义数据模型和表</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">[Serializable]
-public sealed class PlayerSettingsModel
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>玩家设置表</h3>
+    <ul><li>声明 serializable data。</li><li>表给稳定 StorageKey。</li><li>注册后读取并保存。</li></ul>
+    <div class="api-signature"><pre><code class="language-csharp">[Serializable]
+public sealed class PlayerSettingsData
 {
-    public bool MusicOn;
-    public bool SfxOn;
+    public bool MusicOn = true;
+    public bool SfxOn = true;
 }
 
-public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsModel&gt;
+public sealed class PlayerSettingsTable : DataTable&lt;PlayerSettingsData&gt;
 {
-    protected override int CurrentVersion =&gt; 1;
-
-    public bool MusicOn
-    {
-        get =&gt; Data.MusicOn;
-        set =&gt; SetValue(ref Data.MusicOn, value);
-    }
-
-    protected override PlayerSettingsModel GetDefaultData()
-    {
-        return new PlayerSettingsModel { MusicOn = true, SfxOn = true };
-    }
-}</code></pre>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 2</div><h2>注册表</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">EFrame.Current.Data.RegisterTable&lt;PlayerSettingsTable&gt;();
-var table = EFrame.Current.Data.GetTable&lt;PlayerSettingsTable&gt;();</code></pre>
-                        <p>推荐在启动流程里统一注册，不要到处懒注册。这样加载和保存行为更稳定，也更容易审计。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 3</div><h2>改值时只走表自己的 API</h2></div></div>
-                    <div class="panel">
-<pre><code class="language-csharp">table.MusicOn = false;
+    public override string StorageKey =&gt; &quot;player.settings&quot;;
+    public bool MusicOn { get =&gt; Data.MusicOn; set =&gt; SetValue(ref Data.MusicOn, value); }
+}</code></pre></div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>使用方式</h2></div></div>
+    <div class="api-signature"><pre><code class="language-csharp">Context.Data.RegisterTable&lt;PlayerSettingsTable&gt;();
+var table = Context.Data.GetTable&lt;PlayerSettingsTable&gt;();
+table.MusicOn = false;
 table.Save();
-
-var saveResult = table.LastSaveResult;
-Debug.Log(saveResult.Message);</code></pre>
-                        <p>你应该读取 `LastSaveResult` / `LastLoadResult` 来判断结果，而不是单纯依赖控制台日志。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Step 4</div><h2>需要升级时再引入版本迁移</h2></div></div>
-                    <div class="panel">
-                        <p>当数据模型发生向前兼容变化时，通过 `CurrentVersion` 和 `Migrate(...)` 让旧存档迁移到新版本。迁移逻辑也应留在表内部，避免散落在业务代码里。</p>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+Debug.Log(table.LastSaveResult.Message);</code></pre></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

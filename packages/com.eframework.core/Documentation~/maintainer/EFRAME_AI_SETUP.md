@@ -1,4 +1,4 @@
-# EFrame AI 接入说明
+﻿# EFrame AI 接入说明
 
 这套配置把 EFrame 开发规范沉淀为可继承的 AI 工作区层。新项目引入框架并完成 Unity 冷启动后，可在编辑器窗口同步 Codex、GitHub Copilot 和 Claude Code 的 AI 契约。
 
@@ -108,7 +108,7 @@ EFrame Tools/项目初始化向导
 
 Audio 初始化资产统一放在 `Assets/Resources/Audio`：`EFrameAudioMixerSettings.mixer` 由 Audio Setup/项目初始化向导生成，运行时通过 `AudioResourcePaths` 集中加载。
 
-资源新增、移动或删除后，`Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的托管资源会自动同步 Addressables 分组。菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 会打开托管资源窗口，用于选择哪些目录树生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。窗口也可查看 Addressables 与 `ResPath.Generated` 对应关系、目录规范问题，以及执行手动修复/验证。
+资源新增、移动或删除后，`Assets/App/Res`、`Assets/Scenes` 和 `Assets/Modules` 下的托管资源会自动同步 Addressables 分组。菜单 `EFrame Tools/Addressables/Sync Groups And Generate ResPath` 会打开托管资源窗口，用于选择哪些目录树生成 `Assets/App/Runtime/Generated/Res/ResPath.Generated.cs`。窗口也可查看 Addressables 与 `ResPath` 对应关系、目录规范问题，以及执行手动修复/验证。
 
 ## 4. 仅同步 AI 的方式
 

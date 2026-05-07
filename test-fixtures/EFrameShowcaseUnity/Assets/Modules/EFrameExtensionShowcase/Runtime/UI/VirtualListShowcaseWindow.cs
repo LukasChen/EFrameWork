@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using EFramework.Extensions.UI.VirtualList;
 using EFramework.Generated;
 using EFramework.Generated.UI;
@@ -10,7 +10,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
     public sealed class VirtualListShowcaseWindow : MonoBehaviour
     {
-        public const string AssetPath = ResPath.Generated.Modules.EFrameExtensionShowcase.Res.UI.Panels.EFrameExtensionShowcase.QVirtualListShowcaseWindow;
+        public const string AssetPath = ResPath.Modules.EFrameExtensionShowcase.UI.Panels.EFrameExtensionShowcase.QVirtualListShowcaseWindow;
 
         public Action CloseRequested { get; set; }
 

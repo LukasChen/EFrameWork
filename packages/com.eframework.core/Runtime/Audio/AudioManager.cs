@@ -351,10 +351,10 @@ namespace EFramework.Runtime.Audio
             // 防抖检查：同一clip在minInterval内不重复播放
             if (m_lastPlayTimeByClip.TryGetValue(audioClip, out float lastPlayTime))
             {
-                if (Time.time - lastPlayTime < minInterval)
+                if (UnityEngine.Time.time - lastPlayTime < minInterval)
                     return;
             }
-            m_lastPlayTimeByClip[audioClip] = Time.time;
+            m_lastPlayTimeByClip[audioClip] = UnityEngine.Time.time;
 
             // 获取可用的AudioSource
             AudioSource audioSource = GetAvailableAudioSource();

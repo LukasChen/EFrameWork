@@ -1,112 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / Data / Service - EFrame Docs</title>
-    <link rel="stylesheet" href="../../../assets/style.css">
-    <script defer src="../../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / Data / Data Service - EFrame 文档</title>
+  <link rel="stylesheet" href="../../../assets/style.css">
+  <script defer src="../../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / Data / Service</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../../index.html">首页</a>
-                        <a href="../../../quickstart/index.html">快速开始</a>
-                        <a href="../../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>Data 子页</h2>
-                    <nav class="nav-links">
-                        <a href="../index.html">Runtime / Data</a>
-                        <a href="index.html">Data Service</a>
-                        <a href="../table/index.html">DataTable</a>
-                        <a href="../storage/index.html">Storage & Results</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../../index.html">Docs</a></span><span>Runtime</span><span>Data</span><span>Service</span></div>
-                    <div class="eyebrow">Orchestration</div>
-                    <h1>`IDataService` / `DataManager` 负责的是注册、批量加载保存和应用生命周期接线，而不是表内部业务语义。</h1>
-                    <p class="lead">数据系统里最上层的职责很明确：统一管理有哪些表、这些表什么时候加载、什么时候保存，以及在暂停和退出时触发什么保存策略。具体字段怎么变、什么时候标 dirty，不属于这里。</p>
-                    <div class="meta-list">
-                        <div><dt>接口</dt><dd>`IDataService`</dd></div>
-                        <div><dt>实现</dt><dd>`DataManager`</dd></div>
-                        <div><dt>关键方法</dt><dd>`RegisterTable` / `GetTable` / `SaveAll` / `LoadAll`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / Data / Data Service</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../../index.html">首页</a><a href="../../../quickstart/index.html">快速开始</a><a href="../../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../../core/index.html">Core</a><a href="../../assets/index.html">Assets</a><a href="../../ui/index.html">UI</a><a href="../index.html">Data</a><a href="../../audio/index.html">Audio</a><a href="../../events/index.html">Events</a><a href="../../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../../extensions/index.html">扩展包总览</a><a href="../../../extensions/ui-extras/index.html">UI Extras</a><a href="../../../extensions/effects/index.html">Effects</a><a href="../../../extensions/debug-console/index.html">Debug Console</a><a href="../../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../../examples/ui-page/index.html">UI 页面</a><a href="../../../examples/popup/index.html">Popup</a><a href="../../../examples/data-table/index.html">DataTable</a><a href="../../../examples/resource-preload/index.html">资源预加载</a><a href="../../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../../editor/bootstrap/index.html">Bootstrap</a><a href="../../../editor/ui-tools/index.html">UI 工具</a><a href="../../../editor/audio-tools/index.html">音频工具</a><a href="../../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../../index.html">文档</a></span><span>运行时</span><span>Data</span><span>Data Service</span></div>
+          <div class="eyebrow">Data Detail</div>
+          <h1>Data / Data Service</h1>
+          <p class="lead"><code>IDataService</code> / <code>DataManager</code> 负责注册、批量加载保存和 App 生命周期接线。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Key APIs</div><h2>服务层 API</h2></div></div>
-                    <div class="panel">
-                        <h3>`T RegisterTable&lt;T&gt;() where T : IDataTable, new()`</h3>
-                        <table>
-                            <thead><tr><th>行为</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>创建并注入存储</td><td>内部 `new T()` 后会立即 `SetDataStorage(m_storage)`。</td></tr>
-                                <tr><td>校验唯一性</td><td>同时校验 `Key` 和 `StorageKey`，避免不同表写到同一份存档。</td></tr>
-                                <tr><td>自动加载</td><td>注册完成后立即 `table.Load()`，不是只登记不加载。</td></tr>
-                                <tr><td>重复注册</td><td>若同类型表已存在，直接返回已注册实例。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`GetTable&lt;T&gt;()`</h3>
-                        <p>通过类型名作为 key 获取已注册表。如果表未注册，`DataManager` 会记录错误并返回默认值。因此推荐在启动流程统一注册，不要依赖“先用再说”的惰性调用。</p>
-                    </div>
-                    <div class="panel section">
-                        <h3>`SaveAll(bool forceFlush = false)` / `LoadAll()`</h3>
-                        <p>`SaveAll()` 会遍历所有表并转发 `forceFlush`。`LoadAll()` 会重新执行每张表的加载流程。它们本身不理解单张表的数据结构，只负责批量编排。</p>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>Service</strong><p>只做注册、查找、批量加载保存和生命周期接线。</p></div><div class="module-row"><strong>Table</strong><p>拥有业务字段、修改入口、迁移、默认值和结果解释。</p></div><div class="module-row"><strong>Storage</strong><p>只关心字节、文件、备份、序列化和底层失败。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>Data Service 使用位置</h3>
+    <ul><li>启动流程注册表。</li><li>业务逻辑通过表的公开 API 修改数据。</li><li>UI 和遥测读取结果对象，不依赖日志文本。</li></ul>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Lifecycle</div><h2>DataManager 自动接了哪些应用事件</h2></div></div>
-                    <div class="module-list">
-                        <div class="module-row">
-                            <strong>`AppPausedEvent`</strong>
-                            <p>调用 `SaveAll()`，只保存 dirty 表。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`AppQuitEvent`</strong>
-                            <p>调用 `SaveAll(true)`，强制冲刷，避免退出时漏写。</p>
-                        </div>
-                        <div class="module-row">
-                            <strong>`Dispose()`</strong>
-                            <p>再次 `SaveAll(true)`，随后逐张 `Dispose()` 并清空注册表。</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Boundary</div><h2>服务层不该承担什么</h2></div></div>
-                    <div class="callout-grid">
-                        <div class="callout">
-                            <h3>应该做</h3>
-                            <p>注册、加载、保存、唯一性校验、应用生命周期接线。</p>
-                        </div>
-                        <div class="callout">
-                            <h3>不应该做</h3>
-                            <p>字段级变更、版本迁移细节、业务规则判断。这些应留在 `DataTable&lt;T&gt;` 内部。</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>RegisterTable&lt;T&gt;()</code></td><td>创建并加载表</td><td>校验 Key 和 StorageKey 唯一性。</td></tr><tr><td><code>GetTable&lt;T&gt;()</code></td><td>按类型获取表</td><td>未注册会记录错误。</td></tr><tr><td><code>LoadAll/SaveAll</code></td><td>批量编排</td><td>不理解单张表业务语义。</td></tr><tr><td><code>Dispose()</code></td><td>保存并释放表</td><td>应用退出路径。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

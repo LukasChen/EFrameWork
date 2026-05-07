@@ -1,206 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Runtime / Effects - EFrame Docs</title>
-    <link rel="stylesheet" href="../../assets/style.css">
-    <script defer src="../../assets/site.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>运行时 / Effects - EFrame 文档</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <script defer src="../../assets/site.js"></script>
 </head>
 <body>
-    <div class="site-shell">
-        <aside class="site-nav">
-            <a class="brand" href="../../index.html">
-                <small>EFrame</small>
-                <strong>Framework Docs</strong>
-                <span>Runtime / Effects</span>
-            </a>
-            <button class="nav-toggle" type="button">展开文档导航</button>
-            <div class="nav-sections">
-                <section class="nav-section">
-                    <h2>开始</h2>
-                    <nav class="nav-links">
-                        <a href="../../index.html">首页</a>
-                        <a href="../../quickstart/index.html">快速开始</a>
-                        <a href="../../api/index.html">API 总览</a>
-                    </nav>
-                </section>
-                <section class="nav-section">
-                    <h2>Runtime</h2>
-                    <nav class="nav-links">
-                        <a href="../core/index.html">Core</a>
-                        <a href="../ui/index.html">UI</a>
-                        <a href="../data/index.html">Data</a>
-                        <a href="../assets/index.html">Assets</a>
-                        <a href="../audio/index.html">Audio</a>
-                        <a href="../events/index.html">Events</a>
-                        <a href="index.html">Effects</a>
-                        <a href="../utils/index.html">Utils</a>
-                    </nav>
-                </section>
-            </div>
-        </aside>
-        <main class="content-area">
-            <div class="page">
-                <header class="page-header">
-                    <div class="breadcrumbs"><span><a href="../../index.html">Docs</a></span><span>Runtime</span><span>Effects</span></div>
-                    <div class="eyebrow">Visual Effects</div>
-                    <h1>Effects 已迁入可选 `com.eframework.effects` 扩展包。</h1>
-                    <p class="lead">`FlyAnimationSystem`、`IconBounceEffect` 和 `CameraShake` 不再属于 `com.eframework.core`。需要这些表现能力的项目应显式安装 `com.eframework.effects`，core 只保留稳定基础设施。</p>
-                    <div class="meta-list">
-                        <div><dt>扩展包</dt><dd>`com.eframework.effects`</dd></div>
-                        <div><dt>飞行系统</dt><dd>`FlyAnimationSystem`</dd></div>
-                        <div><dt>回弹效果</dt><dd>`IconBounceEffect`</dd></div>
-                        <div><dt>配置资产</dt><dd>`FlyAnimationConfig` / `IconBounceConfig`</dd></div>
-                    </div>
-                </header>
+  <div class="site-shell">
+    <aside class="site-nav" data-open="false">
+      <a class="brand" href="../../index.html">
+        <small>EFrame</small>
+        <strong>框架文档</strong>
+        <span>运行时 / Effects</span>
+      </a>
+      <button class="nav-toggle" type="button">展开文档导航</button>
+      <div class="nav-sections"><section class="nav-section">
+        <h2>开始</h2>
+        <nav class="nav-links">
+          <a href="../../index.html">首页</a><a href="../../quickstart/index.html">快速开始</a><a href="../../api/index.html">API 速查</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>核心模块</h2>
+        <nav class="nav-links">
+          <a href="../core/index.html">Core</a><a href="../assets/index.html">Assets</a><a href="../ui/index.html">UI</a><a href="../data/index.html">Data</a><a href="../audio/index.html">Audio</a><a href="../events/index.html">Events</a><a href="../utils/index.html">Utils</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>扩展包</h2>
+        <nav class="nav-links">
+          <a href="../../extensions/index.html">扩展包总览</a><a href="../../extensions/ui-extras/index.html">UI Extras</a><a href="../../extensions/effects/index.html">Effects</a><a href="../../extensions/debug-console/index.html">Debug Console</a><a href="../../extensions/ai-loop/index.html">AI Loop</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>示例</h2>
+        <nav class="nav-links">
+          <a href="../../examples/ui-page/index.html">UI 页面</a><a href="../../examples/popup/index.html">Popup</a><a href="../../examples/data-table/index.html">DataTable</a><a href="../../examples/resource-preload/index.html">资源预加载</a><a href="../../examples/virtual-list/index.html">虚拟列表</a>
+        </nav>
+      </section><section class="nav-section">
+        <h2>编辑器与 AI</h2>
+        <nav class="nav-links">
+          <a href="../../editor/bootstrap/index.html">Bootstrap</a><a href="../../editor/ui-tools/index.html">UI 工具</a><a href="../../editor/audio-tools/index.html">音频工具</a><a href="../../ai/index.html">AI 协作层</a>
+        </nav>
+      </section></div>
+    </aside>
+    <main class="content-area">
+      <div class="page">
+        <header class="page-header">
+          <div class="breadcrumbs"><span><a href="../../index.html">文档</a></span><span>运行时</span><span>Effects</span></div>
+          <div class="eyebrow">Moved To Extension</div>
+          <h1>Effects 模块迁移</h1>
+          <p class="lead">Core 页保留迁移提示。飞行动画、IconBounce 和 CameraShake 的实际使用见 Effects 扩展包页面。</p>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Fly Effects</div><h2>飞行动画系统</h2></div></div>
-                    <div class="panel">
-                        <h3>`FlyAnimationSystem.Play(FlySequenceRequest request)`</h3>
-                        <table>
-                            <thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`request.Config`</td><td>`FlyAnimationConfig`</td><td>飞行动画配置，决定资源、路径、数量压缩和音效策略。</td></tr>
-                                <tr><td>`request.LogicalCount`</td><td>`int`</td><td>逻辑数量，不一定等于最终可视飞行体数量，系统会按配置压缩。</td></tr>
-                                <tr><td>`request.StartPosition` / `TargetPosition`</td><td>`Vector3`</td><td>起点和终点。</td></tr>
-                                <tr><td>`request.Parent`</td><td>`Transform`</td><td>可选父节点，适合 UI 或特定层级挂载。</td></tr>
-                                <tr><td>返回值</td><td>`FlySequenceHandle`</td><td>当前播放序列的句柄，可用于后续跟踪有效性。</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="api-signature"><pre><code class="language-csharp">var handle = FlyAnimationSystem.Play(new FlySequenceRequest
-{
-    Config = coinFlyConfig,
-    LogicalCount = 20,
-    StartPosition = start,
-    TargetPosition = target,
-    Parent = uiRoot,
-    OnArrive = delta =&gt; score += delta
-});</code></pre></div>
-                    </div>
-                    <div class="panel section">
-                        <p>`FlySequenceRequest` 还支持 `Scale`、`UseUnscaledTime`、`VisualCountOverride`、`DisposeMode`、`OnCompleted` 等参数。实际意义是把“逻辑数量”“可视表现数量”“实例释放策略”解耦，不让业务直接承担表现资源池化细节。</p>
-                    </div>
-                </section>
+        </header>
+        <section class="section">
+    <div class="section-header"><div><h2>特点和能力</h2></div></div>
+    <div class="module-list"><div class="module-row"><strong>Core 状态</strong><p>Core 不再承载表现效果实现，仅保留迁移入口。</p></div><div class="module-row"><strong>扩展包</strong><p><code>com.eframework.effects</code> 提供 FlyAnimationSystem、IconBounceEffect、CameraShakeFx。</p></div></div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>范例</h2></div></div>
+    <div class="panel">
+    <h3>迁移到 Effects 扩展包</h3>
+    <ul><li>在初始化向导的 Extensions 中勾选 Effects。</li><li>执行 Apply 写入 <code>Packages/manifest.json</code>。</li><li>业务表现调用迁移到 <code>EFramework.Extensions.Effects</code> 命名空间。</li></ul>
 
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Config Details</div><h2>`FlyAnimationConfig` 参数细节</h2></div></div>
-                    <div class="panel">
-                        <table>
-                            <thead><tr><th>字段</th><th>类型</th><th>作用</th></tr></thead>
-                            <tbody>
-                                <tr><td>`PrefabReference`</td><td>`AssetReferenceGameObject`</td><td>飞行体预制体入口。`HasValidAsset` 依赖它判断配置是否可播放。</td></tr>
-                                <tr><td>`PathType`</td><td>`FlyPathType`</td><td>路径类型，可选 `Linear`、`QuadraticBezier`、`CubicBezier`、`ScatterThenFly`。</td></tr>
-                                <tr><td>`Duration`</td><td>`float`</td><td>整体飞行时长，下限 0.01 秒。</td></tr>
-                                <tr><td>`MoveProgress`</td><td>`AnimationCurve`</td><td>控制轨迹推进节奏，不改变轨迹形状，只改变时间分布。</td></tr>
-                                <tr><td>`ScaleOverLife`</td><td>`AnimationCurve`</td><td>控制飞行体生命周期中的缩放倍数。</td></tr>
-                                <tr><td>`AlphaOverLife`</td><td>`AnimationCurve`</td><td>控制飞行体生命周期中的透明度。</td></tr>
-                                <tr><td>`StartRandomRadius`</td><td>`float`</td><td>起点随机偏移半径，用于让多个飞行体在起点附近散开。</td></tr>
-                                <tr><td>`RotateSpeedDeg`</td><td>`float`</td><td>每秒旋转角速度，0 表示不旋转。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`ScatterThenFly` 专用字段</h3>
-                        <table>
-                            <thead><tr><th>字段</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`ScatterDuration`</td><td>散开阶段飞向随机点的时长。</td></tr>
-                                <tr><td>`ScatterMoveProgress`</td><td>散开阶段自己的移动曲线。</td></tr>
-                                <tr><td>`ScatterHoldDuration`</td><td>散开后停留时长。</td></tr>
-                                <tr><td>`ScatterFlyControl1Offset` / `ScatterFlyControl2Offset`</td><td>从散开点飞向目标点时使用的三次贝塞尔控制点偏移。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>序列与音效字段</h3>
-                        <table>
-                            <thead><tr><th>字段</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`BaseInterval`</td><td>序列发射基础间隔。</td></tr>
-                                <tr><td>`IntervalMultiplier`</td><td>根据序列进度动态调整实际发射间隔。</td></tr>
-                                <tr><td>`MaxVisualCount`</td><td>逻辑数量很大时的可视压缩上限。</td></tr>
-                                <tr><td>`FlySoundMode` / `ArriveSoundMode`</td><td>控制音效是按序列播放一次、按每个 item 播放，还是关闭。</td></tr>
-                                <tr><td>`FlySoundAsset` / `ArriveSoundAsset`</td><td>音频资源入口，优先使用 `AudioClipAsset`。</td></tr>
-                                <tr><td>`StartEffect` / `EndEffect`</td><td>每个飞行体的起点/终点特效 prefab。</td></tr>
-                                <tr><td>`StartEffectDestroyTime` / `EndEffectDestroyTime`</td><td>对应特效自动销毁时间，0 表示不自动销毁。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Request Details</div><h2>`FlySequenceRequest` 参数和释放策略</h2></div></div>
-                    <div class="panel">
-                        <table>
-                            <thead><tr><th>字段</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`Scale`</td><td>本次序列整体缩放倍率，适合 UI 场景下复用同一配置但改变视觉尺寸。</td></tr>
-                                <tr><td>`UseUnscaledTime`</td><td>是否忽略全局时间缩放，适合暂停态或独立表现层。</td></tr>
-                                <tr><td>`OnArrive`</td><td>每个可视飞行体到达时回调，参数是已压缩权重后的逻辑数量增量。</td></tr>
-                                <tr><td>`OnCompleted`</td><td>所有可视飞行体结束后回调。</td></tr>
-                                <tr><td>`VisualCountOverride`</td><td>覆盖配置中的 `MaxVisualCount`，通常只在非常特定的表现需求下使用。</td></tr>
-                                <tr><td>`DisposeMode`</td><td>决定飞行体实例结束后是回收到池还是直接销毁。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`FlyInstanceDisposeMode`</h3>
-                        <table>
-                            <thead><tr><th>枚举值</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`RecycleToPool`</td><td>默认模式，回收到对象池，适合常规高频表现。</td></tr>
-                                <tr><td>`Destroy`</td><td>直接销毁实例，不回收到池，适合一次性表现或明确不希望复用的情况。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Icon Bounce</div><h2>图标回弹效果</h2></div></div>
-                    <div class="panel">
-                        <h3>`IconBounceEffect.Play()`</h3>
-                        <p>将当前节点按配置或内联参数执行一次回弹缩放动画。默认行为会以缓存的原始缩放为基准；若开启 `AllowStacking`，则允许连续触发时叠加当前状态。</p>
-                        <table>
-                            <thead><tr><th>关键字段</th><th>说明</th></tr></thead>
-                            <tbody>
-                                <tr><td>`Config`</td><td>可选 `IconBounceConfig` 资产，为空时使用组件上的内联参数。</td></tr>
-                                <tr><td>`Duration`</td><td>回弹总时长，最小受限于 0.01 秒。</td></tr>
-                                <tr><td>`BounceStrength`</td><td>回弹强度，控制对原始缩放的偏移幅度。</td></tr>
-                                <tr><td>`UseUnscaledTime`</td><td>是否忽略 `Time.timeScale`。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`IconBounceConfig` 参数细节</h3>
-                        <table>
-                            <thead><tr><th>字段</th><th>类型</th><th>作用</th></tr></thead>
-                            <tbody>
-                                <tr><td>`Duration`</td><td>`float`</td><td>回弹总时长，`OnValidate()` 会强制不小于 0.01 秒。</td></tr>
-                                <tr><td>`BounceStrength`</td><td>`float`</td><td>回弹强度，范围为 0 到 1。</td></tr>
-                                <tr><td>`BounceCurve`</td><td>`AnimationCurve`</td><td>定义缩放偏移曲线，`EvaluateScale(t)` 会在其基础上叠加强度。</td></tr>
-                                <tr><td>`UseUnscaledTime`</td><td>`bool`</td><td>是否在暂停或时间缩放场景下仍按真实时间播放。</td></tr>
-                                <tr><td>`AllowStacking`</td><td>`bool`</td><td>是否允许连续触发时叠加当前播放状态，而不是重置回原始缩放。</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel section">
-                        <h3>`EvaluateScale(float t)` 的含义</h3>
-                        <p>这个方法返回的是“缩放偏移量”，而不是最终缩放值。实际效果是先用 `BounceCurve` 在归一化时间上采样，再乘以 `BounceStrength`，最后加到基础缩放逻辑中。因此调曲线时更像是在调“偏移振幅”，而不是直接调最终缩放。</p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <div class="section-header"><div><div class="eyebrow">Other Effects</div><h2>其他表现能力</h2></div></div>
-                    <div class="card-grid">
-                        <article class="feature-card"><h3>`CameraShake`</h3><p>扩展包内的相机抖动能力，适合把基础抖动参数抽离成稳定调用入口。</p></article>
-                        <article class="feature-card"><h3>Editor 配套</h3><p>`FlyAnimationConfigEditor`、`FlyAnimationDebugRunnerEditor`、`IconBounceConfigEditor`、`IconBounceEffectEditor` 为这些效果提供调试和预览入口。</p></article>
-                        <article class="feature-card"><h3>资源与释放</h3><p>飞行动画系统和资源池、Audio、对象释放策略是联动的，不建议业务自己重复管理实例生命周期。</p></article>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
+  </div>
+  </section><section class="section">
+    <div class="section-header"><div><h2>API 细节</h2></div></div>
+    <div class="panel"><table><thead><tr><th>入口</th><th>用途</th><th>最小记忆点</th></tr></thead><tbody><tr><td><code>com.eframework.effects</code></td><td>表现效果 package</td><td>按需安装。</td></tr><tr><td><code>FlyAnimationSystem</code></td><td>飞行动画序列</td><td>替代 Core 内旧表现入口。</td></tr><tr><td><code>IconBounceEffect</code> / <code>CameraShakeFx</code></td><td>局部表现辅助</td><td>由扩展包维护。</td></tr></tbody></table></div>
+  </section>
+        <footer class="site-footer">文档站由 <code>tools/Build-EFrameDocumentationSite.mjs</code> 生成。API 细节保持精简，完整行为以源码、package README 和同步 AI 契约为准。</footer>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

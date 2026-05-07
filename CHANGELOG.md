@@ -6,6 +6,12 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+### Changed
+
+- Changed `UIControllerBase` to bind `EFrame.Current` by default so normal business controllers no longer need repeated `BindContext(Context)` calls, and updated synced AI/UI guidance to avoid recommending that pattern.
+- Generated resource constants now use `ResPath.*`; module resource addresses use `Modules/<Name>/...` while physical assets remain under `Assets/Modules/<Name>/Res/...`.
+- Simplified the standard FX directory guidance so UI effects live under `Res/UI/.../FX` and scene or gameplay effects live under `Res/SceneAssets/.../FX`.
+
 ## [0.7.8] - 2026-05-07
 
 ### Changed
