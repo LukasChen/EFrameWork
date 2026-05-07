@@ -1,8 +1,8 @@
 ﻿{
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.55",
-    "updatedAt":  "2026-05-07",
-    "notes":  "Shorten generated ResPath API to ResPath.* and omit module Res from generated addresses.",
+    "version":  "0.4.56",
+    "updatedAt":  "2026-05-08",
+    "notes":  "Update runtime helper, UI, resource, and directory guidance for the 0.7.9 framework refactor.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "1880eaa3d50555ae08330075de70971c5c14148885edbf1b483e3a5600febf85"
+                      "sha256":  "cd6ce45d8fd8b4c8b682a0f078f00136bc2da437ed494c9dc086e964cabef9fe"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_SKILL_TRIGGER_GUIDE.md",
@@ -42,7 +42,7 @@
                   },
                   {
                       "path":  ".github/instructions/eframe-instructions.md",
-                      "sha256":  "1954efed9c211786fd9d63e9cd8a44da95505f184e8b3d3773ea844bccdb615e"
+                      "sha256":  "463dac15d7d0355b5a04a8838f1699e9f6568ff62480bd1ea515a3ab220effef"
                   },
                   {
                       "path":  ".github/skills/eframe-ai-loop-validation/SKILL.md",
@@ -200,17 +200,17 @@
                   },
                   {
                       "path":  ".github/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "4a28e7159ae76bb91f8e919f9872e90c14f526e9c6d56dfa6c132e0e54e5dda2"
+                      "sha256":  "99c1a5fbfbbbb9f8a2744d97a58a53c1102038c1016bce0da8e792cc99085439"
                   },
                   {
                       "path":  ".agents/skills/eframe-ui-feature/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "4a28e7159ae76bb91f8e919f9872e90c14f526e9c6d56dfa6c132e0e54e5dda2"
+                      "sha256":  "99c1a5fbfbbbb9f8a2744d97a58a53c1102038c1016bce0da8e792cc99085439"
                   },
                   {
                       "path":  ".claude/skills/eframe-ui-feature/SKILL.md",
                       "sourcePath":  "AIWorkspace~/skills/eframe-ui-feature/SKILL.md",
-                      "sha256":  "4a28e7159ae76bb91f8e919f9872e90c14f526e9c6d56dfa6c132e0e54e5dda2"
+                      "sha256":  "99c1a5fbfbbbb9f8a2744d97a58a53c1102038c1016bce0da8e792cc99085439"
                   }
               ]
 }

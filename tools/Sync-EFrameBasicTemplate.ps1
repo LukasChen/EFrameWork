@@ -45,7 +45,13 @@ $excludedDirectoryNames = @(
     "Obj",
     "obj",
     "bin",
-    "TestResults"
+    "TestResults",
+    "TextMesh Pro"
+)
+
+$excludedPathPrefixes = @(
+    "TextMesh Pro/",
+    "TextMesh Pro.meta"
 )
 
 $excludedFileExtensions = @(
@@ -70,6 +76,12 @@ function Test-SkippedPath {
     param(
         [string]$RelativePath
     )
+
+    foreach ($prefix in $excludedPathPrefixes) {
+        if ($RelativePath.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            return $true
+        }
+    }
 
     $segments = $RelativePath -split "/"
     foreach ($segment in $segments) {
