@@ -3,7 +3,7 @@
 EFrame uses three layers:
 
 - Core: `com.eframework.core`, stable runtime/editor infrastructure and the minimal startup skeleton.
-- Extension: optional packages such as `com.eframework.ui.virtual-list`, `com.eframework.ui-extras`, `com.eframework.effects`, and `com.eframework.debug-console`.
+- Extension: optional packages such as `com.eframework.ui.virtual-list`, `com.eframework.ui-extras`, `com.eframework.effects`, `com.eframework.debug-console`, and `com.eframework.ai-loop`.
 - Samples: project skeletons or modules installed into a consuming Unity project when they are useful.
 
 ## Basic
@@ -49,7 +49,9 @@ EFrame Tools/项目初始化向导
 -> Showcase -> Install Showcase
 ```
 
-`Extensions` opens expanded and automatically scans the current project package state into the checkboxes for UI Virtual List, UI Extras, Effects, and Debug Console. `Select All` selects every extension package so a new project can install all extensions in one pass. `Apply` writes checked extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. Unchecking an already installed package does not remove it. The same list includes `DOTween Adapter`, which applies or removes the `EFRAME_USE_DOTWEEN` scripting define instead of adding a package dependency.
+`Extensions` opens expanded and automatically scans the current project package state into the checkboxes for UI Virtual List, UI Extras, Effects, Debug Console, and AI Loop. `Select All` selects every extension package so a new project can install all extensions in one pass. `Apply` writes checked extension packages into `Packages/manifest.json`; in a local framework checkout it uses sibling `file:` package references, and when Core is installed from a git URL with `?path=/packages/com.eframework.core`, it derives matching git dependencies for each selected extension package. Unchecking an already installed package does not remove it. The same list includes `DOTween Adapter`, which applies or removes the `EFRAME_USE_DOTWEEN` scripting define instead of adding a package dependency.
+
+`AI Loop` installs `com.eframework.ai-loop`, an editor-only PlayMode validation package for Game View screenshots, uGUI input simulation, keyboard simulation, and input record/replay. It is not part of the Basic startup skeleton and should be installed only when the project needs AI-assisted validation such as `UI 自动验收`, `截图验收`, or `录制回放验收`.
 
 `Install Showcase` first installs `com.eframework.ui.virtual-list` and `com.eframework.debug-console`. If those packages were just added to the manifest or are still resolving, wait for Unity Package Manager import and script compilation to finish, then click `Install Showcase` again. Once the required packages are available, the action copies the module template when missing, repairs the installed virtual-list prefab script reference against the copied `VirtualListShowcaseWindow.cs.meta`, refreshes assets, syncs managed Addressables, and sets the StartUp entrance to `GameApp.Modules.EFrameExtensionShowcase.Procedure.ProcedureEFrameExtensionShowcaseEntry`. Rerunning `Install Showcase` on an existing module keeps local files in place and still performs the prefab script-reference repair.
 

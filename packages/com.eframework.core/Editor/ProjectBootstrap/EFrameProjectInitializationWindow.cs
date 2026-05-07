@@ -41,7 +41,8 @@ namespace EFramework.Editor.ProjectBootstrap
             "com.eframework.ui.virtual-list",
             "com.eframework.ui-extras",
             "com.eframework.effects",
-            "com.eframework.debug-console"
+            "com.eframework.debug-console",
+            "com.eframework.ai-loop"
         };
 
         private static readonly string[] ExtensionShowcaseRequiredPackageNames =
@@ -1065,6 +1066,7 @@ namespace EFramework.Editor.ProjectBootstrap
                 "com.eframework.ui-extras" => "UI Extras",
                 "com.eframework.effects" => "Effects",
                 "com.eframework.debug-console" => "Debug Console",
+                "com.eframework.ai-loop" => "AI Loop (Editor Validation)",
                 _ => packageName
             };
         }

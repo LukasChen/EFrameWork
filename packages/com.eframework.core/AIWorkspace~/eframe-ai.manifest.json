@@ -1,8 +1,8 @@
 {
     "name":  "eframe-ai-workspace",
-    "version":  "0.4.50",
+    "version":  "0.4.51",
     "updatedAt":  "2026-05-07",
-    "notes":  "Add convenient skill trigger phrases and a trigger guide for business AI.",
+    "notes":  "Document AI Loop as an optional extension-managed validation package.",
     "clients":  [
                     "codex",
                     "copilot",
@@ -33,7 +33,7 @@
                   {
                       "path":  ".github/eframe/EFRAME_AI_API_INDEX.md",
                       "sourcePath":  "AIWorkspace~/support-docs/EFRAME_AI_API_INDEX.md",
-                      "sha256":  "0e83ecb209ae76d5dd9000e34ac121e0e32c07634fdd452c9348ad59cd9aa450"
+                      "sha256":  "778c20f0a957384d24b2d5bf0cb9ce0a38a14f70d0a6737b8d6f8e1f02a2f96a"
                   },
                   {
                       "path":  ".github/eframe/EFRAME_SKILL_TRIGGER_GUIDE.md",
