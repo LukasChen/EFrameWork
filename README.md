@@ -61,7 +61,7 @@ EFrame Tools/项目初始化向导
 - [packages/com.eframework.core](packages/com.eframework.core)：Core runtime/editor package，包含 `EFrame`、`Procedure`、`QUI`、UI controller/handle、资源、音频、数据、事件和项目初始化工具。
 - [packages/com.eframework.core/Tools~](packages/com.eframework.core/Tools~)：随 package 发布的项目初始化、AI 同步和健康检查脚本。
 - [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~)：给人看的使用文档、维护文档和 HTML 文档站点。
-- [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop)、[packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list)、[packages/com.eframework.ui-extras](packages/com.eframework.ui-extras)、[packages/com.eframework.effects](packages/com.eframework.effects)、[packages/com.eframework.debug-console](packages/com.eframework.debug-console)：可选扩展 package。
+- [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop)、[packages/com.eframework.ui-extras](packages/com.eframework.ui-extras)、[packages/com.eframework.effects](packages/com.eframework.effects)、[packages/com.eframework.debug-console](packages/com.eframework.debug-console)：可选扩展 package。
 
 ## Core 能力
 

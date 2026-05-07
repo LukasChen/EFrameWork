@@ -4,6 +4,13 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.7.8] - 2026-05-07
+
+### Changed
+
+- Removed stale public documentation references to the retired standalone UI Virtual List package; current virtual list guidance points through UI Extras.
+- Changed the Basic template Addressables Play Mode Script default to Fast Mode so first Play Mode runs do not require a packed Addressables build.
+
 ## [0.7.7] - 2026-05-07
 
 ### Added
@@ -211,7 +218,7 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 ### Removed
 
 - Removed legacy `QList` and `XListView` list implementations.
-- Moved `QVirtualListView`, `QVirtualGridView`, and their adapter/pooling support out of core into the optional `com.eframework.ui.virtual-list` package.
+- Moved `QVirtualListView`, `QVirtualGridView`, and their adapter/pooling support out of core into an optional extension package.
 - Moved Unity Ingame Debug Console out of core into the optional `com.eframework.debug-console` package.
 - Moved reusable presentation effects out of core into the optional `com.eframework.effects` package, including fly animation, icon bounce, camera shake, and their editor tooling.
 - Moved GM tools out of core into the optional `com.eframework.gm-tools` package.

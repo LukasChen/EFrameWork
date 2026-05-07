@@ -6,6 +6,13 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ## [Unreleased]
 
+## [0.7.8] - 2026-05-07
+
+### Changed
+
+- Removed stale public documentation references to the retired standalone UI Virtual List package; current virtual list guidance points through UI Extras.
+- Changed the Basic template Addressables Play Mode Script default to Fast Mode so first Play Mode runs do not require a packed Addressables build.
+
 ## [0.7.7] - 2026-05-07
 
 ### Added
@@ -221,7 +228,7 @@ EFrame uses semantic versioning for framework releases. The release version is r
 
 ### Changed
 
-- Split pooled virtual UI list and grid controls into the optional `com.eframework.ui.virtual-list` package.
+- Split pooled virtual UI list and grid controls out of core as an optional extension package.
 - Split Unity Ingame Debug Console into the optional `com.eframework.debug-console` package.
 - Split reusable presentation effects into the optional `com.eframework.effects` package.
 - Split GM tools into the optional `com.eframework.gm-tools` package.

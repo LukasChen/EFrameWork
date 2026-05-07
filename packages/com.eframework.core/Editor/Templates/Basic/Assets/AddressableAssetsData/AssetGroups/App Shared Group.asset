@@ -21,13 +21,9 @@ MonoBehaviour:
     m_SerializedLabels:
     - eframe-managed
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e6ff902b03f8fcf44a487f831680549b
-    m_Address: UI/Panels/Home/HomeView
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - eframe-managed
-    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
+  m_Settings: {fileID: 11400000, guid: c2ecb8c4c3efab341ad607052278b0d8, type: 2}
   m_SchemaSet:
-    m_Schemas: []
+    m_Schemas:
+    - {fileID: 11400000, guid: e8357dbe6fb65754f9381eff13101b48, type: 2}
+    - {fileID: 11400000, guid: dcfca4a35f0050d41b3535c66b35cea3, type: 2}

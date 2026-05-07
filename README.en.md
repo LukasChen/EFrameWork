@@ -61,7 +61,7 @@ Example prompts:
 - [packages/com.eframework.core](packages/com.eframework.core): Core runtime/editor package, including `EFrame`, `Procedure`, `QUI`, UI controllers and handles, assets, audio, data, events, and project initialization tooling.
 - [packages/com.eframework.core/Tools~](packages/com.eframework.core/Tools~): Package-shipped project initialization, AI sync, and health check scripts.
 - [packages/com.eframework.core/Documentation~](packages/com.eframework.core/Documentation~): Human-facing usage docs, maintainer docs, and HTML docs site.
-- [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop), [packages/com.eframework.ui.virtual-list](packages/com.eframework.ui.virtual-list), [packages/com.eframework.ui-extras](packages/com.eframework.ui-extras), [packages/com.eframework.effects](packages/com.eframework.effects), [packages/com.eframework.debug-console](packages/com.eframework.debug-console): Optional extension packages.
+- [packages/com.eframework.ai-loop](packages/com.eframework.ai-loop), [packages/com.eframework.ui-extras](packages/com.eframework.ui-extras), [packages/com.eframework.effects](packages/com.eframework.effects), [packages/com.eframework.debug-console](packages/com.eframework.debug-console): Optional extension packages.
 
 ## Core Capabilities
 

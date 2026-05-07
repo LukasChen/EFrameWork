@@ -15,12 +15,6 @@ MonoBehaviour:
   m_GroupName: App Scenes Group
   m_GUID: 8b0699bd08ec5824c854c4f5568ad458
   m_SerializeEntries:
-  - m_GUID: 521ac4c20fee2a847b5d226441980a79
-    m_Address: Scenes/StartUp
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - eframe-managed
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ae44905d145b91841a2792469bd0e851
     m_Address: Scenes/StartUp
     m_ReadOnly: 0
@@ -34,6 +28,8 @@ MonoBehaviour:
     - eframe-managed
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
-  m_Settings: {fileID: 11400000, guid: e5787f9f01ed2b540ad92a0fe9692b24, type: 2}
+  m_Settings: {fileID: 11400000, guid: c2ecb8c4c3efab341ad607052278b0d8, type: 2}
   m_SchemaSet:
-    m_Schemas: []
+    m_Schemas:
+    - {fileID: 11400000, guid: 595635c4d0c0c784b9703fc90e8854b8, type: 2}
+    - {fileID: 11400000, guid: 68821193e7902a64488f90a481678762, type: 2}
