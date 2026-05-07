@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-05-07
+
+- Merged virtual list/grid controls into UI Extras while keeping the `EFramework.Extensions.UI.VirtualList` namespace.
+- Replaced legacy button/toggle helpers with `UIInteractionGuard`, `UIInteractionReporter`, and `UIInteractionFeedback`.
+- Replaced `SmoothFillController` with `UISmoothFill`.
+- Removed TextPro curved text helpers and legacy `UIBuilder` / local UI animation helper components.
+
 ## 0.2.2 - 2026-05-03
 
 - Fixed `CheckableButton` state object handling so reused state references stay active when any matching state should be visible.

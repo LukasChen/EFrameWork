@@ -37,16 +37,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.eframework.core": "0.6.14",
-        "com.unity.ugui": "2.0.0"
-      }
-    },
-    "com.eframework.ui.virtual-list": {
-      "version": "file:../../../packages/com.eframework.ui.virtual-list",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.eframework.core": "0.6.5",
+        "com.eframework.core": "0.7.6",
         "com.unity.ugui": "2.0.0"
       }
     },

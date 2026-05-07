@@ -51,8 +51,7 @@ Avoid scattered Addressables strings, undocumented `WaitForCompletion`, and pass
 | UI overlay camera participation | `EFrameSceneCamera` | `packages/com.eframework.core/Runtime/EFrameSceneCamera.cs` | Add to scene cameras that should host the framework UI overlay stack. |
 | Safe area content fitting | `SafeAreaFitter` | `packages/com.eframework.core/Runtime/UI/Layout/SafeAreaFitter.cs` | Put on prefab content containers that should stay inside safe areas. |
 | Full-screen background fitting | `FullScreenFitter` | `packages/com.eframework.core/Runtime/UI/Layout/FullScreenFitter.cs` | Put on prefab backgrounds or masks that should extend beyond the fitted UI area. |
-| Optional UI helper/animation components | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Optional package for `CheckableButton`, `Tabbar`, `UIHelper`, `UIAnimation`, and related helpers. |
-| Optional virtual list/grid controls | `com.eframework.ui.virtual-list` | `packages/com.eframework.ui.virtual-list/Runtime` | Optional package for pooled virtual list/grid controls. Keep source item templates inactive or outside the viewport when they live in the authored hierarchy; call `RefreshLayout()` after external layout changes that bypass RectTransform dimension callbacks. |
+| Optional UI extras | `com.eframework.ui-extras` | `packages/com.eframework.ui-extras/Runtime` | Includes reusable controls, graphics helpers, interaction Guard/Reporter/Feedback, and pooled virtual list/grid. Virtual list/grid types keep `EFramework.Extensions.UI.VirtualList`. |
 | Optional PlayMode AI validation | `com.eframework.ai-loop` | `packages/com.eframework.ai-loop/Editor` | Optional editor-only package for screenshots, UI input simulation, keyboard simulation, and input record/replay. |
 
 Avoid hand-built persistent top-level Canvas/EventSystem objects, hand-written normal View wrappers, and direct business `UIViewHandle` ownership.

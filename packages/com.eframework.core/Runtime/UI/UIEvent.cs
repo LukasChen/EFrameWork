@@ -2,10 +2,12 @@ using EFramework.Runtime.Event;
 
 namespace EFramework.Runtime.UI
 {
-    public struct ButtonClickEvent : IEvent
+    public struct UIInteractionEvent : IEvent
     {
         public string UIName;
-        public string ButtonName;
+        public string ElementName;
+        public string InteractionType;
+        public string Value;
     }
 
     public struct UIOpenEvent : IEvent

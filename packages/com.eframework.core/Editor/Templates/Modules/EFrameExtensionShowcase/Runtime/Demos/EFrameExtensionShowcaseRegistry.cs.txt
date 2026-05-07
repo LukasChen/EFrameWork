@@ -8,7 +8,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.Demos
     {
         private static readonly EFrameExtensionShowcaseDemo[] s_demos =
         {
-            Create("UI Virtual List", "com.eframework.ui.virtual-list", "EFrame.UI.VirtualList", "Virtual list and grid controls for large scrollable data sets."),
+            Create("UI Virtual List", "com.eframework.ui-extras", "EFrame.UI.Extras", "Virtual list and grid controls for large scrollable data sets."),
             Create("Debug Console", "com.eframework.debug-console", "IngameDebugConsole.Runtime", "Runtime debug console integration.")
         };
 

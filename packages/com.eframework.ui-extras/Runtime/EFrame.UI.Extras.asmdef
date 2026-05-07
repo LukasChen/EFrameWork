@@ -3,8 +3,7 @@
     "rootNamespace": "",
     "references": [
         "EFrame",
-        "UnityEngine.UI",
-        "Unity.TextMeshPro"
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

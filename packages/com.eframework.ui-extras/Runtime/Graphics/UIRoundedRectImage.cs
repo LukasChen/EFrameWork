@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EFramework.Extensions.UI.Extras.UIHelper
+namespace EFramework.Extensions.UI.Extras.Graphics
 {
     [RequireComponent(typeof(Image))]
     public sealed class UIRoundedRectImage : BaseMeshEffect
@@ -28,6 +28,13 @@ namespace EFramework.Extensions.UI.Extras.UIHelper
                 m_cornerSegments = Mathf.Clamp(value, 2, 12);
                 graphic?.SetVerticesDirty();
             }
+        }
+
+        private void OnValidate()
+        {
+            m_radius = Mathf.Max(0f, m_radius);
+            m_cornerSegments = Mathf.Clamp(m_cornerSegments, 2, 12);
+            graphic?.SetVerticesDirty();
         }
 
         public override void ModifyMesh(VertexHelper vh)

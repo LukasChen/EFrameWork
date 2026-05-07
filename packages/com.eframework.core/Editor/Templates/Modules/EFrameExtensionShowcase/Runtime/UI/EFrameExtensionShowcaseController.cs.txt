@@ -10,7 +10,7 @@ namespace GameApp.Modules.EFrameExtensionShowcase.UI
 {
     public sealed class EFrameExtensionShowcaseController : UIControllerBase<v_EFrameExtensionShowcaseView>
     {
-        private const string VirtualListPackageName = "com.eframework.ui.virtual-list";
+        private const string VirtualListPackageName = "com.eframework.ui-extras";
         private const string DebugConsolePackageName = "com.eframework.debug-console";
 
         private VirtualListShowcaseController m_virtualListController;

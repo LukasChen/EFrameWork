@@ -1,21 +1,22 @@
 {
   "name": "com.eframework.ui-extras",
   "displayName": "EFrame UI Extras",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "unity": "6000.0",
-  "description": "Optional EFrame UI extension package for helper components, UI animation behaviours, and lightweight reusable controls.",
+  "description": "Optional EFrame UI extension package for reusable controls, interaction feedback, smooth graphics helpers, and virtualized list/grid views.",
   "keywords": [
     "unity",
     "eframework",
     "ui",
     "helpers",
-    "animation"
+    "interaction",
+    "virtual-list"
   ],
   "author": {
     "name": "Ethan Hubin"
   },
   "dependencies": {
-    "com.eframework.core": "0.6.14",
+    "com.eframework.core": "0.7.6",
     "com.unity.ugui": "2.0.0"
   }
 }

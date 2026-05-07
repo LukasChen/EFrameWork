@@ -119,7 +119,7 @@ Current runtime UI folders under `packages/com.eframework.core/Runtime/UI/`:
 - `Layout/`: screen fitting and safe-area utilities
 - `Transitions/`: host-owned transition abstractions and built-in transitions
 
-`CheckableButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIHelper`, and `UIAnimation` live in the optional `com.eframework.ui-extras` package under `EFramework.Extensions.UI.Extras.*`. `QVirtualListView` and `QVirtualGridView` live in the optional `com.eframework.ui.virtual-list` package under `EFramework.Extensions.UI.VirtualList`.
+`CheckableButton`, `Tabbar`, `EmptyRayCasterGraphic`, `UIRoundedRectImage`, `UISmoothFill`, `UIInteractionGuard`, `UIInteractionReporter`, `UIInteractionFeedback`, `QVirtualListView`, and `QVirtualGridView` live in the optional `com.eframework.ui-extras` package. Most extras use `EFramework.Extensions.UI.Extras.*`; virtual list/grid types keep the `EFramework.Extensions.UI.VirtualList` namespace.
 
 Virtual list/grid item templates may be inactive; pooled instances are activated internally. When a template is authored inside the view hierarchy, keep the source template inactive or outside the viewport, because the controls manage pooled instances rather than the template object itself. If external layout code changes the viewport size without triggering Unity RectTransform dimension callbacks, call `RefreshLayout()`.
 

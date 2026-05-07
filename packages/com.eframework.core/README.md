@@ -32,7 +32,7 @@ The Simple Game Demo direction is intentionally outside this core repository and
 
 Unity package dependencies include Addressables, UGUI, Input System, Universal RP, and Unity Newtonsoft.Json. TextMeshPro functionality is supplied through UGUI. Core includes a lightweight fallback tween backend, while DOTween is an optional project-installed adapter target because DOTween Free is not a Unity registry dependency.
 
-Complex UI widgets, UI helper/animation components, presentation effects, debug tools, event-driven audio authoring, haptics adapters, and third-party integrations should live in optional extension packages. Virtual list/grid controls are provided by `com.eframework.ui.virtual-list`, helper UI controls by `com.eframework.ui-extras`, presentation effects by `com.eframework.effects`, and the runtime debug console by `com.eframework.debug-console`.
+Complex UI widgets, interaction feedback, presentation effects, debug tools, event-driven audio authoring, haptics adapters, and third-party integrations should live in optional extension packages. Reusable UI controls, interaction helpers, graphics helpers, and virtual list/grid controls are provided by `com.eframework.ui-extras`, presentation effects by `com.eframework.effects`, and the runtime debug console by `com.eframework.debug-console`.
 
 Bundled plugin versions:
 

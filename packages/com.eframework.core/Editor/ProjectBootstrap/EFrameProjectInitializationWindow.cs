@@ -38,7 +38,6 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private static readonly string[] ExtensionPackageNames =
         {
-            "com.eframework.ui.virtual-list",
             "com.eframework.ui-extras",
             "com.eframework.effects",
             "com.eframework.debug-console",
@@ -47,7 +46,7 @@ namespace EFramework.Editor.ProjectBootstrap
 
         private static readonly string[] ExtensionShowcaseRequiredPackageNames =
         {
-            "com.eframework.ui.virtual-list",
+            "com.eframework.ui-extras",
             "com.eframework.debug-console"
         };
 
@@ -1062,7 +1061,6 @@ namespace EFramework.Editor.ProjectBootstrap
         {
             return packageName switch
             {
-                "com.eframework.ui.virtual-list" => "UI Virtual List",
                 "com.eframework.ui-extras" => "UI Extras",
                 "com.eframework.effects" => "Effects",
                 "com.eframework.debug-console" => "Debug Console",

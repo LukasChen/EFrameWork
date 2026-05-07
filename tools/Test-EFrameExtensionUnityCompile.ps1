@@ -53,10 +53,6 @@ function Resolve-UnityEditor {
 }
 
 $extensionPackages = [ordered]@{
-    "com.eframework.ui.virtual-list" = @{
-        Path = "packages/com.eframework.ui.virtual-list"
-        Assemblies = @("EFrame.UI.VirtualList")
-    }
     "com.eframework.ui-extras" = @{
         Path = "packages/com.eframework.ui-extras"
         Assemblies = @("EFrame.UI.Extras")

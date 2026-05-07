@@ -4,7 +4,6 @@
     "com.eframework.debug-console": "file:../../../packages/com.eframework.debug-console",
     "com.eframework.effects": "file:../../../packages/com.eframework.effects",
     "com.eframework.ui-extras": "file:../../../packages/com.eframework.ui-extras",
-    "com.eframework.ui.virtual-list": "file:../../../packages/com.eframework.ui.virtual-list",
     "com.unity.addressables": "2.9.1",
     "com.unity.inputsystem": "1.19.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
