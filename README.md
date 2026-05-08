@@ -13,7 +13,7 @@ EFrame 是一个轻量级 Unity 游戏框架，为业务项目提供标准启动
 通过 Unity Package Manager 安装 Core package：
 
 ```text
-https://github.com/ethanhubin/EFrame.git?path=/packages/com.eframework.core
+https://github.com/ethanhubin/EFrameWork.git?path=/packages/com.eframework.core
 ```
 
 在 Unity Editor 中打开：
