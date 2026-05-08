@@ -4,6 +4,13 @@ All notable changes to the `com.eframework.core` Unity package are documented in
 
 ## [Unreleased]
 
+## [0.7.10] - 2026-05-08
+
+### Fixed
+
+- Fixed project initialization repair so incomplete Addressables settings regain valid default data builders and active build scripts without overriding an already valid business play mode selection.
+- Synchronized Basic template metadata with the fixture source and refreshed synced AI manifest hashes for the release gate.
+
 ## [0.7.9] - 2026-05-08
 
 ### Changed
