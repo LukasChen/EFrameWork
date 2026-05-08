@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Build;
+using UnityEditor.AddressableAssets.Build.DataBuilders;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEngine;
@@ -195,7 +197,8 @@ namespace EFramework.Editor.ProjectBootstrap
             var settings = AddressableAssetSettingsDefaultObject.GetSettings(false);
             if (settings != null)
             {
-                message = "Addressables is already initialized.";
+                EnsureDefaultDataBuilders(settings, out var dataBuilderMessage);
+                message = $"Addressables is already initialized. {dataBuilderMessage}";
                 return true;
             }
 
@@ -206,10 +209,84 @@ namespace EFramework.Editor.ProjectBootstrap
                 return false;
             }
 
+            EnsureDefaultDataBuilders(settings, out var createdDataBuilderMessage);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            message = "Initialized Addressables settings under Assets/AddressableAssetsData.";
+            message = $"Initialized Addressables settings under Assets/AddressableAssetsData. {createdDataBuilderMessage}";
             return true;
+        }
+
+        private static void EnsureDefaultDataBuilders(AddressableAssetSettings settings, out string message)
+        {
+            var changed = false;
+            EnsureDataBuilder<BuildScriptFastMode>(settings, ref changed);
+            EnsureDataBuilder<BuildScriptPackedPlayMode>(settings, ref changed);
+            EnsureDataBuilder<BuildScriptPackedMode>(settings, ref changed);
+
+            if (settings.ActivePlayModeDataBuilder == null
+                || !settings.ActivePlayModeDataBuilder.CanBuildData<AddressablesPlayModeBuildResult>())
+            {
+                var playModeIndex = FindDataBuilderIndex(settings, builder => builder.CanBuildData<AddressablesPlayModeBuildResult>());
+                if (playModeIndex >= 0)
+                {
+                    settings.ActivePlayModeDataBuilderIndex = playModeIndex;
+                    changed = true;
+                }
+            }
+
+            if (settings.ActivePlayerDataBuilder == null
+                || !settings.ActivePlayerDataBuilder.CanBuildData<AddressablesPlayerBuildResult>())
+            {
+                var playerIndex = FindDataBuilderIndex(settings, builder => builder.CanBuildData<AddressablesPlayerBuildResult>());
+                if (playerIndex >= 0)
+                {
+                    settings.ActivePlayerDataBuilderIndex = playerIndex;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                EditorUtility.SetDirty(settings);
+                AssetDatabase.SaveAssets();
+            }
+
+            message = changed
+                ? "Repaired Addressables data builders and active play mode script."
+                : "Addressables data builders are ready.";
+        }
+
+        private static int FindDataBuilderIndex(AddressableAssetSettings settings, Func<IDataBuilder, bool> predicate)
+        {
+            for (var index = 0; index < settings.DataBuilders.Count; index++)
+            {
+                if (settings.DataBuilders[index] is IDataBuilder builder && predicate(builder))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        private static ScriptableObject EnsureDataBuilder<TBuilder>(AddressableAssetSettings settings, ref bool changed)
+            where TBuilder : ScriptableObject, IDataBuilder
+        {
+            foreach (var dataBuilder in settings.DataBuilders)
+            {
+                if (dataBuilder is TBuilder)
+                {
+                    return dataBuilder;
+                }
+            }
+
+            Directory.CreateDirectory(settings.DataBuilderFolder);
+            var builder = ScriptableObject.CreateInstance<TBuilder>();
+            var path = $"{settings.DataBuilderFolder}/{typeof(TBuilder).Name}.asset";
+            AssetDatabase.CreateAsset(builder, AssetDatabase.GenerateUniqueAssetPath(path));
+            settings.AddDataBuilder(builder);
+            changed = true;
+            return builder;
         }
 
         internal static bool EnsureProjectAddressablesGroups(out string message)
